@@ -27,7 +27,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form role="form" method="POST" name="custom_xls_form" id="custom_xls_form"
-                  action="{% url "education_group_learning_units_contains" root_id=root_id education_group_year_pk=education_group_year.pk %}">
+                  action="{% url "education_group_learning_units_contains" year=education_group_version.offer.academic_year.year code=education_group_version.offer.partial_acronym %}">
                 <div class="modal-body">
                     {% csrf_token %}
                     <label>{% trans 'Do you want to export the following informations' %}?</label>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-                    <button class="btn btn-primary no_spinner" type="submit" id="btn_produce_xls">{% trans 'Produce Xls' %}</button>
+                    <button class="btn btn-primary download" type="submit" id="btn_produce_xls">{% trans 'Produce Xls' %}</button>
                 </div>
             </form>
 
@@ -57,7 +57,7 @@
 <script>
 
     $('#btn_produce_xls').click(function (e) {
-        $('#modalCustomXls').modal('toggle');
+        $('#modalCustomXls').modal('hide');
     });
 
     $("#chb_select_all_custom").click(function(){

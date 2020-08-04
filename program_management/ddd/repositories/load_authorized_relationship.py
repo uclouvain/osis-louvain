@@ -25,9 +25,12 @@
 ##############################################################################
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship, \
     AuthorizedRelationshipObject, AuthorizedRelationshipList
+from base.models.education_group_type import EducationGroupType
+from program_management.ddd.repositories.load_node import convert_node_type_enum
+from program_management.models.enums.node_type import NodeType
 
 
-def load() -> AuthorizedRelationshipList:
+def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
     authorized_relationships = []
     qs = ModelRelationship.objects.all().values(
         'parent_type__name',
@@ -35,13 +38,26 @@ def load() -> AuthorizedRelationshipList:
         'min_count_authorized',
         'max_count_authorized',
     )
+    parent_types_with_authorized_learn_unit = set(
+        EducationGroupType.objects.filter(learning_unit_child_allowed=True).values_list('name', flat=True)
+    )
     for obj in qs:
+        parent_type_name = obj['parent_type__name']
         authorized_relationships.append(
             AuthorizedRelationshipObject(
-                obj['parent_type__name'],
-                obj['child_type__name'],
+                convert_node_type_enum(parent_type_name),
+                convert_node_type_enum(obj['child_type__name']),
                 obj['min_count_authorized'],
                 obj['max_count_authorized'],
+            )
+        )
+    for parent_type_name in parent_types_with_authorized_learn_unit:
+        authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                convert_node_type_enum(parent_type_name),
+                NodeType.LEARNING_UNIT,
+                0,
+                999,
             )
         )
     if authorized_relationships:

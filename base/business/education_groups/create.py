@@ -46,6 +46,7 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
+#  FIXME :: To remove - implemented in TrainingBuilder
 def create_initial_group_element_year_structure(
         parent_egys: List[EducationGroupYear]) -> Dict[int, List[GroupElementYear]]:
     children_created = defaultdict(list)
@@ -182,6 +183,7 @@ def _get_validation_rule(
     return get_object_or_none(ValidationRule, pk=egy_title_reference)
 
 
+#  FIXME :: To remove - implemented in generate_node_code.py
 def _generate_child_partial_acronym(
         parent: EducationGroupYear,
         child_initial_value: str,
@@ -218,6 +220,7 @@ def _generate_child_partial_acronym(
     return partial_acronym
 
 
+#  FIXME :: To remove - implemented in generate_node_code.py
 def _get_cnum_subdivision(
         child_initial_value: str,
         reg_child_initial_value: Pattern) -> Tuple[str, str]:

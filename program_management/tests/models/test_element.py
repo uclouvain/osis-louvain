@@ -33,7 +33,7 @@ from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from program_management.models.element import Element
-from program_management.tests.factories.element import ElementFactory, ElementEducationGroupYearFactory, \
+from program_management.tests.factories.element import ElementFactory, \
     ElementLearningUnitYearFactory, ElementLearningClassYearFactory, ElementGroupYearFactory
 
 
@@ -42,10 +42,10 @@ class TestElementSave(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
-        academic_year = cls.egy.academic_year
-        cls.luy = LearningUnitYearFactory(academic_year=academic_year)
+        cls.academic_year = cls.egy.academic_year
+        cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.lcy = LearningClassYearFactory()
-        cls.gy = GroupYearFactory(academic_year=academic_year, group=GroupFactory(start_year=academic_year))
+        cls.gy = GroupYearFactory(academic_year=cls.academic_year, group=GroupFactory(start_year=cls.academic_year))
 
     def test_save_no_foreign_key_set(self):
 
@@ -62,14 +62,6 @@ class TestElementSave(TestCase):
                                        learning_class_year=None).exists()
             )
 
-    def test_save_one_education_group_year_fk(self):
-        element = ElementEducationGroupYearFactory(education_group_year=self.egy)
-        element.save()
-
-        self.assertTrue(
-            Element.objects.filter(education_group_year=element.education_group_year).exists()
-        )
-
     def test_save_one_group_year_fk(self):
         element = ElementGroupYearFactory.build(group_year=self.gy)
         element.save()
@@ -79,11 +71,9 @@ class TestElementSave(TestCase):
         )
 
     def test_save_one_learning_unit_year_fk(self):
-        element = ElementLearningUnitYearFactory.build(learning_unit_year=self.luy)
-        element.save()
-
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.assertTrue(
-            Element.objects.filter(learning_unit_year=self.luy).exists()
+            Element.objects.filter(learning_unit_year=learning_unit_year).exists()
         )
 
     def test_save_one_learning_class_year_fk(self):

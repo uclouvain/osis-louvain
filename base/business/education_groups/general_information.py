@@ -34,12 +34,13 @@ from django.http import HttpResponse
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, GroupType
-from base.models.group_element_year import find_learning_unit_roots
+from education_group.models.group_year import GroupYear
+from program_management.ddd.repositories.find_roots import find_roots
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def publish_education_group_year(education_group_year_obj: EducationGroupYear) -> bool:
+def publish_group_year(group_year_obj: GroupYear) -> bool:
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
@@ -47,15 +48,10 @@ def publish_education_group_year(education_group_year_obj: EducationGroupYear) -
                                    'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
-    trainings = find_learning_unit_roots(
-        [education_group_year_obj],
-        return_result_params={
-            'parents_as_instances': True
-        }
-    ).get(education_group_year_obj.pk, [])
+    trainings = find_roots([group_year_obj], as_instances=True).get(group_year_obj.pk, [])
 
-    education_groups_to_publish = [education_group_year_obj] + trainings \
-        if education_group_year_obj.education_group_type.name != GroupType.COMMON_CORE.name \
+    education_groups_to_publish = [group_year_obj] + trainings \
+        if group_year_obj.education_group_type.name != GroupType.COMMON_CORE.name \
         else trainings
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()

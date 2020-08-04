@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 NO_ADDITIONAL_FEES = "NO_ADDITIONAL_FEES"
 AESS_CAPAES = "AESS_CAPAES"
 MINERVAL_COMPLETE = "MINERVAL_COMPLETE"
@@ -34,7 +36,7 @@ ACCESS_CONTEST = "ACCESS_CONTEST"
 UNIVERSITY_CERTIFICATE_30_CREDITS = "UNIVERSITY_CERTIFICATE_30_CREDITS"
 CERTIFICATE_MEDECINE_COMPETENCE = "CERTIFICATE_MEDECINE_COMPETENCE"
 
-
+# FIXME :: DEPRECATED - use RateCode() instead
 RATE_CODE = (
     (NO_ADDITIONAL_FEES, _("No additional fees")),
     (AESS_CAPAES, _("AESS CAPAES")),
@@ -45,3 +47,14 @@ RATE_CODE = (
     (UNIVERSITY_CERTIFICATE_30_CREDITS, _("University certificate 30 credits")),
     (CERTIFICATE_MEDECINE_COMPETENCE, _("Certificate medicine competence"))
 )
+
+
+class RateCode(ChoiceEnum):
+    NO_ADDITIONAL_FEES = _("No additional fees")
+    AESS_CAPAES = _("AESS CAPAES")
+    MINERVAL_COMPLETE = _("Minerval complete")
+    UNIVERSITY_CERTIFICATE = _("University certificate")
+    ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION = _("Advanced master in medical specialization")
+    ACCESS_CONTEST = _("Access contest")
+    UNIVERSITY_CERTIFICATE_30_CREDITS = _("University certificate 30 credits")
+    CERTIFICATE_MEDECINE_COMPETENCE = _("Certificate medicine competence")

@@ -32,18 +32,18 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups import create
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
-from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
 from base.models.academic_year import current_academic_year
 from base.models.campus import Campus
 from base.models.education_group import EducationGroup
-from base.models.education_group_type import find_authorized_types, EducationGroupType
+from base.models.education_group_type import find_authorized_types
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import find_pedagogical_entities_version, get_last_version
-from base.models.enums import education_group_categories
-from base.models.enums.education_group_categories import Categories, TRAINING
+from base.models.entity_version import get_last_version, EntityVersion
+from base.models.enums import education_group_categories, groups
+from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
-from program_management.business.group_element_years import management
+from education_group.models.group_year import GroupYear
+from osis_role.contrib.forms.fields import EntityRoleChoiceField
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
@@ -64,10 +64,22 @@ class MainCampusChoiceField(forms.ModelChoiceField):
         super().__init__(queryset, *args, **kwargs)
 
 
-class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
-    def __init__(self, queryset, *args, **kwargs):
-        queryset = find_pedagogical_entities_version()
-        super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
+class ManagementEntitiesVersionChoiceField(EntityRoleChoiceField):
+    def __init__(self, person, initial, **kwargs):
+        group_names = (groups.FACULTY_MANAGER_GROUP, groups.CENTRAL_MANAGER_GROUP, )
+        self.initial = initial
+        super().__init__(
+            person=person,
+            group_names=group_names,
+            label=_('Management entity'),
+            **kwargs,
+        )
+
+    def get_queryset(self):
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.initial:
+            qs |= EntityVersion.objects.filter(pk=self.initial)
+        return qs
 
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
@@ -98,25 +110,39 @@ class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
 
 class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
     """
-    Permission Field for educationgroup(year)
+    Permission Field for educationgroup
 
-    This mixin will get allowed field on reference_field model according to perm's
+    This mixin will get allowed field on reference_field model according to perms
     """
+
+    def is_edition_period_opened(self):
+        return EventPermEducationGroupEdition().is_open()
+
     def get_context(self):
-        is_edition_period_egy_opened = EventPermEducationGroupEdition().is_open()
+        is_open = self.is_edition_period_opened()
         if self.category == education_group_categories.TRAINING:
-            return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                TRAINING_DAILY_MANAGEMENT
+            return TRAINING_PGRM_ENCODING_PERIOD if is_open else TRAINING_DAILY_MANAGEMENT
         elif self.category == education_group_categories.MINI_TRAINING:
-            return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                MINI_TRAINING_DAILY_MANAGEMENT
+            return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_open else MINI_TRAINING_DAILY_MANAGEMENT
         elif self.category == education_group_categories.GROUP:
-            return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                GROUP_DAILY_MANAGEMENT
+            return GROUP_PGRM_ENCODING_PERIOD if is_open else GROUP_DAILY_MANAGEMENT
         return super().get_context()
 
 
-class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+class PermissionFieldEducationGroupYearMixin(PermissionFieldEducationGroupMixin):
+    """
+    Permission Field for educationgroupyear
+
+    This mixin will get allowed field on reference_field model according to perms and egy related period
+    """
+
+    def is_edition_period_opened(self):
+        education_group_year = self.instance if hasattr(self.instance, 'academic_year') else None
+        dummy_group_year = GroupYear(academic_year=education_group_year.academic_year) if education_group_year else None
+        return EventPermEducationGroupEdition(obj=dummy_group_year, raise_exception=False).is_open()
+
+
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupYearMixin):
     """
     Permission Field for Hops(year) and for Coorganization
 
@@ -128,14 +154,13 @@ class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
         super().__init__(*args, **kwargs)
 
 
-class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupMixin,
+class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupYearMixin,
                                   forms.ModelForm):
     category = None
 
     class Meta:
         model = EducationGroupYear
         field_classes = {
-            "management_entity": MainEntitiesVersionChoiceField,
             "main_teaching_campus": MainCampusChoiceField,
             "enrollment_campus": MainCampusChoiceField,
             "education_group_type": EducationGroupTypeModelChoiceField,
@@ -156,9 +181,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
                 raise PermissionDenied("Unauthorized type {} for {}".format(education_group_type, self.category))
 
         super().__init__(*args, **kwargs)
+        self._filter_management_entity_according_to_person()
         self._set_initial_values()
         self._filter_education_group_type()
-        self._filter_management_entity_according_to_person()
         self._init_and_disable_academic_year()
         self._preselect_entity_version_from_entity_value()
 
@@ -200,9 +225,13 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             self.initial['management_entity'] = get_last_version(self.instance.management_entity).pk
 
     def _filter_management_entity_according_to_person(self):
+        entity = self.instance.management_entity
         if 'management_entity' in self.fields:
-            self.fields['management_entity'].queryset = \
-                self.fields['management_entity'].queryset.filter(entity__in=self.user.person.linked_entities)
+            self.fields['management_entity'] = ManagementEntitiesVersionChoiceField(
+                person=self.user.person,
+                disabled=self.fields['management_entity'].disabled,
+                initial=get_last_version(entity).pk if entity else None
+            )
 
     def _disable_field(self, key, initial_value=None):
         field = self.fields[key]
@@ -329,9 +358,8 @@ class CommonBaseForm:
 
     @staticmethod
     def _save_group_element_year(parent, child):
-        # TODO :: what if this relation parent/child already exists? Should we create a new GroupElementYear anymore?
         if parent:
-            group_element_year.get_or_create_group_element_year(parent, child_branch=child)
+            group_element_year.GroupElementYear.objects.get_or_create(parent=parent, child_branch=child)
 
     @property
     def errors(self):
@@ -339,37 +367,6 @@ class CommonBaseForm:
         for form in self.forms.values():
             errors.update(form.errors)
         return errors
-
-
-class EducationGroupTypeForm(forms.Form):
-    name = EducationGroupTypeModelChoiceField(
-        EducationGroupType.objects.none(),
-        label=_("Type of training"),
-        required=True,
-    )
-
-    def __init__(self, parent, category, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.parent = parent
-        self.fields["name"].queryset = find_authorized_types(
-            category=category,
-            parents=self.parent
-        ).exclude(name__in=DISABLED_OFFER_TYPE)  # Temporary exclude Major and Mobility partnership (OSIS-2911)
-
-        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
-            "category": Categories[category].value
-        }
-
-    def clean_name(self):
-        education_group_type = self.cleaned_data.get("name")
-        if education_group_type:
-            if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
-                raise ValidationError(_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                                        "has already reached the limit.") % {
-                    'child_type': education_group_type,
-                    'parent': self.parent
-                })
-        return education_group_type
 
 
 # TODO: Only used in program_management/ ==> Move to it ?

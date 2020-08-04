@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 
@@ -38,7 +38,7 @@ class TestClearClipboard(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("education_group_clear_clipboard")
-        cls.central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
+        cls.central_manager = CentralManagerForUEFactory("view_educationgroup", user__superuser=False)
 
     def test_when_not_logged(self):
         response = self.client.post(self.url)
@@ -74,11 +74,7 @@ class TestClearClipboard(TestCase):
         luy = LearningUnitYearFactory()
 
         element_cache = ElementCache(self.central_manager.user)
-        element_cache.save_element_selected(luy)
-        self.assertDictEqual(
-            element_cache.cached_data,
-            {'id': luy.pk, 'modelname': 'base_learningunityear', 'action': ElementCache.ElementCacheAction.COPY.value}
-        )
-
+        element_cache.save_element_selected(luy.acronym, luy.academic_year.year)
+        self.assertTrue(element_cache.cached_data)
         self.client.post(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertIsNone(element_cache.cached_data)

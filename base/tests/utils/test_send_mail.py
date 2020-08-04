@@ -250,6 +250,7 @@ class TestSendMessage(TestCase):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
                          'Toutes les notes ont été soumises.')
 
+
 def add_message_template_txt():
     msg_template = message_template.MessageTemplate(
         reference="assessments_all_scores_by_pgm_manager_txt",

@@ -25,38 +25,38 @@
 ##############################################################################
 from django.test import TestCase
 
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory, GroupTextLabelFactory, \
+    LearningUnitYearTextLabelFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory, \
+    LearningUnitYearTranslatedTextFactory, GroupTranslatedTextFactory
 
 REFERENCE = 2502
 
 
 class TranslatedTextTest(TestCase):
     def test_find_by_entity_reference(self):
-        text_label_lu_3 = TextLabelFactory(order=1, label='program', entity=entity_name.LEARNING_UNIT_YEAR)
-        text_label_oy_1 = TextLabelFactory(order=2, label='introduction', entity=entity_name.OFFER_YEAR)
-        text_label_oy_2 = TextLabelFactory(order=3, label='profil', entity=entity_name.OFFER_YEAR)
-        text_label_oy_3 = TextLabelFactory(order=4, label='job', entity=entity_name.OFFER_YEAR)
+        text_label_lu_3 = LearningUnitYearTextLabelFactory(order=1, label='program')
+        text_label_oy_1 = OfferTextLabelFactory(order=2, label='introduction')
+        text_label_oy_2 = OfferTextLabelFactory(order=3, label='profil')
+        text_label_oy_3 = OfferTextLabelFactory(order=4, label='job')
+        text_label_gy_1 = GroupTextLabelFactory(order=5, label='test')
 
-        TranslatedTextFactory(text_label=text_label_lu_3,
-                              entity=entity_name.LEARNING_UNIT_YEAR,
-                              reference=REFERENCE)
+        LearningUnitYearTranslatedTextFactory(text_label=text_label_lu_3,
+                                              reference=REFERENCE)
 
-        TranslatedTextFactory(text_label=text_label_oy_1,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
-        TranslatedTextFactory(text_label=text_label_oy_2,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
-        TranslatedTextFactory(text_label=text_label_oy_3,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
+        OfferTranslatedTextFactory(text_label=text_label_oy_1,
+                                   reference=REFERENCE)
+        OfferTranslatedTextFactory(text_label=text_label_oy_2,
+                                   reference=REFERENCE)
+        OfferTranslatedTextFactory(text_label=text_label_oy_3,
+                                   reference=REFERENCE)
+        GroupTranslatedTextFactory(text_label=text_label_gy_1,
+                                   reference=REFERENCE)
 
         tt = TranslatedText.objects.filter(
-            text_label__entity=entity_name.OFFER_YEAR,
-            reference=REFERENCE
+            reference=REFERENCE,
+            entity='offer_year'
         ).order_by('text_label__order').values_list('text_label__label', flat=True)
         self.assertEqual(
             list(tt),

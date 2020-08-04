@@ -1,0 +1,143 @@
+{% load static bootstrap3 %}
+{% load i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="content-form">
+    {{ content_formset.management_form }}
+    {{ content_formset.media }}
+    <div class="panel panel-default">
+        <div class="panel-body" data-formset-prefix="{{ content_formset.prefix }}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                        <th>{% trans 'Code' %}</th>
+                        <th>{% trans 'Title' %}</th>
+                        <th>{% trans 'Cred. rel./abs.' %}</th>
+                        {% if content_formset.forms and content_formset.forms.0.is_a_parent_minor_major_option_list_choice %}
+                            <th class="text-center">{% trans 'Access condition' %}</th>
+                        {% else %}
+                            <th class="text-center">{% trans 'Mandatory' %}</th>
+                            <th>{% trans 'Block' %}</th>
+                            <th>{% trans 'Link type' %}</th>
+                            <th>{% trans 'Comment' %}</th>
+                            <th>{% trans 'English comment' %}</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody data-formset-body id="content-forms">
+                    {% for form in content_formset.forms %}
+                        {% if forloop.first %}
+                            {{ form.media }}
+                        {% endif %}
+                        <tr class="link-row" data-formset-form id="{{ form.prefix }}">
+                            {{ form.id }}
+                            {% if form.is_a_link_with_child_of_learning_unit %}
+                                {# Link attrs relevant for child of type learning unit #}
+                                <td style="width:8%"></td>
+                                <td>
+                                    <a id="lnk_learning_unit_{{ form.child_obj.id }}"
+                                       href="{% url 'learning_unit' form.child_obj.id %}">
+                                        {{ form.child_obj.acronym }}
+                                    </a>
+                                </td>
+                                <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
+                                    {% else %}style="width:23%"{% endif %}>
+                                        {{ form.child_obj.full_title_fr }}
+                                </td>
+                                <td style="width:8%">
+                                   {% with form.child_obj.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
+                                       {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
+                                   {% endwith %}
+                                </td>
+                            {% else %}
+                                {# Link attrs relevant for child of type group #}
+                                <td style="width:8%">{{ form.child_obj.abbreviated_title }}</td>
+                                <td>
+                                    <a href="{% url 'element_identification' code=form.child_obj.code year=form.child_obj.year %}">
+                                        {{ form.child_obj.code }}
+                                    </a>
+                                </td>
+                                <td {% if form.is_a_parent_minor_major_option_list_choice %}style="width:55%"
+                                    {% else %}style="width:23%"{% endif %}>
+                                        {{ form.child_obj.titles.title_fr }}
+                                </td>
+                                <td style="width:8%">
+                                    {{ form.initial.relative_credits | default_if_none:'-' }}
+                                    / {{ form.child_obj.credits|floatformat:-2 | default_if_none:'-' }}
+                                </td>
+                            {% endif %}
+
+                            {% if form.is_a_parent_minor_major_option_list_choice %}
+                                 <td style="width:35%" class="text-center">
+                                    {{ form.access_condition }}
+                                </td>
+                            {% else %}
+                                <td style="width:6%" class="text-center">
+                                    {{ form.is_mandatory }}
+                                </td>
+                                <td style="width:5%">
+                                    {% if form.block %}
+                                        {% bootstrap_field form.block show_label=False %}
+                                    {% endif %}
+                                </td>
+                                <td style="width:9%">
+                                    {% if form.link_type %}
+                                        {% bootstrap_field form.link_type show_label=False|default_if_none:'-' %}
+                                    {% endif %}
+                                </td>
+                                <td style="width:20%">
+                                    {% if form.comment_fr %}
+                                        {% bootstrap_field form.comment_fr show_label=False %}
+                                    {% endif %}
+                                </td>
+                                <td style="width:20%">
+                                    {% if form.comment_en %}
+                                        {% bootstrap_field form.comment_en show_label=False %}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script>
+    $('.link-row').formset({
+        prefix: '{{ content_formset.prefix }}',
+        addText: '',
+        deleteText: ''
+    });
+</script>
+
+
+
+
+
+

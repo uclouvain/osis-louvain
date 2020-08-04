@@ -44,22 +44,20 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 
 
 class EducationGroupYearTest(TestCase):
-    def setUp(self):  # No setUpTestData here, tests cannot be interrelated
+    def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING,
-                                                                       name=education_group_types.TrainingType.BACHELOR.name)
-
-        self.education_group_type_minitraining = EducationGroupTypeFactory(
-            category=education_group_categories.MINI_TRAINING
+        self.education_group_type_training = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.BACHELOR.name
         )
 
-        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        self.education_group_type_minitraining = EducationGroupTypeFactory(minitraining=True)
+        self.education_group_type_group = EducationGroupTypeFactory(group=True)
 
         self.education_group_type_finality = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
@@ -67,17 +65,29 @@ class EducationGroupYearTest(TestCase):
         )
 
         self.education_group_year_1 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_training
+        )
         self.education_group_year_2 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_minitraining)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_minitraining
+        )
         self.education_group_year_3 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_training
+        )
         self.education_group_year_4 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_group)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_group
+        )
         self.education_group_year_5 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_group)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_group
+        )
         self.education_group_year_6 = EducationGroupYearFactory(
-            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_training
+        )
         self.education_group_year_MD = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type=self.education_group_type_finality,
@@ -109,10 +119,14 @@ class EducationGroupYearTest(TestCase):
             parent=None
         )
 
-        self.group_element_year_4 = GroupElementYearFactory(parent=self.education_group_year_3,
-                                                            child_branch=self.education_group_year_1)
-        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_6,
-                                                            child_branch=self.education_group_year_1)
+        self.group_element_year_4 = GroupElementYearFactory(
+            parent=self.education_group_year_3,
+            child_branch=self.education_group_year_1
+        )
+        self.group_element_year_5 = GroupElementYearFactory(
+            parent=self.education_group_year_6,
+            child_branch=self.education_group_year_1
+        )
 
     def test_verbose_type(self):
         type_of_egt = self.education_group_year_1.education_group_type.get_name_display()
@@ -263,11 +277,17 @@ class EducationGroupYearCleanTest(TestCase):
 
     def test_clean_constraint_only_one_value_set_case_no_errors(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=None, constraint_type=CREDITS)
-        e.clean()
+        try:
+            e.clean()
+        except ValidationError:
+            self.fail()
 
         e.min_constraint = None
         e.max_constraint = 12
-        e.clean()
+        try:
+            e.clean()
+        except ValidationError:
+            self.fail()
 
     def test_clean_no_constraint_type(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=None)
@@ -309,7 +329,8 @@ class EducationGroupYearCleanTest(TestCase):
         self.assertListEqual(
             context_error.exception.messages,
             [_("You cannot create/update an education group before %(limit_year)s") % {
-                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}]
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+            }]
         )
 
 
@@ -423,6 +444,7 @@ class TestCleanAcronym(TestCase):
 
 class TestFindWithEnrollmentsCount(TestCase):
     """Unit tests on find_with_enrollments_count()"""
+
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -527,8 +549,7 @@ class EducationGroupYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-        cls.translated_text = TranslatedTextFactory(entity=entity_name.OFFER_YEAR,
-                                                    reference=cls.education_group_year.id)
+        cls.translated_text = OfferTranslatedTextFactory(reference=cls.education_group_year.id)
 
         cls.education_group_year_no_cms = EducationGroupYearFactory()
 

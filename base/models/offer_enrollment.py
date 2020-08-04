@@ -53,3 +53,10 @@ class OfferEnrollment(SerializableModel):
             ("can_access_student_path", "Can access student path"),
             ("can_access_evaluation", "Can access evaluation"),
         )
+
+
+def count_enrollments(acronym: str, year: int) -> int:
+    return OfferEnrollment.objects.filter(
+        education_group_year__acronym=acronym,
+        education_group_year__academic_year__year=year
+    ).count()

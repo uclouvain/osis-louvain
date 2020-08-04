@@ -23,30 +23,58 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from django.urls import reverse
 from django.views.generic import CreateView
 
-from base.business.education_groups.perms import is_eligible_to_add_achievement
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.mixins import AjaxTemplateMixin
+from education_group.views.proxy.read import Tab
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class CreateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, CreateView):
+class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
+                                      CreateView):
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
-    rules = [is_eligible_to_add_achievement]
+    permission_required = 'base.add_educationgroupachievement'
+    force_reload = True
 
     def form_valid(self, form):
         form.instance.education_group_year = self.education_group_year
         return super().form_valid(form)
 
+    def get_permission_object(self):
+        return self.education_group_year
 
-class CreateEducationGroupDetailedAchievement(AjaxTemplateMixin, EducationGroupDetailedAchievementMixin, CreateView):
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, str(self.object.pk)
+        )
+
+
+class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
+                                              EducationGroupDetailedAchievementMixin, CreateView):
     form_class = EducationGroupDetailedAchievementForm
     template_name = "education_group/blocks/form/update_achievement.html"
-    rules = [is_eligible_to_add_achievement]
+    permission_required = 'base.add_educationgroupachievement'
+    force_reload = True
 
     def form_valid(self, form):
         form.instance.education_group_achievement = self.education_group_achievement
         return super().form_valid(form)
+
+    def get_permission_object(self):
+        return self.education_group_year
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.object.pk
+        )

@@ -26,7 +26,7 @@
 <div id="{{ section }}">
     <h3 {% if not can_edit %}class="education_group_year-common italic"{% endif %}>{{ text }}
         {% if can_edit_information and can_edit %}
-            {% url 'education_group_year_admission_condition_update_text' root.pk education_group_year.pk as update_text_url %}
+            {% url 'education_group_year_admission_condition_update_text' node.year node.code as update_text_url %}
             <a href="#" role="button"
                class="button modify-text-btn"
                data-form="{{ update_text_url }}?section={{ section_name }}&title={{ text.split|join:"%20" }}">

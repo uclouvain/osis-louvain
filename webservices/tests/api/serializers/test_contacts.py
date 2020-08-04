@@ -32,6 +32,7 @@ from base.tests.factories.education_group_publication_contact import EducationGr
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices.api.serializers.contacts import ContactsSerializer, ContactSerializer
 
 
@@ -40,17 +41,18 @@ class ContactsSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.language = 'en'
         now = datetime.datetime.now()
-        entity = EntityFactory()
+        cls.entity = EntityFactory()
         EntityVersionFactory(
-            entity=entity,
-            start_date=now.replace(year=now.year-1)
+            entity=cls.entity,
+            start_date=now.replace(year=now.year - 1)
         )
         cls.egy = EducationGroupYearFactory(
             academic_year__year=now.year,
-            management_entity=entity,
-            publication_contact_entity=entity
+            management_entity=cls.entity,
+            publication_contact_entity=cls.entity
         )
-        cls.serializer = ContactsSerializer(cls.egy, context={'lang': cls.language})
+        cls.node = NodeEducationGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
+        cls.serializer = ContactsSerializer(cls.node, context={'language': cls.language, 'offer': cls.egy})
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -60,6 +62,16 @@ class ContactsSerializerTestCase(TestCase):
             'management_entity'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_return_none_if_no_pubication_contact_entity(self):
+        egy = EducationGroupYearFactory(
+            academic_year__year=2018,
+            management_entity=self.entity,
+            publication_contact_entity=None
+        )
+        node = NodeEducationGroupYearFactory(code=egy.partial_acronym, year=2018)
+        serializer = ContactsSerializer(node, context={'language': self.language, 'offer': egy})
+        self.assertIsNone(serializer.data['entity'])
 
 
 class ContactSerializerTestCase(TestCase):
@@ -80,7 +92,7 @@ class ContactSerializerTestCase(TestCase):
                 output_field=CharField()
             ),
         ).first()
-        cls.serializer = ContactSerializer(cls.annoted_contact, context={'lang': cls.language})
+        cls.serializer = ContactSerializer(cls.annoted_contact, context={'language': cls.language, 'offer': cls.egy})
 
     def test_contains_expected_fields(self):
         expected_fields = [

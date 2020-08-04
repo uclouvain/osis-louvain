@@ -34,7 +34,7 @@ from base.models.enums import learning_unit_year_periodicity, learning_unit_year
 from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 
 
 class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
@@ -55,6 +55,7 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             learning_unit_year_subtype=learning_unit_year_subtypes.FULL,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
+        cls.person_central = CentralManagerForUEFactory()
         cls.partim_learning_unit = cls.setup_learning_unit(
             start_year=cls.starting_academic_year)
         cls.partim = cls.setup_learning_unit_year(
@@ -64,7 +65,6 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             learning_unit_year_subtype=learning_unit_year_subtypes.PARTIM,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
-        cls.person_central = CentralManagerFactory()
         generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def test_edit_end_date_send_dates_with_end_date_not_defined(self):

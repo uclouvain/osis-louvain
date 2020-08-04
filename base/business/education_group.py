@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
-from base.business.education_groups import perms
 from base.business.xls import get_name_or_username, convert_boolean
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
@@ -114,16 +113,9 @@ def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exc
     if isinstance(a_user, Person):
         person = a_user
         a_user = person.user
-    else:
-        person = Person.objects.get(user=a_user)
 
-    if not perms.check_permission(person, "base.can_edit_education_group_administrative_data", raise_exception):
-        return False
-
-    if person.is_central_manager and _is_management_entity_linked_to_user(person, an_education_group_year):
-        return True
-
-    return is_program_manager(a_user, education_group=an_education_group_year.education_group)
+    return a_user.has_perm("base.can_edit_education_group_administrative_data", an_education_group_year) or \
+        is_program_manager(a_user, education_group=an_education_group_year.education_group)
 
 
 def _is_management_entity_linked_to_user(person, an_education_group_year):
@@ -186,20 +178,23 @@ def create_xls_administrative_data(user, education_group_years_qs, filters, orde
     education_group_years = education_group_years_qs.filter(
         education_group_type__category=education_group_categories.TRAINING
     ).select_related(
-        'education_group_type',
-        'academic_year',
+        'educationgroupversion__offer__education_group_type',
+        'educationgroupversion__offer__academic_year',
     ).prefetch_related(
         Prefetch(
-            'education_group__mandate_set',
+            'educationgroupversion__offer__education_group__mandate_set',
             queryset=Mandate.objects.prefetch_related('mandatary_set')
         ),
         Prefetch(
-            'offeryearcalendar_set',
+            'educationgroupversion__offer__offeryearcalendar_set',
             queryset=OfferYearCalendar.objects.select_related('academic_calendar__sessionexamcalendar')
         )
     )
     found_education_groups = ordering_data(education_group_years, order_data)
-    working_sheets_data = prepare_xls_content_administrative(found_education_groups)
+    # FIXME: should be improved with ddd usage
+    working_sheets_data = prepare_xls_content_administrative(
+        [gy.educationgroupversion.offer for gy in found_education_groups]
+    )
     header_titles = _get_translated_header_titles()
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION_ADMINISTRATIVE,

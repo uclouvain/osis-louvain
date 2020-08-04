@@ -25,14 +25,21 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 PRESIDENT = "PRESIDENT"
 SECRETARY = "SECRETARY"
 SIGNATORY = "SIGNATORY"
 
-
+# FIXME :: DEPRECATED - use MandateTypes instead
 MANDATE_TYPES = (
     (PRESIDENT, _("President")),
     (SECRETARY, _("Secretary")),
-    (SIGNATORY, _("Signatory"))
+    (SIGNATORY, _("Signatory")),
 )
 
+
+class MandateTypes(ChoiceEnum):
+    PRESIDENT = _("President")
+    SECRETARY = _("Secretary")
+    SIGNATORY = _("Signatory")

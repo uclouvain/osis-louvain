@@ -23,12 +23,53 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods
+from waffle.decorators import waffle_flag
 
-from base.views.mixins import AjaxTemplateMixin
+import program_management.ddd.service.write.down_link_service
+import program_management.ddd.service.write.up_link_service
+from base.views.common import display_success_messages
+from education_group.models.group_year import GroupYear
+from osis_role.contrib.views import permission_required
+from program_management.ddd import command, service
 
 
-class MoveNodeView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
-    pass
-    # SEE : UpdateGroupElementYearView
+def group_element_year_parent_getter_via_path(request) -> GroupYear:
+    path = request.POST["path"]
+    *_, parent_id, child_id = path.split("|")
+    return get_object_or_404(GroupYear, element__id=parent_id)
+
+
+@login_required
+@waffle_flag("education_group_update")
+@permission_required("base.change_link_data", fn=group_element_year_parent_getter_via_path)
+@require_http_methods(['POST'])
+def up(request):
+    path = request.POST["path"]
+    command_up = command.OrderUpLinkCommand(path=path)
+    node_identity_id = service.write.up_link_service.up_link(command_up)
+
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    display_success_messages(request, success_msg)
+
+    http_referer = request.META.get('HTTP_REFERER')
+    return redirect(http_referer)
+
+
+@login_required
+@waffle_flag("education_group_update")
+@permission_required("base.change_link_data", fn=group_element_year_parent_getter_via_path)
+@require_http_methods(['POST'])
+def down(request):
+    path = request.POST["path"]
+    command_down = command.OrderDownLinkCommand(path=path)
+    node_identity_id = service.write.down_link_service.down_link(command_down)
+
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    display_success_messages(request, success_msg)
+
+    http_referer = request.META.get('HTTP_REFERER')
+    return redirect(http_referer)

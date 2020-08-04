@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib import admin
 
+from base.auth.roles import entity_manager
 from base.models import *
 from base.models import validation_rule, education_group_achievement, education_group_detailed_achievement
 
@@ -78,6 +79,9 @@ admin.site.register(entity_manager.EntityManager,
 
 admin.site.register(entity_version.EntityVersion,
                     entity_version.EntityVersionAdmin)
+
+admin.site.register(entity_version_address.EntityVersionAddress,
+                    entity_version_address.EntityVersionAddressAdmin)
 
 admin.site.register(exam_enrollment.ExamEnrollment,
                     exam_enrollment.ExamEnrollmentAdmin)

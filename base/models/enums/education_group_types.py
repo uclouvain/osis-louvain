@@ -160,9 +160,33 @@ class MiniTrainingType(EducationGroupTypesEnum):
     MOBILITY_PARTNERSHIP = _("Mobility partnership")
 
     @classmethod
+    def get_eligible_to_be_created(cls) -> List['MiniTrainingType']:
+        return [
+            cls.DEEPENING,
+            cls.SOCIETY_MINOR,
+            cls.ACCESS_MINOR,
+            cls.OPEN_MINOR,
+            cls.DISCIPLINARY_COMPLEMENT_MINOR,
+            cls.OPTION
+        ]
+
+    @classmethod
     def minors(cls):
         return [
             cls.SOCIETY_MINOR.name, cls.ACCESS_MINOR.name, cls.OPEN_MINOR.name, cls.DISCIPLINARY_COMPLEMENT_MINOR.name
+        ]
+
+    @classmethod
+    def minors_and_deepening(cls) -> List['MiniTrainingType']:
+        return cls.minors_enum() + [cls.DEEPENING]
+
+    @classmethod
+    def minors_enum(cls):
+        return [
+            MiniTrainingType.ACCESS_MINOR,
+            MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR,
+            MiniTrainingType.OPEN_MINOR,
+            MiniTrainingType.SOCIETY_MINOR
         ]
 
     @classmethod
@@ -178,6 +202,17 @@ class MiniTrainingType(EducationGroupTypesEnum):
             cls.OPEN_MINOR.name,
             cls.DISCIPLINARY_COMPLEMENT_MINOR.name,
             cls.FSA_SPECIALITY.name,
+        ]
+
+    @classmethod
+    def with_skills_achievements(cls):
+        return cls.with_admission_condition()
+
+    @classmethod
+    def mini_training_types_enum(cls) -> List[EducationGroupTypesEnum]:
+        return [
+            cls.DEEPENING, cls.SOCIETY_MINOR, cls.ACCESS_MINOR,
+            cls.OPEN_MINOR, cls.DISCIPLINARY_COMPLEMENT_MINOR, cls.FSA_SPECIALITY, cls.OPTION, cls.MOBILITY_PARTNERSHIP
         ]
 
 
@@ -203,6 +238,10 @@ class GroupType(EducationGroupTypesEnum):
         return [
             cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name
         ]
+
+    @classmethod
+    def minor_major_list_choice_enums(cls) -> List['GroupType']:
+        return [cls.MINOR_LIST_CHOICE, cls.MAJOR_LIST_CHOICE]
 
     @classmethod
     def ordered(cls):

@@ -41,13 +41,9 @@
         {{ form.cms_id }}
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
-        <button class="btn btn-primary" type="submit">
+        <button class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
+        <button class="btn btn-primary" type="submit" onclick="CKupdate();">
             <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
         </button>
     </div>
 </form>
-
-{% block script %}
-    <script type="text/javascript" src="{% static 'js/learning_unit/ckeditor.js' %}"></script>
-{% endblock script %}

@@ -49,7 +49,7 @@
     {
         "pk": 4,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -66,7 +66,7 @@
     {
         "pk": 5,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -79,7 +79,7 @@
     {
         "pk": 6,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -97,56 +97,9 @@
         "model": "rules_management.fieldreference"
     },
     {
-        "pk": 7,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "TRAINING_DAILY_MANAGEMENT",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 8,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "TRAINING_PROPOSAL_MANAGEMENT",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": []
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 9,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "TRAINING_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
         "pk": 10,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -163,7 +116,7 @@
     {
         "pk": 11,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -176,7 +129,7 @@
     {
         "pk": 12,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -287,7 +240,7 @@
     {
         "pk": 19,
         "fields": {
-            "field_name": "partial_deliberation",
+            "field_name": "has_partial_deliberation",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -304,7 +257,7 @@
     {
         "pk": 20,
         "fields": {
-            "field_name": "partial_deliberation",
+            "field_name": "has_partial_deliberation",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -317,7 +270,7 @@
     {
         "pk": 21,
         "fields": {
-            "field_name": "partial_deliberation",
+            "field_name": "has_partial_deliberation",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -519,7 +472,7 @@
     {
         "pk": 34,
         "fields": {
-            "field_name": "admission_exam",
+            "field_name": "has_admission_exam",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -536,7 +489,7 @@
     {
         "pk": 35,
         "fields": {
-            "field_name": "admission_exam",
+            "field_name": "has_admission_exam",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -549,7 +502,7 @@
     {
         "pk": 36,
         "fields": {
-            "field_name": "admission_exam",
+            "field_name": "has_admission_exam",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -660,7 +613,7 @@
     {
         "pk": 43,
         "fields": {
-            "field_name": "dissertation",
+            "field_name": "has_dissertation",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -677,7 +630,7 @@
     {
         "pk": 44,
         "fields": {
-            "field_name": "dissertation",
+            "field_name": "has_dissertation",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -690,7 +643,7 @@
     {
         "pk": 45,
         "fields": {
-            "field_name": "dissertation",
+            "field_name": "has_dissertation",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -801,7 +754,7 @@
     {
         "pk": 52,
         "fields": {
-            "field_name": "funding",
+            "field_name": "can_be_funded",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -818,7 +771,7 @@
     {
         "pk": 53,
         "fields": {
-            "field_name": "funding",
+            "field_name": "can_be_funded",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -831,7 +784,7 @@
     {
         "pk": 54,
         "fields": {
-            "field_name": "funding",
+            "field_name": "can_be_funded",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -848,7 +801,7 @@
     {
         "pk": 55,
         "fields": {
-            "field_name": "funding_cud",
+            "field_name": "can_be_international_funded",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -865,7 +818,7 @@
     {
         "pk": 56,
         "fields": {
-            "field_name": "funding_cud",
+            "field_name": "can_be_international_funded",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -878,7 +831,7 @@
     {
         "pk": 57,
         "fields": {
-            "field_name": "funding_cud",
+            "field_name": "can_be_international_funded",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -942,7 +895,7 @@
     {
         "pk": 61,
         "fields": {
-            "field_name": "funding_direction_cud",
+            "field_name": "international_funding_orientation",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -959,7 +912,7 @@
     {
         "pk": 62,
         "fields": {
-            "field_name": "funding_direction_cud",
+            "field_name": "international_funding_orientation",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -972,7 +925,7 @@
     {
         "pk": 63,
         "fields": {
-            "field_name": "funding_direction_cud",
+            "field_name": "international_funding_orientation",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1036,7 +989,7 @@
     {
         "pk": 67,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1053,7 +1006,7 @@
     {
         "pk": 68,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1066,7 +1019,7 @@
     {
         "pk": 69,
         "fields": {
-            "field_name": "internship",
+            "field_name": "internship_presence",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1083,7 +1036,7 @@
     {
         "pk": 70,
         "fields": {
-            "field_name": "joint_diploma",
+            "field_name": "leads_to_diploma",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1100,7 +1053,7 @@
     {
         "pk": 71,
         "fields": {
-            "field_name": "joint_diploma",
+            "field_name": "leads_to_diploma",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1113,7 +1066,7 @@
     {
         "pk": 72,
         "fields": {
-            "field_name": "joint_diploma",
+            "field_name": "leads_to_diploma",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1365,7 +1318,7 @@
     {
         "pk": 88,
         "fields": {
-            "field_name": "university_certificate",
+            "field_name": "produce_university_certificate",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1382,7 +1335,7 @@
     {
         "pk": 89,
         "fields": {
-            "field_name": "university_certificate",
+            "field_name": "produce_university_certificate",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1395,7 +1348,7 @@
     {
         "pk": 90,
         "fields": {
-            "field_name": "university_certificate",
+            "field_name": "produce_university_certificate",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1553,7 +1506,7 @@
     {
         "pk": 100,
         "fields": {
-            "field_name": "primary_language",
+            "field_name": "main_language",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1570,7 +1523,7 @@
     {
         "pk": 101,
         "fields": {
-            "field_name": "primary_language",
+            "field_name": "main_language",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1583,7 +1536,7 @@
     {
         "pk": 102,
         "fields": {
-            "field_name": "primary_language",
+            "field_name": "main_language",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -1794,7 +1747,7 @@
     {
         "pk": 115,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1811,7 +1764,7 @@
     {
         "pk": 116,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -1824,7 +1777,7 @@
     {
         "pk": 117,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3069,7 +3022,7 @@
     {
         "pk": 193,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "MINI_TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3086,7 +3039,7 @@
     {
         "pk": 194,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "MINI_TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3099,7 +3052,7 @@
     {
         "pk": 195,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "MINI_TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3522,7 +3475,7 @@
     {
         "pk": 220,
         "fields": {
-            "field_name": "acronym",
+            "field_name": "abbreviated_title",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3552,7 +3505,7 @@
     {
         "pk": 222,
         "fields": {
-            "field_name": "acronym",
+            "field_name": "abbreviated_title",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3572,7 +3525,7 @@
     {
         "pk": 223,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3589,7 +3542,7 @@
     {
         "pk": 224,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "GROUP_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3602,7 +3555,7 @@
     {
         "pk": 225,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3620,56 +3573,9 @@
         "model": "rules_management.fieldreference"
     },
     {
-        "pk": 226,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "GROUP_DAILY_MANAGEMENT",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 227,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "GROUP_PROPOSAL_MANAGEMENT",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": []
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 228,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "GROUP_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
         "pk": 229,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3686,7 +3592,7 @@
     {
         "pk": 230,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "GROUP_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3699,7 +3605,7 @@
     {
         "pk": 231,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3719,7 +3625,7 @@
     {
         "pk": 232,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3749,7 +3655,7 @@
     {
         "pk": 234,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3915,7 +3821,7 @@
     {
         "pk": 244,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3945,7 +3851,7 @@
     {
         "pk": 246,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3965,7 +3871,7 @@
     {
         "pk": 247,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3995,7 +3901,7 @@
     {
         "pk": 249,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4015,7 +3921,7 @@
     {
         "pk": 250,
         "fields": {
-            "field_name": "remark_english",
+            "field_name": "remark_en",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4045,7 +3951,7 @@
     {
         "pk": 252,
         "fields": {
-            "field_name": "remark_english",
+            "field_name": "remark_en",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4305,7 +4211,7 @@
     {
         "pk": 268,
         "fields": {
-            "field_name": "web_re_registration",
+            "field_name": "has_online_re_registration",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4322,7 +4228,7 @@
     {
         "pk": 269,
         "fields": {
-            "field_name": "co_graduation",
+            "field_name": "code_inter_cfb",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4339,7 +4245,7 @@
     {
         "pk": 270,
         "fields": {
-            "field_name": "co_graduation_coefficient",
+            "field_name": "coefficient",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4492,7 +4398,7 @@
     {
         "pk": 279,
         "fields": {
-            "field_name": "ares_study",
+            "field_name": "ares_code",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4509,7 +4415,7 @@
     {
         "pk": 280,
         "fields": {
-            "field_name": "ares_ability",
+            "field_name": "ares_authorization",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4526,7 +4432,7 @@
     {
         "pk": 281,
         "fields": {
-            "field_name": "web_re_registration",
+            "field_name": "has_online_re_registration",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4543,7 +4449,7 @@
     {
         "pk": 282,
         "fields": {
-            "field_name": "co_graduation",
+            "field_name": "code_inter_cfb",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4560,7 +4466,7 @@
     {
         "pk": 283,
         "fields": {
-            "field_name": "co_graduation_coefficient",
+            "field_name": "coefficient",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4713,7 +4619,7 @@
     {
         "pk": 292,
         "fields": {
-            "field_name": "ares_study",
+            "field_name": "ares_code",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4730,7 +4636,7 @@
     {
         "pk": 293,
         "fields": {
-            "field_name": "ares_ability",
+            "field_name": "ares_authorization",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4780,7 +4686,7 @@
     {
         "pk": 297,
         "fields": {
-            "field_name": "partial_title",
+            "field_name": "partial_title_fr",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4797,7 +4703,7 @@
     {
         "pk": 298,
         "fields": {
-            "field_name": "partial_title",
+            "field_name": "partial_title_fr",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4810,7 +4716,7 @@
     {
         "pk": 299,
         "fields": {
-            "field_name": "partial_title",
+            "field_name": "partial_title_fr",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4827,7 +4733,7 @@
     {
         "pk": 300,
         "fields": {
-            "field_name": "partial_title_english",
+            "field_name": "partial_title_en",
             "context": "TRAINING_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4844,7 +4750,7 @@
     {
         "pk": 301,
         "fields": {
-            "field_name": "partial_title_english",
+            "field_name": "partial_title_en",
             "context": "TRAINING_PROPOSAL_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4857,7 +4763,7 @@
     {
         "pk": 302,
         "fields": {
-            "field_name": "partial_title_english",
+            "field_name": "partial_title_en",
             "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",

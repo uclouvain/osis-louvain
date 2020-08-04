@@ -26,6 +26,7 @@
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
+UE_CENTRAL_MANAGER_GROUP = "central_managers_for_ue"
 UE_FACULTY_MANAGER_GROUP = "faculty_managers_for_ue"
 ADMINISTRATIVE_MANAGER_GROUP = "administrative_manager"
 PROGRAM_MANAGER_GROUP = "program_managers"

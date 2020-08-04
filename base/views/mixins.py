@@ -74,6 +74,7 @@ class RulesRequiredMixin(UserPassesTestMixin):
 class AjaxTemplateMixin:
     ajax_template_suffix = "_inner"
     partial_reload = None
+    force_reload = False
 
     def get_template_names(self):
         template_names = super().get_template_names()
@@ -113,6 +114,8 @@ class AjaxTemplateMixin:
                 response['success_url'] = url
             if self.partial_reload:
                 response['partial_reload'] = self.partial_reload
+            if self.force_reload:
+                response['force_reload'] = self.force_reload
             return JsonResponse(response)
 
 

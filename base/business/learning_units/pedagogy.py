@@ -29,7 +29,9 @@ from base.models import academic_year
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from cms.enums import entity_name
-from cms.models import text_label, translated_text
+from cms.models import translated_text
+from cms.models.text_label import TextLabel
+from osis_common.utils.models import get_object_or_none
 
 
 def save_teaching_material(teach_material):
@@ -53,7 +55,7 @@ def postpone_teaching_materials(luy, commit=True):
         from base.models import teaching_material
         This function override all teaching materials from start_luy until latest version of this luy
         teaching_material.postpone_teaching_materials(luy)
-        :param start_luy: The learning unit year which we want to start postponement
+        :param luy: The learning unit year which we want to start postponement
         :param commit:
         :return:
         """
@@ -76,7 +78,10 @@ def bulk_save(teaching_materials, commit=True):
 
 
 def update_bibliography_changed_field_in_cms(learning_unit_year):
-    txt_label = text_label.get_by_label_or_none('bibliography')
+    txt_label = get_object_or_none(
+        TextLabel,
+        label='bibliography'
+    )
     if txt_label:
         for language in settings.LANGUAGES:
             translated_text.update_or_create(

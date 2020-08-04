@@ -27,47 +27,33 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestNodeDuplicationValidator(SimpleTestCase):
+class TestNodeDuplicationValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
         link = LinkFactory()
         self.tree_with_child = ProgramTreeFactory(root_node=link.parent)
         self.child = link.child
 
-    def test_when_node_already_exists(self):
-        node_to_attach = self.child
-        validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
-        )
-        self.assertFalse(validator.is_valid())
-        expected_result = _("You can not add the same child several times.")
-        self.assertEqual(expected_result, validator.error_messages[0])
+    def test_should_raise_exception_when_node_to_attach_is_already_a_child_of_parent_node(self):
+        expected_result = _("You can not add the same child %(child_node)s several times.") % {
+            "child_node": self.child
+        }
 
-    def test_when_node_already_exists_in_other_group_of_the_same_tree(self):
+        self.assertValidatorRaises(
+            NodeDuplicationValidator(self.tree_with_child.root_node, self.child),
+            [expected_result]
+        )
+
+    def test_should_not_raise_exception_when_node_to_attach_is_not_a_direct_child_of_parent_node(self):
         node_to_attach = NodeGroupYearFactory()
         link = LinkFactory(parent=self.tree_with_child.root_node)
         LinkFactory(parent=link.child, child=node_to_attach)
-        validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
-        )
-        self.assertTrue(validator.is_valid())
 
-    def test_when_node_does_not_exists(self):
-        node_to_attach = NodeGroupYearFactory()
-        validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
-        )
-        self.assertTrue(validator.is_valid())
+        self.assertValidatorNotRaises(NodeDuplicationValidator(self.tree_with_child.root_node, node_to_attach))

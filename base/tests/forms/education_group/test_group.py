@@ -43,6 +43,7 @@ from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from rules_management.enums import GROUP_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD
 
 
@@ -141,7 +142,7 @@ class TestGroupForm(TestCase):
 
         # Create user and attached it to management entity
         person = PersonFactory()
-        PersonEntityFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
+        CentralManagerFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
         cls.user = person.user
 
     def test_create(self):

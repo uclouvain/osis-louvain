@@ -30,8 +30,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
 from django.db.models import Count, Min, When, Case, Max
-from django.db.models.signals import post_delete
-from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -45,14 +43,12 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
-from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
+from base.models.enums.constraint_type import CONSTRAINT_TYPE
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.validation_rule import ValidationRule
-from cms.enums.entity_name import OFFER_YEAR
-from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 from osis_common.utils.models import get_object_or_none
@@ -197,6 +193,7 @@ class EducationGroupYear(SerializableModel):
     partial_title = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in French")
     )
@@ -204,6 +201,7 @@ class EducationGroupYear(SerializableModel):
     partial_title_english = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in English")
     )
@@ -487,6 +485,7 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("ISCED domain"),
+        limit_choices_to={'is_ares': True},
     )
 
     management_entity = models.ForeignKey(
@@ -684,7 +683,7 @@ class EducationGroupYear(SerializableModel):
             else self.title
         return "{} ({} {})".format(title, self.credits or 0, _("credits"))
 
-    @property
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def verbose_title(self):
         if self.is_finality:
             if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
@@ -710,22 +709,16 @@ class EducationGroupYear(SerializableModel):
         return self.remark
 
     @property
-    def verbose_constraint(self):
-        msg = "from %(min)s to %(max)s credits among" \
-            if self.constraint_type == CREDITS else "from %(min)s to %(max)s among"
-        return _(msg) % {
-            "min": self.min_constraint if self.min_constraint else "",
-            "max": self.max_constraint if self.max_constraint else ""
-        }
-
-    @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:
             return "{} {}".format(self.duration, self.get_duration_unit_display())
         return ""
 
     def get_absolute_url(self):
-        return reverse("education_group_read", args=[self.pk, self.pk])
+        return reverse(
+            'education_group_read_proxy',
+            args=[self.academic_year.year, self.acronym]
+        )
 
     @property
     def str_domains(self):
@@ -987,6 +980,14 @@ def search(**kwargs):
     return qs.select_related('education_group_type', 'academic_year')
 
 
+def have_link_with_epc(acronym: str, year: int) -> bool:
+    return EducationGroupYear.objects.filter(
+        acronym=acronym,
+        academic_year__year=year,
+        linked_with_epc=True
+    ).exists()
+
+
 # TODO :: Annotate/Count() in only 1 query instead of 2
 # TODO :: Count() on category_type == MINI_TRAINING will be in the future in another field FK (or other table).
 def find_with_enrollments_count(learning_unit_year):
@@ -1008,8 +1009,3 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
     return EducationGroupYear.objects \
         .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
-
-
-@receiver(post_delete, sender=EducationGroupYear)
-def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

@@ -573,9 +573,6 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Commerce partner"
-msgstr ""
-
 msgid "Common English title"
 msgstr ""
 
@@ -630,6 +627,9 @@ msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Continuing education academic year linkable to admission"
 msgstr ""
 
 msgid "Coordinator"
@@ -888,6 +888,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Embassy"
+msgstr ""
+
 msgid "End"
 msgstr ""
 
@@ -941,6 +944,9 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
 msgid "Enter text to search"
+msgstr ""
+
+msgid "Enterprise"
 msgstr ""
 
 msgid "Entities"
@@ -1183,6 +1189,9 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+msgid "Hospital"
+msgstr ""
+
 msgid "ISCED domain"
 msgstr "ISCED/CITE domain"
 
@@ -1213,9 +1222,6 @@ msgid "Include subordinate entities"
 msgstr ""
 
 msgid "Included in"
-msgstr ""
-
-msgid "Industrial partner"
 msgstr ""
 
 msgid "Initial data"
@@ -1250,9 +1256,6 @@ msgid "Invalid action"
 msgstr ""
 
 msgid "Invalid code"
-msgstr ""
-
-msgid "Is current partner"
 msgstr ""
 
 msgid "Is this teaching material mandatory?"
@@ -1747,6 +1750,9 @@ msgstr ""
 msgid "Non university Bachelors"
 msgstr ""
 
+msgid "Non-governmental organization"
+msgstr ""
+
 msgid "Not concerned"
 msgstr ""
 
@@ -2172,9 +2178,6 @@ msgstr ""
 msgid "Provisory"
 msgstr ""
 
-msgid "Public partner"
-msgstr ""
-
 msgid "Publication contact entity"
 msgstr ""
 
@@ -2362,9 +2365,6 @@ msgid "Separate"
 msgstr ""
 
 msgid "Service courses"
-msgstr ""
-
-msgid "Service partner"
 msgstr ""
 
 msgid "Session"
@@ -2747,12 +2747,12 @@ msgstr ""
 
 #, python-format
 msgctxt "female"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 #, python-format
 msgctxt "male"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 msgid "The user has not permission to create education groups."
@@ -2761,7 +2761,7 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
@@ -2781,6 +2781,9 @@ msgstr ""
 msgid ""
 "The value of field '%(field)s' is different between year %(year)s - "
 "%(value)s and year %(next_year)s - %(next_value)s"
+msgstr ""
+
+msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "The volume Q1 or Q2 must have a value but not both"
@@ -3068,6 +3071,7 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
+msgctxt "section title"
 msgid "Welcome"
 msgstr ""
 

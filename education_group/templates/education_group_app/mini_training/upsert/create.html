@@ -1,0 +1,19 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load i18n %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li class="active">
+        {% trans 'New Mini-Training' %}
+    </li>
+{% endblock breadcrumb %}
+
+{% block header_content %}
+    <div class="page-header">
+        <h2>{% trans 'New Mini-Training' %}</h2>
+    </div>
+{% endblock header_content %}
+
+{% block content %}
+    {% include "education_group_app/mini_training/upsert/layout_mini_training_form.html" %}
+{% endblock content %}

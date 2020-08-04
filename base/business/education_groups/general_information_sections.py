@@ -26,6 +26,7 @@
 from collections import namedtuple
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
@@ -62,11 +63,16 @@ CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
 CAREER_DEVELOPMENT = 'career_development'
 TUITION_FEES = 'tuition_fees'
+VERSIONS = 'versions'
+
+# Skills / Achievements
+CMS_LABEL_PROGRAM_AIM = 'skills_and_achievements_introduction'
+CMS_LABEL_ADDITIONAL_INFORMATION = 'skills_and_achievements_additional_text'
 
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [
-    Section(title=_('Welcome'),
+    Section(title=pgettext('section title', 'Welcome'),
             labels=[
                 WELCOME_INTRODUCTION,
                 WELCOME_PROFIL,
@@ -86,6 +92,7 @@ SECTION_LIST = [
                 DETAILED_PROGRAM,
                 PURPOSES,
                 OPTIONS,
+                VERSIONS,
                 COMMON_DIDACTIC_PURPOSES,
                 CAAP,
                 AGREGATION,
@@ -146,7 +153,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -169,7 +176,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            STRUCTURE
+            STRUCTURE,
         ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
@@ -192,7 +199,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            STRUCTURE
+            STRUCTURE,
         ]
     },
     TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
@@ -215,7 +222,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            STRUCTURE
+            STRUCTURE,
         ]
     },
     TrainingType.BACHELOR.name: {
@@ -238,7 +245,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     TrainingType.CERTIFICATE.name: {
@@ -256,7 +263,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             PREREQUISITE,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     TrainingType.CAPAES.name: {
@@ -295,7 +302,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            STRUCTURE
+            STRUCTURE,
         ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
@@ -319,7 +326,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            STRUCTURE
+            STRUCTURE,
         ]
     },
     TrainingType.PGRM_MASTER_120.name: {
@@ -344,7 +351,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.MASTER_MA_120.name: {
@@ -381,7 +389,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.MASTER_MA_180_240.name: {
@@ -416,7 +425,8 @@ SECTIONS_PER_OFFER_TYPE = {
             COMPLEMENTARY_MODULE,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            VERSIONS
         ]
     },
     TrainingType.MASTER_MC.name: {
@@ -438,7 +448,8 @@ SECTIONS_PER_OFFER_TYPE = {
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
             EVALUATION,
-            OPTIONS
+            OPTIONS,
+            VERSIONS
         ]
     },
 
@@ -460,7 +471,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
@@ -481,7 +492,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -502,7 +513,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     MiniTrainingType.OPEN_MINOR.name: {
@@ -523,7 +534,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
@@ -544,7 +555,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {

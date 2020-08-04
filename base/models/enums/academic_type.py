@@ -25,13 +25,21 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
 
 NON_ACADEMIC = "NON_ACADEMIC"
 NON_ACADEMIC_CREF = "NON_ACADEMIC_CREF"
 ACADEMIC = "ACADEMIC"
 
+#  FIXME ::  DEPRECATED - use AcademicTypes enum instead
 ACADEMIC_TYPES = (
     (NON_ACADEMIC, _("Non academic")),
     (NON_ACADEMIC_CREF, _("Non academic CREF")),
     (ACADEMIC, _("Academic"))
 )
+
+
+class AcademicTypes(ChoiceEnum):
+    NON_ACADEMIC = _("Non academic")
+    NON_ACADEMIC_CREF = _("Non academic CREF")
+    ACADEMIC = _("Academic")

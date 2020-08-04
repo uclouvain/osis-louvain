@@ -32,7 +32,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class TestLearningAchievementView(TestCase):
@@ -44,8 +44,8 @@ class TestLearningAchievementView(TestCase):
             subtype=learning_unit_year_subtypes.FULL
         )
 
-        cls.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
-        cls.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
+        cls.language_fr = FrenchLanguageFactory()
+        cls.language_en = EnglishLanguageFactory()
 
     def test_get_anchor_reference_for_delete(self):
         achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,

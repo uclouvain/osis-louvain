@@ -32,6 +32,7 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices import business
 
 
@@ -74,6 +75,11 @@ class GetEvaluationTestCase(TestCase):
 class GetContactsIntroTextTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory()
+        self.node = NodeEducationGroupYearFactory(
+            code=self.education_group_year.partial_acronym,
+            year=self.education_group_year.academic_year.year,
+            node_type=self.education_group_year.education_group_type,
+        )
         self.cms_label_name = business.CONTACT_INTRO_KEY
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label=self.cms_label_name)
@@ -92,12 +98,17 @@ class GetContactsIntroTextTestCase(TestCase):
 
     def test_get_contacts_intro_text_case_no_value(self):
         education_group_year = EducationGroupYearFactory()
-        self.assertIsNone(business.get_contacts_intro_text(education_group_year, settings.LANGUAGE_CODE_FR))
+        node = NodeEducationGroupYearFactory(
+            node_type=education_group_year.education_group_type,
+            code=education_group_year.partial_acronym,
+            year=education_group_year.academic_year.year
+        )
+        self.assertIsNone(business.get_contacts_intro_text(node, settings.LANGUAGE_CODE_FR))
 
     def test_get_contacts_intro_text_case_french_version(self):
-        intro_text = business.get_contacts_intro_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
+        intro_text = business.get_contacts_intro_text(self.node, settings.LANGUAGE_CODE_FR)
         self.assertEqual(intro_text, self.contact_intro_fr.text)
 
     def test_get_contacts_intro_text_case_english_version(self):
-        intro_text = business.get_contacts_intro_text(self.education_group_year, settings.LANGUAGE_CODE_EN)
+        intro_text = business.get_contacts_intro_text(self.node, settings.LANGUAGE_CODE_EN)
         self.assertEqual(intro_text, self.contact_intro_en.text)

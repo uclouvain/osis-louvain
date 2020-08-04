@@ -23,11 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ajax_select import register, LookupChannel
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from dal import autocomplete
 from django import forms
-from django.db.models import Q
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -35,20 +33,17 @@ from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin, \
     CheckConsistencyCertificateAimsMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
-    MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
+    EducationGroupYearModelForm, PermissionFieldTrainingMixin
+from education_group.forms.fields import MainEntitiesVersionChoiceField
 from base.forms.utils.choice_field import add_blank
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.entity_version import get_last_version
-from base.models.enums import education_group_categories, rate_code, decree_category
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import TrainingType
 from base.models.hops import Hops
-from reference.models.domain import Domain
-from reference.models.enums import domain_type
-from reference.models.language import Language
 
 
 def _get_section_choices():
@@ -200,34 +195,34 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
-        self.fields['primary_language'].queryset = Language.objects.all().order_by('name')
+        # self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
+        # self.fields['primary_language'].queryset = Language.objects.all().order_by('name')
 
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
 
-        self.fields['decree_category'].choices = sorted(add_blank(decree_category.DecreeCategories.choices()),
-                                                        key=lambda c: c[1])
-        self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
-        self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
-                                                    .select_related('decree')
-        if not self.fields['certificate_aims'].disabled:
-            self.fields['section'].disabled = False
+        # self.fields['decree_category'].choices = sorted(add_blank(decree_category.DecreeCategories.choices()),
+        #                                                 key=lambda c: c[1])
+        # self.fields['rate_code'].choices = sorted(rate_code.RATE_CODE, key=lambda c: c[1])
+        # self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
+        #                                             .select_related('decree')
+        # if not self.fields['certificate_aims'].disabled:
+        #     self.fields['section'].disabled = False
 
-        if not getattr(self.initial, 'academic_year', None):
-            self.set_initial_diploma_values()
+        # if not getattr(self.initial, 'academic_year', None):
+        #     self.set_initial_diploma_values()
 
-        if 'instance' in kwargs and not kwargs['instance']:
-            self.fields['academic_year'].label = _('Start')
+        # if 'instance' in kwargs and not kwargs['instance']:
+        #     self.fields['academic_year'].label = _('Start')
 
-    def set_initial_diploma_values(self):
-        if self.education_group_type and \
-                self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
-            self.fields['joint_diploma'].initial = True
-            self.fields['diploma_printing_title'].required = True
-        else:
-            self.fields['joint_diploma'].initial = False
-            self.fields['diploma_printing_title'].required = False
+    # def set_initial_diploma_values(self):
+    #     if self.education_group_type and \
+    #             self.education_group_type.name in TrainingType.with_diploma_values_set_initially_as_true():
+    #         self.fields['joint_diploma'].initial = True
+    #         self.fields['diploma_printing_title'].required = True
+    #     else:
+    #         self.fields['joint_diploma'].initial = False
+    #         self.fields['diploma_printing_title'].required = False
 
     def clean_certificate_aims(self):
         return EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
@@ -343,29 +338,3 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
             not field.disabled for field_name, field
             in self.forms[forms.ModelForm].fields.items() if field_name in self.diploma_tab_fields
         )
-
-
-@register('university_domains')
-class UniversityDomainsLookup(LookupChannel):
-
-    model = Domain
-
-    def check_auth(self, request):
-        # override the default behaviour
-        pass
-
-    def get_query(self, q, request):
-        return self.model.objects.filter(type=domain_type.UNIVERSITY)\
-                                 .filter(Q(name__icontains=q) | Q(code__icontains=q) |
-                                         Q(decree__name__icontains=q))\
-                                 .select_related('decree')\
-                                 .order_by('-decree__name', 'name')
-
-    def format_item_display(self, item):
-        return "<span class='tag'>{}</span>".format(self.format_match(item))
-
-    def get_result(self, item):
-        return self.format_match(item)
-
-    def format_match(self, item):
-        return "{}:{} {}".format(item.decree.name, item.code, item.name)

@@ -33,11 +33,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from waffle.decorators import waffle_flag
+from rules.contrib.views import permission_required
 
 from base import models as mdl_base
 from base.business.education_group import has_coorganization
-from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
@@ -47,17 +46,13 @@ from base.models import program_manager
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
-from base.views.education_groups.perms import can_change_education_group
-from program_management.forms.group_element_year import GroupElementYearFormset
+from program_management.forms.tree.attach import GroupElementYearFormset
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_education_group(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(
+def get_education_group_year_by_pk(request, root_id, education_group_year_id):
+    return get_object_or_404(
         EducationGroupYear.objects.select_related('education_group_type').prefetch_related(
             Prefetch(
                 'groupelementyear_set',
@@ -70,27 +65,26 @@ def update_education_group(request, root_id, education_group_year_id):
         ),
         pk=education_group_year_id
     )
-    person = request.user.person
 
-    # Store root in the instance to avoid to pass the root in methods
-    # it will be used in the templates.
-    education_group_year.root = root_id
+
+# TODO: Split view of update_certification_aims with update_education_group
+@login_required
+def update_education_group(request, offer_id, education_group_year_id):
+    education_group_year = get_object_or_404(
+        EducationGroupYear.objects.select_related('education_group'),
+        pk=education_group_year_id
+    )
+    person = request.user.person
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
             and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
-        return _update_certificate_aims(request, root_id, education_group_year)
-
-    groupelementyear_formset = GroupElementYearFormset(
-        request.POST or None,
-        prefix='group_element_year_formset',
-        queryset=education_group_year.groupelementyear_set.all()
-    )
-    return _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset)
+        return _update_certificate_aims(request, offer_id, education_group_year)
+    return update_education_group_year(request, offer_id, education_group_year_id)
 
 
+@permission_required('base.change_educationgroupcertificateaim',
+                     fn=lambda request, root_id, education_group_year: education_group_year)
 def _update_certificate_aims(request, root_id, education_group_year):
-    perms.is_eligible_to_edit_certificate_aims(request.user.person, education_group_year, raise_exception=True)
-
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():
@@ -103,10 +97,19 @@ def _update_certificate_aims(request, root_id, education_group_year):
     })
 
 
-def _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset):
-    # Protect the view
-    can_change_education_group(request.user, education_group_year)
+@login_required
+@permission_required('base.change_educationgroup', fn=get_education_group_year_by_pk, raise_exception=True)
+def update_education_group_year(request, root_id, education_group_year_id):
+    education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
+    # Store root in the instance to avoid to pass the root in methods
+    # it will be used in the templates.
+    education_group_year.root = root_id
 
+    groupelementyear_formset = GroupElementYearFormset(
+        request.POST or None,
+        prefix='group_element_year_formset',
+        queryset=education_group_year.groupelementyear_set.all()
+    )
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     view_function = _get_view(education_group_year.education_group_type.category)
     return view_function(request, education_group_year, root, groupelementyear_formset)
@@ -169,7 +172,13 @@ def _common_success_redirect(request, form, root, groupelementyear_form=None):
 
 
 def _get_success_message_for_update_education_group_year(root_id, education_group_year):
-    link = reverse("education_group_read", args=[root_id, education_group_year.id])
+    link = reverse(
+        "element_identification",
+        kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated.") % {
         "link": link,
         "acronym": education_group_year.acronym,
@@ -188,12 +197,24 @@ def _get_success_redirect_url(root, education_group_year):
     is_current_viewed_deleted = not mdl_base.education_group_year.search(id=education_group_year.id).exists()
     if is_current_viewed_deleted:
         # Case current updated is deleted, we will take the latest existing [At this stage, we always have lastest]
-        qs = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group) \
+        lastest = mdl_base.education_group_year.search().filter(education_group=education_group_year.education_group) \
             .order_by('academic_year__year') \
             .last()
-        url = reverse("education_group_read", args=[qs.pk, qs.id])
+        url = reverse(
+            "element_identification",
+            kwargs={
+                "year": lastest.academic_year.year,
+                "code": lastest.partial_acronym
+            }
+        )
     else:
-        url = reverse("education_group_read", args=[root.pk, education_group_year.id])
+        url = reverse(
+            "element_identification",
+            kwargs={
+                "year": education_group_year.academic_year.year,
+                "code": education_group_year.partial_acronym
+            }
+        )
     return url
 
 
@@ -203,12 +224,14 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
     has_content = len(groupelementyear_formset.queryset) > 0
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
     if request.method == 'POST':
-        if form_education_group_year.is_valid() and (not has_content or groupelementyear_formset.is_valid()):
+        if form_education_group_year.is_valid() and \
+                (not (has_content and can_change_content) or groupelementyear_formset.is_valid()):
             return _common_success_redirect(
                 request,
                 form_education_group_year,
-                root, groupelementyear_formset if has_content else None
+                root, groupelementyear_formset if has_content and can_change_content else None
             )
         else:
             show_error_message_for_form_invalid(request)
@@ -218,7 +241,8 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         'group_element_years': groupelementyear_formset,
-        'show_minor_major_option_table': education_group_year.is_minor_major_option_list_choice
+        'show_minor_major_option_table': education_group_year.is_minor_major_option_list_choice,
+        "show_content_tab": can_change_content
     })
 
 
@@ -227,7 +251,12 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     coorganization_formset = None
-    forms_valid = all([form_education_group_year.is_valid(), groupelementyear_formset.is_valid()])
+    has_content = len(groupelementyear_formset.queryset) > 0
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
+    forms_valid = all(
+        [form_education_group_year.is_valid(),
+         not (has_content and can_change_content) or groupelementyear_formset.is_valid()]
+    )
     if has_coorganization(education_group_year):
         coorganization_formset = OrganizationFormset(
             data=request.POST or None,
@@ -239,7 +268,10 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         if forms_valid:
             if has_coorganization(education_group_year):
                 coorganization_formset.save()
-            return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+            return _common_success_redirect(
+                request, form_education_group_year, root,
+                groupelementyear_formset if has_content and can_change_content else None
+            )
         else:
             show_error_message_for_form_invalid(request)
 
@@ -251,10 +283,9 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
         "show_diploma_tab": form_education_group_year.show_diploma_tab(),
-        'can_change_coorganization': perms.is_eligible_to_change_coorganization(
-            person=request.user.person,
-            education_group=education_group_year,
-        ),
+        "show_content_tab": can_change_content,
+        'can_change_coorganization':
+            request.user.has_perm('base.change_educationgrouporganization', education_group_year),
         'group_element_years': groupelementyear_formset,
         "is_finality_types": education_group_year.is_finality
     })
@@ -287,10 +318,16 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
-
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
     if request.method == 'POST':
-        if form.is_valid() and groupelementyear_formset.is_valid():
-            return _common_success_redirect(request, form, root, groupelementyear_formset)
+        has_content = len(groupelementyear_formset.queryset) > 0
+        forms_valid = all(
+            [form.is_valid(), not (has_content and can_change_content) or groupelementyear_formset.is_valid()]
+        )
+        if forms_valid:
+            return _common_success_redirect(
+                request, form, root, groupelementyear_formset if has_content and can_change_content else None
+            )
         else:
             show_error_message_for_form_invalid(request)
 
@@ -298,5 +335,6 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
         "form_education_group_year": form.forms[forms.ModelForm],
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm],
-        'group_element_years': groupelementyear_formset
+        'group_element_years': groupelementyear_formset,
+        "show_content_tab": can_change_content,
     })

@@ -35,13 +35,14 @@ from attribution.models.enums.function import COORDINATOR
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
-    _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _add_training_data, \
-    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
+from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
+    prepare_proposal_legend_ws_data, _get_wrapped_cells, \
+    _get_font_rows, _get_attribution_line, _add_training_data, \
+    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
 from base.business.learning_unit_xls import _get_col_letter
+from base.business.learning_unit_xls import get_significant_volume
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
@@ -62,7 +63,11 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.document import xls_build
+from program_management.tests.factories.education_group_version import \
+    ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -70,6 +75,7 @@ PARENT_PARTIAL_ACRONYM = 'LDROI'
 PARENT_ACRONYM = 'LBIR'
 PARENT_TITLE = 'TITLE 1'
 ROOT_ACRONYM = 'DRTI'
+VERSION_ACRONYM = 'CRIM'
 
 
 class TestLearningUnitXls(TestCase):
@@ -80,6 +86,7 @@ class TestLearningUnitXls(TestCase):
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
                                                          credits=50)
+        cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
         cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
         cls.proposal_creation_1 = ProposalLearningUnitFactory(
@@ -95,11 +102,17 @@ class TestLearningUnitXls(TestCase):
         cls.an_education_group_parent = EducationGroupYearFactory(academic_year=cls.academic_year,
                                                                   education_group_type=direct_parent_type,
                                                                   acronym=ROOT_ACRONYM)
+        cls.a_group_year_parent = GroupYearFactory(academic_year=cls.academic_year, acronym=ROOT_ACRONYM)
+        cls.a_group_year_parent_element = ElementFactory(group_year=cls.a_group_year_parent)
+        StandardEducationGroupVersionFactory(offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent)
+
         cls.group_element_child = GroupElementYearFactory(
-            parent=cls.an_education_group_parent,
-            child_branch=None,
-            child_leaf=cls.learning_unit_yr_1
+            parent_element=cls.a_group_year_parent_element,
+            child_element=cls.learning_unit_yr_1_element
         )
+        # Particular OF
+        cls.create_version(direct_parent_type)
+        #
         cls.an_education_group = EducationGroupYearFactory(academic_year=cls.academic_year,
                                                            acronym=PARENT_ACRONYM,
                                                            title=PARENT_TITLE,
@@ -197,6 +210,28 @@ class TestLearningUnitXls(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+    @classmethod
+    def create_version(cls, direct_parent_type):
+        cls.learning_unit_yr_version = LearningUnitYearFactory(academic_year=cls.academic_year,
+                                                               learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
+                                                               credits=50)
+        cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
+        cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type=direct_parent_type,
+            acronym=VERSION_ACRONYM)
+        cls.a_group_year_parent_for_particular_version = GroupYearFactory(academic_year=cls.academic_year,
+                                                                          acronym=VERSION_ACRONYM)
+        cls.a_group_year_parent_element_for_particular_version = ElementFactory(
+            group_year=cls.a_group_year_parent_for_particular_version)
+        cls.particular_education_group_version = ParticularTransitionEducationGroupVersionFactory(
+            offer=cls.an_education_group_parent_for_particular_version,
+            root_group=cls.a_group_year_parent_for_particular_version)
+        GroupElementYearFactory(
+            parent_element=cls.a_group_year_parent_element_for_particular_version,
+            child_element=cls.learning_unit_yr_version_element
+        )
+
     def test_get_wrapped_cells_with_teachers_and_programs(self):
         styles = _get_wrapped_cells([self.learning_unit_yr_1, self.learning_unit_yr_2],
                                     COL_TEACHERS_LETTER,
@@ -223,10 +258,10 @@ class TestLearningUnitXls(TestCase):
         self.assertIsNone(_get_col_letter(titles, 'whatever'))
 
     def test_get_colored_rows(self):
-        self.assertEqual(_get_colored_rows([self.learning_unit_yr_1,
-                                            self.learning_unit_yr_2,
-                                            self.proposal_creation_1.learning_unit_year,
-                                            self.proposal_creation_2.learning_unit_year]),
+        self.assertEqual(_get_font_rows([self.learning_unit_yr_1,
+                                         self.learning_unit_yr_2,
+                                         self.proposal_creation_1.learning_unit_year,
+                                         self.proposal_creation_2.learning_unit_year]),
                          {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4]})
 
     def test_get_attributions_line(self):
@@ -254,9 +289,9 @@ class TestLearningUnitXls(TestCase):
         )
 
     def test_get_significant_volume(self):
-        self.assertEqual(_get_significant_volume(10), 10)
-        self.assertEqual(_get_significant_volume(None), '')
-        self.assertEqual(_get_significant_volume(0), '')
+        self.assertEqual(get_significant_volume(10), 10)
+        self.assertEqual(get_significant_volume(None), '')
+        self.assertEqual(get_significant_volume(0), '')
 
     def test_prepare_legend_ws_data(self):
         expected = {
@@ -270,7 +305,7 @@ class TestLearningUnitXls(TestCase):
             ],
             xls_build.WORKSHEET_TITLE_KEY: _('Legend'),
             xls_build.STYLED_CELLS:
-                DEFAULT_LEGEND_STYLES
+                DEFAULT_LEGEND_FILLS
         }
         self.assertEqual(prepare_proposal_legend_ws_data(), expected)
 
@@ -279,10 +314,12 @@ class TestLearningUnitXls(TestCase):
             closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
         ).get()
         formations = _add_training_data(luy_1)
-        expected = "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
-                                                "{0:.2f}".format(luy_1.credits),
-                                                self.an_education_group_parent.acronym,
-                                                self.an_education_group_parent.title)
+        expected = "{} ({}) - {} - {}".format(
+            self.a_group_year_parent.partial_acronym,
+            "{0:.2f}".format(luy_1.credits),
+            self.a_group_year_parent.acronym,
+            self.a_group_year_parent.title_fr
+        )
         self.assertEqual(formations, expected)
 
     def test_get_data_part1(self):
@@ -303,13 +340,13 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
         self.assertEqual(param.get(xls_build.USER), user_name)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: []})
-        self.assertEqual(param.get(xls_build.COLORED_ROWS), {})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
+        self.assertEqual(param.get(xls_build.FONT_ROWS), {})
 
         titles.append(HEADER_PROGRAMS)
 
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: ['C2', 'C3']})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
 
     def test_get_data_part2(self):
         learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
@@ -430,21 +467,21 @@ class TestLearningUnitXls(TestCase):
             '',
             luy.get_periodicity_display(),
             yesno(luy.status),
-            _get_significant_volume(luy.pm_vol_tot or 0),
-            _get_significant_volume(luy.pm_vol_q1 or 0),
-            _get_significant_volume(luy.pm_vol_q2 or 0),
+            get_significant_volume(luy.pm_vol_tot or 0),
+            get_significant_volume(luy.pm_vol_q1 or 0),
+            get_significant_volume(luy.pm_vol_q2 or 0),
             luy.pm_classes or 0,
-            _get_significant_volume(luy.pp_vol_tot or 0),
-            _get_significant_volume(luy.pp_vol_q1 or 0),
-            _get_significant_volume(luy.pp_vol_q2 or 0),
+            get_significant_volume(luy.pp_vol_tot or 0),
+            get_significant_volume(luy.pp_vol_q1 or 0),
+            get_significant_volume(luy.pp_vol_q2 or 0),
             luy.pp_classes or 0,
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
+            "{} ({}) - {} - {}".format(self.a_group_year_parent.partial_acronym,
                                          "{0:.2f}".format(luy.credits),
-                                         self.an_education_group_parent.acronym,
-                                         self.an_education_group_parent.title)
+                                         self.a_group_year_parent.acronym,
+                                         self.a_group_year_parent.title_fr)
         ]
 
     def test_get_attribution_detail(self):
@@ -496,6 +533,21 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(first_attribution[29], '')
         self.assertEqual(first_attribution[30], 15)
         self.assertEqual(first_attribution[31], 5)
+
+    def test_add_training_data_for_version(self):
+        luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        ).get()
+
+        formations = _add_training_data(luy)
+        expected = "{} ({}) - {} - {}".format(
+            self.a_group_year_parent_for_particular_version.partial_acronym,
+            "{0:.2f}".format(luy.credits),
+            "{}[{}-Transition]".format(self.a_group_year_parent_for_particular_version.acronym,
+                                       self.particular_education_group_version.version_name),
+            self.a_group_year_parent_for_particular_version.title_fr
+        )
+        self.assertEqual(formations, expected)
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):

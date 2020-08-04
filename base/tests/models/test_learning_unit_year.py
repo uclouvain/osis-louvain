@@ -45,20 +45,16 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
-from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
     LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
-from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 
 
 class LearningUnitYearTest(TestCase):
@@ -294,6 +290,19 @@ class LearningUnitYearWarningsTest(TestCase):
             type=LECTURING,
             learning_unit_year=self.luy_full
         ).first()
+        luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
+
+        learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            learning_unit_year=luy_partim
+        ).first()
+        learning_component_year_partim_lecturing.planned_classes = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q1 = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q2 = 0
+        learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
+        learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
+        learning_component_year_partim_lecturing.save()
+
 
         self.luy_full.quadrimester = None
         self.luy_full.save()
@@ -561,18 +570,26 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full.credits = self.luy_full.credits + 1
         self.luy_full.save()
 
-        test_cases = [
-            {'vol_q1': 10, 'vol_q2': 20, 'vol_tot_annual': 30, 'planned_classes': 0, 'vol_tot_global': 60}
-        ]
+        luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
 
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.component_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.component_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.component_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.component_full_lecturing.planned_classes = case.get('planned_classes')
-                self.component_full_lecturing.repartition_volume_requirement_entity = 0
-                self.component_full_lecturing.save()
+        learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            learning_unit_year=luy_partim
+        ).first()
+
+        learning_component_year_partim_lecturing.planned_classes = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q1 = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q2 = 0
+        learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
+        learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
+        learning_component_year_partim_lecturing.save()
+
+        self.component_full_lecturing.hourly_volume_partial_q1 = 30
+        self.component_full_lecturing.hourly_volume_partial_q2 = 20
+        self.component_full_lecturing.hourly_volume_total_annual = 50
+        self.component_full_lecturing.planned_classes = 0
+        self.component_full_lecturing.repartition_volume_requirement_entity = 0
+        self.component_full_lecturing.save()
 
         excepted_error = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_acronym),
@@ -589,6 +606,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.hourly_volume_partial_q1 = 0
         self.component_full_lecturing.hourly_volume_partial_q2 = 0
         self.component_full_lecturing.hourly_volume_total_annual = 0
+        self.component_full_lecturing.repartition_volume_requirement_entity = 0
         self.component_full_lecturing.planned_classes = 1
         self.component_full_lecturing.save()
 
@@ -819,109 +837,6 @@ class TestQuadriConsistency(TestCase):
         self.assertIn(excepted_error, self.luy_full.warnings)
 
 
-class TestHasOrIsPrerequisite(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.grp_ele_leaf = GroupElementYearFactory(
-            parent__education_group_type=GroupEducationGroupTypeFactory(),
-            parent__academic_year=cls.academic_year,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
-        )
-        cls.second_grp_ele_leaf = GroupElementYearFactory(
-            parent=cls.grp_ele_leaf.parent,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory(academic_year=cls.academic_year)
-
-        )
-        cls.grp_ele_root = GroupElementYearFactory(
-            child_branch=cls.grp_ele_leaf.parent,
-            parent__academic_year=cls.academic_year,
-        )
-
-        cls.other_grp_ele_root = GroupElementYearFactory(
-            parent__academic_year=cls.academic_year,
-            child_branch__education_group_type=GroupEducationGroupTypeFactory(),
-            child_branch__academic_year=cls.academic_year
-        )
-        cls.other_grp_ele_intermediary = GroupElementYearFactory(
-            parent=cls.other_grp_ele_root.child_branch,
-            child_branch=cls.grp_ele_root.child_branch
-        )
-
-    def test_should_return_false_when_luy_has_no_prerequisite_nor_is_prerequisite(self):
-        self.assertFalse(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_false_when_luy_has_prerequisite_in_other_root(self):
-        PrerequisiteItemFactory(
-            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
-            group_number=1,
-            position=1,
-        )
-        self.assertFalse(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_false_when_luy_is_prerequisite_in_other_root(self):
-        PrerequisiteItemFactory(
-            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
-            group_number=1,
-            position=1,
-        )
-        self.assertFalse(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_true_if_luy_has_prerequisite(self):
-        PrerequisiteItemFactory(
-            prerequisite__education_group_year=self.grp_ele_root.parent,
-            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
-            group_number=1,
-            position=1,
-        )
-        self.assertTrue(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_true_if_luy_is_prerequisite(self):
-        PrerequisiteItemFactory(
-            prerequisite__education_group_year=self.grp_ele_root.parent,
-            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
-            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
-            group_number=1,
-            position=1,
-        )
-        self.assertTrue(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_true_if_luy_has_prerequisite_in_other_root_but_same_group(self):
-        PrerequisiteItemFactory(
-            prerequisite__education_group_year=self.other_grp_ele_root.parent,
-            prerequisite__learning_unit_year=self.grp_ele_leaf.child_leaf,
-            group_number=1,
-            position=1,
-        )
-        self.assertTrue(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-    def test_should_return_true_if_luy_is_prerequisite_in_other_root_but_same_group(self):
-        PrerequisiteItemFactory(
-            prerequisite__education_group_year=self.other_grp_ele_root.parent,
-            prerequisite__learning_unit_year=self.second_grp_ele_leaf.child_leaf,
-            learning_unit=self.grp_ele_leaf.child_leaf.learning_unit,
-            group_number=1,
-            position=1,
-        )
-        self.assertTrue(
-            self.grp_ele_leaf.child_leaf.has_or_is_prerequisite(self.grp_ele_leaf.parent)
-        )
-
-
 class ContainerTypeVerboseTest(TestCase):
     """Unit tests on container_type_verbose()"""
 
@@ -973,10 +888,7 @@ class LearningUnitYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year = LearningUnitYearFactory()
-        cls.translated_text = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=cls.learning_unit_year.id
-        )
+        cls.translated_text = LearningUnitYearTranslatedTextFactory(reference=cls.learning_unit_year.id)
 
         cls.learning_unit_year_no_cms = LearningUnitYearFactory()
 

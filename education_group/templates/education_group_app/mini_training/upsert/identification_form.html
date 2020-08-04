@@ -1,0 +1,84 @@
+{% load static bootstrap3 %}
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="identification-form">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% include "education_group_app/blocks/form/field_with_help_text.html" with form_field=mini_training_form.abbreviated_title only%}
+                        </div>
+                        <div class="col-md-6">
+                            {% include "education_group_app/blocks/form/field_with_help_text.html" with form_field=mini_training_form.code only%}
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.category form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_form.type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.status form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_form.schedule_type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.credits form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_form.constraint_type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_form.min_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
+                        {% bootstrap_field mini_training_form.max_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
+                    </div>
+                    <br>
+                    {% bootstrap_field mini_training_form.title_fr %}
+                    {% bootstrap_field mini_training_form.title_en %}
+                    {% bootstrap_field mini_training_form.keywords %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% bootstrap_field mini_training_form.management_entity %}
+                    {% bootstrap_field mini_training_form.academic_year %}
+                    {% bootstrap_field mini_training_form.end_year %}
+                    {% bootstrap_field mini_training_form.teaching_campus %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% bootstrap_field mini_training_form.remark_fr label_class="d-block text-first-letter-capitalize" %}
+            {% bootstrap_field mini_training_form.remark_en label_class="d-block text-first-letter-capitalize" %}
+        </div>
+    </div>
+</div>

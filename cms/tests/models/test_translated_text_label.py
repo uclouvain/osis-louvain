@@ -28,14 +28,13 @@ from django.test import TestCase
 
 from cms.enums import entity_name
 from cms.models.translated_text_label import get_label_translation
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 
 
 class TranslatedTextLabelTest(TestCase):
     def test_get_label_translation(self):
-        text_label = TextLabelFactory(
-            entity=entity_name.OFFER_YEAR,
+        text_label = OfferTextLabelFactory(
             label='TEST_LABEL'
         )
         TranslatedTextLabelFactory(

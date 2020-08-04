@@ -33,7 +33,7 @@ class TestSynchonizationUserRoleCommand(TestCase):
         self.command_instance.handle()
 
         self.person.refresh_from_db()
-        self.assertEquals(self.person.user.groups.count(), 1)
+        self.assertEqual(self.person.user.groups.count(), 1)
 
     @mock.patch('osis_role.management.commands.sync_user_role.Command._get_users_in_role_model_but_not_in_auth_groups')
     @mock.patch('osis_role.management.commands.sync_user_role.Command._get_users_in_auth_groups_but_not_in_role_model')
@@ -45,4 +45,4 @@ class TestSynchonizationUserRoleCommand(TestCase):
 
         self.command_instance.handle()
         self.person.refresh_from_db()
-        self.assertEquals(self.person.user.groups.count(), 0)
+        self.assertEqual(self.person.user.groups.count(), 0)

@@ -31,48 +31,51 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
+from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
+    CMS_LABEL_ADDITIONAL_INFORMATION
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
+from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.views.proxy.read import Tab
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
 class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-
+        StandardEducationGroupVersionFactory(offer=cls.education_group_year)
         cls.achievement_0 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
 
-        cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group',
-            'change_educationgroupachievement',
-            'delete_educationgroupachievement',
-            user=cls.user
-        )
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        for perm_name in ['delete_educationgroupachievement', 'change_educationgroupachievement']:
+            perm = Permission.objects.get(codename=perm_name)
+            cls.person.user.user_permissions.add(perm)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.person.user)
 
     def test_form_valid_up(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "up"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -82,12 +85,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_valid_down(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={"action": "down"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "down"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -97,12 +100,12 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_form_invalid(self):
         response = self.client.post(
             reverse(
-                "education_group_achievements_actions",
+                "training_achievement_actions",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"action": "not_an_action"}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "not_an_action"}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -114,24 +117,24 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={"code_name": code}
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"code_name": code, 'path': 1111}
         )
 
         self.assertEqual(response.status_code, 302)
         self.achievement_2.refresh_from_db()
         self.assertEqual(self.achievement_2.code_name, code)
 
-    def test_permission_denied(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+    def test_update_case_user_without_permissions(self):
+        self.client.force_login(user=UserFactory())
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "update_education_group_achievement",
+                "training_achievement_update",
                 args=[
                     self.education_group_year.pk,
                     self.education_group_year.pk,
@@ -144,42 +147,80 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     def test_delete(self):
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_0.pk,
-                ]), data={}
+                ]), data={'path': 1111}
         )
 
         self.assertEqual(response.status_code, 302)
         with self.assertRaises(ObjectDoesNotExist):
             self.achievement_0.refresh_from_db()
 
-    def test_permission_denied(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="delete_educationgroupachievement"))
+    def test_delete_case_user_without_permissions(self):
+        self.client.force_login(user=UserFactory())
         response = self.client.post(
             reverse(
-                "delete_education_group_achievement",
+                "training_achievement_delete",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     self.achievement_2.pk,
-                ]), data={}
+                ]), data={"path": 1111}
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_detailed_achievement(self):
+        code = "The life is like a box of chocolates"
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement)
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_update",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    achievement.pk,
+                    d_achievement.pk
+                ]), data={"code_name": code, "path": 1111}
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
+        d_achievement.refresh_from_db()
+        self.assertEqual(d_achievement.code_name, code)
+
+    def test_training_detailed_achievement_actions(self):
+        achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
+        d_achievement_1 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=0)
+        d_achievement_2 = EducationGroupDetailedAchievementFactory(education_group_achievement=achievement, order=1)
+        response = self.client.post(
+            reverse(
+                "training_detailed_achievement_actions",
+                args=[
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                    self.achievement_2.pk,
+                    d_achievement_2.pk
+
+                ]) + '?path={}&tab={}'.format(1111, Tab.SKILLS_ACHIEVEMENTS), data={"action": "up"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        d_achievement_1.refresh_from_db()
+        d_achievement_2.refresh_from_db()
+        self.assertEqual(d_achievement_1.order, 1)
+        self.assertEqual(d_achievement_2.order, 0)
 
 
 class TestEducationGroupAchievementCMSSetup(TestCase):
     def setUp(self):
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
-        self.education_group_year = EducationGroupYearFactory()
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.client.force_login(self.user)
+        self.person = PersonFactory()
+        self.academic_year = AcademicYearFactory(current=True)
+        self.education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
+        self.client.force_login(self.person.user)
 
 
 class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementCMSSetup):
@@ -192,12 +233,11 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
                 self.education_group_year.pk,
                 self.education_group_year.pk,
             ]
-        )
-        self.text_label = TextLabelFactory(label=CMS_LABEL_PROGRAM_AIM, entity=entity_name.OFFER_YEAR)
-        self.program_aim_french = TranslatedTextFactory(
+        ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.pk, Tab.SKILLS_ACHIEVEMENTS)
+        self.text_label = OfferTextLabelFactory(label=CMS_LABEL_PROGRAM_AIM)
+        self.program_aim_french = OfferTranslatedTextFactory(
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
-            entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.pk,
             text="dummy text"
         )
@@ -206,7 +246,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         """This test ensure that the french version is updated and the english version is created"""
         data = {
             "text_french": 'dummy text in french',
-            "text_english": 'dummy text in english'
+            "text_english": 'dummy text in english',
         }
 
         response = self.client.post(self.url, data=data)
@@ -224,8 +264,19 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
             text=data['text_english']
         ).exists())
 
+    def test_update_achievement_program_aim_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data["translated_label"], _('the program aims'))
+        self.assertEqual(
+            response.context_data["url_action"],
+            reverse(
+                'education_group_achievement_program_aim',
+                args=[self.education_group_year.id, self.education_group_year.id]
+            ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.id, Tab.SKILLS_ACHIEVEMENTS))
+
     def test_update_without_permission(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        self.client.force_login(user=UserFactory())
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 403)
 
@@ -233,7 +284,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         self.client.logout()
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertTrue("/login/?next=" in response.url)
 
 
 class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupAchievementCMSSetup):
@@ -246,22 +297,21 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
                 self.education_group_year.pk,
                 self.education_group_year.pk,
             ]
-        )
+        ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.pk, Tab.SKILLS_ACHIEVEMENTS)
 
-        self.text_label = TextLabelFactory(label=CMS_LABEL_ADDITIONAL_INFORMATION, entity=entity_name.OFFER_YEAR)
-        self.program_aim_french = TranslatedTextFactory(
+        self.text_label = OfferTextLabelFactory(label=CMS_LABEL_ADDITIONAL_INFORMATION)
+        self.program_aim_french = OfferTranslatedTextFactory(
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
-            entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.pk,
             text="dummy text"
         )
 
-    def test_update_achievement_program_aim(self):
+    def test_update_additional_information(self):
         """This test ensure that the french version is updated and the english version is created"""
         data = {
             "text_french": 'dummy text in french',
-            "text_english": 'dummy text in english'
+            "text_english": 'dummy text in english',
         }
 
         response = self.client.post(self.url, data=data)
@@ -279,8 +329,19 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
             text=data['text_english']
         ).exists())
 
+    def test_update_achievement_additional_information_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data["translated_label"], _('additional informations'))
+        self.assertEqual(
+            response.context_data["url_action"],
+            reverse(
+                'education_group_achievement_additional_information',
+                args=[self.education_group_year.id, self.education_group_year.id]
+            ) + '?path={}&tab={}#achievement_'.format(self.education_group_year.id, Tab.SKILLS_ACHIEVEMENTS))
+
     def test_update_without_permission(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        self.client.force_login(user=UserFactory())
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 403)
 
@@ -288,4 +349,4 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         self.client.logout()
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertTrue("/login/?next=" in response.url)

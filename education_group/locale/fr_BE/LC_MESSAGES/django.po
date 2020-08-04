@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-20 10:11+0100\n"
+"POT-Creation-Date: 2020-07-31 09:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,758 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the mini-training."
+msgid_plural "%(count_enrollment)d students are enrolled in the mini-training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la mini-formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la mini-formation."
+
+#, python-format
+msgid "%(count_enrollment)d student is enrolled in the training."
+msgid_plural "%(count_enrollment)d students are enrolled in the training."
+msgstr[0] "%(count_enrollment)d étudiant est inscrit à la formation."
+msgstr[1] "%(count_enrollment)d étudiants sont inscrits à la formation."
+
+#, python-format
+msgid "%(max)s must be greater or equals than %(min)s"
+msgstr "%(max)s doit être plus grand ou égal à %(min)s"
+
+msgid "ARES ability"
+msgstr "Habilitation ARES"
+
+msgid "ARES study code"
+msgstr "Code étude ARES"
+
+msgid "ARES-GRACA"
+msgstr "ARES-GRACA"
+
+msgid "Academic responsible"
+msgstr "Responsable académique"
+
+msgid "Academic type"
+msgstr "Nature"
+
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Access"
+msgstr "Accès"
+
+msgid "Access condition"
+msgstr "Condition d'accès"
+
+msgid "Acronym/Short title"
+msgstr "Sigle/Intitulé abrégé"
+
+msgctxt "abbreviation"
+msgid "Acronym/Short title"
+msgstr "Sigle/Int. abr."
+
+msgid "Acronym/Short title '{}' already exists"
+msgstr "Sigle/Intitulé abrégé '{}' existe déjà"
+
+msgid "Acronym/Short title is required"
+msgstr "Sigle/Intitulé abrégé est requis"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Activities on other campus"
+msgstr "Activités sur d'autres sites"
+
+msgid "Add the English content of this paragraph"
+msgstr "Ajouter le contenu Anglais de ce paragraphe"
+
+msgid "Add the French content of this paragraph"
+msgstr "Ajouter le contenu Français de ce paragraphe"
+
+msgid "Additional info"
+msgstr "Infos complémentaires"
+
+msgid "Administration entity"
+msgstr "Entité d'administration"
+
+msgid "Administrative data"
+msgstr "Données administratives"
+
+msgid "Admission and Enrolment Procedures for general registration"
+msgstr "Procédures d'admission et d'inscription"
+
+msgid "Admission exam"
+msgstr "Concours"
+
+msgid "Adults taking up their university training"
+msgstr "Adultes en reprise d'études"
+
+msgid "Alert Message"
+msgstr "Message d'alerte"
+
+#, python-format
+msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
+
+#, python-format
+msgid "Are you sure you want to delete %(code)s - %(title)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
+
+msgid "Bachelors of the Dutch speaking Community of Belgium"
+msgstr "Bachelier de la Communauté flamande de Belgique"
+
+msgid "Block"
+msgstr "Bloc"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "Central admission manager"
+msgstr "Gestionnaire central d'admission"
+
+msgid "Central manager"
+msgstr "Gestionnaire central"
+
+msgid "Central managers"
+msgstr "Gestionnaire centraux"
+
+msgid "Certificate aim can only be edited by program manager"
+msgstr ""
+"Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
+"programme"
+
+msgid "Clear clipboard"
+msgstr "Vider le presse-papier"
+
+msgid "Co-graduation total coefficient"
+msgstr "Coefficient total de co-diplômation"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Code already exists"
+msgstr "Le code existe déjà"
+
+msgid "Code co-graduation inter CfB"
+msgstr "Code co-diplômation intra CfB"
+
+msgid "Comment"
+msgstr "Commentaire"
+
+msgid "Conditions"
+msgstr "Conditions"
+
+msgid "Contacts"
+msgstr "Contacts"
+
+msgid "Content"
+msgstr "Contenu"
+
+msgid "Coorganization can only be changed by central manager"
+msgstr ""
+
+msgid "Copied element"
+msgstr "Élément copié"
+
+msgid "Course enrollment"
+msgstr "Inscription aux cours"
+
+msgid "Create"
+msgstr "Créer"
+
+msgid "Cred. rel./abs."
+msgstr "Créd. rel./abs."
+
+msgid "Credits"
+msgstr "Crédits"
+
+msgid "Credits must be greater or equals than 0"
+msgstr "Credits doit être plus grand ou égal à 0"
+
+msgid "Cut element"
+msgstr "Élément coupé"
+
+msgid "Datetime"
+msgstr "Date/heure"
+
+msgid "Decree category"
+msgstr "Catégorie décret"
+
+msgid "Default learning unit enrollment"
+msgstr "Inscription par défaut aux cours"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Deliberation"
+msgstr "Délibération"
+
+msgid "Detach"
+msgstr "Retirer"
+
+msgid "Diploma"
+msgstr "Diplôme"
+
+msgid "Diploma title"
+msgstr "Intitulé du diplôme/du certificat"
+
+msgid "Diplomas /  Certificates"
+msgstr "Diplômes /  Certificats"
+
+msgid "Dissertation"
+msgstr "Mémoire"
+
+msgid "Dissertation submission"
+msgstr "Remise du mémoire"
+
+msgid "Duration"
+msgstr "Durée"
+
+msgid "Edit"
+msgstr "Modifier"
+
 msgid "End academic year"
 msgstr "Année académique de fin"
 
 msgid "End year must be greater than the start year, or equal"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
+
+msgid "English comment"
+msgstr "Commentaire en anglais"
+
+msgid "Enrollment campus"
+msgstr "Lieu d'inscription"
+
+msgid "Enrollment enabled"
+msgstr "Inscriptible"
+
+msgid "Enter text to search"
+msgstr "Entrez le texte à rechercher"
+
+msgid "Entity"
+msgstr "Entité"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
+
+msgid "Exams Enrollments"
+msgstr "Inscription aux examens"
+
+msgid "Faculty manager"
+msgstr "Gestionnaire facultaire"
+
+msgid "Faculty managers"
+msgstr "Gestionnaires facultaires"
+
+msgid "For all students"
+msgstr "Pour tous les étudiants"
+
+msgid "Foreign Bachelors"
+msgstr "Bacheliers étrangers"
+
+msgid "Formation catalogue"
+msgstr "Catalogue des formations"
+
+msgid "French language proficiency examination"
+msgstr "Maîtrise de la langue française"
+
+msgid "From"
+msgstr "De"
+
+msgid "Funding"
+msgstr "Finançable"
+
+msgid "Funding direction"
+msgstr "Orientation de financement"
+
+msgid "Funding international cooperation CCD/CUD"
+msgstr "Financement coopération internationale CCD/CUD"
+
+msgid "Funding international cooperation CCD/CUD direction"
+msgstr "Orientation coopération internationale CCD/CUD"
+
+msgid "General Conditions"
+msgstr ""
+
+msgid "General informations"
+msgstr ""
+
+msgid "Go down"
+msgstr ""
+
+msgid "Go up"
+msgstr ""
+
+msgid "Graduates"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+#, python-format
+msgid ""
+"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
+"created."
+msgstr ""
+"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"créé avec succès"
+
+#, python-format
+msgid ""
+"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
+"updated."
+msgstr ""
+"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a été "
+"mis à jour avec succès"
+
+msgid "Holders of a 2nd cycle University degree"
+msgstr ""
+
+msgid "Holders of a non-University 2nd cycle degree"
+msgstr ""
+
+msgid "ISCED domain"
+msgstr "Domaine ISCED/CITE"
+
+msgid "Identification"
+msgstr ""
+
+msgid "Institution"
+msgstr ""
+
+msgid "Internship"
+msgstr "Stage"
+
+msgid "Jury"
+msgstr ""
+
+msgid "Jury members"
+msgstr ""
+
+msgid "Keywords"
+msgstr ""
+
+msgid "Language Exam"
+msgstr ""
+
+msgid "Last modifications"
+msgstr ""
+
+msgid "Last year of organization"
+msgstr ""
+
+msgid "Leads to diploma/certificate"
+msgstr ""
+
+msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit"
+msgstr ""
+
+msgid "Link type"
+msgstr ""
+
+msgid "Linked with EPC"
+msgstr "Liens existants dans l'application EPC."
+
+msgid "Main"
+msgstr ""
+
+msgid "Management entity"
+msgstr ""
+
+msgid "Mandatory"
+msgstr ""
+
+msgid "Marks presentation"
+msgstr ""
+
+msgid "Masters"
+msgstr ""
+
+msgid "Mini training"
+msgstr ""
+
+msgid "Mini-Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
+"été créé avec succès"
+
+msgid "Modification"
+msgstr "Modification"
+
+msgid "New Education Group"
+msgstr ""
+
+msgid "New Mini-Training"
+msgstr "Nouvelle Mini-Formation"
+
+msgid "New Training"
+msgstr "Nouvelle Formation"
+
+msgid "Non university Bachelors"
+msgstr ""
+
+msgid "Number of elements"
+msgstr ""
+
+msgid "Opening to Adults"
+msgstr ""
+
+msgid "Other academic responsibles"
+msgstr ""
+
+msgid "Other contacts"
+msgstr ""
+
+msgid "Other languages activities"
+msgstr ""
+
+msgid "Others Bachelors of the French speaking Community of Belgium"
+msgstr ""
+
+msgid "Own comment"
+msgstr ""
+
+msgid "Partial deliberation"
+msgstr ""
+
+msgid "Partial title in English"
+msgstr ""
+
+msgid "Partial title in French"
+msgstr ""
+
+msgid "Personalized access"
+msgstr ""
+
+msgid "Please enter an academic year greater or equal to group start year."
+msgstr ""
+
+msgid "Please enter an academic year less or equal to group end year."
+msgstr ""
+
+msgid "Primary language"
+msgstr ""
+
+msgid "Producing annexe"
+msgstr ""
+
+msgid "Producing certificat"
+msgstr ""
+
+msgid "Professionnal title"
+msgstr ""
+
+msgid "Program managers"
+msgstr ""
+
+msgid "Program organized with other institutes"
+msgstr ""
+
+msgid "Rate code"
+msgstr ""
+
+msgid "Reduction"
+msgstr ""
+
+msgid "Reference institution"
+msgstr ""
+
+msgid "Refresh publication"
+msgstr ""
+
+msgid "Remark"
+msgstr ""
+
+msgid "Remarks"
+msgstr ""
+
+msgid "Schedule type"
+msgstr ""
+
+msgid "Scores diffusion"
+msgstr ""
+
+msgid "Search..."
+msgstr "Recherche..."
+
+msgid "Session"
+msgstr ""
+
+msgid "Signatory qualification"
+msgstr ""
+
+msgid "Special Conditions"
+msgstr ""
+
+msgid "Specific Conditions"
+msgstr ""
+
+msgid "Specific admission requirements"
+msgstr ""
+
+msgid "Stage"
+msgstr ""
+
+msgid "Standard"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start academic year"
+msgstr "Année académique de début"
+
+msgid "Status"
+msgstr ""
+
+msgid "The field can contain only one value."
+msgstr ""
+
+msgid "The fields concerning ARES have to be ALL filled-in or none of them"
+msgstr ""
+"Les champs concernant les données de l'ARES doivent être soit tous remplis "
+"soit tous vides"
+
+msgid "The following links has been updated"
+msgstr "Les liens suivants ont été mis à jour"
+
+#, python-brace-format
+msgid ""
+"The formation you work with doesn't exist (or is not at the same position) "
+"in the tree {root.title} in {root.year}.You've been redirected to the root "
+"{root.code} ({root.year})"
+msgstr ""
+"La formation avec laquelle vous travaillez n'existe pas (ou n'est pas à la "
+"même position) dans le programme de {root.title} en {root.year}.Vous avez "
+"été redirigé vers la racine du programme : {root.code} ({root.year})."
+
+#, python-format
+msgid "The group %(code)s has been deleted."
+msgstr "Le groupement %(code)s a été supprimé."
+
+#, python-format
+msgid "The mini-training %(code)s has been deleted."
+msgstr "La mini-formation %(code)s a été supprimée."
+
+#, python-format
+msgid "The program %(acronym)s will be published soon"
+msgstr ""
+
+msgid ""
+"The scope of the user is limited and prevents this action to be performed"
+msgstr ""
+"La portée de l'utilisateur est limitée et empêche la réalisation de cette "
+"action"
+
+#, python-format
+msgid "The training %(code)s has been deleted."
+msgstr "La formation %(code)s a été supprimée."
+
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to create a %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
+
+#, python-format
+msgctxt "male"
+msgid "The user does not have permission to create a %(category)s."
+msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
+
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to delete a %(category)s."
+msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+
+msgid "The user is not allowed to create/modify this type of education group"
+msgstr "L'utilisateur n'est pas autorisé à créer/modifer ce type de formation"
+
+msgid "The user is not attached to the management entity"
+msgstr ""
+
+msgid "The value of this attribute is inherited from the standard OF"
+msgstr ""
+
+msgid "There can only be one type 2 expectation"
+msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
+
+msgid "Title"
+msgstr ""
+
+msgid "Title in English"
+msgstr ""
+
+msgid "Title in French"
+msgstr ""
+
+msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+"successfully created."
+msgstr ""
+"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
+"créé avec succès"
+
+msgid "Trainings"
+msgstr ""
+
+msgid "Type of constraint"
+msgstr ""
+
+msgid "Type of training"
+msgstr ""
+
+msgid "UCL Bachelors"
+msgstr ""
+
+msgid "UCL Diploma"
+msgstr ""
+
+msgid "University Bachelors"
+msgstr ""
+
+msgid "University certificate"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Utilizations"
+msgstr ""
+
+msgid "Validity"
+msgstr ""
+
+msgid "Validity cannot be greater than last year of organization"
+msgstr ""
+"Validité ne peut pas être supérieure à la dernière année d'organisation"
+
+msgid "Web re-registration"
+msgstr ""
+
+msgid "Weighting"
+msgstr ""
+
+msgid ""
+"You can't copy the mini-training '{code}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la mini-formation '{code}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
+
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it ends in {end_year}"
+msgstr ""
+"Vous ne pouvez pas recopier la formation '{acronym}' de {from_year} vers "
+"{to_year} car elle se termine en {end_year}"
+
+#, python-format
+msgid ""
+"You cannot change/delete a education group existing before %(limit_year)s"
+msgstr ""
+"Vous ne pouvez pas supprimer/modifier une formation existant avant "
+"%(limit_year)s"
+
+msgid "You should precise at least minimum or maximum constraint"
+msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
+
+msgid "You should precise constraint type"
+msgstr "Vous devez préciser le type de contrainte"
+
+msgid "activate to sort column ascending"
+msgstr ""
+
+msgid "activate to sort column descending"
+msgstr ""
+
+msgid "activities in English"
+msgstr ""
+
+msgid "additional informations"
+msgstr ""
+
+msgid "at"
+msgstr ""
+
+msgid "certificate aims"
+msgstr ""
+
+msgid "code"
+msgstr ""
+
+msgid "comment (internal)"
+msgstr ""
+
+msgid "credits"
+msgstr ""
+
+msgid "dissertation"
+msgstr "mémoire"
+
+msgid "duration unit"
+msgstr "type durée"
+
+msgid "filter by section"
+msgstr "préfiltrer par rubrique"
+
+msgid "is using in"
+msgstr ""
+
+msgid "main domain"
+msgstr "Domaine principal"
+
+msgid "maximum constraint"
+msgstr ""
+
+msgid "minimum constraint"
+msgstr ""
+
+msgid "of version"
+msgstr "de la version"
+
+msgid "on successful completion of this program, each student is able to"
+msgstr ""
+
+msgid "remark"
+msgstr ""
+
+msgid "remark in english"
+msgstr ""
+
+msgid "secondary domains"
+msgstr ""
+
+msgid "skills and achievements"
+msgstr ""
+
+msgid "the program aims"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "type of constraint"
+msgstr ""
+
+msgid "undefined"
+msgstr ""
+
+msgid "unspecified"
+msgstr "indéterminé"
