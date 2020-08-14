@@ -75,7 +75,6 @@ urlpatterns = [
             name="education_group_pedagogy_edit"),
     ])),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
-        url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
     ])),
