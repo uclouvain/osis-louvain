@@ -29,7 +29,6 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.urls import path
 
-import base.views.education_groups.create
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
