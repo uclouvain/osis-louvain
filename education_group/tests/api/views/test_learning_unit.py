@@ -24,11 +24,13 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import Value, IntegerField
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearMasterFactory
@@ -75,9 +77,11 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+        gey = GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         GroupElementYearFactory(parent=cls.sub_group, child_branch=None, child_leaf=cls.learning_unit_year)
-
+        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+            relative_credits=Value(gey.relative_credits, output_field=IntegerField())
+        ).first()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
@@ -94,15 +98,12 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [self.training],
+            [self.offer],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR,
                 'learning_unit_year': self.learning_unit_year,
-                'education_group_root_ids': {
-                    self.common_core.id: [self.training.id],
-                }
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -119,23 +120,25 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             academic_year=self.academic_year
         )
         GroupElementYearFactory(parent=finality, child_branch=sub_group, child_leaf=None)
-        GroupElementYearFactory(parent=sub_group, child_branch=None, child_leaf=self.learning_unit_year)
-
+        gey = GroupElementYearFactory(parent=sub_group, child_branch=None, child_leaf=self.learning_unit_year)
+        offer = EducationGroupYear.objects.filter(id=finality_root.id).annotate(
+            relative_credits=Value(gey.relative_credits, output_field=IntegerField())
+        ).first()
         query_string = {'ignore_complementary_module': 'true'}
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [self.training, finality_root],
+            [offer, self.offer],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR,
                 'learning_unit_year': self.learning_unit_year,
-                'education_group_root_ids': {self.common_core.id: [self.training.id], sub_group.id: [finality_root.id]}
             }
         )
-
+        print(response.data)
+        print(serializer.data)
         self.assertCountEqual(response.data, serializer.data)
 
 
@@ -162,8 +165,11 @@ class EducationGroupRootsListTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+        gey = GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         cls.user = UserFactory()
+        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+            relative_credits=Value(gey.relative_credits, output_field=IntegerField())
+        ).first()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
@@ -199,13 +205,12 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [self.training],
+            [self.offer],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_EN,
                 'learning_unit_year': self.learning_unit_year,
-                'education_group_root_ids': {self.common_core.id: [self.training.id]}
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -274,4 +279,3 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             }
         )
         self.assertEqual(response.data, serializer.data)
-

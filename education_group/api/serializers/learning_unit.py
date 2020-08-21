@@ -28,11 +28,9 @@ from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
 from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
@@ -87,18 +85,7 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
 
     def get_learning_unit_credits(self, obj):
         learning_unit_year = self.context.get('learning_unit_year')
-        education_group_root_ids = self.context.get('education_group_root_ids')
-        parent_offers = [
-            parent_id for parent_id, offer_ids in education_group_root_ids.items()
-            for offer_id in offer_ids if offer_id == obj.id
-        ]
-
-        gey = GroupElementYear.objects.filter(
-            child_leaf=learning_unit_year,
-            id__in=[element.id for element in EducationGroupHierarchy(root=obj).to_list(flat=True)],
-            parent_id__in=parent_offers
-        ).first()
-        return gey.relative_credits or (learning_unit_year and learning_unit_year.credits)
+        return obj.relative_credits or (learning_unit_year and learning_unit_year.credits)
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):

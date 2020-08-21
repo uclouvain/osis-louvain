@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.db.models.expressions import RawSQL
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -79,15 +79,38 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
 
         return EducationGroupYear.objects.filter(
             pk__in=offer_ids
-        ).select_related('education_group_type', 'academic_year')
+        ).select_related('education_group_type', 'academic_year').annotate(
+            relative_credits=RawSQL(
+                self.get_extra_query(),
+                (self.learning_unit_year.id,)
+            )
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({
             'learning_unit_year': self.learning_unit_year,
-            'education_group_root_ids': self.education_group_root_ids
         })
         return context
+
+    @staticmethod
+    def get_extra_query():
+        return """
+            WITH RECURSIVE group_element_year_children AS (
+                SELECT gey.child_branch_id, gey.child_leaf_id, gey.relative_credits
+                FROM base_groupelementyear gey
+                WHERE parent_id = (
+                    SELECT egy.id FROM base_educationgroupyear egy WHERE egy.id = base_educationgroupyear.id
+                )
+                UNION ALL
+                SELECT child.child_branch_id, child.child_leaf_id, child.relative_credits
+                FROM base_groupelementyear AS child
+                INNER JOIN group_element_year_children AS parent on parent.child_branch_id = child.parent_id
+            )
+            SELECT geyc.relative_credits
+            FROM group_element_year_children geyc 
+            WHERE child_leaf_id = %s LIMIT 1
+        """
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):

@@ -24,9 +24,11 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.db.models import Value, IntegerField
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
+from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -47,22 +49,25 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
+        relative_credits = 15
         group = GroupFactory(academic_year=cls.academic_year)
         cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.training, child_branch=group, child_leaf=None)
         cls.group_element_year = GroupElementYearFactory(
-            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=15
+            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=relative_credits
         )
 
         url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
             'acronym': cls.luy.acronym,
             'year': cls.academic_year.year,
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+            relative_credits=Value(relative_credits, output_field=IntegerField())
+        ).first()
+        cls.serializer = EducationGroupRootsListSerializer(cls.offer, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN,
             'learning_unit_year': cls.luy,
-            'education_group_root_ids': {group.id: [cls.training.id]}
         })
 
     def test_contains_expected_fields(self):
