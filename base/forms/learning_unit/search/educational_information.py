@@ -24,16 +24,14 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField
+from django.db.models.expressions import RawSQL
 from django_filters import filters
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models import entity_calendar
+from base.models import academic_calendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.views.learning_units.search.common import SearchTypes
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
@@ -57,16 +55,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             "learningcomponentyear_set",
         )
 
-        translated_text_qs = TranslatedText.objects.filter(
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False,
-            reference=OuterRef('pk')
-        ).order_by("-changed")
-
-        return queryset.annotate(
-            last_translated_text_changed=Subquery(translated_text_qs.values('changed')[:1]),
-        )
+        return queryset
 
     @property
     def qs(self):
@@ -77,36 +66,27 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         return queryset
 
     def _compute_summary_status(self, queryset):
-        """
-        This function will compute the summary status. First, we will take the entity calendar
-        (or entity calendar parent and so one) of the requirement entity. If not found, the summary status is
-        computed with the general Academic Calendar Object
-        """
-        entity_calendars_computed = entity_calendar.build_calendar_by_entities(
-            self.form.cleaned_data['academic_year'].past(),
+        ac_calendar = academic_calendar.get_by_reference_and_data_year(
             SUMMARY_COURSE_SUBMISSION,
+            self.form.cleaned_data['academic_year']
         )
-        requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
 
-        summary_status_case_statment = [When(last_translated_text_changed__isnull=True, then=False)]
-        for requirement_entity_id in set(requirement_entities_ids):
-            start_summary_course_submission = entity_calendars_computed.get(requirement_entity_id, {}).get('start_date')
-            if start_summary_course_submission is None:
-                continue
-
-            summary_status_case_statment.append(
-                When(
-                    learning_container_year__requirement_entity=requirement_entity_id,
-                    last_translated_text_changed__gte=start_summary_course_submission,
-                    then=True
-                )
+        extra_query = """
+            EXISTS(
+                SELECT * 
+                FROM cms_translatedtext
+                JOIN cms_textlabel ct on cms_translatedtext.text_label_id = ct.id
+                JOIN reversion_version rv on rv.object_id::int = cms_translatedtext.id
+                JOIN reversion_revision rr on rv.revision_id = rr.id
+                WHERE ct.label in %s 
+                    and rr.date_created >= %s 
+                    and cms_translatedtext.reference = base_learningunityear.id
             )
+        """
 
-        queryset = queryset.annotate(
-            summary_status=Case(
-                *summary_status_case_statment,
-                default=Value(False),
-                output_field=BooleanField()
+        return queryset.annotate(
+            summary_status=RawSQL(
+                extra_query,
+                (tuple(CMS_LABEL_PEDAGOGY), ac_calendar and ac_calendar.start_date,)
             )
         )
-        return queryset
