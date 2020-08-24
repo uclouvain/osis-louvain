@@ -97,9 +97,12 @@ class AdmissionCondition(models.Model):
 
 class AdmissionConditionAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('name',)
+    search_fields = ['education_group_year__acronym',
+                     'education_group_year__partial_acronym']
+    list_filter = ('education_group_year__academic_year', )
 
     def name(self, obj):
-        return obj.education_group_year.acronym
+        return str(obj.education_group_year)
 
 
 CONDITION_ADMISSION_ACCESSES = [
@@ -158,6 +161,9 @@ class AdmissionConditionLine(OrderedModel):
 
 class AdmissionConditionLineAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('name', 'section')
+    search_fields = ['admission_condition__education_group_year__acronym',
+                     'admission_condition__education_group_year__partial_acronym']
+    list_filter = ('section', 'admission_condition__education_group_year__academic_year')
 
     def name(self, obj):
-        return obj.admission_condition.education_group_year.acronym
+        return str(obj.admission_condition.education_group_year)
