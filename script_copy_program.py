@@ -598,14 +598,13 @@ if __name__ == '__main__':
             delete_links_old_model(to_year)
             delete_prerequisites(to_year)
         if args.all or args.old_model:
-            # link_created = copy_to_old_model(year)
-            # print('Links successfully copied : {}%'.format(link_created['percentage']))
+            link_created = copy_to_old_model(year)
+            print('Links successfully copied : {}%'.format(link_created['percentage']))
             common_created = copy_commons(year)
             print('Commons successfully copied : {}%'.format(common_created['percentage']))
         if args.all or args.old_model or args.prerequisite:
-            pass
-            # preq_created = create_prerequisites(to_year)
-            # print('Prerequisites successfully copied : {}%'.format(preq_created['percentage']))
+            preq_created = create_prerequisites(to_year)
+            print('Prerequisites successfully copied : {}%'.format(preq_created['percentage']))
         if args.update_education_group:
             correct_end_date_education_group_type_groups(year)
         if args.new_model:
