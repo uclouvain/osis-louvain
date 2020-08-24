@@ -365,7 +365,7 @@ def get_next_education_group_year(old_education_group_year: EducationGroupYear,
 
 
 def copy_common_to_next_year(copy_to_year: AcademicYear) -> dict:
-    common_fields = ['common-1ba', 'common-2m', 'common-2mc', 'common-2a']
+    common_fields = ['common-1ba', 'common-2m', 'common-2mc', 'common-2a', 'common']
     egys = EducationGroupYear.objects.filter(acronym__in=common_fields, academic_year__year=copy_to_year.year-1)
     common_created = 0
     for egy in egys:
@@ -598,13 +598,14 @@ if __name__ == '__main__':
             delete_links_old_model(to_year)
             delete_prerequisites(to_year)
         if args.all or args.old_model:
-            link_created = copy_to_old_model(year)
-            print('Links successfully copied : {}%'.format(link_created['percentage']))
+            # link_created = copy_to_old_model(year)
+            # print('Links successfully copied : {}%'.format(link_created['percentage']))
             common_created = copy_commons(year)
             print('Commons successfully copied : {}%'.format(common_created['percentage']))
         if args.all or args.old_model or args.prerequisite:
-            preq_created = create_prerequisites(to_year)
-            print('Prerequisites successfully copied : {}%'.format(preq_created['percentage']))
+            pass
+            # preq_created = create_prerequisites(to_year)
+            # print('Prerequisites successfully copied : {}%'.format(preq_created['percentage']))
         if args.update_education_group:
             correct_end_date_education_group_type_groups(year)
         if args.new_model:
