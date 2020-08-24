@@ -2,13 +2,12 @@ import argparse
 import datetime
 import os
 import uuid
-from typing import Type
+from typing import Type, Tuple
 
 import django
 import dotenv
 from django.db import models, IntegrityError
 from django.db.models import Subquery, Q
-
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 dotenv.read_dotenv(os.path.join(base_dir, '.env'))
@@ -54,59 +53,69 @@ class CopyLuyOldModel:
         self.new_learning_unit_year = new_learning_unit_year
 
     def run(self):
-        self.copy_data_from_model(LearningAchievement, 'LEARNINGACHIEVEMENT')
-        self.copy_data_from_model(LearningComponentYear, 'LEARNINGCOMPONENTYEAR')
-        self.copy_data_from_model(LearningUnitEnrollment, 'LEARNINGUNITENROLLMENT')
+        self.copy_data_from_model(
+            LearningAchievement,
+            ("consistency_id", "learning_unit_year", "language"),
+            'LEARNINGACHIEVEMENT'
+        )
+        self.copy_data_from_model(
+            LearningComponentYear,
+            ("learning_unit_year", "type"),
+            'LEARNINGCOMPONENTYEAR'
+        )
+        self.copy_data_from_model(
+            LearningUnitEnrollment,
+            ('offer_enrollment', 'learning_unit_year', 'enrollment_state'),
+            'LEARNINGUNITENROLLMENT'
+        )
         self.copy_general_information()
 
-    def copy_data_from_model(self,
-                             model: Type[models.Model],
-                             msg_type_error=None):
+    def copy_data_from_model(self, model: Type[models.Model], unique_fields: Tuple, msg_type_error=None):
         result = []
         old_datas = model.objects.filter(
-            learning_unit_year=self.old_learning_unit_year
+            learning_unit_year=self.new_learning_unit_year
         )
-        for data in old_datas:
-            old_data = data
-            data.id = None
-            data.pk = None
-            if getattr(data, 'external_id', None):
-                data.external_id = None
-            if getattr(data, 'uuid', None):
-                data.uuid = uuid.uuid4()
-            data.learning_unit_year = self.new_learning_unit_year
+        model_fields = {field.name for field in model._meta._get_fields(reverse=False, include_hidden=True)}
+        fields_to_update = model_fields - {"external_id", "changed", "id"}
+
+        for old_data in old_datas:
+            defaults = {field: getattr(old_data, field) for field in fields_to_update if field not in unique_fields}
+
+            keys = {field: getattr(old_data, field) for field in unique_fields}
+            keys["learning_unit_year"] = self.new_learning_unit_year
             try:
-                data.save()
+                new_data, created = model.objects.update_or_create(**keys, defaults=defaults)
             except IntegrityError as e:
                 write_logging_file(e.args, msg_type_error)
             if VERBOSITY:
-                print("\t\t\t", data)
-            result.append({'new': data, 'old': old_data})
+                print("\t\t\t", old_data)
+            result.append({'new': new_data, 'old': old_data})
         if not old_datas:
-            write_logging_file('No {} found for {}'.format(model._meta.object_name, self.new_learning_unit_year),
+            write_logging_file('No {} found for {}'.format(model._meta.object_name, self.old_learning_unit_year),
                                msg_type_error)
         return result
 
     def copy_general_information(self):
         old_translated_texts = TranslatedText.objects.filter(
             entity=LEARNING_UNIT_YEAR,
-            reference=Subquery(
-                LearningUnitYear.objects.filter(
-                    pk=self.old_learning_unit_year.pk
-                ).values('id')[:1]
-            )
+            reference=self.old_learning_unit_year.id
         )
 
         for translated_text in old_translated_texts:
-            translated_text.id = None
-            translated_text.pk = None
-            translated_text.reference = self.new_learning_unit_year.id
             try:
-                translated_text.save()
+                new_translated_text, created = TranslatedText.objects.update_or_create(
+                    entity=LEARNING_UNIT_YEAR,
+                    reference=self.new_learning_unit_year.id,
+                    language=translated_text.language,
+                    text_label=translated_text.text_label,
+                    defaults={
+                       "text": translated_text.text
+                    }
+                )
             except IntegrityError as e:
                 write_logging_file(e.args, 'GENERAL_INFO')
             if VERBOSITY:
-                print('\t\t\t', translated_text)
+                print('\t\t\t', new_translated_text)
         if not old_translated_texts:
             write_logging_file('No TranslatedText found for {}'.format(self.old_learning_unit_year), 'GENERAL_INFO')
 
@@ -118,12 +127,32 @@ class CopyEgyOldModel:
         self.new_education_group_year = new_education_group_year
 
     def run(self):
-        self.copy_data_from_model(EducationGroupYearDomain, 'SECOND_DOMAIN')
-        self.copy_data_from_model(EducationGroupLanguage, 'LANGUAGE')
+        self.copy_data_from_model(
+            EducationGroupYearDomain,
+            ('education_group_year', ),
+            'SECOND_DOMAIN'
+        )
+        self.copy_data_from_model(
+            EducationGroupLanguage,
+            ('education_group_year', ),
+            'LANGUAGE'
+        )
         self.copy_education_group_achievement()
-        self.copy_data_from_model(EducationGroupCertificateAim, 'CERTIFICATE_AIM')
-        self.copy_data_from_model(EducationGroupOrganization, 'ORGANIZATION')
-        self.copy_data_from_model(EducationGroupPublicationContact, 'PUBLICATIONCONTACT')
+        self.copy_data_from_model(
+            EducationGroupCertificateAim,
+            ('education_group_year', 'certificate_aim'),
+            'CERTIFICATE_AIM'
+        )
+        self.copy_data_from_model(
+            EducationGroupOrganization,
+            ('education_group_year', 'organization'),
+            'ORGANIZATION'
+        )
+        self.copy_data_from_model(
+            EducationGroupPublicationContact,
+            ('education_group_year', 'type', 'order'),
+            'PUBLICATIONCONTACT'
+        )
         self.copy_admission_condition()
         self.copy_general_information()
 
@@ -134,16 +163,21 @@ class CopyEgyOldModel:
             education_group_achievement_id=old_education_group_achievement_id
         )
         for egyda in old_egy_detailed_achievements:
-            egyda.id = None
-            egyda.pk = None
-            egyda.external_id = None
-            egyda.education_group_achievement = new_old_education_group_achievement
             try:
-                egyda.save()
+                new_egya, created = EducationGroupDetailedAchievement.objects.update_or_create(
+                    education_group_achievement=new_old_education_group_achievement,
+                    order=egyda.order,
+                    defaults={
+                        "english_text": egyda.english_text,
+                        "french_text": egyda.french_text,
+                        "code_name": egyda.code_name
+                    }
+
+                )
             except IntegrityError as e:
                 write_logging_file(e.args, 'DETAILED_ACHIEVEMENT')
             if VERBOSITY:
-                print("\t\t\t", egyda)
+                print("\t\t\t", new_egya)
         if not old_egy_detailed_achievements:
             write_logging_file('No EducationGroupDetailedAchievement found for {}'
                                .format(old_egy_detailed_achievements),
@@ -154,86 +188,104 @@ class CopyEgyOldModel:
             education_group_year=self.old_education_group_year
         )
         for egya in old_egy_achievements:
-            old_id = egya.id
-            egya.id = None
-            egya.pk = None
-            egya.external_id = None
-            egya.education_group_year = self.new_education_group_year
-            egya.save()
-            self.copy_education_group_detailed_achievement(old_id, egya)
+            new_egya, created = EducationGroupAchievement.objects.update_or_create(
+                education_group_year=self.new_education_group_year,
+                order=egya.order,
+                defaults={
+                    "english_text": egya.english_text,
+                    "french_text": egya.french_text,
+                    "code_name": egya.code_name,
+                }
+
+            )
+            self.copy_education_group_detailed_achievement(egya.id, new_egya)
             if VERBOSITY:
-                print("\t\t\t", egya)
+                print("\t\t\t", new_egya)
         if not old_egy_achievements:
             write_logging_file('No EducationGroupAchievement found for {}'.format(self.old_education_group_year),
                                'ACHIEVEMENT')
 
-    def copy_data_from_model(self,
-                             model: Type[models.Model],
-                             msg_type_error=None):
+    def copy_data_from_model(self, model: Type[models.Model], unique_fields: Tuple, msg_type_error=None):
         result = []
         old_datas = model.objects.filter(
             education_group_year=self.old_education_group_year
         )
-        for data in old_datas:
-            old_data = data
-            data.id = None
-            data.pk = None
-            if getattr(data, 'external_id', None):
-                data.external_id = None
-            if getattr(data, 'uuid', None):
-                data.uuid = uuid.uuid4()
-            data.education_group_year = self.new_education_group_year
+        model_fields = {field.name for field in model._meta._get_fields(reverse=False, include_hidden=True)}
+        fields_to_update = model_fields - {"external_id", "changed", "id"}
+
+        for old_data in old_datas:
+            defaults = {field: getattr(old_data, field) for field in fields_to_update if field not in unique_fields}
+            keys = {field: getattr(old_data, field) for field in unique_fields}
+            keys["education_group_year"] = self.new_education_group_year
             try:
-                data.save()
-            except IntegrityError as e:
+                new_data, created = model.objects.update_or_create(**keys, defaults=defaults)
+            except (IntegrityError, ) as e:
+                print(self.new_education_group_year.id)
+                print(defaults.keys())
                 write_logging_file(e.args, msg_type_error)
+                new_data = None
             if VERBOSITY:
-                print("\t\t\t", data)
-            result.append({'new': data, 'old': old_data})
+                print("\t\t\t", old_data)
+            result.append({'new': new_data, 'old': old_data})
         if not old_datas:
             write_logging_file('No {} found for {}'.format(model._meta.object_name, self.old_education_group_year),
                                msg_type_error)
         return result
 
     def copy_admission_condition(self):
-        admission_list = self.copy_data_from_model(AdmissionCondition, 'ADMISSION_CONDITION')
+        admission_list = self.copy_data_from_model(
+            AdmissionCondition,
+            ('education_group_year', ),
+            'ADMISSION_CONDITION'
+        )
+
         for admission in admission_list:
             old_lines = AdmissionConditionLine.objects.filter(admission_condition=admission['old'])
             for line in old_lines:
-                line.id = None
-                line.pk = None
-                line.admission_condition = admission['new']
-                if getattr(line, 'uuid', None):
-                    line.uuid = uuid.uuid4()
                 try:
-                    line.save()
-                except IntegrityError as e:
+                    new_line, created = AdmissionConditionLine.objects.update_or_create(
+                        admission_condition=admission['new'],
+                        section=line.section,
+                        order=line.order,
+                        defaults={
+                            "access": line.access,
+                            "diploma": line.diploma,
+                            "conditions": line.conditions,
+                            "remarks": line.remarks,
+                            "diploma_en": line.diploma_en,
+                            "conditions_en": line.conditions_en,
+                            "remarks_en": line.remarks_en,
+                        }
+                    )
+                except (IntegrityError, AdmissionConditionLine.MultipleObjectsReturned) as e:
                     write_logging_file(e.args, 'ADMISSION_LINE')
+                    new_line = None
                 if VERBOSITY:
-                    print("\t\t\t", line)
+                    print("\t\t\t", new_line)
             if not old_lines:
                 write_logging_file('No AdmissionConditionLine found for {}'.format(admission['old']), 'ADMISSION_LINE')
 
     def copy_general_information(self):
         old_translated_texts = TranslatedText.objects.filter(
             entity=OFFER_YEAR,
-            reference=Subquery(
-                EducationGroupYear.objects.filter(
-                    pk=self.old_education_group_year.pk
-                ).values('id')[:1]
-            )
+            reference=self.old_education_group_year.id
         )
 
         for translated_text in old_translated_texts:
-            translated_text.id = None
-            translated_text.pk = None
-            translated_text.reference = self.new_education_group_year.id
             try:
-                translated_text.save()
+                new_translated_text, created = TranslatedText.objects.update_or_create(
+                    entity=OFFER_YEAR,
+                    reference=self.new_education_group_year.id,
+                    language=translated_text.language,
+                    text_label=translated_text.text_label,
+                    defaults={
+                        "text": translated_text.text
+                    }
+                )
             except IntegrityError as e:
                 write_logging_file(e.args, 'GENERAL_INFO')
             if VERBOSITY:
-                print('\t\t\t', translated_text)
+                print('\t\t\t', new_translated_text)
         if not old_translated_texts:
             write_logging_file('No TranslatedText found for {}'.format(self.old_education_group_year), 'GENERAL_INFO')
 
@@ -250,6 +302,21 @@ def copy_to_old_model(from_year: int):
     if VERBOSITY:
         print("End copy to old model")
     print('Copying to old model time:', total_time)
+    return result
+
+
+def copy_commons(from_year: int):
+    start_time = datetime.datetime.now()
+    year = AcademicYear.objects.get(year=from_year)
+    new_year = year.next()
+    if VERBOSITY:
+        print("Start copy of common offers")
+    result = copy_common_to_next_year(new_year)
+    end_time = datetime.datetime.now()
+    total_time = end_time - start_time
+    if VERBOSITY:
+        print("End copy of common offers")
+    print('Copying commons time:', total_time)
     return result
 
 
@@ -272,39 +339,57 @@ def get_next_learning_unit_year(child_leaf: LearningUnitYear, copy_to_year: Acad
 def get_next_education_group_year(old_education_group_year: EducationGroupYear,
                                   copy_to_year: AcademicYear) -> EducationGroupYear:
     try:
-        if old_education_group_year.education_group_type.category == education_group_categories.TRAINING \
-                or old_education_group_year.education_group_type.category == education_group_categories.MINI_TRAINING:
-            egy = EducationGroupYear.objects.get(education_group=old_education_group_year.education_group,
-                                                 academic_year=copy_to_year)
-        else:
-            try:
-                egy = EducationGroupYear.objects.get(
-                    education_group=old_education_group_year.education_group,
-                    academic_year=copy_to_year,
-                )
-            except EducationGroupYear.DoesNotExist:
-                egy = old_education_group_year
-                egy.id = None
-                egy.pk = None
-                egy.external_id = None
-                egy.uuid = uuid.uuid4()
-                egy.academic_year = copy_to_year
-                try:
-                    egy.save()
-                except IntegrityError as e:
-                    write_logging_file(e.args, 'EDUCATIONGROUPYEAR')
-        copy_egy_to_next_year = CopyEgyOldModel(old_education_group_year, egy)
-        copy_egy_to_next_year.run()
-        if VERBOSITY:
-            print("\t\t\t", egy)
-        return egy
+        egy = EducationGroupYear.objects.get(
+            education_group=old_education_group_year.education_group,
+            academic_year=copy_to_year,
+        )
+        egy.publication_contact_entity = old_education_group_year.publication_contact_entity
+        egy.acronym = old_education_group_year.acronym
+        egy.save()
     except EducationGroupYear.DoesNotExist:
-        write_logging_file('EducationGroup {} does NOT exist in {}'.format(
-            old_education_group_year.education_group.most_recent_acronym,
-            copy_to_year),
-            'EDUCATIONGROUPYEAR'
-         )
-        return None
+        egy = old_education_group_year
+        egy.id = None
+        egy.pk = None
+        egy.external_id = None
+        egy.uuid = uuid.uuid4()
+        egy.academic_year = copy_to_year
+        try:
+            egy.save()
+        except IntegrityError as e:
+            write_logging_file(e.args, 'EDUCATIONGROUPYEAR')
+    copy_egy_to_next_year = CopyEgyOldModel(old_education_group_year, egy)
+    copy_egy_to_next_year.run()
+    if VERBOSITY:
+        print("\t\t\t", egy)
+    return egy
+
+
+def copy_common_to_next_year(copy_to_year: AcademicYear) -> dict:
+    common_fields = ['common-1ba', 'common-2m', 'common-2mc', 'common-2a', 'common']
+    egys = EducationGroupYear.objects.filter(acronym__in=common_fields, academic_year__year=copy_to_year.year-1)
+    common_created = 0
+    for egy in egys:
+        clean_common_data_for_next_year(egy)
+        next_egy = get_next_education_group_year(egy, copy_to_year)
+        if next_egy:
+            common_created += 1
+    return {
+        'created': common_created,
+        'total': len(common_fields),
+        'percentage': (common_created / len(common_fields) * 100)
+    }
+
+
+def clean_common_data_for_next_year(egy_previous_year):
+    next_year_egy = egy_previous_year.next_year()
+    if not next_year_egy:
+        return
+
+    queries = []
+    admission_list = AdmissionCondition.objects.filter(education_group_year=next_year_egy)
+    queries.append(AdmissionConditionLine.objects.filter(admission_condition__in=admission_list))
+    queries.append(admission_list)
+    delete_from_queryset(queries)
 
 
 def copy_link_to_next_year(copy_to_year: AcademicYear) -> dict:
@@ -515,6 +600,8 @@ if __name__ == '__main__':
         if args.all or args.old_model:
             link_created = copy_to_old_model(year)
             print('Links successfully copied : {}%'.format(link_created['percentage']))
+            common_created = copy_commons(year)
+            print('Commons successfully copied : {}%'.format(common_created['percentage']))
         if args.all or args.old_model or args.prerequisite:
             preq_created = create_prerequisites(to_year)
             print('Prerequisites successfully copied : {}%'.format(preq_created['percentage']))
