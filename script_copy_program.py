@@ -219,8 +219,6 @@ class CopyEgyOldModel:
             try:
                 new_data, created = model.objects.update_or_create(**keys, defaults=defaults)
             except (IntegrityError, ) as e:
-                print(self.new_education_group_year.id)
-                print(defaults.keys())
                 write_logging_file(e.args, msg_type_error)
                 new_data = None
             if VERBOSITY:
@@ -353,11 +351,18 @@ def get_next_education_group_year(old_education_group_year: EducationGroupYear,
         }
         defaults = {field: getattr(old_education_group_year, field)
                     for field in fields_to_update}
-        egy, created = EducationGroupYear.objects.update_or_create(
-            academic_year=copy_to_year,
-            education_group=old_education_group_year.education_group,
-            defaults=defaults
-        )
+        if old_education_group_year.education_group_type.category == education_group_categories.GROUP:
+            egy, created = EducationGroupYear.objects.update_or_create(
+                academic_year=copy_to_year,
+                education_group=old_education_group_year.education_group,
+                defaults=defaults
+            )
+        else:
+            egy, created = EducationGroupYear.objects.get_or_create(
+                academic_year=copy_to_year,
+                education_group=old_education_group_year.education_group,
+                defaults=defaults
+            )
     except IntegrityError as e:
         write_logging_file(e.args, 'EDUCATIONGROUPYEAR')
         return None
