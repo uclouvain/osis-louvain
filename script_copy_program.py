@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import os
-import uuid
 from typing import Type, Tuple
 
 import django
@@ -76,7 +75,7 @@ class CopyLuyOldModel:
             learning_unit_year=self.new_learning_unit_year
         )
         model_fields = {field.name for field in model._meta._get_fields(reverse=False, include_hidden=True)}
-        fields_to_update = model_fields - {"external_id", "changed", "id"}
+        fields_to_update = model_fields - {"external_id", "changed", "id", 'uuid'}
 
         for old_data in old_datas:
             defaults = {field: getattr(old_data, field) for field in fields_to_update if field not in unique_fields}
@@ -211,7 +210,7 @@ class CopyEgyOldModel:
             education_group_year=self.old_education_group_year
         )
         model_fields = {field.name for field in model._meta._get_fields(reverse=False, include_hidden=True)}
-        fields_to_update = model_fields - {"external_id", "changed", "id"}
+        fields_to_update = model_fields - {"external_id", "changed", "id", 'uuid'}
 
         for old_data in old_datas:
             defaults = {field: getattr(old_data, field) for field in fields_to_update if field not in unique_fields}
@@ -339,24 +338,29 @@ def get_next_learning_unit_year(child_leaf: LearningUnitYear, copy_to_year: Acad
 def get_next_education_group_year(old_education_group_year: EducationGroupYear,
                                   copy_to_year: AcademicYear) -> EducationGroupYear:
     try:
-        egy = EducationGroupYear.objects.get(
-            education_group=old_education_group_year.education_group,
+        model_fields = {field.name
+                        for field in EducationGroupYear._meta._get_fields(reverse=False, include_hidden=True)}
+        fields_to_update = model_fields - {
+            "academic_year",
+            "education_group",
+            "languages",
+            "certificate_aims",
+            "secondary_domains",
+            'uuid',
+            'external_id',
+            'changed',
+            'id'
+        }
+        defaults = {field: getattr(old_education_group_year, field)
+                    for field in fields_to_update}
+        egy, created = EducationGroupYear.objects.update_or_create(
             academic_year=copy_to_year,
+            education_group=old_education_group_year.education_group,
+            defaults=defaults
         )
-        egy.publication_contact_entity = old_education_group_year.publication_contact_entity
-        egy.acronym = old_education_group_year.acronym
-        egy.save()
-    except EducationGroupYear.DoesNotExist:
-        egy = old_education_group_year
-        egy.id = None
-        egy.pk = None
-        egy.external_id = None
-        egy.uuid = uuid.uuid4()
-        egy.academic_year = copy_to_year
-        try:
-            egy.save()
-        except IntegrityError as e:
-            write_logging_file(e.args, 'EDUCATIONGROUPYEAR')
+    except IntegrityError as e:
+        write_logging_file(e.args, 'EDUCATIONGROUPYEAR')
+        return None
     copy_egy_to_next_year = CopyEgyOldModel(old_education_group_year, egy)
     copy_egy_to_next_year.run()
     if VERBOSITY:
@@ -518,7 +522,9 @@ def delete_data_from_education_group_year(egy: EducationGroupYear):
         )
     ))
     old_egy_achievements = EducationGroupAchievement.objects.filter(education_group_year=egy)
-    queries.append(EducationGroupDetailedAchievement.objects.filter(education_group_achievement__in=old_egy_achievements))
+    queries.append(
+        EducationGroupDetailedAchievement.objects.filter(education_group_achievement__in=old_egy_achievements)
+    )
     queries.append(old_egy_achievements)
     admission_list = AdmissionCondition.objects.filter(education_group_year=egy)
     queries.append(AdmissionConditionLine.objects.filter(admission_condition__in=admission_list))
