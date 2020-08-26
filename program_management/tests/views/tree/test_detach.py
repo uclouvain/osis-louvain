@@ -103,7 +103,9 @@ class TestDetachNodeView(TestCase):
     def test_detach_case_post_success(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
+            parent_title=self.group_element_year.parent.acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
+            child_title=self.group_element_year.child_branch.acronym,
             parent_year=self.group_element_year.parent.academic_year.year,
             child_year=self.group_element_year.child_branch.academic_year.year
         )
@@ -124,7 +126,9 @@ class TestDetachNodeView(TestCase):
     def test_detach_when_element_is_in_clipboard(self, mock_service):
         mock_service.return_value = link.LinkIdentity(
             parent_code=self.group_element_year.parent.partial_acronym,
+            parent_title=self.group_element_year.parent.acronym,
             child_code=self.group_element_year.child_branch.partial_acronym,
+            child_title=self.group_element_year.child_branch.acronym,
             parent_year=self.group_element_year.parent.academic_year.year,
             child_year=self.group_element_year.child_branch.academic_year.year
         )

@@ -36,7 +36,9 @@ from program_management.models.enums.node_type import NodeType
 @attr.s(frozen=True, slots=True)
 class LinkIdentity(interface.EntityIdentity):
     parent_code = attr.ib(type=str)
+    parent_title = attr.ib(type=str)
     child_code = attr.ib(type=str)
+    child_title = attr.ib(type=str)
     parent_year = attr.ib(type=int)
     child_year = attr.ib(type=int)
 
@@ -67,7 +69,12 @@ class Link(interface.Entity):
     @entity_id.default
     def _link_identity(self) -> LinkIdentity:
         if self.parent and self.child:
-            return LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
+            return LinkIdentity(self.parent.code,
+                                self.parent.title,
+                                self.child.code,
+                                self.child.title,
+                                self.parent.year,
+                                self.child.year)
 
     @property
     def has_changed(self):

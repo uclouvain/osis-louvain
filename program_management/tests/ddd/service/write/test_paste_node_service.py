@@ -87,7 +87,9 @@ class TestPasteNode(TestCase, ValidatorPatcherMixin):
         result = program_management.ddd.service.write.paste_element_service.paste_element(self.paste_command)
         expected_result = link.LinkIdentity(
             parent_code=self.root_node.code,
+            parent_title=self.root_node.title,
             child_code=self.node_to_paste.code,
+            child_title=self.node_to_paste.title,
             parent_year=self.root_node.year,
             child_year=self.node_to_paste.year
         )
