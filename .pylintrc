@@ -1,0 +1,14 @@
+[MASTER]
+jobs=0
+ignore=tests,migrations,fixtures
+
+[MESSAGES CONTROL]
+disable=all
+enable=print-statement, design, format, similarities
+
+[DESIGN]
+min-public-methods=0
+
+[FORMAT]
+max-line-length=120
+max-modules-lines=500

@@ -66,14 +66,14 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
         detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
-        warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-        if warning_messages:
-            display_warning_messages(self.request, warning_messages)
         try:
             link_to_detach_id = detach_node_service.detach_node(detach_node_command)
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
             display_error_messages(self.request, business_exception.messages)
         else:
+            warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
+            display_warning_messages(self.request, warning_messages)
+
             context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s - %(title)s ?") % {
                 "acronym": link_to_detach_id.child_code,
                 "title": link_to_detach_id.child_title
