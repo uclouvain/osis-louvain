@@ -42,7 +42,8 @@ attrs==19.3.0
 pycodestyle==2.4.0
 pylint==2.4.4
 diff-cover==3.0.1
-
+# setuptools 50.0 causes issues
+setuptools==49.6.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
