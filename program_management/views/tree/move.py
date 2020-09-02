@@ -52,7 +52,8 @@ def up(request):
     command_up = command.OrderUpLinkCommand(path=path)
     node_identity_id = service.write.up_link_service.up_link(command_up)
 
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    success_msg = _("The %(year)s - %(acronym)s has been moved") % {'acronym': node_identity_id.code,
+                                                                    'year': node_identity_id.year}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
@@ -68,7 +69,8 @@ def down(request):
     command_down = command.OrderDownLinkCommand(path=path)
     node_identity_id = service.write.down_link_service.down_link(command_down)
 
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': node_identity_id.code}
+    success_msg = _("The %(year)s - %(acronym)s has been moved") % {'acronym': node_identity_id.code,
+                                                                    'year': node_identity_id.year}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')

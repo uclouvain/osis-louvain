@@ -169,10 +169,18 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
     def _append_success_messages(self, link_identities_ids):
         messages = []
         for link_identity in link_identities_ids:
+            parent = node_repository.NodeRepository.get(
+                node.NodeIdentity(link_identity.parent_code, link_identity.parent_year)
+            )
             messages.append(
-                _("\"%(child)s\" has been pasted into \"%(parent)s\"") % {
+                _("\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
+                  "\"%(parent_year)s - %(parent)s%(parent_title)s\"") % {
                     "child": link_identity.child_code,
-                    "parent": link_identity.parent_code
+                    "child_year": link_identity.child_year,
+                    "parent": link_identity.parent_code,
+                    "parent_year": link_identity.parent_year,
+                    "parent_title": " - {}".format(parent.title) if parent.title else "",
+                    "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
                 }
             )
         return messages

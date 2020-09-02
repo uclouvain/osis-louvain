@@ -21,7 +21,9 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+msgid ""
+"\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 msgstr ""
 
 #, python-format
@@ -537,7 +539,7 @@ msgid "Teaching methods"
 msgstr ""
 
 #, python-format
-msgid "The %(acronym)s has been moved"
+msgid "The %(year)s - %(acronym)s has been moved"
 msgstr ""
 
 #, python-format
@@ -708,6 +710,9 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr ""
 
+msgid "added"
+msgstr ""
+
 msgid "bibliography"
 msgstr ""
 
@@ -752,6 +757,9 @@ msgid "on"
 msgstr ""
 
 msgid "optional"
+msgstr ""
+
+msgid "pasted"
 msgstr ""
 
 #, python-format

@@ -23,8 +23,12 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+msgid ""
+"\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
+msgstr ""
+"\"%(child_year)s - %(child)s\" a été %(copy_message)s dans "
+"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -570,8 +574,8 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 #, python-format
-msgid "The %(acronym)s has been moved"
-msgstr "%(acronym)s a été déplacé"
+msgid "The %(year)s - %(acronym)s has been moved"
+msgstr "%(year)s - %(acronym)s a été déplacé"
 
 #, python-format
 msgid ""
@@ -769,6 +773,9 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
+msgid "added"
+msgstr "ajouté"
+
 msgid "bibliography"
 msgstr "bibliographie"
 
@@ -814,6 +821,9 @@ msgstr "le"
 
 msgid "optional"
 msgstr "optionnel"
+
+msgid "pasted"
+msgstr "collé"
 
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
