@@ -175,12 +175,12 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             messages.append(
                 _("\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
                   "\"%(parent_year)s - %(parent)s%(parent_title)s\"") % {
-                    "child": link_identity.child_code,
-                    "child_year": link_identity.child_year,
-                    "parent": link_identity.parent_code,
-                    "parent_year": link_identity.parent_year,
-                    "parent_title": " - {}".format(parent.title) if parent.title else "",
-                    "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
+                      "child": link_identity.child_code,
+                      "child_year": link_identity.child_year,
+                      "parent": link_identity.parent_code,
+                      "parent_year": link_identity.parent_year,
+                      "parent_title": " - {}".format(parent.title) if parent.title else "",
+                      "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
                 }
             )
         return messages
