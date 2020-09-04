@@ -27,8 +27,8 @@ msgid ""
 "\"%(child_year)s - %(child)s\" has been %(copy_message)s into "
 "\"%(parent_year)s - %(parent)s%(parent_title)s\""
 msgstr ""
-"\"%(child_year)s - %(child)s\" a été %(copy_message)s dans "
-"\"%(parent_year)s - %(parent)s%(parent_title)s\""
+"\"%(child_year)s - %(child)s\" a été %(copy_message)s dans \"%(parent_year)s "
+"- %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -574,8 +574,8 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 #, python-format
-msgid "The %(year)s - %(acronym)s has been moved"
-msgstr "%(year)s - %(acronym)s a été déplacé"
+msgid "The %(acronym)s - %(title)s - %(year)s has been moved"
+msgstr "%(acronym)s - %(title)s - %(year)s a été déplacé"
 
 #, python-format
 msgid ""
