@@ -179,7 +179,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
                       "child_year": link_identity.child_year,
                       "parent": link_identity.parent_code,
                       "parent_year": link_identity.parent_year,
-                      "parent_title": " - {}".format(parent.title) if parent.title else "",
+                      "parent_title": " - {}".format(parent.title) if parent and parent.title else "",
                       "copy_message": _("pasted") if ElementCache(self.request.user.id).cached_data else _("added")
                 }
             )

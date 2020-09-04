@@ -574,8 +574,8 @@ msgid "Teaching methods"
 msgstr "Méthodes d'enseignement"
 
 #, python-format
-msgid "The %(acronym)s - %(title)s - %(year)s has been moved"
-msgstr "%(acronym)s - %(title)s - %(year)s a été déplacé"
+msgid "The %(year)s - %(acronym)s%(title)s has been moved"
+msgstr "%(year)s - %(acronym)s%(title)s a été déplacé"
 
 #, python-format
 msgid ""

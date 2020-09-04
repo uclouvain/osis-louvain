@@ -539,7 +539,7 @@ msgid "Teaching methods"
 msgstr ""
 
 #, python-format
-msgid "The %(acronym)s - %(title)s - %(year)s has been moved"
+msgid "The %(year)s - %(acronym)s%(title)s has been moved"
 msgstr ""
 
 #, python-format

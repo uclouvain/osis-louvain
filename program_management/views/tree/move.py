@@ -57,9 +57,10 @@ def up(request):
     moved_node = node_repository.NodeRepository.get(
         node.NodeIdentity(node_identity_id.code, node_identity_id.year)
     )
-    success_msg = _("The %(acronym)s - %(title)s - %(year)s has been moved") % {'acronym': node_identity_id.code,
-                                                                                'year': node_identity_id.year,
-                                                                                'title': moved_node.title}
+    success_msg = _("The %(year)s - %(acronym)s%(title)s has been moved") % {'acronym': node_identity_id.code,
+                                                                             'year': node_identity_id.year,
+                                                                             'title': " - {}".format(moved_node.title)
+                                                                             if moved_node and moved_node.title else ""}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
@@ -79,9 +80,10 @@ def down(request):
         node.NodeIdentity(node_identity_id.code, node_identity_id.year)
     )
 
-    success_msg = _("The %(acronym)s - %(title)s - %(year)s has been moved") % {'acronym': node_identity_id.code,
-                                                                                'year': node_identity_id.year,
-                                                                                'title': moved_node.title}
+    success_msg = _("The %(year)s - %(acronym)s%(title)s has been moved") % {'acronym': node_identity_id.code,
+                                                                             'year': node_identity_id.year,
+                                                                             'title': " - {}".format(moved_node.title)
+                                                                             if moved_node and moved_node.title else ""}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
