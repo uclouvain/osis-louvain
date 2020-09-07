@@ -25,7 +25,6 @@
 ##############################################################################
 from django import forms
 from django.forms import TextInput
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
@@ -75,7 +74,7 @@ class SpecificVersionForm(forms.Form):
         )
         choices_years = [(x, display_as_academic_year(x)) for x in range(self.training_identity.year, max_year + 1)]
 
-        if max_year == timezone.now().year+6:
+        if max_year == current_academic_year().year+6:
             self.fields["end_year"].choices = BLANK_CHOICE + choices_years
         else:
             self.fields["end_year"].choices = choices_years

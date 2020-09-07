@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import mock
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -32,7 +32,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory, FacultyManagerForUEFactory
+from education_group.tests.ddd.factories.training import TrainingIdentityFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeIdentityFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 from program_management.views.tree_version.create import CreateProgramTreeVersionType
@@ -44,49 +46,35 @@ class TestCreateProgramTreeVersion(TestCase):
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.current_year = cls.current_academic_year.year
         AcademicYearFactory.produce_in_future(cls.current_academic_year.year, 10)
-        cls.type = TrainingEducationGroupTypeFactory()
-
-        cls.group_year = GroupYearFactory(
-            academic_year=cls.current_academic_year,
-            partial_acronym="LDROI200M"
-        )
-
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=cls.current_academic_year,
-            education_group_type=cls.type,
-            acronym=cls.group_year.acronym
-        )
-
-        cls.education_group_version = EducationGroupVersionFactory(
-            offer=cls.education_group_year,
-            root_group=cls.group_year,
-            version_name=""
-        )
-
-        cls.element = ElementFactory(group_year=cls.group_year)
 
         cls.central_manager = CentralManagerForUEFactory("view_educationgroup")
         cls.factulty_manager = FacultyManagerForUEFactory("view_educationgroup")
         cls.simple_user = PersonFactory()
 
+        cls.program_tree_identity = ProgramTreeIdentityFactory(year=cls.current_year)
+        cls.training_identity = TrainingIdentityFactory(year=cls.current_year)
+
+        cls.url = reverse(
+            "create_education_group_version",
+            kwargs={"year": cls.program_tree_identity.year, "code": cls.program_tree_identity.code}
+        )
+
         cls.valid_data = {
             "version_name": "CMS",
             "title": "Titre",
             "title_english": "Title",
-            "end_year": cls.current_year,
+            "end_year": cls.program_tree_identity.year,
             "save_type": CreateProgramTreeVersionType.NEW_VERSION.value
         }
-        cls.url = reverse(
-            "create_education_group_version",
-            kwargs={"year": cls.group_year.academic_year.year, "code": cls.group_year.partial_acronym}
-        )
 
     def test_get_init_form_create_program_tree_version_with_disconected_user(self):
         response = self.client.get(self.url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "registration/login.html")
 
-    def test_get_init_form_create_program_tree_version_for_central_manager(self):
+    @mock.patch('education_group.ddd.domain.service.identity_search.TrainingIdentitySearch.get_from_node_identity')
+    def test_get_init_form_create_program_tree_version_for_central_manager(self, mock_get_from_node_identity):
+        mock_get_from_node_identity.return_value = self.training_identity
         self.client.force_login(self.central_manager.user)
         response = self.client.get(self.url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -104,9 +92,14 @@ class TestCreateProgramTreeVersion(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    def test_get_context_form(self):
+    @mock.patch('education_group.ddd.domain.service.identity_search.TrainingIdentitySearch.get_from_node_identity')
+    def test_get_context_form(self, mock_get_from_node_identity):
+        mock_get_from_node_identity.return_value = self.training_identity
         self.client.force_login(self.central_manager.user)
         response = self.client.get(self.url, data={}, follow=True)
+        self._assert_correct_end_year_choices(response)
+
+    def _assert_correct_end_year_choices(self, response):
         self.assertEqual(len(response.context['form'].fields['end_year'].choices), 8)
         self.assertEqual(response.context['form'].fields['end_year'].choices[0][0], None)
         self.assertEqual(response.context['form'].fields['end_year'].choices[7][0], self.current_year + 6)
