@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-04 09:29+0200\n"
+"POT-Creation-Date: 2020-09-04 14:28+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -31,6 +31,10 @@ msgstr ""
 "- %(parent)s%(parent_title)s\""
 
 #, python-format
+msgid "%(node_to_add)s version must be the same as %(root_node)s version"
+msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
+
+#, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
@@ -41,8 +45,7 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -127,6 +130,9 @@ msgstr "Ent. attrib."
 
 msgid "Annual"
 msgstr "Annuel"
+
+msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -479,6 +485,10 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
 
+#, python-brace-format
+msgid "Program tree not found : {code} {year}"
+msgstr "Programme non trouvé : {code} {year}"
+
 msgid "Prolong"
 msgstr "Prolonger la version existante"
 
@@ -520,6 +530,9 @@ msgstr "Enregistrer"
 
 msgid "Search"
 msgstr "Recherche"
+
+msgid "Select a language"
+msgstr "Sélectionner une langue"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
@@ -569,8 +582,8 @@ msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
 msgstr ""
-"L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
-"auquel vous voulez rattachez."
+"L'élément %(child)s que vous voulez attacher est déjà un parent de l'élément "
+"auquel vous voulez rattacher."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
@@ -585,18 +598,6 @@ msgstr "L'UE a des prérequis et est un prérequis"
 
 msgid "The learning unit is a prerequisite"
 msgstr "L'UE est un prérequis"
-
-#, python-format
-msgid "The link of %(acronym)s has been updated"
-msgstr "Le lien de %(acronym)s a été mis à jour"
-
-#, python-format
-msgid ""
-"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
-"already reached the limit."
-msgstr ""
-"Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
-"atteint la limite maximum."
 
 #, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
@@ -618,6 +619,15 @@ msgstr ""
 "Les prérequis des unités d'enseignement suivantes contenues dans "
 "l'organisation de formation annualisée %(acronym)s seront supprimés: "
 "%(learning_units)s"
+
+#, python-format
+msgid "The program %(title)s - %(academic_year)s will be published soon"
+msgstr "Le programme %(title)s - %(academic_year)s sera publié sous peu"
+
+msgid ""
+"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+msgstr ""
+"La version de programme %(offer_acronym)s %(version_name)s a été supprimée avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -664,6 +674,10 @@ msgstr "Enseignant·e·s"
 
 msgid "Type"
 msgstr "Type"
+
+#, python-brace-format
+msgid "Unable to publish sections for {code} - {year}"
+msgstr "Impossible de publier les sections pour {code} - {year}"
 
 msgid "Utilizations"
 msgstr "Utilisations"
@@ -723,6 +737,14 @@ msgstr ""
 "Vous ne pouvez pas copier la version de  programme '{acronym}' de "
 "{from_year} à {to_year} parce qu'elle finit en {end_year}"
 
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as specific "
+"versions exists during this year."
+msgstr ""
+"Vous ne pouvez pas supprimer le programme standard '{code}' en {year} parce "
+"qu'il existe une version particiulière durant cette année."
+
 #, python-format
 msgid ""
 "You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
@@ -730,14 +752,6 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas attacher \"%(child)s\" de type \"%(child_types)s\" à "
 "\"%(parent)s\" de type \"%(parent_type)s\""
-
-#, python-format
-msgid ""
-"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s"
-"\")"
-msgstr ""
-"Vous ne pouvez pas ajouter \"%(child_types)s\" à \"%(parent)s\" (de type "
-"\"%(parent_type)s\")"
 
 #, python-format
 msgid ""
