@@ -23,20 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
+from base.models.enums import education_group_types
 from base.utils.cache import ElementCache
-from base.views.common import display_success_messages
 from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd.command import GetGroupCommand
+from education_group.ddd.domain import exception
+from education_group.ddd.service.read.get_group_service import get_group
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd import command
+from program_management.ddd.command import GetProgramTreeVersionFromNodeCommand
 from program_management.ddd.domain import link
-from program_management.ddd.service.write import detach_node_service
 from program_management.ddd.service.read import detach_warning_messages_service
+from program_management.ddd.service.read.get_program_tree_version_from_node_service import \
+    get_program_tree_version_from_node
+from program_management.ddd.service.write import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -74,13 +80,33 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
             display_warning_messages(self.request, warning_messages)
 
-            link_to_detach = self.get_object()
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s%(title)s ?") % {
-                "acronym": link_to_detach_id.child_code,
-                "title": " - {}".format(link_to_detach.child_element.group_year.acronym)
-                         if link_to_detach.child_element.group_year else ""
+            context['confirmation_message'] = _("Are you sure you want to detach \"%(node)s\" ?") % {
+                'node': self.get_str_node(link_to_detach_id.child_code, link_to_detach_id.child_year)
             }
         return context
+
+    def get_str_node(self, code: str, year: int) -> str:
+        try:
+            my_group_cmd = GetGroupCommand(code, year)
+            my_group = get_group(my_group_cmd)
+            if isinstance(my_group.type, (education_group_types.TrainingType,
+                                          education_group_types.MiniTrainingType)):
+                my_program_tree_version_cmd = GetProgramTreeVersionFromNodeCommand(code, year)
+                program_tree_version = get_program_tree_version_from_node(my_program_tree_version_cmd)
+            else:
+                program_tree_version = None
+            return "%(acronym)s - %(title)s%(version)s - %(year)s" % {
+                "year": display_as_academic_year(year),
+                "acronym": code,
+                "title": "{}".format(my_group.abbreviated_title),
+                "version": "[{}]".format(program_tree_version.version_label)
+                           if program_tree_version and program_tree_version.version_label else ""
+            }
+        except exception.GroupNotFoundException:
+            return "%(year)s - %(acronym)s" % {
+                "year": display_as_academic_year(year),
+                "acronym": code
+            }
 
     def get_initial(self):
         return {
@@ -96,9 +122,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return obj
 
     def form_valid(self, form):
-        link = self.get_object()
-        parent_title = link.parent_element.group_year.acronym if link.parent_element.group_year else None
-        child_title = link.child_element.group_year.acronym if link.child_element.group_year else None
         try:
             link_entity_id = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
@@ -107,14 +130,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
         display_success_messages(
             self.request,
-            [_("\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
-               "\"%(parent_year)s - %(parent)s%(parent_title)s\"") % {
-                'child': link_entity_id.child_code,
-                'child_year': link_entity_id.child_year,
-                'child_title': " - {}".format(child_title) if child_title else "",
-                'parent': link_entity_id.parent_code,
-                'parent_year': link_entity_id.parent_year,
-                'parent_title': " - {}".format(parent_title) if parent_title else "",
+            [_("\"%(child_node)s\" has been detached from \"%(parent_node)s\"") % {
+                'child_node': self.get_str_node(link_entity_id.child_code, link_entity_id.child_year),
+                'parent_node': self.get_str_node(link_entity_id.parent_code, link_entity_id.parent_year),
             }]
         )
 

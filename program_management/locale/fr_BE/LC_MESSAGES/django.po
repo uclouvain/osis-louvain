@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-09 14:36+0200\n"
+"POT-Creation-Date: 2020-09-10 16:20+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -23,11 +23,8 @@ msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
 
 #, python-format
-msgid ""
-"\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
-"\"%(parent_year)s - %(parent)s%(parent_title)s\""
-msgstr ""
-"\"%(child_year)s - %(child)s%(child_title)s\" a été retiré de \"%(parent_year)s - %(parent)s%(parent_title)s\""
+msgid "\"%(child_node)s\" has been detached from \"%(parent_node)s\""
+msgstr "\"%(child_node)s\" a été collé dans \"%(parent_node)s\""
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -80,11 +77,27 @@ msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : "
 "%(acronym)s"
 
+#, fuzzy
+#| msgid "Mobility"
+msgid "ARES ability"
+msgstr "Mobilité"
+
+msgid "ARES study code"
+msgstr ""
+
+msgid "ARES-GRACA"
+msgstr ""
+
 msgid "Absolute credits"
 msgstr "Crédits absolus"
 
 msgid "Ac yr."
 msgstr "Anac."
+
+#, fuzzy
+#| msgid "Academic year"
+msgid "Academic type"
+msgstr "Année académique"
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -111,6 +124,9 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+msgid "Activities on other campus"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
@@ -119,6 +135,14 @@ msgstr "Ajouter"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
+
+#, fuzzy
+#| msgid "Attribution entity"
+msgid "Administration entity"
+msgstr "Entité d'attribution"
+
+msgid "Admission exam"
+msgstr ""
 
 msgctxt "plural"
 msgid "All"
@@ -136,8 +160,8 @@ msgstr ""
 "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
-msgid "Are you sure you want to detach %(acronym)s%(title)s ?"
-msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s%(title)s ?"
+msgid "Are you sure you want to detach \"%(node)s\" ?"
+msgstr "Êtes-vous sûr·e de vouloir retirer \"%(node)s\" ?"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
@@ -193,8 +217,14 @@ msgstr "Interdit de retirer la racine."
 msgid "Category"
 msgstr "Catégorie"
 
+msgid "Co-graduation total coefficient"
+msgstr ""
+
 msgid "Code"
 msgstr "Code"
+
+msgid "Code co-graduation inter CfB"
+msgstr ""
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -220,17 +250,42 @@ msgstr "crédits"
 msgid "Cut element"
 msgstr "Elément coupé"
 
+#, fuzzy
+#| msgid "Category"
+msgid "Decree category"
+msgstr "Catégorie"
+
 msgid "Description fiche"
 msgstr "Fiche descriptive"
+
+msgid "Diploma title"
+msgstr ""
+
+msgid "Diplomas /  Certificates"
+msgstr ""
 
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
+#, fuzzy
+#| msgid "Creation"
+msgid "Duration"
+msgstr "Création"
+
 msgid "English comment"
 msgstr "Commentaire anglais"
 
+msgid "Enrollment campus"
+msgstr ""
+
+msgid "Enrollment enabled"
+msgstr ""
+
 msgid "Entity"
 msgstr "Entité Resp."
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
 
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
@@ -268,17 +323,40 @@ msgstr "Intitulé de la version en anglais"
 msgid "Full title of the french version"
 msgstr "Intitulé de la version en français"
 
+msgid "Funding"
+msgstr ""
+
+msgid "Funding direction"
+msgstr ""
+
+msgid "Funding international cooperation CCD/CUD"
+msgstr ""
+
+msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
 msgid "Group"
 msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
 
+msgid "ISCED domain"
+msgstr ""
+
+#, fuzzy
+#| msgid "Modification"
+msgid "Identification"
+msgstr "Modification"
+
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
 
 msgid "Include transition"
 msgstr "Inclure transition"
+
+msgid "Internship"
+msgstr ""
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
@@ -291,14 +369,25 @@ msgstr ""
 "Il est interdit d'attacher %(child_node)s à un élément d'une autre année "
 "académique %(parent_node)s."
 
+msgid "Keywords"
+msgstr ""
+
 msgid "Language"
 msgstr "Langue"
+
+msgid "Leads to diploma/certificate"
+msgstr ""
 
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
 msgid "Learning class year"
 msgstr "Classe"
+
+#, fuzzy
+#| msgid "Learning units"
+msgid "Learning location"
+msgstr "Unités d'enseignement"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -353,6 +442,11 @@ msgstr "Max. crédits"
 
 msgid "Min. credits"
 msgstr "Min. crédits"
+
+#, fuzzy
+#| msgid "New Mini-Training"
+msgid "Mini-Training"
+msgstr "Nouvelle Mini-Formation"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -434,6 +528,19 @@ msgstr "Au choix"
 msgid "Other informations"
 msgstr "Autres informations"
 
+msgid "Other languages activities"
+msgstr ""
+
+#, fuzzy
+#| msgid "Title in English"
+msgid "Partial title in English"
+msgstr "Intitulé en anglais"
+
+#, fuzzy
+#| msgid "Title in French"
+msgid "Partial title in French"
+msgstr "Intitulé en français"
+
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -478,6 +585,11 @@ msgstr "Prérequis non valides."
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
+#, fuzzy
+#| msgid "Select a language"
+msgid "Primary language"
+msgstr "Sélectionner une langue"
+
 msgid "Produce xls of trainings with administrative data"
 msgstr ""
 "Produire un fichier Excel avec la liste des formations et données "
@@ -485,6 +597,9 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
+
+msgid "Professionnal title"
+msgstr ""
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
@@ -505,6 +620,9 @@ msgstr "Légende proposition"
 msgid "Quadrimester"
 msgstr "Quadrimestre"
 
+msgid "Rate code"
+msgstr ""
+
 msgid "Registration ID"
 msgstr "NOMA"
 
@@ -517,6 +635,9 @@ msgstr "Crédits relatifs"
 msgid "Relative credits must be greater or equals than 0"
 msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
+msgid "Remark"
+msgstr ""
+
 msgid "Req. Entity"
 msgstr "Entité Resp."
 
@@ -528,6 +649,11 @@ msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+#, fuzzy
+#| msgid "Subtype"
+msgid "Schedule type"
+msgstr "Sous-type"
 
 msgid "Search"
 msgstr "Recherche"
@@ -552,6 +678,14 @@ msgstr "Utilisations"
 
 msgid "Standard"
 msgstr "Standard"
+
+#, fuzzy
+#| msgid "Academic year"
+msgid "Start academic year"
+msgstr "Année académique"
+
+msgid "Status"
+msgstr ""
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
@@ -660,6 +794,11 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
+#, fuzzy
+#| msgid "Trainings"
+msgid "Training"
+msgstr "Formations"
+
 msgid "Trainings"
 msgstr "Formations"
 
@@ -678,12 +817,31 @@ msgstr "Enseignant·e·s"
 msgid "Type"
 msgstr "Type"
 
+msgid "Type of constraint"
+msgstr ""
+
+#, fuzzy
+#| msgid "List of trainings"
+msgid "Type of training"
+msgstr "Liste des enseignants"
+
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
+msgid "University certificate"
+msgstr ""
+
+#, fuzzy
+#| msgid "training"
+msgid "Update Training"
+msgstr "formation"
+
 msgid "Utilizations"
 msgstr "Utilisations"
+
+msgid "Validity"
+msgstr ""
 
 msgid "Version"
 msgstr "Version"
@@ -693,6 +851,11 @@ msgstr "Sigle de la version"
 
 msgid "Volume"
 msgstr "Volume"
+
+#, fuzzy
+#| msgid "Registration ID"
+msgid "Web re-registration"
+msgstr "NOMA"
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
@@ -776,8 +939,29 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
+#, fuzzy
+#| msgid "Title in English"
+msgid "activities in English"
+msgstr "Intitulé en anglais"
+
 msgid "bibliography"
 msgstr "bibliographie"
+
+#, fuzzy
+#| msgid "Specifications"
+msgid "certificate aims"
+msgstr "Utilisations"
+
+msgid "comment (internal)"
+msgstr ""
+
+#, fuzzy
+#| msgid "Creation"
+msgid "dissertation"
+msgstr "Création"
+
+msgid "duration unit"
+msgstr ""
 
 msgid "email"
 msgstr "email"
@@ -816,6 +1000,15 @@ msgstr "classe"
 msgid "learning unit year"
 msgstr "Unités d'enseignement"
 
+msgid "main domain"
+msgstr ""
+
+msgid "maximum constraint"
+msgstr ""
+
+msgid "minimum constraint"
+msgstr ""
+
 msgid "on"
 msgstr "le"
 
@@ -826,6 +1019,14 @@ msgstr "optionnel"
 msgid "prerequisites-%(year)s-%(acronym)s"
 msgstr "prérequis-%(year)s-%(acronym)s"
 
+#, fuzzy
+#| msgid "Title in English"
+msgid "remark in english"
+msgstr "Intitulé en anglais"
+
+msgid "secondary domains"
+msgstr ""
+
 msgid "training"
 msgstr "formation"
 
@@ -834,3 +1035,16 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#, fuzzy, python-format
+#~| msgid "prerequisites-%(year)s-%(acronym)s"
+#~ msgid "%(year)s - %(acronym)s"
+#~ msgstr "prérequis-%(year)s-%(acronym)s"
+
+#, python-format
+#~ msgid ""
+#~ "\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
+#~ "\"%(parent_year)s - %(parent)s%(parent_title)s\""
+#~ msgstr ""
+#~ "\"%(child_year)s - %(child)s%(child_title)s\" a été retiré de "
+#~ "\"%(parent_year)s - %(parent)s%(parent_title)s\""
