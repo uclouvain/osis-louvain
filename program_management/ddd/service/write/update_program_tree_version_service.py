@@ -73,7 +73,7 @@ def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_u
     end_year_updated = end_year_updated or postponement_limit
 
     if end_year > end_year_updated:
-        for year_to_delete in range(end_year_updated, program_tree_version.end_year_of_existence):
+        for year_to_delete in range(end_year_updated, program_tree_version.end_year_of_existence or postponement_limit):
             delete_specific_version_service.delete_specific_version(
                 DeleteSpecificVersionCommand(
                     acronym=identity.offer_acronym,

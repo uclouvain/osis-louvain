@@ -23,49 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-import attr
+from django.test import SimpleTestCase
 
-from osis_common.ddd import interface
-
-
-class DiplomaAimIdentity(interface.EntityIdentity):
-
-    def __init__(self, section: int, code: int):
-        self.section = section
-        self.code = code
-
-    def __eq__(self, other):
-        return self.section == other.section \
-               and self.code == other.code
-
-    def __hash__(self):
-        return hash(str(self.section) + str(self.code))
+from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
 
 
-class DiplomaAim(interface.Entity):
+class TestDiplomaAim(SimpleTestCase):
 
-    def __init__(self, entity_id: DiplomaAimIdentity, description: str):
-        super(DiplomaAim, self).__init__(entity_id=entity_id)
-        self.entity_id = entity_id
-        self.description = description
-
-    @property
-    def section(self) -> int:
-        return self.entity_id.section
-
-    @property
-    def code(self) -> int:
-        return self.entity_id.code
-
-    def __str__(self):
-        return "{} - {} {}".format(self.section, self.code, self.description)
-
-
-@attr.s(frozen=True, slots=True)
-class Diploma(interface.ValueObject):
-    leads_to_diploma = attr.ib(type=bool, default=False)
-    printing_title = attr.ib(type=str, default='')
-    professional_title = attr.ib(type=str, default='')
-    aims = attr.ib(type=List['DiplomaAim'], factory=list)
+    def test_str(self):
+        diploma_aim = DiplomaAimFactory(entity_id__section=2, entity_id__code=192, description="description")
+        self.assertEqual(str(diploma_aim), "2 - 192 description")

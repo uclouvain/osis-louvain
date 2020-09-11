@@ -783,7 +783,7 @@ msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
 msgid "This version exists until"
-msgstr "Date de fin d'existence"
+msgstr "Dernière année d'organisation"
 
 msgid "Title"
 msgstr "Intitulé"

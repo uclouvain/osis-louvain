@@ -214,7 +214,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 administration_entity_obj.acronym, administration_entity_obj.title
             ) if administration_entity_obj else None,
             "academic_year": training_obj.academic_year,
-            "start_year": display_as_academic_year(training_obj.start_year),
+            "start_year": display_as_academic_year(group_obj.start_year),
             "teaching_campus": group_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
             "other_campus_activities": training_obj.other_campus_activities.value
@@ -240,7 +240,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "leads_to_diploma": training_obj.diploma.leads_to_diploma,
             "diploma_printing_title": training_obj.diploma.printing_title,
             "professional_title": training_obj.diploma.professional_title,
-            "certificate_aims": ','.join(training_obj.diploma.aims)
+            "certificate_aims": ',  '.join([str(aim) for aim in training_obj.diploma.aims])
         }
         return form_initial_values
 

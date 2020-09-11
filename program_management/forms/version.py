@@ -82,9 +82,9 @@ class SpecificVersionForm(forms.Form):
         self.node_identity = node_identity
         super().__init__(*args, **kwargs)
 
-        self.__init_academic_year_choices()
+        self._init_academic_year_choices()
 
-    def __init_academic_year_choices(self):
+    def _init_academic_year_choices(self):
         max_year = get_end_postponement_year_service.calculate_program_tree_end_postponement(
             GetEndPostponementYearCommand(code=self.node_identity.code, year=self.node_identity.year)
         )
@@ -253,7 +253,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
-        return '.'.join(["TrainingForm", self.training_type.name, field_name])
+        return '.'.join(["GroupForm", self.training_type.name, field_name])
 
     # PermissionFieldMixin
     def get_context(self) -> str:
@@ -325,7 +325,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
-        return '.'.join(["MiniTrainingForm", self.mini_training_type.name, field_name])
+        return '.'.join(["GroupForm", self.mini_training_type.name, field_name])
 
     # PermissionFieldMixin
     def get_context(self) -> str:

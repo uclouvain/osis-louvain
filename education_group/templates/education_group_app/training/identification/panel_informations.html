@@ -92,7 +92,7 @@
         <div class="row">
             <div class="col-md-12" id="group_title_fr">
                 {% bootstrap_label _("Title in French") label_class='d-block'%}
-                <p>{{ node.group_title_fr }}</p>
+                <p>{{ education_group_year.titles.title_fr }}</p>
             </div>
         </div>
         {% if not current_version.is_standard or current_version.is_transition %}
@@ -117,7 +117,7 @@
         <div class="row">
             <div class="col-md-12" id="group_title_en">
                 {% bootstrap_label _("Title in English") label_class='d-block'%}
-                <p>{{ node.group_title_en }}</p>
+                <p>{{ education_group_year.titles.title_en }}</p>
             </div>
         </div>
         {% if not current_version.is_standard  or current_version.is_transition %}

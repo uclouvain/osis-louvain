@@ -30,6 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
@@ -48,7 +49,9 @@ class TestTrainingVersionUpdateGetView(TestCase):
                 year=cls.training_version_obj.tree.root_node.year
             )
         )
-        cls.training_obj = TrainingFactory()
+
+        cls.diploma_aims = [DiplomaAimFactory(), DiplomaAimFactory()]
+        cls.training_obj = TrainingFactory(diploma__aims=cls.diploma_aims)
 
         cls.url = reverse(
             'training_version_update',
