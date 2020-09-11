@@ -19,8 +19,6 @@ msgstr ""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr ""
-"\"%(child_year)s - %(child)s%(child_title)s\" has been removed from "
-"\"%(parent_year)s - %(parent)s%(parent_title)s\""
 
 #, python-format
 msgid "\"%(child_node)s\" has been detached from \"%(parent_node)s\""
