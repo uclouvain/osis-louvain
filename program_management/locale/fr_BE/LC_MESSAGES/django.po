@@ -77,23 +77,11 @@ msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : "
 "%(acronym)s"
 
-msgid "ARES ability"
-msgstr ""
-
-msgid "ARES study code"
-msgstr ""
-
-msgid "ARES-GRACA"
-msgstr ""
-
 msgid "Absolute credits"
 msgstr "Crédits absolus"
 
 msgid "Ac yr."
 msgstr "Anac."
-
-msgid "Academic type"
-msgstr ""
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -120,9 +108,6 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
-msgid "Activities on other campus"
-msgstr ""
-
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
@@ -131,12 +116,6 @@ msgstr "Ajouter"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
-
-msgid "Administration entity"
-msgstr ""
-
-msgid "Admission exam"
-msgstr ""
 
 msgctxt "plural"
 msgid "All"
@@ -211,14 +190,8 @@ msgstr "Interdit de retirer la racine."
 msgid "Category"
 msgstr "Catégorie"
 
-msgid "Co-graduation total coefficient"
-msgstr ""
-
 msgid "Code"
 msgstr "Code"
-
-msgid "Code co-graduation inter CfB"
-msgstr ""
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -244,38 +217,17 @@ msgstr "crédits"
 msgid "Cut element"
 msgstr "Elément coupé"
 
-msgid "Decree category"
-msgstr ""
-
 msgid "Description fiche"
 msgstr "Fiche descriptive"
-
-msgid "Diploma title"
-msgstr ""
-
-msgid "Diplomas /  Certificates"
-msgstr ""
 
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
-msgid "Duration"
-msgstr "Durée"
-
 msgid "English comment"
 msgstr "Commentaire anglais"
 
-msgid "Enrollment campus"
-msgstr ""
-
-msgid "Enrollment enabled"
-msgstr ""
-
 msgid "Entity"
 msgstr "Entité Resp."
-
-msgid "Error(s) in form: The modifications are not saved"
-msgstr ""
 
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
@@ -313,38 +265,17 @@ msgstr "Intitulé de la version en anglais"
 msgid "Full title of the french version"
 msgstr "Intitulé de la version en français"
 
-msgid "Funding"
-msgstr ""
-
-msgid "Funding direction"
-msgstr ""
-
-msgid "Funding international cooperation CCD/CUD"
-msgstr ""
-
-msgid "Funding international cooperation CCD/CUD direction"
-msgstr ""
-
 msgid "Group"
 msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
 
-msgid "ISCED domain"
-msgstr ""
-
-msgid "Identification"
-msgstr "Identification"
-
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
 
 msgid "Include transition"
 msgstr "Inclure transition"
-
-msgid "Internship"
-msgstr ""
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
@@ -357,23 +288,14 @@ msgstr ""
 "Il est interdit d'attacher %(child_node)s à un élément d'une autre année "
 "académique %(parent_node)s."
 
-msgid "Keywords"
-msgstr ""
-
 msgid "Language"
 msgstr "Langue"
-
-msgid "Leads to diploma/certificate"
-msgstr ""
 
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
 msgid "Learning class year"
 msgstr "Classe"
-
-msgid "Learning location"
-msgstr ""
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -428,9 +350,6 @@ msgstr "Max. crédits"
 
 msgid "Min. credits"
 msgstr "Min. crédits"
-
-msgid "Mini-Training"
-msgstr "Mini-Formation"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -512,15 +431,6 @@ msgstr "Au choix"
 msgid "Other informations"
 msgstr "Autres informations"
 
-msgid "Other languages activities"
-msgstr ""
-
-msgid "Partial title in English"
-msgstr "Intitulé partiel en anglais"
-
-msgid "Partial title in French"
-msgstr "Intitulé partiel en français"
-
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -565,9 +475,6 @@ msgstr "Prérequis non valides."
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
-msgid "Primary language"
-msgstr "Langue principale"
-
 msgid "Produce xls of trainings with administrative data"
 msgstr ""
 "Produire un fichier Excel avec la liste des formations et données "
@@ -598,9 +505,6 @@ msgstr "Légende proposition"
 msgid "Quadrimester"
 msgstr "Quadrimestre"
 
-msgid "Rate code"
-msgstr ""
-
 msgid "Registration ID"
 msgstr "NOMA"
 
@@ -613,9 +517,6 @@ msgstr "Crédits relatifs"
 msgid "Relative credits must be greater or equals than 0"
 msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
-msgid "Remark"
-msgstr ""
-
 msgid "Req. Entity"
 msgstr "Entité Resp."
 
@@ -627,9 +528,6 @@ msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
-
-msgid "Schedule type"
-msgstr "Type d'horaire"
 
 msgid "Search"
 msgstr "Recherche"
@@ -654,12 +552,6 @@ msgstr "Utilisations"
 
 msgid "Standard"
 msgstr "Standard"
-
-msgid "Start academic year"
-msgstr "Début d'année académique"
-
-msgid "Status"
-msgstr ""
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
@@ -768,9 +660,6 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
-msgid "Training"
-msgstr "Formation"
-
 msgid "Trainings"
 msgstr "Formations"
 
@@ -789,27 +678,12 @@ msgstr "Enseignant·e·s"
 msgid "Type"
 msgstr "Type"
 
-msgid "Type of constraint"
-msgstr ""
-
-msgid "Type of training"
-msgstr "Type de formation"
-
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
-msgid "University certificate"
-msgstr ""
-
-msgid "Update Training"
-msgstr "Mise à jour de la formation"
-
 msgid "Utilizations"
 msgstr "Utilisations"
-
-msgid "Validity"
-msgstr ""
 
 msgid "Version"
 msgstr "Version"
@@ -819,9 +693,6 @@ msgstr "Sigle de la version"
 
 msgid "Volume"
 msgstr "Volume"
-
-msgid "Web re-registration"
-msgstr ""
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
@@ -905,25 +776,8 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
-
-msgid "activities in English"
-msgstr "activités en anglais"
-
 msgid "bibliography"
 msgstr "bibliographie"
-
-
-msgid "certificate aims"
-msgstr ""
-
-msgid "comment (internal)"
-msgstr ""
-
-msgid "dissertation"
-msgstr ""
-
-msgid "duration unit"
-msgstr ""
 
 msgid "email"
 msgstr "email"
@@ -962,15 +816,6 @@ msgstr "classe"
 msgid "learning unit year"
 msgstr "Unités d'enseignement"
 
-msgid "main domain"
-msgstr ""
-
-msgid "maximum constraint"
-msgstr ""
-
-msgid "minimum constraint"
-msgstr ""
-
 msgid "on"
 msgstr "le"
 
@@ -980,12 +825,6 @@ msgstr "optionnel"
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
 msgstr "prérequis-%(year)s-%(acronym)s"
-
-msgid "remark in english"
-msgstr "remarque en anglais"
-
-msgid "secondary domains"
-msgstr ""
 
 msgid "training"
 msgstr "formation"
