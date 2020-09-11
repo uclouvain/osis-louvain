@@ -122,9 +122,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return obj
 
     def form_valid(self, form):
-        link = self.get_object()
-        parent_title = link.parent_element.group_year.acronym if link.parent_element.group_year else None
-        child_title = link.child_element.group_year.acronym if link.child_element.group_year else None
         try:
             link_entity_id = form.save()
         except osis_common.ddd.interface.BusinessExceptions as business_exception:
