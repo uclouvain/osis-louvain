@@ -36,11 +36,14 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, get_fake_group_repository, \
+    get_fake_mini_training_repository
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain import link
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
+    get_fake_program_tree_repository
 from program_management.tests.factories.element import ElementGroupYearFactory
 from testing.mocks import MockPatcherMixin
 
@@ -67,9 +70,26 @@ class TestDetachNodeView(TestCase, MockPatcherMixin):
     def setUp(self):
         self.client.force_login(self.person.user)
         self._mock_authorized_relationship_validator()
-        self.fake_program_tree_version = get_fake_program_tree_version_repository([])
-        self.mock_repo("program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
-                       self.fake_program_tree_version)
+        self.fake_training_repo = get_fake_training_repository([])
+        self.fake_group_repo = get_fake_group_repository([])
+        self.fake_mini_training_repo = get_fake_mini_training_repository([])
+        self.fake_program_tree_repo = get_fake_program_tree_repository([])
+        self.fake_program_tree_version_repo = get_fake_program_tree_version_repository([])
+
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
+        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
+        self.mock_repo(
+            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
+            self.fake_mini_training_repo
+        )
+        self.mock_repo(
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
+            self.fake_program_tree_repo
+        )
+        self.mock_repo(
+            "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
+            self.fake_program_tree_version_repo
+        )
 
     def _mock_authorized_relationship_validator(self):
         self.validator_patcher = mock.patch.object(
