@@ -77,10 +77,8 @@ msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : "
 "%(acronym)s"
 
-#, fuzzy
-#| msgid "Mobility"
 msgid "ARES ability"
-msgstr "Mobilité"
+msgstr ""
 
 msgid "ARES study code"
 msgstr ""
@@ -94,10 +92,8 @@ msgstr "Crédits absolus"
 msgid "Ac yr."
 msgstr "Anac."
 
-#, fuzzy
-#| msgid "Academic year"
 msgid "Academic type"
-msgstr "Année académique"
+msgstr ""
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -136,10 +132,8 @@ msgstr "Ajouter"
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
-#, fuzzy
-#| msgid "Attribution entity"
 msgid "Administration entity"
-msgstr "Entité d'attribution"
+msgstr ""
 
 msgid "Admission exam"
 msgstr ""
@@ -250,10 +244,8 @@ msgstr "crédits"
 msgid "Cut element"
 msgstr "Elément coupé"
 
-#, fuzzy
-#| msgid "Category"
 msgid "Decree category"
-msgstr "Catégorie"
+msgstr ""
 
 msgid "Description fiche"
 msgstr "Fiche descriptive"
@@ -267,10 +259,8 @@ msgstr ""
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
-#, fuzzy
-#| msgid "Creation"
 msgid "Duration"
-msgstr "Création"
+msgstr "Durée"
 
 msgid "English comment"
 msgstr "Commentaire anglais"
@@ -344,10 +334,8 @@ msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
 msgid "ISCED domain"
 msgstr ""
 
-#, fuzzy
-#| msgid "Modification"
 msgid "Identification"
-msgstr "Modification"
+msgstr "Identification"
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -384,10 +372,8 @@ msgstr "Unités d'enseignement"
 msgid "Learning class year"
 msgstr "Classe"
 
-#, fuzzy
-#| msgid "Learning units"
 msgid "Learning location"
-msgstr "Unités d'enseignement"
+msgstr ""
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -443,10 +429,8 @@ msgstr "Max. crédits"
 msgid "Min. credits"
 msgstr "Min. crédits"
 
-#, fuzzy
-#| msgid "New Mini-Training"
 msgid "Mini-Training"
-msgstr "Nouvelle Mini-Formation"
+msgstr "Mini-Formation"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -531,15 +515,11 @@ msgstr "Autres informations"
 msgid "Other languages activities"
 msgstr ""
 
-#, fuzzy
-#| msgid "Title in English"
 msgid "Partial title in English"
-msgstr "Intitulé en anglais"
+msgstr "Intitulé partiel en anglais"
 
-#, fuzzy
-#| msgid "Title in French"
 msgid "Partial title in French"
-msgstr "Intitulé en français"
+msgstr "Intitulé partiel en français"
 
 msgid "Particulière"
 msgstr "Particulière"
@@ -585,10 +565,8 @@ msgstr "Prérequis non valides."
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
-#, fuzzy
-#| msgid "Select a language"
 msgid "Primary language"
-msgstr "Sélectionner une langue"
+msgstr "Langue principale"
 
 msgid "Produce xls of trainings with administrative data"
 msgstr ""
@@ -650,10 +628,8 @@ msgstr "Groupement racine"
 msgid "Save"
 msgstr "Enregistrer"
 
-#, fuzzy
-#| msgid "Subtype"
 msgid "Schedule type"
-msgstr "Sous-type"
+msgstr "Type d'horaire"
 
 msgid "Search"
 msgstr "Recherche"
@@ -679,10 +655,8 @@ msgstr "Utilisations"
 msgid "Standard"
 msgstr "Standard"
 
-#, fuzzy
-#| msgid "Academic year"
 msgid "Start academic year"
-msgstr "Année académique"
+msgstr "Début d'année académique"
 
 msgid "Status"
 msgstr ""
@@ -794,10 +768,8 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
-#, fuzzy
-#| msgid "Trainings"
 msgid "Training"
-msgstr "Formations"
+msgstr "Formation"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -820,10 +792,8 @@ msgstr "Type"
 msgid "Type of constraint"
 msgstr ""
 
-#, fuzzy
-#| msgid "List of trainings"
 msgid "Type of training"
-msgstr "Liste des enseignants"
+msgstr "Type de formation"
 
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
@@ -832,10 +802,8 @@ msgstr "Impossible de publier les sections pour {code} - {year}"
 msgid "University certificate"
 msgstr ""
 
-#, fuzzy
-#| msgid "training"
 msgid "Update Training"
-msgstr "formation"
+msgstr "Mise à jour de la formation"
 
 msgid "Utilizations"
 msgstr "Utilisations"
@@ -852,10 +820,8 @@ msgstr "Sigle de la version"
 msgid "Volume"
 msgstr "Volume"
 
-#, fuzzy
-#| msgid "Registration ID"
 msgid "Web re-registration"
-msgstr "NOMA"
+msgstr ""
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
@@ -939,26 +905,22 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu du programme n'est pas vide."
 
-#, fuzzy
-#| msgid "Title in English"
+
 msgid "activities in English"
-msgstr "Intitulé en anglais"
+msgstr "activités en anglais"
 
 msgid "bibliography"
 msgstr "bibliographie"
 
-#, fuzzy
-#| msgid "Specifications"
+
 msgid "certificate aims"
-msgstr "Utilisations"
+msgstr ""
 
 msgid "comment (internal)"
 msgstr ""
 
-#, fuzzy
-#| msgid "Creation"
 msgid "dissertation"
-msgstr "Création"
+msgstr ""
 
 msgid "duration unit"
 msgstr ""
@@ -1019,10 +981,8 @@ msgstr "optionnel"
 msgid "prerequisites-%(year)s-%(acronym)s"
 msgstr "prérequis-%(year)s-%(acronym)s"
 
-#, fuzzy
-#| msgid "Title in English"
 msgid "remark in english"
-msgstr "Intitulé en anglais"
+msgstr "remarque en anglais"
 
 msgid "secondary domains"
 msgstr ""
@@ -1035,16 +995,3 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#, fuzzy, python-format
-#~| msgid "prerequisites-%(year)s-%(acronym)s"
-#~ msgid "%(year)s - %(acronym)s"
-#~ msgstr "prérequis-%(year)s-%(acronym)s"
-
-#, python-format
-#~ msgid ""
-#~ "\"%(child_year)s - %(child)s%(child_title)s\" has been detached from "
-#~ "\"%(parent_year)s - %(parent)s%(parent_title)s\""
-#~ msgstr ""
-#~ "\"%(child_year)s - %(child)s%(child_title)s\" a été retiré de "
-#~ "\"%(parent_year)s - %(parent)s%(parent_title)s\""
