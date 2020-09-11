@@ -483,9 +483,6 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
 
-msgid "Professionnal title"
-msgstr ""
-
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
 msgstr "Programme non trouvé : {code} {year}"

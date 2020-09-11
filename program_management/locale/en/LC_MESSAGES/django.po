@@ -172,9 +172,6 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Code co-graduation inter CfB"
-msgstr ""
-
 msgid "Comment"
 msgstr ""
 
