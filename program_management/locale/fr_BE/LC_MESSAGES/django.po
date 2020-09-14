@@ -993,6 +993,3 @@ msgstr "Oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Acronym of version"
-#~ msgstr "Sigle de la version"
