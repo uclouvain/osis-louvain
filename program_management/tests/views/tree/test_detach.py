@@ -31,19 +31,21 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, get_fake_group_repository, \
-    get_fake_mini_training_repository
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain import link
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 from testing.mocks import MockPatcherMixin
 
@@ -52,7 +54,77 @@ from testing.mocks import MockPatcherMixin
 class TestDetachNodeView(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
+        """
+        root_node
+        |-----common_core
+             |---- LDROI100A (UE)
+        |----subgroup1
+             |---- LDROI120B (UE)
+             |----subgroup2
+                  |---- LDROI1300 (UE)
+                  |---- LAGRO2400 (UE)
+        :return:
+        """
         cls.academic_year = AcademicYearFactory(current=True)
+        cls.person = PersonFactory()
+        cls.root_node = NodeGroupYearFactory(node_id=1,
+                                             code="LBIR100B",
+                                             title="Bachelier en droit",
+                                             year=cls.academic_year.year)
+        cls.common_core = NodeGroupYearFactory(node_id=2,
+                                               code="LGROUP100A",
+                                               title="Tronc commun",
+                                               year=cls.academic_year.year)
+        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3,
+                                                    code="LDROI100A",
+                                                    common_title_fr="Introduction",
+                                                    specific_title_fr="Partie 1",
+                                                    year=cls.academic_year.year)
+        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4,
+                                                    code="LDROI120B",
+                                                    common_title_fr="Séminaire",
+                                                    specific_title_fr="Partie 1",
+                                                    year=cls.academic_year.year)
+        cls.subgroup1 = NodeGroupYearFactory(node_id=5,
+                                             code="LSUBGR100G",
+                                             title="Sous-groupe 1",
+                                             year=cls.academic_year.year)
+        cls.subgroup2 = NodeGroupYearFactory(node_id=10,
+                                             code="LSUBGR190G",
+                                             title="Sous-groupe 2",
+                                             year=cls.academic_year.year)
+
+        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
+                                                    code="LDROI1300",
+                                                    common_title_fr="Introduction droit",
+                                                    specific_title_fr="Partie 1",
+                                                    year=cls.academic_year.year)
+        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8,
+                                                    code="LAGRO2400",
+                                                    common_title_fr="Séminaire agro",
+                                                    specific_title_fr="Partie 1",
+                                                    year=cls.academic_year.year)
+
+        LinkFactory(parent=cls.root_node, child=cls.common_core)
+        LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
+        LinkFactory(parent=cls.root_node, child=cls.subgroup1)
+        LinkFactory(parent=cls.subgroup1, child=cls.ldroi120b)
+        LinkFactory(parent=cls.subgroup1, child=cls.subgroup2)
+        LinkFactory(parent=cls.subgroup2, child=cls.ldroi1300)
+        LinkFactory(parent=cls.subgroup2, child=cls.lagro2400)
+
+        cls.tree = ProgramTree(root_node=cls.root_node)
+
+        cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
+                                                 education_group_type__category=education_group_categories.TRAINING,
+                                                 acronym=cls.root_node.code,
+                                                 title=cls.root_node.title,
+                                                 academic_year__year=cls.root_node.year)
+        cls.egv_root = EducationGroupVersionFactory(
+            offer=cls.root_egy,
+            version_name='',
+        )
+
         element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(
             parent_element=element,
@@ -70,22 +142,8 @@ class TestDetachNodeView(TestCase, MockPatcherMixin):
     def setUp(self):
         self.client.force_login(self.person.user)
         self._mock_authorized_relationship_validator()
-        self.fake_training_repo = get_fake_training_repository([])
-        self.fake_group_repo = get_fake_group_repository([])
-        self.fake_mini_training_repo = get_fake_mini_training_repository([])
-        self.fake_program_tree_repo = get_fake_program_tree_repository([])
         self.fake_program_tree_version_repo = get_fake_program_tree_version_repository([])
 
-        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
-        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
-        self.mock_repo(
-            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
-            self.fake_mini_training_repo
-        )
-        self.mock_repo(
-            "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
-            self.fake_program_tree_repo
-        )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
             self.fake_program_tree_version_repo
