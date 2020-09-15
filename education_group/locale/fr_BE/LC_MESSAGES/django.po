@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 09:40+0200\n"
+"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -314,6 +314,12 @@ msgstr "Maîtrise de la langue française"
 msgid "From"
 msgstr "De"
 
+msgid "Full title of the english version"
+msgstr "Intitulé de la version en anglais"
+
+msgid "Full title of the french version"
+msgstr "Intitulé de la version en français"
+
 msgid "Funding"
 msgstr "Finançable"
 
@@ -602,9 +608,6 @@ msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit tous remplis "
 "soit tous vides"
 
-msgid "The following links has been updated"
-msgstr "Les liens suivants ont été mis à jour"
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -873,9 +876,6 @@ msgstr "contrainte maximum"
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
-msgid "of version"
-msgstr "de la version"
-
 msgid "on successful completion of this program, each student is able to"
 msgstr "au terme de ce programme, le diplômé est capable de"
 
@@ -905,3 +905,4 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
+

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.utils.urls import reverse_with_get
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
 
 
@@ -35,3 +36,10 @@ class MiniTrainingReadContent(MiniTrainingRead):
             **super().get_context_data(**kwargs),
             "children": self.get_object().children
         }
+
+    def get_update_mini_training_url(self) -> str:
+        return reverse_with_get(
+            'content_update',
+            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
+            get={"path_to": self.get_path(), "tab": self.active_tab.name}
+        )

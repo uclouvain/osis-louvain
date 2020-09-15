@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 09:40+0200\n"
+"POT-Creation-Date: 2020-09-15 08:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -302,6 +302,12 @@ msgstr ""
 msgid "From"
 msgstr ""
 
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
 msgid "Funding"
 msgstr ""
 
@@ -575,9 +581,6 @@ msgstr ""
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 
-msgid "The following links has been updated"
-msgstr ""
-
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -819,9 +822,6 @@ msgid "maximum constraint"
 msgstr ""
 
 msgid "minimum constraint"
-msgstr ""
-
-msgid "of version"
 msgstr ""
 
 msgid "on successful completion of this program, each student is able to"

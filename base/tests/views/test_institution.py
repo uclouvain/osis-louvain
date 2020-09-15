@@ -52,7 +52,7 @@ class EntityViewTestCase(APITestCase):
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         cls.start_date = datetime.date.today() - datetime.timedelta(weeks=48)
-        cls.end_date = datetime.date.today() + datetime.timedelta(weeks=48)
+        cls.end_date = None
 
         cls.entity_version = EntityVersionFactory(
             acronym="ENTITY_CHILDREN",

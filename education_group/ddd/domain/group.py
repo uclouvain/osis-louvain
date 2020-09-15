@@ -30,7 +30,7 @@ import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -43,6 +43,7 @@ from education_group.ddd.domain.service.enum_converter import EducationGroupType
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList
 from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
 class GroupBuilder:
@@ -123,8 +124,15 @@ class Group(interface.RootEntity):
     def year(self) -> int:
         return self.entity_id.year
 
+    @property
+    def academic_year(self) -> AcademicYear:
+        return AcademicYear(self.year)
+
     def is_minor_major_option_list_choice(self):
         return self.type.name in GroupType.minor_major_option_list_choice()
+
+    def is_training(self):
+        return self.type in TrainingType
 
     def update(
             self,

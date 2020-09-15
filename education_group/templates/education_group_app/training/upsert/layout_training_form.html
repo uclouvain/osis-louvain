@@ -33,24 +33,8 @@
             {% include "blocks/forms/create_cancel_buttons.html" %}
         </div>
 
-        <div class="panel-body">
-            <ul class="nav nav-tabs" role="tablist">
-                {% for tab in tabs %}
-                    {% if tab.display %}
-                        <li role="presentation" class="form-tab {% if tab.active %}active{% endif %}">
-                            <a data-toggle="tab" href="#tab-{{ forloop.counter }}" role="tab">{{ tab.text }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <div class="tab-content">
-                {% for tab in tabs %}
-                    <div id="tab-{{ forloop.counter }}" class="tab-pane {% if tab.active %}active{% endif %}">
-                        {% include tab.include_html %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+        {% include "blocks/tabs.html" %}
+
         <div class="panel-footer text-right">
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>

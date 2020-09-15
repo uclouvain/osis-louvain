@@ -44,7 +44,7 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
     def setUp(self):
         self.current_year = 2020
         self.maximum_postponement_year = 2025
-        AcademicYearFactory.produce_in_future(self.current_year - 1)
+        academic_years = AcademicYearFactory.produce_in_future(self.current_year - 1)
 
         self.root_node_code = 'LDROI200M'
 
@@ -67,6 +67,13 @@ class TestCalculateEndPostponementYearAsTraining(MockPatcherMixin, TestCase):
             code=self.root_node_code,
             year=self.current_year,
         )
+
+        self.mock_get_starting_academic_year(academic_years)
+
+    def mock_get_starting_academic_year(self, academic_years):
+        patcher = mock.patch("base.models.academic_year.starting_academic_year", return_value=academic_years[0])
+        mock_starting_academic_year = patcher.start()
+        self.addCleanup(patcher.stop)
 
     @mock.patch("program_management.ddd.domain.service.identity_search._get_data_from_db")
     def test_when_root_node_is_training_and_end_year_is_none(self, mock_data_from_db):

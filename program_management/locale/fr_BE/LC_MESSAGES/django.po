@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-04 14:28+0200\n"
+"POT-Creation-Date: 2020-09-15 08:54+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -77,11 +77,23 @@ msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : "
 "%(acronym)s"
 
+msgid "ARES ability"
+msgstr "Habilitation ARES"
+
+msgid "ARES study code"
+msgstr "Code étude ARES"
+
+msgid "ARES-GRACA"
+msgstr "Code étude ARES"
+
 msgid "Absolute credits"
 msgstr "Crédits absolus"
 
 msgid "Ac yr."
 msgstr "Anac."
+
+msgid "Academic type"
+msgstr "Nature"
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -91,9 +103,6 @@ msgstr "Condition d'accès"
 
 msgid "Acronym"
 msgstr "Sigle"
-
-msgid "Acronym of version"
-msgstr "Sigle de la version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -108,6 +117,9 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+msgid "Activities on other campus"
+msgstr "Activités sur d'autres sites"
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
@@ -116,6 +128,12 @@ msgstr "Ajouter"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
+
+msgid "Administration entity"
+msgstr "Entité d'administration"
+
+msgid "Admission exam"
+msgstr "Concours"
 
 msgctxt "plural"
 msgid "All"
@@ -127,8 +145,10 @@ msgstr "Ent. attrib."
 msgid "Annual"
 msgstr "Annuel"
 
+#, python-format
 msgid "Are you sure you want to delete %(offer_acronym)s %(version_name)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
+msgstr ""
+"Êtes-vous sûr·e de vouloir supprimer %(offer_acronym)s %(version_name)s ?"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -188,8 +208,14 @@ msgstr "Interdit de retirer la racine."
 msgid "Category"
 msgstr "Catégorie"
 
+msgid "Co-graduation total coefficient"
+msgstr "Coefficient total de co-diplômation"
+
 msgid "Code"
 msgstr "Code"
+
+msgid "Code co-graduation inter CfB"
+msgstr "Code co-diplômation intra CfB"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -215,17 +241,39 @@ msgstr "crédits"
 msgid "Cut element"
 msgstr "Elément coupé"
 
+msgid "Decree category"
+msgstr "Catégorie décret"
+
 msgid "Description fiche"
 msgstr "Fiche descriptive"
+
+msgid "Diploma title"
+msgstr "Intitulé du diplôme/du certificat"
+
+msgid "Diplomas /  Certificates"
+msgstr "Diplômes /  Certificats"
 
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
+msgid "Duration"
+msgstr "Durée"
+
 msgid "English comment"
 msgstr "Commentaire anglais"
 
+msgid "Enrollment campus"
+msgstr "Lieu d'inscription"
+
+msgid "Enrollment enabled"
+msgstr "Inscriptible"
+
 msgid "Entity"
 msgstr "Entité Resp."
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
@@ -263,17 +311,38 @@ msgstr "Intitulé de la version en anglais"
 msgid "Full title of the french version"
 msgstr "Intitulé de la version en français"
 
+msgid "Funding"
+msgstr "Finançable"
+
+msgid "Funding direction"
+msgstr "Orientation de financement"
+
+msgid "Funding international cooperation CCD/CUD"
+msgstr "Financement coopération internationale CCD/CUD"
+
+msgid "Funding international cooperation CCD/CUD direction"
+msgstr "Orientation coopération internationale CCD/CUD"
+
 msgid "Group"
 msgstr "Groupement"
 
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr "IMPOSSIBLE D'AFFICHER A CAUSE D'UN CARACTERE IRREGULIER"
 
+msgid "ISCED domain"
+msgstr "Domaine ISCED/CITE"
+
+msgid "Identification"
+msgstr "Identification"
+
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
 
 msgid "Include transition"
 msgstr "Inclure transition"
+
+msgid "Internship"
+msgstr "Stage"
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
@@ -286,14 +355,23 @@ msgstr ""
 "Il est interdit d'attacher %(child_node)s à un élément d'une autre année "
 "académique %(parent_node)s."
 
+msgid "Keywords"
+msgstr "Mots clés"
+
 msgid "Language"
 msgstr "Langue"
+
+msgid "Leads to diploma/certificate"
+msgstr "Mène à diplôme/certificat"
 
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
 
 msgid "Learning class year"
 msgstr "Classe"
+
+msgid "Learning location"
+msgstr "Lieu d'enseignement"
 
 msgid "Learning unit year"
 msgstr "Unités d'enseignement"
@@ -348,6 +426,9 @@ msgstr "Max. crédits"
 
 msgid "Min. credits"
 msgstr "Min. crédits"
+
+msgid "Mini-Training"
+msgstr "Mini-Formation"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -429,6 +510,18 @@ msgstr "Au choix"
 msgid "Other informations"
 msgstr "Autres informations"
 
+msgid "Other languages activities"
+msgstr "Activités dans d'autres langues"
+
+msgid "Partial deliberation"
+msgstr "Sous-épreuve"
+
+msgid "Partial title in English"
+msgstr "Intitulé partiel en anglais"
+
+msgid "Partial title in French"
+msgstr "Intitulé partiel en français"
+
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -473,6 +566,9 @@ msgstr "Prérequis non valides."
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
+msgid "Primary language"
+msgstr "Langue principale"
+
 msgid "Produce xls of trainings with administrative data"
 msgstr ""
 "Produire un fichier Excel avec la liste des formations et données "
@@ -480,6 +576,9 @@ msgstr ""
 
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
+
+msgid "Professionnal title"
+msgstr "Titre professionnel"
 
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
@@ -500,6 +599,9 @@ msgstr "Légende proposition"
 msgid "Quadrimester"
 msgstr "Quadrimestre"
 
+msgid "Rate code"
+msgstr "Code tarif"
+
 msgid "Registration ID"
 msgstr "NOMA"
 
@@ -512,6 +614,9 @@ msgstr "Crédits relatifs"
 msgid "Relative credits must be greater or equals than 0"
 msgstr "Crédits relatifs doit être plus grand ou égal à 0"
 
+msgid "Remark"
+msgstr "Remarque"
+
 msgid "Req. Entity"
 msgstr "Entité Resp."
 
@@ -523,6 +628,9 @@ msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Schedule type"
+msgstr "Type horaire"
 
 msgid "Search"
 msgstr "Recherche"
@@ -547,6 +655,12 @@ msgstr "Utilisations"
 
 msgid "Standard"
 msgstr "Standard"
+
+msgid "Start academic year"
+msgstr "Année académique de début"
+
+msgid "Status"
+msgstr "Active"
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
@@ -596,6 +710,10 @@ msgid "The learning unit is a prerequisite"
 msgstr "L'UE est un prérequis"
 
 #, python-format
+msgid "The link of %(code)s - %(acronym)s - %(year)s has been updated."
+msgstr "Le lien de %(code)s - %(acronym)s - %(year)s a été mis à jour."
+
+#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
@@ -620,10 +738,12 @@ msgstr ""
 msgid "The program %(title)s - %(academic_year)s will be published soon"
 msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
+#, python-format
 msgid ""
 "The program tree version %(offer_acronym)s %(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée avec succès."
+"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"avec succès."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -653,6 +773,9 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
+msgid "Training"
+msgstr "Formation"
+
 msgid "Trainings"
 msgstr "Formations"
 
@@ -671,12 +794,30 @@ msgstr "Enseignant·e·s"
 msgid "Type"
 msgstr "Type"
 
+msgid "Type of constraint"
+msgstr "Type de contrainte"
+
+msgid "Type of training"
+msgstr "Type de formation"
+
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
+msgid "University certificate"
+msgstr "Certificat universitaire"
+
+msgid "Update Content"
+msgstr "Modification Contenu"
+
+msgid "Update Training"
+msgstr "Modifier Formation"
+
 msgid "Utilizations"
 msgstr "Utilisations"
+
+msgid "Validity"
+msgstr "Validité"
 
 msgid "Version"
 msgstr "Version"
@@ -686,6 +827,9 @@ msgstr "Sigle de la version"
 
 msgid "Volume"
 msgstr "Volume"
+
+msgid "Web re-registration"
+msgstr "Ré-inscription par internet"
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
@@ -730,8 +874,8 @@ msgid ""
 "You can't copy the program tree version '{acronym}' from {from_year} to "
 "{to_year} because it ends in {end_year}"
 msgstr ""
-"Vous ne pouvez pas copier la version de formation '{acronym}' de "
-"{from_year} à {to_year} parce qu'elle finit en {end_year}"
+"Vous ne pouvez pas copier la version de formation '{acronym}' de {from_year} "
+"à {to_year} parce qu'elle finit en {end_year}"
 
 #, python-brace-format
 msgid ""
@@ -769,8 +913,23 @@ msgstr ""
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu de la formation n'est pas vide."
 
+msgid "activities in English"
+msgstr "activités en anglais"
+
 msgid "bibliography"
 msgstr "bibliographie"
+
+msgid "certificate aims"
+msgstr "attendus du diplôme"
+
+msgid "comment (internal)"
+msgstr "commentaire (interne)"
+
+msgid "dissertation"
+msgstr "mémoire"
+
+msgid "duration unit"
+msgstr "type durée"
 
 msgid "email"
 msgstr "email"
@@ -809,6 +968,15 @@ msgstr "classe"
 msgid "learning unit year"
 msgstr "Unités d'enseignement"
 
+msgid "main domain"
+msgstr "domaine principal"
+
+msgid "maximum constraint"
+msgstr "contrainte maximum"
+
+msgid "minimum constraint"
+msgstr "contrainte minimum"
+
 msgid "on"
 msgstr "le"
 
@@ -818,6 +986,12 @@ msgstr "optionnel"
 #, python-format
 msgid "prerequisites-%(year)s-%(acronym)s"
 msgstr "prérequis-%(year)s-%(acronym)s"
+
+msgid "remark in english"
+msgstr "remarque en anglais"
+
+msgid "secondary domains"
+msgstr "domaines secondaires"
 
 msgid "training"
 msgstr "formation"
