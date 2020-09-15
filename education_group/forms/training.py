@@ -38,7 +38,6 @@ from django.db.models import Value, CharField
 from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
-from education_group.ddd.business_types import *
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
@@ -57,6 +56,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.business_types import *
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
@@ -207,7 +207,8 @@ class CreateTrainingForm(ValidationRuleMixin, PermissionFieldMixin, forms.Form):
     management_entity = forms.CharField()
     administration_entity = MainEntitiesVersionChoiceField(
         queryset=None,
-        to_field_name="acronym"
+        to_field_name="acronym",
+        label=_('Administration entity')
     )
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),

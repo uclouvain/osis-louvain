@@ -47,7 +47,14 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
 
     @cached_property
     def luy(self):
-        return get_object_or_404(LearningUnitYear, id=self.kwargs["learning_unit_year_id"])
+        luy_id = self.kwargs.get('learning_unit_year_id')
+        if luy_id:
+            return get_object_or_404(LearningUnitYear, id=luy_id)
+        else:
+            return get_object_or_404(
+                LearningUnitYear,
+                acronym=self.kwargs['code'], academic_year__year=self.kwargs['year']
+            )
 
     @cached_property
     def parent_luy(self):

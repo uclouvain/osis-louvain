@@ -382,7 +382,7 @@ def get_full_context(learning_unit_year):
         initial_data = reinitialize_learning_unit_year(components_list, context, initial_data, learning_unit_year)
     context['learning_unit_year_fields'] = get_learning_unit_context(learning_unit_year)
     context['learning_container_year_fields'] = get_learning_container_year_context(learning_unit_year)
-    context['campus'] = learning_unit_year.campus.name
+    context['campus'] = learning_unit_year.campus.name if learning_unit_year.campus else None
     context['learning_container_year_partims'] = [partim.subdivision for partim in
                                                   learning_unit_year.get_partims_related()]
     context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)

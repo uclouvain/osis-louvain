@@ -72,7 +72,7 @@ urlpatterns = [
         ])),
     ])),
     url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/attributions/', include([
-        url(r'^$', attribution.learning_unit_attributions,
-            name="learning_unit_attributions"),
+        url(r'^$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
+        url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
     ])),
 ]
