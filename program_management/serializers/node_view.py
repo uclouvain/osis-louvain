@@ -219,5 +219,5 @@ def get_program_tree_version_title(node_identity: 'NodeIdentity',
             if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
                 return "[{}]".format(program_tree_version.title_en)
             else:
-                return "[{}]".format(program_tree_version.title_fr)
+                return "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
     return ''
