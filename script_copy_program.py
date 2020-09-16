@@ -416,7 +416,7 @@ def copy_link_to_next_year(copy_to_year: AcademicYear) -> dict:
          | Q(child_leaf__learning_unit__end_year__isnull=True)
          | Q(child_leaf__learning_unit__end_year__year__gte=copy_to_year.year)),
         parent__academic_year__year=copy_to_year.year - 1,
-        ).select_related('parent', 'child_branch', 'child_leaf')
+    ).select_related('parent', 'child_branch', 'child_leaf')
     links_created = 0
     for gey in geys:
         new_gey = get_next_link_year(gey, copy_to_year)
@@ -453,9 +453,8 @@ def get_next_link_year(old_gey: 'GroupElementYear', copy_to_year: 'AcademicYear'
 
     try:
         parent = get_next_education_group_year(old_parent, copy_to_year)
-        child_branch = get_next_education_group_year(old_branch, copy_to_year) if old_gey.child_branch else None
-        child_leaf = get_next_learning_unit_year(old_leaf, copy_to_year) if old_gey.child_leaf else None
-
+        child_branch = get_next_education_group_year(old_branch, copy_to_year) if old_branch else None
+        child_leaf = get_next_learning_unit_year(old_leaf, copy_to_year) if old_leaf else None
         try:
             new_egy = GroupElementYear.objects.get(parent=parent, child_branch=child_branch, child_leaf=child_leaf)
             for key, value in defaults.items():
@@ -463,8 +462,8 @@ def get_next_link_year(old_gey: 'GroupElementYear', copy_to_year: 'AcademicYear'
             new_egy.save()
         except GroupElementYear.DoesNotExist:
             new_values = {'parent': parent, 'child_branch': child_branch, 'child_leaf': child_leaf}
-            new_values.update(defaults)
-            new_egy = GroupElementYear(**new_values)
+            defaults.update(new_values)
+            new_egy = GroupElementYear(**defaults)
             new_egy.save()
         return new_egy
     except IntegrityError as e:
