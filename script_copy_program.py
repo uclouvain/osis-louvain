@@ -443,7 +443,7 @@ def get_next_link_year(old_gey: 'GroupElementYear', copy_to_year: 'AcademicYear'
     fields_to_update = model_fields - {
         'parent',
         'child_branch',
-        'child_leaf'
+        'child_leaf',
         'uuid',
         'external_id',
         'changed',
