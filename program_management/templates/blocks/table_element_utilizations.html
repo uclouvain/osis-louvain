@@ -8,8 +8,6 @@
         <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
         <th>{% trans 'Title' %}</th>
         <th>{% trans 'Cred. rel./abs.' %}</th>
-        <th>{% trans 'Min. credits' %}</th>
-        <th>{% trans 'Max. credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
         <th>{% trans 'Formations' %}</th>
@@ -29,17 +27,26 @@
             {{ row.link.relative_credits | default_if_none:'-' }} /
             {{ row.link.child.credits.normalize | default_if_none:'-' }}
         </td>
-        <td>{{ row.link.min_credits | default_if_none:'-' }}</td>
-        <td>{{ row.link.max_credits | default_if_none:'-' }}</td>
         <td>{{ row.link.is_mandatory | yesno:_("yes,no") | title }}</td>
         <td>{{ row.link.block | default_if_none:'-' }}</td>
         <td>
-            {% for root_node in row.root_nodes %}
-                {# TODO: Compute URL #}
-                {% url 'element_identification' root_node.year root_node.code as url_root_identification %}
-                <a href="{{ url_root_identification }}">
-                    {{ root_node.title }}{{ row.root_version_label }}</a>
-                {% if not forloop.last %} - {% endif %}
+            {% for root in row.training_nodes %}
+                <ul>
+                    <li>
+                        <a href="{{ root.direct_parent.root_url }}">
+                            {{ root.direct_parent.title }}{{ root.direct_parent.root_version_label }}
+                        </a>
+                        {% if root.top_nodes %}
+                            <ul>
+                                {% for top_node in root.top_nodes %}
+                                    {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
+                                        {{ top_node.title }}{{ top_node.root_version_label }}
+                                    {% if forloop.last %}</li>{% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                </ul>
             {% empty %}
                 -
             {% endfor %}
