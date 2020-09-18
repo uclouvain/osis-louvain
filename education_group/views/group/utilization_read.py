@@ -24,11 +24,6 @@
 #
 ##############################################################################
 from education_group.views.group.common_read import Tab, GroupRead
-from program_management.ddd import command
-from program_management.ddd.service.read import search_tree_versions_using_node_service
-from program_management.serializers.node_view import get_program_tree_version_name
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.views.element_utilization import get_utilization_rows
 
 
@@ -38,12 +33,5 @@ class GroupReadUtilization(GroupRead):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        node = self.get_object()
-        cmd = command.GetProgramTreesVersionFromNodeCommand(code=node.code, year=node.year)
-        program_trees_versions = search_tree_versions_using_node_service.search_tree_versions_using_node(cmd)
-        trees = []
-        for program_tree_version in program_trees_versions:
-            trees.append(program_tree_version.get_tree())
-
-        context['utilization_rows'] = get_utilization_rows(trees, node)
+        context['utilization_rows'] = get_utilization_rows(self.get_object())
         return context

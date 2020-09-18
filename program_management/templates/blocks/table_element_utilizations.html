@@ -33,16 +33,16 @@
             {% for root in row.training_nodes %}
                 <ul>
                     <li>
-                        <a href="{{ root.direct_parent.root_url }}">
-                            {{ root.direct_parent.title }}{{ root.direct_parent.root_version_label }}
+                        <a href="{{ root.direct_gathering.url }}">
+                            {{ root.direct_gathering.parent.title }}{{ root.version_name }}
                         </a>
-                        {% if root.top_nodes %}
-                            <ul>
-                                {% for top_node in root.top_nodes %}
-                                    {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
-                                        {{ top_node.title }}{{ top_node.root_version_label }}
-                                    {% if forloop.last %}</li>{% endif %}
-                                {% endfor %}
+                        {% if root.root_nodes %}
+                            <ul><li>
+                                {% for root_node in root.root_nodes %}
+                                    {% if forloop.first %}{% trans 'Included in' %} : {% else %} - {% endif %}
+                                    <a href="{{ root_node.url }}">{{ root_node.root.title }}{{ root_node.version_name }}</a>
+                                    {% if forloop.last %}{% endif %}
+                                {% endfor %}</li>
                             </ul>
                         {% endif %}
                     </li>
