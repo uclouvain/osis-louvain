@@ -25,6 +25,7 @@
 ##############################################################################
 from education_group.views.group.common_read import Tab, GroupRead
 from program_management.views.element_utilization import get_utilization_rows
+from program_management.ddd.domain.node import  NodeIdentity
 
 
 class GroupReadUtilization(GroupRead):
@@ -33,5 +34,6 @@ class GroupReadUtilization(GroupRead):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['utilization_rows'] = get_utilization_rows(self.get_object())
+        node = self.get_object()
+        context['utilization_rows'] = get_utilization_rows(NodeIdentity(code=node.code, year=node.year))
         return context

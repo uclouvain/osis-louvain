@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 from django.urls import reverse
 
@@ -49,40 +49,28 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['utilization_rows'] = get_utilization_rows(self.node)
+        context['utilization_rows'] = get_utilization_rows(NodeIdentity(code=self.node.code, year=self.node.year))
         return context
 
 
-def get_utilization_rows(node: 'Node') -> List[Dict[str, Any]]:
-    print('get_utilization_rows {}'.format(node.code))
-    cmd = GetProgramTreesFromNodeCommand(code=node.code, year=node.year)
+def get_utilization_rows(node_identity: 'NodeIdentity') -> List[Dict[str, Any]]:
+    cmd = GetProgramTreesFromNodeCommand(code=node_identity.code, year=node_identity.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
 
     utilization_rows_dict = {}
     parent_nodes = []
 
     for tree in program_trees:
-        print('r*****eee')
         for path, child_node in tree.root_node.descendents.items():
-            if child_node == node:
-                print('m==')
+            if child_node.entity_id == node_identity:
                 links = tree.get_links_using_node(child_node)
                 for link in links:
                     if link.parent not in parent_nodes:
-                        print('ii')
                         cmd = GetProgramTreesFromNodeCommand(code=link.parent.code, year=link.parent.year)
                         parent_node_pgm_trees = search_program_trees_using_node_service.search_program_trees_using_node(
                             cmd)
                         if parent_node_pgm_trees:
-                            for parent_tree in parent_node_pgm_trees:
-                                for path2, child_node2 in parent_tree.root_node.descendents.items():
-                                    if isinstance(child_node2, NodeGroupYear) and child_node2 == link.parent:
-                                        gathering = get_explore_parents(parent_tree.get_parents(path2))
-                                        lk_to_update = utilization_rows_dict.get(link, [])
-                                        if gathering:
-                                            lk_to_update.append(gathering)
-                                        utilization_rows_dict.update({link: lk_to_update})
-
+                            _build_parents_info(link, parent_node_pgm_trees, utilization_rows_dict)
                         else:
                             lk_to_update = utilization_rows_dict.get(link, [])
                             if link.parent not in lk_to_update:
@@ -91,15 +79,17 @@ def get_utilization_rows(node: 'Node') -> List[Dict[str, Any]]:
     return _buid_utilization_rows(utilization_rows_dict)
 
 
-def _buid_utilization_rows(utilization_rows_dict: Dict['Node', List['Node']]) -> List[Dict[str, Any]]:
+def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) -> List[Dict[str, Any]]:
     utilization_rows = []
 
     for link, training_nodes in utilization_rows_dict.items():
         utilization_in_trainings = {}
-        if len(training_nodes) == 0 and (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()) or link.parent.is_training() or link.parent.is_mini_training():
+        if len(training_nodes) == 0 and \
+                (link.parent.is_minor_or_deepening()) or \
+                (link.parent.is_training() and link.parent.is_finality()) or \
+                link.parent.is_training() or link.parent.is_mini_training():
             utilization_in_trainings = {link.parent: []}
         else:
-
             for utilization in training_nodes:
                 root_node = utilization.get('root_node')
                 direct_parent = utilization.get('parent_direct_node')
@@ -122,7 +112,7 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Node', List['Node']]) ->
     return sorted(utilization_rows, key=lambda row: row['link'].parent.code)
 
 
-def _get_training_nodes(dd):
+def _get_training_nodes(dd: Dict['NodeGroupYear', List['NodeGroupYear']]) -> List[Dict[str, Any]]:
     training_nodes = []
     for direct_parent, main_root_nodes in dd.items():
         root_nodes = []
@@ -142,7 +132,7 @@ def _get_training_nodes(dd):
                 'version_name': _get_version_name(direct_parent)
             }
         )
-    return training_nodes
+    return sorted(training_nodes, key=lambda row: row['direct_gathering']['parent'].title)
 
 
 def _get_version_name(direct_parent):
@@ -158,19 +148,14 @@ def _get_identification_url(node: 'Node'):
     return reverse('element_identification', kwargs={'code': node.code, 'year': node.year})
 
 
-def get_explore_parents(parents: List['Node']) -> Dict[str, 'Node']:
-    print('get_explore_parents')
+def get_explore_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
     parent_direct_node = None
     root_node = None
-    print(len(parents))
     for node in parents:
-        print(node.title)
         if (node.is_minor_or_deepening()) or (node.is_training() and node.is_finality()):
             parent_direct_node = node
-            print('if')
         if node.is_training() or node.is_mini_training():
             root_node = node
-            print('if2')
 
     if parent_direct_node is None and root_node is None:
         return None
@@ -178,3 +163,14 @@ def get_explore_parents(parents: List['Node']) -> Dict[str, 'Node']:
         'parent_direct_node': parent_direct_node,
         'root_node': root_node
     }
+
+
+def _build_parents_info(link, parent_node_pgm_trees, utilization_rows_dict):
+    for parent_tree in parent_node_pgm_trees:
+        for path, child_node in parent_tree.root_node.descendents.items():
+            if isinstance(child_node, NodeGroupYear) and child_node == link.parent:
+                gathering = get_explore_parents(parent_tree.get_parents(path))
+                lk_to_update = utilization_rows_dict.get(link, [])
+                if gathering:
+                    lk_to_update.append(gathering)
+                utilization_rows_dict.update({link: lk_to_update})
