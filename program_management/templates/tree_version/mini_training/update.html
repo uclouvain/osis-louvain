@@ -40,8 +40,12 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>{{ mini_training_obj.acronym }} [{{ mini_training_version_obj.version_name }} ] - {{ mini_training_obj.academic_year }}</h2>
-        <h3>{{ mini_training_obj.titles.title_fr }}</h3>
+        <h2>
+            {{ mini_training_obj.acronym }} {{ mini_training_version_obj.version_label }} - {{ mini_training_obj.academic_year }}
+        </h2>
+        <h3>
+            {{ mini_training_obj.titles.title_fr }} {% if mini_training_version_obj.title_fr %} [{{ mini_training_version_obj.title_fr }}]{% endif %}
+        </h3>
     </div>
 {% endblock header_content %}
 

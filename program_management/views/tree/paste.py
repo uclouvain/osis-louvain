@@ -114,8 +114,8 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         context_data["nodes_by_id"] = {
             ele["element_code"]: node_repository.NodeRepository.get(
                 node.NodeIdentity(ele["element_code"], ele["element_year"])
-            ) for ele in self.nodes_to_paste}
-
+            ) for ele in self.nodes_to_paste
+        }
         self._format_title_with_version(context_data["nodes_by_id"])
 
         for form in context_data["formset"].forms:
@@ -124,7 +124,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
             form.is_group_year_form = isinstance(node_elem, NodeGroupYear)
 
         if len(context_data["formset"]) > 0:
-            context_data['is_group_year_formset'] = context_data["formset"][0].is_group_year_form
+            context_data['has_group_year_form'] = context_data["formset"][0].is_group_year_form
 
         if not self.nodes_to_paste:
             display_warning_messages(self.request, _("Please cut or copy an item before paste"))

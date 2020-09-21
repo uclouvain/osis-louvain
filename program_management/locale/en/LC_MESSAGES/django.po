@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 08:54+0200\n"
+"POT-Creation-Date: 2020-09-15 14:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,10 @@ msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
+msgstr ""
+
+#, python-format
+msgid "\"%(child)s\" has been successfully updated"
 msgstr ""
 
 #, python-format

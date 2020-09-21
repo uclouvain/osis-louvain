@@ -93,7 +93,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             ).distinct()
 
         if 'partnership' in settings.INSTALLED_APPS:
-            from partnership.models import PartnershipEntityManager
+            from partnership.auth.roles.partnership_manager import PartnershipEntityManager
             qs = qs.prefetch_related(
                 Prefetch(
                     'partnershipentitymanager_set',

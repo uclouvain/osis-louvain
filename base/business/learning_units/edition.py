@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import logging
-from typing import Dict, List, Any, Iterable
+from typing import Dict, List, Any
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -62,7 +62,6 @@ from cms.models.translated_text import TranslatedText
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
@@ -122,6 +121,8 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
         new_academic_year = AcademicYear.objects.max_adjournment()
+        if last_learning_unit_year.is_partim():
+            new_academic_year = _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year)
 
     with transaction.atomic():
         for ac_year in get_next_academic_years(learning_unit_to_edit, new_academic_year.year):
@@ -129,6 +130,16 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
             result.append(create_learning_unit_year_creation_message(new_luy))
 
     return result
+
+
+def _get_max_academic_year_for_partim(last_learning_unit_year, new_academic_year):
+    full_learning_unit = last_learning_unit_year.parent.learning_unit
+    last_full = LearningUnitYear.objects.filter(
+        learning_unit=full_learning_unit
+    ).order_by('academic_year').last()
+    if last_full.academic_year.year < new_academic_year.year:
+        new_academic_year = last_full.academic_year
+    return new_academic_year
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
@@ -140,7 +151,8 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
         actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
-        if actual_end_year < new_academic_year.year:
+        both_no_end_year = no_planned_end and not lu_parent.learning_unit.end_year
+        if not both_no_end_year and actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -710,4 +722,3 @@ def __report_component(reference: LearningComponentYear, to_postpone_to: List[Le
             learning_unit_year=learning_unit_year_obj,
             type=reference.type,
         )
-

@@ -309,7 +309,7 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
                     'organization__organizationaddress_set',
                     OrganizationAddress.objects.all().select_related('country')
                 )
-            ).order_by('all_students')
+            ).select_related('organization').order_by('all_students')
         ),
         Prefetch(
             'administration_entity',

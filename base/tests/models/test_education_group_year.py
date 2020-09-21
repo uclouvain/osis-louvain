@@ -50,9 +50,12 @@ from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 class EducationGroupYearTest(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.education_group_type_training = EducationGroupTypeFactory(
-            category=education_group_categories.TRAINING,
-            name=education_group_types.TrainingType.BACHELOR.name
+        self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING,
+                                                                       name=education_group_types.TrainingType.BACHELOR.name)
+
+        self.education_group_type_minitraining = EducationGroupTypeFactory(
+            category=education_group_categories.MINI_TRAINING,
+            name=education_group_types.MiniTrainingType.DEEPENING.name
         )
 
         self.education_group_type_minitraining = EducationGroupTypeFactory(minitraining=True)

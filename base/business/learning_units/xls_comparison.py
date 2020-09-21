@@ -91,18 +91,12 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
         xls_build.HEADER_TITLES: learning_unit_titles(),
         xls_build.WS_TITLE: WORKSHEET_TITLE,
     }
-    dict_styled_cells = {}
 
     if cells_modified_with_green_font:
-        parameters[xls_build.FONT_CELLS] = parameters[xls_build.FONT_CELLS].update(
-            {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
-        )
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
-        parameters[xls_build.BORDER_CELLS] = dict_styled_cells.update({xls_build.BORDER_TOP: cells_with_top_border})
-
-    if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
+        parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_TOP: cells_with_top_border}
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
@@ -438,16 +432,13 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
         xls_build.HEADER_TITLES: COMPARISON_PROPOSAL_TITLES,
         xls_build.WS_TITLE: COMPARISON_WORKSHEET_TITLE,
     }
-    dict_styled_cells = {}
+
     if cells_modified_with_green_font:
-        parameters[xls_build.FONT_CELLS] = parameters[xls_build.FONT_CELLS].update(
-            {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
-        )
+        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
 
     if cells_with_top_border:
-        dict_styled_cells[xls_build.BORDER_BOTTOM] = cells_with_top_border
-    if dict_styled_cells:
-        parameters[xls_build.STYLED_CELLS] = dict_styled_cells
+        parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_BOTTOM: cells_with_top_border}
+
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 

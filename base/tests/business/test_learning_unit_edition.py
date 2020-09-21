@@ -47,7 +47,7 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -57,7 +57,8 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
+    LearningUnitYearFullFactory
 from cms.models.translated_text import TranslatedText
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -598,6 +599,36 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
 
         excepted_end_year -= 4
         self._edit_lu(learning_unit_full_annual, excepted_end_year)
+
+    def test_extend_partim_until_last_existing_parent_if_no_end_year(self):
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, 3)]
+        luy = LearningUnitYearFullFactory(
+            learning_unit__end_year=None,
+            academic_year=academic_years[0],
+            learning_container_year__requirement_entity=self.entity
+        )
+        for anac in academic_years[1:]:
+            LearningUnitYearFullFactory(
+                learning_unit=luy.learning_unit,
+                academic_year=anac
+            )
+        partim = LearningUnitYearPartimFactory(
+            learning_container_year=luy.learning_container_year,
+            academic_year=academic_years[0],
+            learning_unit__end_year=academic_years[0]
+        )
+
+        result = edit_learning_unit_end_date(partim.learning_unit, None)
+        expected_result = academic_years[-1].year - academic_years[0].year
+        self.assertTrue(len(result) >= expected_result)
+
+        created_partims = list(
+            LearningUnitYear.objects.filter(
+                subtype=learning_unit_year_subtypes.PARTIM
+            ).exclude(id=partim.id)
+        )
+
+        self.assertEqual(len(created_partims), expected_result)
 
     def test_extend_learning_unit_with_wrong_entity(self):
         end_year_full, learning_unit_full_annual, learning_unit_years = self._create_full_learning_unit()

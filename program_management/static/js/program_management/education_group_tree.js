@@ -317,6 +317,30 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             }
                         },
 
+                        "modify": {
+                            "label": gettext("Modify the link"),
+                            "separator_before": true,
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+
+                                $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.modify_url
+                                    }
+                                });
+                            },
+                            "title": $node.a_attr.modification_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // tree's root cannot be edit (no link with parent...)
+                                return __ret.modify_url == null;
+                            }
+                        },
+
                         "open_all": {
                             "separator_before": true,
                             "label": gettext("Open all"),
@@ -382,6 +406,7 @@ function get_data_from_tree(data) {
         view_url: obj.a_attr.href,
         paste_url: obj.a_attr.paste_url,
         detach_url: obj.a_attr.detach_url,
+        modify_url: obj.a_attr.modify_url,
         search_url: obj.a_attr.search_url,
         path: obj.a_attr.path
     };

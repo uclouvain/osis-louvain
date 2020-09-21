@@ -905,4 +905,3 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
-

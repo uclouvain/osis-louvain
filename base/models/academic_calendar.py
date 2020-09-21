@@ -64,7 +64,7 @@ class AcademicCalendarQuerySet(models.QuerySet):
         if not date:
             date = timezone.now()
 
-        return self.filter(start_date__lte=date, end_date__gte=date)
+        return self.filter(start_date__lte=date, end_date__gt=date)
 
     def starting_within(self, days=0, weeks=0):
         today = timezone.now()

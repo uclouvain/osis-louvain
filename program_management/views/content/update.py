@@ -23,10 +23,10 @@ from learning_unit.ddd.service.read import get_multiple_learning_unit_years_serv
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
-from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
-from program_management.ddd.service.write import update_link_service
-from program_management.models.enums.node_type import NodeType
 from program_management.ddd.domain import exception as program_exception
+from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
+from program_management.ddd.service.write import bulk_update_link_service
+from program_management.models.enums.node_type import NodeType
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -100,7 +100,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             parent_node_year=self.kwargs['year'],
             update_link_cmds=update_link_commands
         )
-        return update_link_service.bulk_update_links(cmd_bulk)
+        return bulk_update_link_service.bulk_update_links(cmd_bulk)
 
     def get_attach_path(self) -> Optional['Path']:
         return self.request.GET.get('path_to') or None

@@ -1,0 +1,28 @@
+{% load bootstrap3 i18n static %}
+{% load dictionnary %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+            <th>{% trans 'Code' %}</th>
+            <th>{% trans 'Mandatory' %}</th>
+            <th>{% trans 'Block' %}</th>
+            <th>{% trans 'Link type' %}</th>
+            <th>{% trans 'Comment' %}</th>
+            <th>{% trans 'English comment' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if formset %}
+        {% for form in formset.forms %}
+            {{ form.media }}
+            {% with nodes_by_id|get_item:form.node_code as node  %}
+                {% include "blocks/link_form_inner/group_item.html" with node=node%}
+            {% endwith %}
+        {% endfor %}
+    {% else %}
+        {% include "blocks/link_form_inner/group_item.html" with node=node %}
+    {% endif %}
+    </tbody>
+</table>

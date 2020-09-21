@@ -1,0 +1,26 @@
+{% load bootstrap3 i18n static %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>{% trans 'Code' %}</th>
+        <th>{% trans 'Cred. rel./abs.' %}</th>
+        <th>{% trans 'Mandatory' %}</th>
+        <th>{% trans 'Block' %}</th>
+        <th>{% trans 'Comment' %}</th>
+        <th>{% trans 'English comment' %}</th>
+    </tr>
+    </thead>
+    <tbody data-formset-body id="group_element_year-form">
+    {% if formset %}
+        {% for form in formset.forms %}
+            {{ form.media }}
+            {% with nodes_by_id|get_item:form.node_code as node  %}
+                {% include "blocks/link_form_inner/learning_unit_item.html" with node=node%}
+            {% endwith %}
+        {% endfor %}
+    {% else %}
+        {% include "blocks/link_form_inner/learning_unit_item.html" with node=node %}
+    {% endif %}
+    </tbody>
+</table>

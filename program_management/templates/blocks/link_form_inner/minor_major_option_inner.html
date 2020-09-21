@@ -1,0 +1,24 @@
+{% load i18n static %}
+{% load dictionnary %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+            <th>{% trans 'Code' %}</th>
+            <th>{% trans 'Access condition' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if formset %}
+        {% for form in formset.forms %}
+            {{ form.media }}
+            {% with nodes_by_id|get_item:form.node_code as node  %}
+                {% include "blocks/link_form_inner/minor_major_option_item.html" with node=node%}
+            {% endwith %}
+        {% endfor %}
+    {% else %}
+        {% include "blocks/link_form_inner/minor_major_option_item.html" with node=node %}
+    {% endif %}
+    </tbody>
+</table>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 08:54+0200\n"
+"POT-Creation-Date: 2020-09-15 14:49+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,6 +25,10 @@ msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
 msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+
+#, python-format
+msgid "\"%(child)s\" has been successfully updated"
+msgstr "\"%(child)s\" a été modifié avec succès"
 
 #, python-format
 msgid "%(node_to_add)s version must be the same as %(root_node)s version"
@@ -660,7 +664,7 @@ msgid "Start academic year"
 msgstr "Année académique de début"
 
 msgid "Status"
-msgstr "Active"
+msgstr "Statut"
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"

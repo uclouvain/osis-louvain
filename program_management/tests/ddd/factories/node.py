@@ -87,6 +87,9 @@ class NodeGroupYearFactory(NodeFactory):
         group = factory.Trait(
             node_type=factory.fuzzy.FuzzyChoice(GroupType)
         )
+        listchoice = factory.Trait(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+        )
 
 
 class NodeLearningUnitYearFactory(NodeFactory):

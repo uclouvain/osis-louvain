@@ -29,6 +29,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
@@ -37,7 +38,6 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
-from backoffice.settings.base import LANGUAGE_CODE_EN
 
 
 def serialize_children(
@@ -71,6 +71,12 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
         'title': link.child.code,
         'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
         'detach_url': reverse_with_get('tree_detach_node', args=[context['root'].pk], get={"path": path}),
+        'modify_url': reverse('tree_update_link', args=[
+            link.parent.code,
+            link.parent.year,
+            link.child.code,
+            link.child.year
+        ]),
         'search_url': reverse_with_get(
             'quick_search_learning_unit' if tree.allows_learning_unit_child(
                 link.child) else 'quick_search_education_group',

@@ -21,36 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import factory.fuzzy
 
-from django.db import transaction
-
-from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateLinkCommand
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd import command
 
 
-@transaction.atomic()
-def update_link(cmd: UpdateLinkCommand) -> 'Link':
-    tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
+class UpdateLinkCommandFactory(factory.Factory):
+    class Meta:
+        model = command.UpdateLinkCommand
+        abstract = False
 
-    child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
-    link_updated = get_updated_link(child_id, tree, cmd)
-    ProgramTreeRepository.update(tree)
-    return link_updated
+    parent_node_code = factory.Sequence(lambda n: 'Code%02d' % n)
+    parent_node_year = factory.Faker("random_int")
 
+    child_node_code = factory.Sequence(lambda n: 'Code%02d' % n)
+    child_node_year = factory.Faker("random_int")
 
-def get_updated_link(child_id, tree, update_cmd):
-    return tree.update_link(
-        parent_path=str(tree.root_node.node_id),
-        child_id=child_id,
-        relative_credits=update_cmd.relative_credits,
-        access_condition=update_cmd.access_condition,
-        is_mandatory=update_cmd.is_mandatory,
-        block=update_cmd.block,
-        link_type=update_cmd.link_type,
-        comment=update_cmd.comment,
-        comment_english=update_cmd.comment_english
-    )
+    access_condition = None
+    is_mandatory = None
+    block = None
+    link_type = None
+    comment = ""
+    comment_english = ""
+    relative_credits = None
