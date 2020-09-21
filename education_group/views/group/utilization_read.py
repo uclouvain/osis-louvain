@@ -25,7 +25,7 @@
 ##############################################################################
 from education_group.views.group.common_read import Tab, GroupRead
 from program_management.views.element_utilization import get_utilization_rows
-from program_management.ddd.domain.node import  NodeIdentity
+from program_management.ddd.domain.node import NodeIdentity
 
 
 class GroupReadUtilization(GroupRead):
