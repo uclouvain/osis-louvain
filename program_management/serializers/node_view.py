@@ -58,8 +58,8 @@ def serialize_children(
     return serialized_children
 
 
-def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'ProgramTree', version_name='', context=None) \
-        -> dict:
+def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'ProgramTree', version_name='',
+                                        context=None) -> dict:
     return {
         'path': path,
         'href': reverse_with_get('element_identification', args=[link.child.year, link.child.code], get={"path": path}),
