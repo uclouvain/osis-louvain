@@ -345,8 +345,6 @@ msgstr "Inclure transition"
 msgid "Include transition"
 msgstr "Inclure transition"
 
-#, fuzzy
-#| msgid "Include transition"
 msgid "Included in"
 msgstr "Inclure transition"
 
