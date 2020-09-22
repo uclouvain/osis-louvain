@@ -25,7 +25,10 @@ function setListenerForCopyElements() {
         const url = event.target.dataset.url;
         const element_code = event.target.dataset.element_code;
         const element_year = event.target.dataset.element_year;
-        handleCopyAction(url, element_code, element_year);
+        const element_type = event.target.dataset.element_type;
+        const element_title = event.target.dataset.title;
+        const version_name = event.target.dataset.version_name;
+        handleCopyAction(url, element_code, element_year, element_type, element_title, version_name);
         event.preventDefault();
     });
 }
@@ -172,13 +175,16 @@ function handleCutAction(cut_url, element_code, element_year, path_to_detach) {
     });
 }
 
-function handleCopyAction(copy_url, element_code, element_year) {
+function handleCopyAction(copy_url, element_code, element_year, element_type, element_title, version_name) {
     $.ajax({
         url: copy_url,
         dataType: 'json',
         data: {
             'element_code': element_code,
-            'element_year': element_year
+            'element_year': element_year,
+            'element_type': element_type,
+            'element_title': element_title,
+            'version_name': version_name
         },
         type: 'POST',
         success: function (jsonResponse) {
@@ -263,7 +269,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "label": gettext("Copy"),
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
-                                handleCopyAction(copy_element_url, node_data.element_code, node_data.element_year)
+                                handleCopyAction(copy_element_url, node_data.element_code, node_data.element_year, node_data.element_type, node_data.element_title, node_data.version_name)
                             }
                         },
 
@@ -408,6 +414,8 @@ function get_data_from_tree(data) {
         detach_url: obj.a_attr.detach_url,
         modify_url: obj.a_attr.modify_url,
         search_url: obj.a_attr.search_url,
-        path: obj.a_attr.path
+        path: obj.a_attr.path,
+        version_name: obj.a_attr.version_name,
+        element_title: obj.a_attr.element_title
     };
 }

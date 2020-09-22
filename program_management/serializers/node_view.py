@@ -58,7 +58,8 @@ def serialize_children(
     return serialized_children
 
 
-def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'ProgramTree', context=None) -> dict:
+def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'ProgramTree', version_name='', context=None) \
+        -> dict:
     return {
         'path': path,
         'href': reverse_with_get('element_identification', args=[link.child.year, link.child.code], get={"path": path}),
@@ -83,6 +84,8 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
             args=[link.child.academic_year.year],
             get={"path": path}
         ),
+        'element_title': link.child.title,
+        'version_name': version_name
     }
 
 
@@ -132,6 +135,10 @@ def _get_node_view_serializer(
         nodes_of_tree_versions: List['ProgramTreeVersion'] = None
 ) -> dict:
 
+    version_name = get_program_tree_version_name(
+        NodeIdentity(code=link.child.code, year=link.child.year),
+        nodes_of_tree_versions
+    )
     return {
         'id': path,
         'path': path,
@@ -139,10 +146,7 @@ def _get_node_view_serializer(
         'text': '%(code)s - %(title)s%(version)s' %
                 {'code': link.child.code,
                  'title': link.child.title,
-                 'version': get_program_tree_version_name(
-                     NodeIdentity(code=link.child.code, year=link.child.year),
-                     nodes_of_tree_versions
-                 )
+                 'version': version_name
                  },
         'children': serialize_children(
             children=link.child.children,
@@ -151,7 +155,7 @@ def _get_node_view_serializer(
             context=context,
             nodes_of_tree_versions=nodes_of_tree_versions
         ),
-        'a_attr': _get_node_view_attribute_serializer(link, path, tree, context=context),
+        'a_attr': _get_node_view_attribute_serializer(link, path, tree, version_name, context=context),
     }
 
 

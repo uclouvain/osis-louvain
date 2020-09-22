@@ -37,15 +37,24 @@ MESSAGE_TEMPLATE = "<strong>{clipboard_title}</strong><br>{object_str}"
 def copy_to_cache(request):
     element_code = request.POST['element_code']
     element_year = int(request.POST['element_year'])
+    element_type = request.POST['element_type']
+
     copy_command = command.CopyElementCommand(request.user.id, element_code, element_year)
 
     copy_element_service.copy_element_service(copy_command)
-
-    success_msg = MESSAGE_TEMPLATE.format(
-        clipboard_title=_("Copied element"),
-        object_str="{} - {}".format(element_code, element_year),
-    )
-
+    clipboard_title = _("Copied element")
+    if element_type == 'LEARNING_UNIT':
+        success_msg = MESSAGE_TEMPLATE.format(
+            clipboard_title=clipboard_title,
+            object_str="{} - {}".format(element_code, element_year),
+        )
+    elif element_type == 'GROUP':
+        element_title = request.POST.get('element_title')
+        version_name = request.POST.get('version_name', '')
+        success_msg = MESSAGE_TEMPLATE.format(
+            clipboard_title=clipboard_title,
+            object_str="{} - {}{} - {}".format(element_code, element_title, version_name, element_year),
+        )
     return JsonResponse({'success_message': success_msg})
 
 

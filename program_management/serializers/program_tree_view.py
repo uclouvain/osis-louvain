@@ -39,11 +39,12 @@ from program_management.serializers.node_view import serialize_children
 def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
     path = str(tree.root_node.pk)
 
+    version_label = __get_tree_version_label(tree)
     return {
         'text': '%(code)s - %(title)s%(version_label)s' % {
             'code': tree.root_node.code,
             'title': tree.root_node.title,
-            'version_label': __get_tree_version_label(tree),
+            'version_label': version_label,
         },
         'id': path,
         'icon': None,
@@ -66,6 +67,8 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
                 args=[tree.root_node.academic_year.year],
                 get={"path": str(tree.root_node.pk)}
             ),
+            'element_title': tree.root_node.title,
+            'version_name': version_label
         }
     }
 
