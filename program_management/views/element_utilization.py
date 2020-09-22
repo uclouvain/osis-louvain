@@ -84,12 +84,13 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) ->
 
     for link, training_nodes in utilization_rows_dict.items():
         utilization_in_trainings = {}
-        if len(training_nodes) == 0 and \
-                (link.parent.is_minor_or_deepening()) or \
-                (link.parent.is_training() and link.parent.is_finality()) or \
-                link.parent.is_training() or link.parent.is_mini_training():
-            utilization_in_trainings = {link.parent: []}
-        else:
+        # if len(training_nodes) == 0 and \
+        #         (link.parent.is_minor_or_deepening()) or \
+        #         (link.parent.is_training() and link.parent.is_finality()) or \
+        #         link.parent.is_training() or link.parent.is_mini_training():
+        #     utilization_in_trainings = {link.parent: []}
+        # else:
+        if len(training_nodes) > 0:
             for utilization in training_nodes:
                 root_node = utilization.get('root_node')
                 direct_parent = utilization.get('parent_direct_node')
@@ -102,7 +103,8 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) ->
                     if root_node and key != root_node and root_node not in used_trainings:
                         used_trainings.append(root_node)
                         utilization_in_trainings.update({key: used_trainings})
-
+        elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()) :
+            utilization_in_trainings = {link.parent: []}
         utilization_rows.append(
             {
                 'link': link,

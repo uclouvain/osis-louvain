@@ -131,11 +131,14 @@ class TestLearningUnitUtilization(TestCase):
             group_year__education_group_type__name=GroupType.COMMON_CORE.name,
         )
 
-        cls.element_luy1_particular_version = ElementLearningUnitYearFactory(learning_unit_year__academic_year=cls.academic_year)
+        cls.element_luy1_particular_version = ElementLearningUnitYearFactory(
+            learning_unit_year__academic_year=cls.academic_year
+        )
 
         GroupElementYearFactory(parent_element=cls.training_root_element_particular_version,
                                 child_element=cls.common_core_element_particular_version)
-        GroupElementYearChildLeafFactory(parent_element=cls.common_core_element_particular_version, child_element=cls.element_luy1_particular_version)
+        GroupElementYearChildLeafFactory(parent_element=cls.common_core_element_particular_version,
+                                         child_element=cls.element_luy1_particular_version)
 
         cls.education_group_particular_version = EducationGroupVersionFactory(
             offer__academic_year=cls.academic_year,
