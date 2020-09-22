@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 14:49+0200\n"
+"POT-Creation-Date: 2020-09-22 08:11+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -345,6 +345,11 @@ msgstr "Inclure transition"
 msgid "Include transition"
 msgstr "Inclure transition"
 
+#, fuzzy
+#| msgid "Include transition"
+msgid "Included in"
+msgstr "Inclure transition"
+
 msgid "Internship"
 msgstr "Stage"
 
@@ -424,12 +429,6 @@ msgstr "Regroupement principal"
 
 msgid "Mandatory"
 msgstr "Obligatoire"
-
-msgid "Max. credits"
-msgstr "Max. crédits"
-
-msgid "Min. credits"
-msgstr "Min. crédits"
 
 msgid "Mini-Training"
 msgstr "Mini-Formation"

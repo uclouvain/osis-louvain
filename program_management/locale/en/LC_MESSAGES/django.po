@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-15 14:49+0200\n"
+"POT-Creation-Date: 2020-09-22 08:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -319,6 +319,9 @@ msgstr ""
 msgid "Include transition"
 msgstr ""
 
+msgid "Included in"
+msgstr ""
+
 msgid "Internship"
 msgstr ""
 
@@ -394,12 +397,6 @@ msgid "Main gathering"
 msgstr ""
 
 msgid "Mandatory"
-msgstr ""
-
-msgid "Max. credits"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Mini-Training"
