@@ -45,10 +45,11 @@ class TestCopyToCache(TestCase):
         self.assertEqual(response.status_code, http.HttpResponseNotAllowed.status_code)
 
     @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
-    def test_should_call_copy_element_service_when_view_is_called_via_post_request(self, mock_copy_service):
+    def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_UE(self, mock_copy_service):
         response = self.client.post(self.url, data={
             "element_code": "LOSIS2548",
             "element_year": 2015,
+            "element_type": "LEARNING_UNIT",
         })
         copy_command = command.CopyElementCommand(self.person.user.id, "LOSIS2548", 2015)
         mock_copy_service.assert_called_with(copy_command)
@@ -57,6 +58,24 @@ class TestCopyToCache(TestCase):
             {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
                 clipboard_title=_("Copied element"),
                 object_str="LOSIS2548 - 2015"
+            )}
+        )
+
+    @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
+    def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_group(self, mock_copy_service):
+        response = self.client.post(self.url, data={
+            "element_code": "LOSIS2548",
+            "element_year": 2015,
+            "element_type": "GROUP",
+            "element_title": "title"
+        })
+        copy_command = command.CopyElementCommand(self.person.user.id, "LOSIS2548", 2015)
+        mock_copy_service.assert_called_with(copy_command)
+        self.assertEqual(
+            response.json(),
+            {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
+                clipboard_title=_("Copied element"),
+                object_str="LOSIS2548 - title - 2015"
             )}
         )
 
