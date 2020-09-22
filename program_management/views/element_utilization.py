@@ -103,7 +103,7 @@ def _buid_utilization_rows(utilization_rows_dict: Dict['Link', List['Node']]) ->
                     if root_node and key != root_node and root_node not in used_trainings:
                         used_trainings.append(root_node)
                         utilization_in_trainings.update({key: used_trainings})
-        elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()) :
+        elif (link.parent.is_minor_or_deepening()) or (link.parent.is_training() and link.parent.is_finality()):
             utilization_in_trainings = {link.parent: []}
         utilization_rows.append(
             {
