@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-23 10:25+0200\n"
+"POT-Creation-Date: 2020-09-24 13:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -667,6 +667,12 @@ msgstr ""
 msgid "Training not found : {acronym} {year}"
 msgstr ""
 
+msgid "Training version can only be created by central manager"
+msgstr ""
+
+msgid "Training version can only be deleted by central manager"
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 
@@ -709,9 +715,6 @@ msgid "Validity"
 msgstr ""
 
 msgid "Validity cannot be greater than last year of organization"
-msgstr ""
-
-msgid "Version can only be created by central manager"
 msgstr ""
 
 msgid "Version name {} already exists"
