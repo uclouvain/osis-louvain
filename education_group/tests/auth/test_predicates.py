@@ -5,7 +5,8 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
+    EducationGroupYearMasterFactory
 from education_group.tests.factories.group import GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -263,7 +264,7 @@ class TestIsContinuingEducationGroupYear(TestCase):
         )
 
     def test_case_is_not_continuing_education_group_year(self):
-        education_group_year = EducationGroupYearFactory()
+        education_group_year = EducationGroupYearMasterFactory()
         self.assertFalse(
             predicates.is_continuing_education_group_year(
                 self.user,
