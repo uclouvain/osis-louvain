@@ -32,7 +32,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -40,7 +40,7 @@ class TestTrainingReadDiplomaCertificate(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
             offer__academic_year__year=2019,
@@ -94,7 +94,7 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         self.assertIn('versions_choices', response.context)
         self.assertIn('training', response.context)
 
-    def test_assert_active_tabs_is_diplimas_certificates_and_others_are_not_active(self):
+    def test_assert_active_tabs_is_diplomas_certificates_and_others_are_not_active(self):
         from education_group.views.training.common_read import Tab
 
         response = self.client.get(self.url)

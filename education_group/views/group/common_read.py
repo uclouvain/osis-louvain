@@ -186,7 +186,8 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                "?path={}".format(self.get_path())
 
     def get_tab_urls(self):
-        return OrderedDict({
+        display_general_information = self.have_general_information_tab()
+        tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
                 'active': Tab.IDENTIFICATION == self.active_tab,
@@ -207,15 +208,21 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             },
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
-                'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': self.have_general_information_tab(),
+                'active': Tab.GENERAL_INFO == self.active_tab and display_general_information,
+                'display': display_general_information,
                 'url': get_tab_urls(Tab.GENERAL_INFO, self.node_identity, self.get_path()),
             }
         })
+        for tab, tab_dict in tab_urls.items():
+            if not tab == Tab.IDENTIFICATION:
+                if tab_dict['active']:
+                    return tab_urls
+        tab_urls[Tab.IDENTIFICATION]['active'] = True
+        return tab_urls
 
     def have_general_information_tab(self):
         return self.get_object().node_type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range
+               self._is_general_info_and_condition_admission_in_display_range()
 
     def _is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
