@@ -32,7 +32,7 @@ from django.db.models import OuterRef, Subquery, fields, F
 from base.business.education_groups import general_information_sections
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import TrainingType
 from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.text_label import TextLabel
@@ -44,7 +44,7 @@ from program_management.ddd.domain.node import NodeGroupYear
 def get_sections_of_common(year: int, language_code: str):
     reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
     labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
-    empty_group_node = NodeGroupYear(node_type=GroupType.COMMON_CORE)
+    empty_group_node = NodeGroupYear(node_type=TrainingType.PGRM_MASTER_120)
     translated_labels = __get_translated_labels(reference_pk, labels, language_code, empty_group_node)
     sections = OrderedDict()
     for section in general_information_sections.SECTION_LIST:

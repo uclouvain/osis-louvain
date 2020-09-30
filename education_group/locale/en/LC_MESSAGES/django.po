@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 13:10+0200\n"
+"POT-Creation-Date: 2020-09-30 10:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,9 +244,6 @@ msgstr ""
 msgid "Deliberation"
 msgstr ""
 
-msgid "Detach"
-msgstr ""
-
 msgid "Diploma"
 msgstr ""
 
@@ -340,10 +337,7 @@ msgstr ""
 msgid "General informations"
 msgstr ""
 
-msgid "Go down"
-msgstr ""
-
-msgid "Go up"
+msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"

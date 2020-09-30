@@ -1,4 +1,4 @@
-from .common import CommonGeneralInformation
+from .common import CommonGeneralInformation, UpdateCommonGeneralInformation
 from .common_bachelor import CommonBachelorAdmissionCondition
 from .common_aggregate import CommonAggregateAdmissionCondition
 from .common_master import CommonMasterAdmissionCondition

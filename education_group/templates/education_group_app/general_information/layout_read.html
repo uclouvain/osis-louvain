@@ -30,8 +30,10 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    {{ block.super }}
-    <li class="active"> {{ object.code }} </li>
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'catalog_configuration' %}" id="lnk_catalog_configuration">{% trans 'Configuration' %}</a></li>
+    <li><a  href="{% url 'common_topics_configuration' %}" id="lnk_common_topics_configuration">{% trans 'Management common topics' %}</a></li>
+    <li class="active"> {{ object.acronym }} </li>
 {% endblock %}
 
 {% block header_content %}

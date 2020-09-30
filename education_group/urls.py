@@ -156,6 +156,11 @@ urlpatterns = [
     ])),
     path('general_information/<int:year>/', include([
         path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
+        path(
+            'common/update',
+            general_information.UpdateCommonGeneralInformation.as_view(),
+            name="update_common_general_information"
+        ),
         path('common/publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
         path(
             'common-bachelor/',

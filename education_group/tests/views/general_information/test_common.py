@@ -23,13 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
+from base.business.education_groups import general_information_sections
 from base.tests.factories.education_group_year import EducationGroupYearCommonFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from cms.enums import entity_name
+from cms.tests.factories.text_label import TextLabelFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.views.general_information.common import Tab
 
 
@@ -71,9 +77,9 @@ class TestCommonGeneralInformation(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.context['object'], self.common_education_group_year)
-        expected_update_url = reverse('education_group_pedagogy_edit', args=[
-            self.common_education_group_year.pk
-        ])
+        expected_update_url = reverse('update_common_general_information', args=[
+            self.common_education_group_year.academic_year.year
+        ]) + "?path="
         self.assertEqual(response.context['update_label_url'], expected_update_url)
 
         expected_publish_url = reverse('publish_common_general_information', kwargs={
@@ -89,3 +95,80 @@ class TestCommonGeneralInformation(TestCase):
 
         self.assertEqual(len(response.context['tab_urls']), 1)
         self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
+
+
+class TestUpdateCommonGetGeneralInformation(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
+        cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
+
+        cls.label_name = random.choice(general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific'])
+        TextLabelFactory(label=cls.label_name, entity=entity_name.OFFER_YEAR)
+
+        cls.url = reverse('update_common_general_information', kwargs={'year': 2018}) + "?label=" + cls.label_name
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_case_user_have_not_permission(self):
+        self.client.force_login(UserFactory())
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_case_common_not_exists(self):
+        dummy_url = reverse('update_common_general_information', kwargs={'year': 1990})
+        response = self.client.get(dummy_url)
+
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
+    def test_assert_template_used(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_pedagogy_edit_inner.html")
+
+
+class TestUpdateCommonPostGeneralInformation(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
+        cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
+
+        cls.label_name = random.choice(general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific'])
+        TextLabelFactory(label=cls.label_name, entity=entity_name.OFFER_YEAR)
+
+        cls.url = reverse('update_common_general_information', kwargs={'year': 2018}) + "?label=" + cls.label_name
+
+    def setUp(self) -> None:
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_case_user_have_not_permission(self):
+        self.client.force_login(UserFactory())
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_case_assert_redirect(self):
+        expected_redirect = reverse('common_general_information', kwargs={
+            'year': self.common_education_group_year.academic_year.year
+        })
+        response = self.client.post(self.url, {
+            'label': self.label_name,
+            'text_french': "Text in french",
+            'text_english': "Text in english"
+        })
+        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
