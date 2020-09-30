@@ -25,19 +25,25 @@
 {% endcomment %}
 
 <div class="container-align-items-center" aria-label="actions">
-    <form id="form_up_{{ link.child.code }}" method="POST"
-          action="{% url 'content_up' %}">
-        {% csrf_token %}
-        <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
-        {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
-    </form>
 
-    <form id="form_down_{{ link.child.code }}" method="POST"
-          action="{% url 'content_down' %}">
-        {% csrf_token %}
-        <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
-        {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
-    </form>
+    {% if not up_disabled %}
+        <form id="form_up_{{ link.child.code }}" method="POST"
+              action="{% url 'content_up' %}">
+            {% csrf_token %}
+            <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+            {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
+        </form>
+    {% endif %}
+
+    {% if not down_disabled %}
+        <form id="form_down_{{ link.child.code }}" method="POST"
+              action="{% url 'content_down' %}">
+            {% csrf_token %}
+            <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+
+            {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
+        </form>
+    {% endif %}
 
     {% url 'tree_detach_node' node.node_id as detach_url %}
     {% a_tag_modal_has_perm url=detach_url|addstr:'?path='|addstr:node_path|addstr:"|"|addstr:link.child.node_id text='<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year %}

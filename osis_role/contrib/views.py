@@ -31,7 +31,7 @@ class AjaxPermissionRequiredMixin(PermissionRequiredMixinRules):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
-            error_msg = get_permission_error(request.user, self.permission_required)
+            error_msg = self.get_permission_error(request)
             if request.is_ajax():
                 return render(request, 'education_group/blocks/modal/modal_access_denied.html', {
                     'access_message': error_msg
@@ -39,3 +39,6 @@ class AjaxPermissionRequiredMixin(PermissionRequiredMixinRules):
             else:
                 raise PermissionDenied(error_msg)
         return super().dispatch(request, *args, **kwargs)
+
+    def get_permission_error(self, request) -> str:
+        return get_permission_error(request.user, self.permission_required)

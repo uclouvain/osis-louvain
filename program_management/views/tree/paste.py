@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 import itertools
 from typing import List, Union
 
@@ -47,6 +48,7 @@ from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from osis_role import errors
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
@@ -66,14 +68,22 @@ class PasteNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMess
     def has_permission(self):
         return self._has_permission_to_detach() & super().has_permission()
 
+    def get_permission_error(self, request) -> str:
+        if not self._has_permission_to_detach():
+            return errors.get_permission_error(request.user, "base.can_detach_node")
+        return super().get_permission_error(request)
+
+    @functools.lru_cache()
     def _has_permission_to_detach(self) -> bool:
         nodes_to_detach_from = [
             int(element_selected["path_to_detach"].split("|")[-2])
             for element_selected in self.nodes_to_paste if element_selected["path_to_detach"]
         ]
         objs_to_detach_from = GroupYear.objects.filter(element__id__in=nodes_to_detach_from)
-        return all(self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
-                   for obj_to_detach in objs_to_detach_from)
+        return all(
+            self.request.user.has_perm("base.can_detach_node", obj_to_detach)
+            for obj_to_detach in objs_to_detach_from
+        )
 
     def get_permission_object(self) -> GroupYear:
         node_to_paste_to_id = int(self.request.GET['path'].split("|")[-1])
