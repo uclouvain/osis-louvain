@@ -102,14 +102,14 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
-                            {% bootstrap_label _("Management entity") label_class='d-block'%}
-                            <p>{{ node.management_entity_acronym }}</p>
+                            {% bootstrap_label _("Management entity") label_class='d-block' %}
+                            <p>{{ node.management_entity_acronym|default_if_none:"-" }}</p>
                         </div>
                     </div>
                     <br>
                     <div class="row">
                         <div class="col-md-12">
-                            {% bootstrap_label _("Learning location") label_class='d-block'%}
+                            {% bootstrap_label _("Learning location") label_class='d-block' %}
                             <p>{{ node.teaching_campus.name }} - {{ node.teaching_campus.university_name }}</p>
                         </div>
                     </div>

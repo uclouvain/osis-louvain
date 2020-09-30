@@ -29,15 +29,13 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError
 from django.utils import timezone
 
-from education_group import publisher
-from education_group.ddd.business_types import *
-
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
 from base.models.campus import Campus as CampusModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group import publisher
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.domain._campus import Campus
@@ -228,12 +226,12 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
             maximum=obj.max_constraint,
         ),
         management_entity=EntityValueObject(
-            acronym=obj.management_entity.most_recent_acronym,
+            acronym=obj.management_entity.most_recent_acronym if obj.management_entity else None,
         ),
         teaching_campus=Campus(
             name=obj.main_teaching_campus.name,
             university_name=obj.main_teaching_campus.organization.name,
-        ),
+        ) if obj.main_teaching_campus else None,
         remark=Remark(
             text_fr=obj.remark_fr,
             text_en=obj.remark_en
