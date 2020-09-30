@@ -39,22 +39,26 @@ from program_management.views.tree_version import create as create_program_tree_
 from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
-    url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
-        groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_pdf_content"),
-    url(r'^pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/(?P<language>[a-z\-]+)',
-        groupelementyear_read.pdf_content, name="pdf_content"),
-    url(
-        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/prerequisites/$',
+    path(
+        'group_pdf_content/<int:year>/<str:code>/',
+        groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_pdf_content"
+    ),
+    path(
+        'pdf_content/<int:year>/<str:code>/<str:language>)',
+        groupelementyear_read.pdf_content, name="pdf_content"
+    ),
+    path(
+        'reporting/<int:year>/<str:code>/prerequisites/',
         excel.get_learning_unit_prerequisites_excel,
         name="education_group_learning_units_prerequisites"
     ),
-    url(
-        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/is_prerequisite_of/$',
+    path(
+        'reporting/<int:year>/<str:code>/is_prerequisite_of/',
         excel.get_learning_units_is_prerequisite_for_excel,
         name="education_group_learning_units_is_prerequisite_for"
     ),
-    url(
-        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/contains/$',
+    path(
+        'reporting/<int:year>/<str:code>/contains/',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
     ),
