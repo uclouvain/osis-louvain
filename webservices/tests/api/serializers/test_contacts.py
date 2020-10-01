@@ -28,6 +28,7 @@ import datetime
 from django.db.models import Case, When, F, CharField
 from django.test import TestCase
 
+from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -39,6 +40,7 @@ from webservices.api.serializers.contacts import ContactsSerializer, ContactSeri
 class ContactsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_year = get_current_year()
         cls.language = 'en'
         now = datetime.datetime.now()
         cls.entity = EntityFactory()
@@ -65,11 +67,11 @@ class ContactsSerializerTestCase(TestCase):
 
     def test_return_none_if_no_pubication_contact_entity(self):
         egy = EducationGroupYearFactory(
-            academic_year__year=2018,
+            academic_year__year=self.current_year,
             management_entity=self.entity,
             publication_contact_entity=None
         )
-        node = NodeGroupYearFactory(code=egy.partial_acronym, year=2018)
+        node = NodeGroupYearFactory(code=egy.partial_acronym, year=self.current_year)
         serializer = ContactsSerializer(node, context={'language': self.language, 'offer': egy})
         self.assertIsNone(serializer.data['entity'])
 

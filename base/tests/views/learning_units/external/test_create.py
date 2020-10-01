@@ -29,13 +29,13 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
 from base.views.learning_units.external.create import get_external_learning_unit_creation_form
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
@@ -51,7 +51,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         )
 
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
-        end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
+        end_year = AcademicYearFactory(year=get_current_year())
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()

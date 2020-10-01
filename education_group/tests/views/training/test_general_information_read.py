@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from program_management.ddd.domain.node import NodeGroupYear
@@ -40,19 +41,20 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestTrainingReadGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_year = get_current_year()
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
-            offer__academic_year__year=2019,
+            offer__academic_year__year=cls.current_year,
             offer__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
             root_group__acronym="DROI2M",
             root_group__partial_acronym="LDROI200M",
-            root_group__academic_year__year=2019,
+            root_group__academic_year__year=cls.current_year,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
         ElementGroupYearFactory(group_year=cls.training_version.root_group)
-        cls.url = reverse('training_general_information', kwargs={'year': 2019, 'code': 'LDROI200M'})
+        cls.url = reverse('training_general_information', kwargs={'year': cls.current_year, 'code': 'LDROI200M'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -90,7 +92,9 @@ class TestTrainingReadGeneralInformation(TestCase):
                 return_value=False
         ):
             response = self.client.get(self.url)
-            expected_redirect = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
+            expected_redirect = reverse('training_identification', kwargs={
+                'year': get_current_year(), 'code': 'LDROI200M'
+            })
             self.assertRedirects(response, expected_redirect)
 
     def test_assert_template_used(self):
@@ -110,7 +114,7 @@ class TestTrainingReadGeneralInformation(TestCase):
         ]) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
-            'publish_general_information', args=["2019", "LDROI200M"]
+            'publish_general_information', args=[str(self.current_year), "LDROI200M"]
         ) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertIsInstance(response.context['tree'], str)

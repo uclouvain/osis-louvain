@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import urllib.parse
 from typing import List
 from unittest import mock
 
@@ -32,6 +31,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.mini_training.common_read import Tab
@@ -43,19 +43,20 @@ from program_management.tests.factories.element import ElementGroupYearFactory
 class TestMiniTrainingReadSkillAchievementsRead(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_year = get_current_year()
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
-            offer__academic_year__year=2019,
+            offer__academic_year__year=cls.current_year,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
             root_group__partial_acronym="LBIOL100P",
-            root_group__academic_year__year=2019,
+            root_group__academic_year__year=cls.current_year,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
         cls.element_group_year = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
         cls.url = reverse(
-            'mini_training_skills_achievements', kwargs={'year': 2019, 'code': 'LBIOL100P'}
+            'mini_training_skills_achievements', kwargs={'year': cls.current_year, 'code': 'LBIOL100P'}
         ) + '?path={}&tab={}'.format(cls.element_group_year.id, Tab.SKILLS_ACHIEVEMENTS)
 
     def setUp(self) -> None:
@@ -73,7 +74,8 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertTrue(
-            '/login/?next=/educationgroups/mini_trainings/2019/LBIOL100P/skills_achievements/' in response.url
+            '/login/?next=/educationgroups/mini_trainings/{}/LBIOL100P/skills_achievements/'.format(self.current_year)
+            in response.url
         )
 
     def test_case_user_have_not_permission(self):
@@ -90,11 +92,15 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
             return_value=False
         ):
             response = self.client.get(self.url)
-            expected_redirect = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+            expected_redirect = reverse('mini_training_identification', kwargs={
+                'year': self.current_year, 'code': 'LBIOL100P'
+            })
             self.assertRedirects(response, expected_redirect)
 
     def test_case_mini_training_not_exists(self):
-        dummy_url = reverse('mini_training_skills_achievements', kwargs={'year': 2018, 'code': 'DUMMY100B'})
+        dummy_url = reverse('mini_training_skills_achievements', kwargs={
+            'year': self.current_year, 'code': 'DUMMY100B'
+        })
         response = self.client.get(dummy_url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
