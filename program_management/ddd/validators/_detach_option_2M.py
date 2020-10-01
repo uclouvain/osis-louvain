@@ -30,6 +30,7 @@ from django.utils.translation import ngettext
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
+from program_management import formatter
 from program_management.ddd.business_types import *
 
 
@@ -99,8 +100,9 @@ class DetachOptionValidator(business_validator.BusinessValidator):
             "Options \"%(acronym)s\" cannot be detach because they are contained in %(finality_acronym)s program.",
             len(options_to_detach)
         ) % {
-            "acronym": ', '.join([self._get_version_title(option) for option in options_to_detach_versions]),
-            "finality_acronym": self._get_version_title(finality_version)
+            "acronym": ', '.join([formatter.format_program_tree_version_identity(option)
+                                  for option in options_to_detach_versions]),
+            "finality_acronym": formatter.format_program_tree_version_identity(finality_version)
         }
 
     def _get_options_to_check_by_tree(self, tree_2m: 'ProgramTree') -> List['Node']:
@@ -125,8 +127,3 @@ class DetachOptionValidator(business_validator.BusinessValidator):
     def _is_inside_finality(self) -> bool:
         parents = self.working_tree.get_parents(self.path_to_node_to_detach)
         return self.node_to_detach.is_finality() or any(p.is_finality() for p in parents)
-
-    def _get_version_title(self, version_identity: 'ProgramTreeVersionIdentity') -> str:
-        return "{}[{}]".format(
-            version_identity.offer_acronym, version_identity.version_name
-        ) if version_identity.version_name else version_identity.offer_acronym

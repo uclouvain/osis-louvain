@@ -24,33 +24,31 @@
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository, program_tree, \
-    program_tree_version
+from program_management.ddd.domain import program_tree_version
+from program_management.ddd.repositories import program_tree_version as tree_version_repository
+from program_management.ddd.service.write import update_program_tree_version_service
 
 
 @transaction.atomic()
-def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
-    node_identity = node.NodeIdentity(code=paste_command.node_to_paste_code, year=paste_command.node_to_paste_year)
-    path_to_detach = paste_command.path_where_to_detach
-    root_id = int(paste_command.path_where_to_paste.split("|")[0])
-    tree = load_tree.load(root_id)
-    node_to_attach = node_repository.NodeRepository.get(node_identity)
-
-    link_created = tree.paste_node(
-        node_to_attach,
-        paste_command,
-        program_tree.ProgramTreeRepository(),
-        program_tree_version.ProgramTreeVersionRepository()
+def update_program_tree_version_end_date(
+        update_cmd: command.UpdateProgramTreeVersionEndDateCommand
+) -> program_tree_version.ProgramTreeVersionIdentity:
+    identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=update_cmd.from_offer_acronym,
+        year=update_cmd.from_year,
+        version_name=update_cmd.from_version_name,
+        is_transition=update_cmd.from_is_transition,
     )
+    tree_version = tree_version_repository.ProgramTreeVersionRepository().get(entity_id=identity)
 
-    if path_to_detach:
-        root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
-        tree_to_detach = tree if root_tree_to_detach == root_id else load_tree.load(root_tree_to_detach)
-        tree_to_detach.detach_node(path_to_detach, program_tree.ProgramTreeRepository())
-
-    persist_tree.persist(tree)
-
-    return link_created.entity_id
+    return update_program_tree_version_service.update_program_tree_version(
+        command=command.UpdateProgramTreeVersionCommand(
+            end_year=update_cmd.end_date,
+            offer_acronym=update_cmd.from_offer_acronym,
+            version_name=update_cmd.from_version_name,
+            year=update_cmd.from_year,
+            is_transition=update_cmd.from_is_transition,
+            title_en=tree_version.title_en,
+            title_fr=tree_version.title_fr
+        )
+    )

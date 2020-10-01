@@ -373,7 +373,8 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
     ) -> 'Link':
         """
         Add a node to the tree
@@ -386,7 +387,8 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_paste,
             paste_command,
-            tree_repository
+            tree_repository,
+            tree_version_repository
         )
         validator.validate()
 

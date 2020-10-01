@@ -26,7 +26,7 @@
 from typing import List
 
 from education_group.ddd import command
-from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.domain import exception
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
@@ -130,5 +130,5 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
         identities_created.append(identity_next_year)
     if conflicted_fields:
         first_conflict_year = min(conflicted_fields.keys())
-        raise TrainingCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
+        raise exception.TrainingCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
     return identities_created

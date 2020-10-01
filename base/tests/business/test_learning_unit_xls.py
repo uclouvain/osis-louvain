@@ -222,7 +222,8 @@ class TestLearningUnitXls(TestCase):
             root_group=cls.a_group_year_parent_for_particular_version)
         cls.group_element_particular = GroupElementYearFactory(
             parent_element=cls.a_group_year_parent_element_for_particular_version,
-            child_element=cls.learning_unit_yr_version_element
+            child_element=cls.learning_unit_yr_version_element,
+            relative_credits=15
         )
 
     def test_get_wrapped_cells_with_teachers_and_programs(self):

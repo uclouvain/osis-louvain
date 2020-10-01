@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
+import operator
 from typing import Union, List
 
-from django.db.models import F, Subquery
+from django.db.models import F, Subquery, Q
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
@@ -45,9 +48,20 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
 
     @classmethod
     def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
+        return cls.get_from_node_identities([node_identity])[0]
+
+    @classmethod
+    def get_from_node_identities(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersionIdentity']:
+        if not node_identities:
+            return []
+
+        filter_clause = functools.reduce(
+            operator.or_,
+            ((Q(partial_acronym=entity_id.code) & Q(academic_year__year=entity_id.year))
+             for entity_id in node_identities)
+        )
         values = GroupYear.objects.filter(
-            partial_acronym=node_identity.code,
-            academic_year__year=node_identity.year
+            filter_clause
         ).annotate(
             offer_acronym=F('educationgroupversion__offer__acronym'),
             year=F('academic_year__year'),
@@ -55,7 +69,7 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
             is_transition=F('educationgroupversion__is_transition'),
         ).values('offer_acronym', 'year', 'version_name', 'is_transition')
         if values:
-            return ProgramTreeVersionIdentity(**values[0])
+            return [ProgramTreeVersionIdentity(**value) for value in values]
         raise interface.BusinessException("Program tree version identity not found")
 
     @classmethod

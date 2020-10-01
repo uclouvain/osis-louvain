@@ -31,7 +31,7 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand
 from program_management.ddd.command import CreateStandardVersionCommand
-from program_management.ddd.domain import exception
+from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import CreateProgramTreeVersionValidatorList
@@ -192,6 +192,10 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.version_name == STANDARD
 
     @property
+    def end_year(self):
+        return academic_year.AcademicYear(year=self.end_year_of_existence)
+
+    @property
     def is_transition(self) -> bool:
         return self.entity_id.is_transition
 
@@ -216,5 +220,5 @@ class ProgramTreeVersion(interface.RootEntity):
         data_as_dict = attr.asdict(data, recurse=False)
         for field, new_value in data_as_dict.items():
             setattr(self, field, new_value)
-        validators_by_business_action.UpdateProgramTreeVersionValidatorList(self)
+        validators_by_business_action.UpdateProgramTreeVersionValidatorList(self).validate()
         return self

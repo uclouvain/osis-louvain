@@ -38,6 +38,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._check_finalities_end_date_lower_or_equal_to_2M import \
+    Check2MEndDateGreaterOrEqualToItsFinalities
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -53,6 +55,7 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
@@ -63,7 +66,8 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
             tree: 'ProgramTree',
             node_to_paste: 'Node',
             paste_command: command.PasteElementCommand,
-            tree_repository: 'ProgramTreeRepository'
+            tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
     ):
         path = paste_command.path_where_to_paste
         link_type = paste_command.link_type
@@ -77,7 +81,12 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
-                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository),
                 MatchVersionValidator(tree, node_to_paste),
             ]
@@ -117,6 +126,7 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
             node_to_paste: 'Node',
             check_paste_command: command.CheckPasteNodeCommand,
             tree_repository: 'ProgramTreeRepository',
+            tree_version_repository: 'ProgramTreeVersionRepository'
     ):
         path = check_paste_command.path_to_paste
 
@@ -125,7 +135,12 @@ class CheckPasteNodeValidatorList(business_validator.BusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_paste),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                _validate_end_date_and_option_finality.ValidateEndDateAndOptionFinality(node_to_paste, tree_repository),
+                ValidateFinalitiesEndDateAndOptions(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
                 MatchVersionValidator(tree, node_to_paste)
             ]
 
@@ -267,8 +282,22 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
 
 class UpdateProgramTreeVersionValidatorList(business_validator.BusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
-        self.validators = []
+        self.validators = [
+            Check2MEndDateGreaterOrEqualToItsFinalities(tree_version)
+        ]
         super().__init__()
+
+    def validate(self):
+        error_messages = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            # TODO : gather multiple BusinessException instead of BusinessExceptions
+            except osis_common.ddd.interface.BusinessExceptions as business_exception:
+                error_messages.extend(business_exception.messages)
+
+        if error_messages:
+            raise osis_common.ddd.interface.BusinessExceptions(error_messages)
 
 
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):

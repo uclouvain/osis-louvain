@@ -87,6 +87,13 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.mocked_postpone_pgrm_tree_version = self.postpone_pgrm_tree_version_patcher.start()
         self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
+        self.update_version_end_date_patcher = mock.patch(
+            "program_management.ddd.service.write.update_program_tree_version_end_date_service."
+            "update_program_tree_version_end_date"
+        )
+        self.mocked_update_version_end_date = self.update_version_end_date_patcher.start()
+        self.addCleanup(self.update_version_end_date_patcher.stop)
+
     def test_assert_call_multiple_service(self):
         postpone_mini_training_and_program_tree_modifications_service.\
             postpone_mini_training_and_program_tree_modifications(self.cmd)
@@ -94,3 +101,4 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)
+        self.assertTrue(self.mocked_update_version_end_date.called)

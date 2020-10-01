@@ -142,3 +142,11 @@ class ProgramTreeVersionMismatch(BusinessExceptions):
         return "{}[{}]".format(
             version_identity.offer_acronym, version_identity.version_name
         ) if version_identity.version_name else version_identity.offer_acronym
+
+
+class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
+    def __init__(self, finality: 'Node', **kwargs):
+        message = _("The end date must be higher or equal to finality %(acronym)s") % {
+            "acronym": finality.title
+        }
+        super().__init__(message, **kwargs)

@@ -47,6 +47,7 @@ def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVer
         "not_found_exception_class": exception.ProgramTreeVersionNotFoundException,
         "delete": _delete_program_tree_version,
         "search": _search_program_tree_version,
+        "search_versions_from_trees": _search_versions_from_trees,
     })
 
 
@@ -118,3 +119,9 @@ def _search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List
         if not children_nodes_ids.isdisjoint(set_node_ids):
             result.append(tree)
     return result
+
+
+@classmethod
+def _search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
+    tree_entities = {tree.entity_id for tree in trees}
+    return [tree_version for tree_version in cls.root_entities if tree_version.tree.entity_id in tree_entities]

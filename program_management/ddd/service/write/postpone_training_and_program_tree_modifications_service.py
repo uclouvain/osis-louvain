@@ -30,14 +30,19 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_training_and_group_modification_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
-    PostponeProgramTreeCommand, PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+    PostponeProgramTreeCommand, PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
+    UpdateProgramTreeVersionEndDateCommand
 from program_management.ddd.service.write import postpone_tree_version_service, \
-    postpone_program_tree_service
+    postpone_program_tree_service, update_program_tree_version_end_date_service
 
 
 def postpone_training_and_program_tree_modifications(
         update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['TrainingIdentity']:
+    update_program_tree_version_end_date_service.update_program_tree_version_end_date(
+        __convert_to_update_program_tree_version_end_date_command(update_command)
+    )
+
     consistency_error = None
     try:
         training_identities = postpone_training_and_group_modification_service.postpone_training_and_group_modification(
@@ -126,4 +131,16 @@ def __convert_to_postpone_training_and_group_modification_command(
         remark_en=cmd.remark_en,
         organization_name=cmd.organization_name,
         schedule_type=cmd.schedule_type,
+    )
+
+
+def __convert_to_update_program_tree_version_end_date_command(
+        cmd: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+) -> UpdateProgramTreeVersionEndDateCommand:
+    return UpdateProgramTreeVersionEndDateCommand(
+        from_offer_acronym=cmd.postpone_from_acronym,
+        from_version_name="",
+        from_year=cmd.postpone_from_year,
+        from_is_transition=False,
+        end_date=cmd.end_year
     )

@@ -30,13 +30,18 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand, \
-    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
-from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service
+    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateProgramTreeVersionEndDateCommand
+from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service, \
+    update_program_tree_version_end_date_service
 
 
 def postpone_mini_training_and_program_tree_modifications(
         update_command: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
+    update_program_tree_version_end_date_service.update_program_tree_version_end_date(
+        __convert_to_update_program_tree_version_end_date_command(update_command)
+    )
+
     consistency_error = None
     try:
         mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service.\
@@ -89,4 +94,16 @@ def __convert_to_postpone_mini_training_and_group_modification_command(
         max_constraint=mini_training_cmd.max_constraint,
         remark_fr=mini_training_cmd.remark_fr,
         remark_en=mini_training_cmd.remark_en,
+    )
+
+
+def __convert_to_update_program_tree_version_end_date_command(
+        cmd: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+) -> UpdateProgramTreeVersionEndDateCommand:
+    return UpdateProgramTreeVersionEndDateCommand(
+        from_offer_acronym=cmd.abbreviated_title,
+        from_version_name="",
+        from_year=cmd.year,
+        from_is_transition=False,
+        end_date=cmd.end_year
     )

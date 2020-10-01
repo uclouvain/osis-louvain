@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
@@ -86,3 +88,19 @@ class ProgramTreeFactory(factory.Factory):
         tree_standard.root_node.children = [link1, link2, link3]
 
         return tree_standard
+
+
+def _tree_builder(data: Dict) -> 'Node':
+    _data = data.copy()
+    children = _data.pop("children", [])
+
+    node = NodeGroupYearFactory(**_data)
+    for child_data in children:
+        child_node = _tree_builder(child_data)
+        LinkFactory(parent=node, child=child_node)
+
+    return node
+
+
+def tree_builder(data: Dict) -> 'ProgramTree':
+    return ProgramTreeFactory(root_node=_tree_builder(data))

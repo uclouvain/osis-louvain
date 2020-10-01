@@ -25,16 +25,14 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
 from education_group.ddd.business_types import *
 from education_group.ddd.command import PostponeGroupModificationCommand
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateProgramTreeVersionCommand, UpdateMiniTrainingVersionCommand, \
-    PostponeGroupVersionCommand
+    PostponeGroupVersionCommand, UpdateProgramTreeVersionEndDateCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
-from program_management.ddd.service.write import update_program_tree_version_service, \
-    update_and_postpone_group_version_service
+from program_management.ddd.service.write import update_and_postpone_group_version_service
+from program_management.ddd.service.write import update_program_tree_version_service
 
 
 def update_and_postpone_mini_training_version(
@@ -113,4 +111,16 @@ def __convert_to_postpone_group_version(
         from_offer_acronym=cmd.offer_acronym,
         from_version_name=cmd.version_name,
         from_is_transition=cmd.is_transition,
+    )
+
+
+def __convert_to_update_program_tree_version_end_date_command(
+        cmd: UpdateMiniTrainingVersionCommand
+) -> UpdateProgramTreeVersionEndDateCommand:
+    return UpdateProgramTreeVersionEndDateCommand(
+        from_offer_acronym=cmd.offer_acronym,
+        from_version_name="",
+        from_year=cmd.year,
+        from_is_transition=False,
+        end_date=cmd.end_year
     )

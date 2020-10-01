@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -249,6 +250,18 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def search_all_versions_from_root_nodes(cls, node_identities: List['Node']) -> List['ProgramTreeVersion']:
         offer_ids = _search_by_node_entities(list(node_identities))
         return _search_versions_from_offer_ids(offer_ids)
+
+    @classmethod
+    def search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
+        root_nodes = [tree.root_node for tree in trees]
+        tree_versions = cls.search_all_versions_from_root_nodes(root_nodes)
+
+        result = []
+        for tree_version in tree_versions:
+            with contextlib.suppress(StopIteration):
+                tree_version.tree = next(tree for tree in trees if tree.entity_id == tree_version.program_tree_identity)
+                result.append(tree_version)
+        return result
 
 
 def _update_end_year_of_existence(educ_group_version: EducationGroupVersion, end_year_of_existence: int):

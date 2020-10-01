@@ -23,29 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Iterable
 
 from django.utils.translation import ngettext
 
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from program_management import formatter
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.service import identity_search
 
 
-# Implmented from _check_attach_options_rules
 class AttachOptionsValidator(BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
     """
 
-    def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
+    def __init__(self, tree_version_2m: 'ProgramTreeVersion', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachOptionsValidator, self).__init__()
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-            assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
+            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.tree_from_node_to_add = tree_from_node_to_add
         self.node_to_add = tree_from_node_to_add.root_node
-        self.tree_2m = tree_2m
+        self.tree_version_2m = tree_version_2m
 
     def get_options_from_finalities(self):
         options_from_finalities = set()
@@ -60,7 +62,7 @@ class AttachOptionsValidator(BusinessValidator):
     def validate(self):
         options_from_finalities = self.get_options_from_finalities()
         if options_from_finalities:
-            options_from_2m = self.tree_2m.root_node.get_all_children_as_nodes(
+            options_from_2m = self.tree_version_2m.tree.root_node.get_all_children_as_nodes(
                 take_only={MiniTrainingType.OPTION},
                 ignore_children_from=set(TrainingType.finality_types_enum())
             )
@@ -72,7 +74,13 @@ class AttachOptionsValidator(BusinessValidator):
                         "Options \"%(code)s\" must be present in %(root_code)s program.",
                         len(missing_options)
                     ) % {
-                        "code": ', '.join(option.code for option in missing_options),
-                        "root_code": self.tree_2m.root_node.code
+                        "code": ', '.join(self._display_inconsistent_nodes(missing_options)),
+                        "root_code": formatter.format_program_tree_version_identity(self.tree_version_2m.entity_id)
                     }
                 )
+
+    def _display_inconsistent_nodes(self, nodes: Iterable['Node']) -> List[str]:
+        node_identities = [node.entity_id for node in nodes]
+        version_identities = identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identities(node_identities)
+        return [formatter.format_program_tree_version_identity(version_identity)
+                for version_identity in version_identities]
