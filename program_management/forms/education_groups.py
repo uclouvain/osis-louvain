@@ -214,7 +214,10 @@ class GroupFilter(FilterSet):
         ).annotate(
             title=Case(
                 When(Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
-                     then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
+                     then=Concat('educationgroupversion__offer__title',
+                                 Value(' ['),
+                                 'educationgroupversion__title_fr',
+                                 Value(']'))),
                 default='title_fr',
                 output_field=CharField(),)
         )

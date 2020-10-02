@@ -61,6 +61,10 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
                      current_version: Optional['ProgramTreeVersion'] = None):
     context = {"current_element": obj}
     if current_version:
+        # Je dois laisser cette ligne ci-dessous si je veux exploiter {{ current_version.tree.root_node.offer_title_fr }}
+        # dans le fichier html.
+        # Une suggestion?
+        print(current_version.get_tree().root_node.title)
         context.update({'current_version': current_version})
     search_parameters = SearchParametersCache(user, obj.__class__.__name__).cached_data
     if not search_parameters:
@@ -129,7 +133,6 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             'next_version_label',
             named=True
         ).order_by(*order_by)
-
 
     current_row = _get_current_row(qs, obj)
 
