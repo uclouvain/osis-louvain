@@ -27,21 +27,21 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.forms.tree.update import UpdateLinkForm
+from program_management.forms.content import LinkForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
     StandardProgramTreeVersionFactory
-from program_management.views.tree.update import UpdateLinkView
 
 
-def form_valid_effect(form: UpdateLinkForm):
+def form_valid_effect(form: LinkForm):
     form.cleaned_data = {}
     return True
 
@@ -112,7 +112,7 @@ class TestUpdateLinkView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/link_update_inner.html')
-        self.assertIsInstance(response.context['form'], UpdateLinkForm)
+        self.assertIsInstance(response.context['form'], LinkForm)
 
     def test_should_show_access_denied_when_user_has_not_perm(self):
         self.permission_mock.return_value = False
@@ -143,7 +143,7 @@ class TestUpdateLinkView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'blocks/link_form_inner/minor_major_option_inner.html')
 
-    @mock.patch.object(UpdateLinkForm, 'is_valid', new=form_valid_effect)
+    @mock.patch.object(LinkForm, 'is_valid', new=form_valid_effect)
     @mock.patch(
         'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'
     )
@@ -159,16 +159,6 @@ class TestUpdateLinkView(TestCase):
         mock_get_tree_version.return_value = StandardProgramTreeVersionFactory()
         self.client.post(self.url, data={})
         self.assertTrue(mock_service.called, msg="View must call update node service")
-
-    @mock.patch.object(UpdateLinkForm, 'is_valid', new=form_valid_effect)
-    @mock.patch('program_management.ddd.service.write.update_link_service.update_link')
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_should_invalidate_form_on_exception_with_error_msg(self, mock_get_tree, mock_service):
-        error_msg = 'error'
-        mock_service.side_effect = BusinessExceptions(messages=[error_msg])
-        mock_get_tree.return_value = self.tree
-        response = self.client.post(self.url, data={})
-        self.assertIn(error_msg, str(response.context_data['form'].errors))
 
     @mock.patch(
         'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity'

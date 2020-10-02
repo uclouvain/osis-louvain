@@ -238,6 +238,9 @@ class Node(interface.Entity):
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 
+    def is_minor_major_option_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_option_list_choice_enums()
+
     def is_option_list_choice(self):
         return self.node_type == GroupType.OPTION_LIST_CHOICE
 
@@ -371,13 +374,13 @@ class Node(interface.Entity):
 
         if self.is_minor_major_list_choice() and \
                 not link_to_update.child.is_minor_major_list_choice():
-            link_type = LinkTypes.REFERENCE
+            link_type = LinkTypes.REFERENCE.name
 
         link_to_update.relative_credits = relative_credits
         link_to_update.access_condition = access_condition
         link_to_update.is_mandatory = is_mandatory
         link_to_update.block = block
-        link_to_update.link_type = link_type
+        link_to_update.link_type = LinkTypes[link_type] if link_type else None
         link_to_update.comment = comment
         link_to_update.comment_english = comment_english
 

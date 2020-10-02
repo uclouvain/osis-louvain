@@ -21,47 +21,169 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from imp import reload
 
-from django.test import SimpleTestCase
-from mock import patch
+from django.test import TestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
+from program_management.ddd.domain import exception
 from program_management.ddd.service.write import update_link_service
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.program_tree import tree_builder
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
+from testing.mocks import MockPatcherMixin
 
 
-def mock_decorator(f):
-    def decorated_function(g):
-        return g
-    return decorated_function(f)
-
-
-class TestUpdateLink(SimpleTestCase):
-
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.parent = self.tree.root_node
-        self.link = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory())
-        self.mock_atomic_transaction = patch(
-            "program_management.ddd.service.write.update_link_service.transaction.atomic", return_value=mock_decorator
+class TestUpdateLink(TestCase, MockPatcherMixin):
+    def setUp(self) -> None:
+        tree_data = {
+            "node_type": TrainingType.BACHELOR,
+            "end_year": 2018,
+            "children": [
+                {"node_type": GroupType.COMMON_CORE},
+                {
+                    "node_type": GroupType.MINOR_LIST_CHOICE,
+                    "children": [
+                        {"node_type": MiniTrainingType.ACCESS_MINOR}
+                    ]
+                },
+                {"node_type": NodeType.LEARNING_UNIT}
+            ]
+        }
+        self.tree = tree_builder(tree_data)
+        self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
+        self.mock_repo(
+            "program_management.ddd.service.write.update_link_service.ProgramTreeRepository",
+            self.fake_program_tree_repository
         )
-        self.mock_atomic_transaction_patcher = self.mock_atomic_transaction.start()
-        self.addCleanup(self.mock_atomic_transaction.stop)
 
-    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    @patch('program_management.ddd.domain.program_tree.ProgramTree.update_link')
-    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.update')
-    def test_should_call_tree_update_link_single_update(self, mock_update_tree, mock_update_link, mock_get_tree):
-        mock_get_tree.return_value = self.tree
-        # reload update_link_service to apply mock decorator
-        reload(update_link_service)
-        command = UpdateLinkCommandFactory(
-            parent_node_code=self.parent.code, parent_node_year=self.parent.year,
-            child_node_code=self.link.child.code, child_node_year=self.link.child.year
+    def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self):
+        block_inputs = ["158", "265", "49"]
+        for block_input in block_inputs:
+            cmd_with_invalid_block_value = UpdateLinkCommandFactory(
+                block=block_input,
+                parent_node_code=self.tree.root_node.code,
+                parent_node_year=self.tree.root_node.year,
+                child_node_code=self.tree.root_node.children_as_nodes[0].code,
+                child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            )
+
+            with self.assertRaises(MultipleBusinessExceptions) as e:
+                update_link_service.update_link(cmd_with_invalid_block_value)
+            self.assertIsInstance(
+                e.exception.exceptions[0],
+                exception.InvalidBlockException
+            )
+
+    def test_failure_when_relative_credits_less_or_equal_to_0(self):
+        cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
+            relative_credits=-1,
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[0].code,
+            child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
-        update_link_service.update_link(cmd=command)
-        self.assertTrue(mock_update_link.called)
-        self.assertTrue(mock_update_tree.called)
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd_with_invalid_relative_credits_value)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
+        )
+
+    def test_failure_when_relative_credits_superior_to_999(self):
+        cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
+            relative_credits=1000,
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[0].code,
+            child_node_year=self.tree.root_node.children_as_nodes[0].year,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd_with_invalid_relative_credits_value)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.RelativeCreditShouldBeLowerOrEqualThan999
+        )
+
+    def test_failure_when_reference_link_with_learning_unit_child_node(self):
+        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
+            link_type=LinkTypes.REFERENCE.name,
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[2].code,
+            child_node_year=self.tree.root_node.children_as_nodes[2].year,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd_with_invalid_reference_link)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.ReferenceLinkNotAllowedWithLearningUnitException
+        )
+
+    def test_always_set_link_type_to_reference_between_minor_list_and_minor(self):
+        minor_list_choice_tree_data = {
+            "node_type": GroupType.MINOR_LIST_CHOICE,
+            "children": [
+                {"node_type": MiniTrainingType.ACCESS_MINOR}
+            ]
+        }
+        minor_list_choice_tree = tree_builder(minor_list_choice_tree_data)
+        self.fake_program_tree_repository.create(minor_list_choice_tree)
+
+        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
+            link_type=None,
+            parent_node_code=minor_list_choice_tree.root_node.code,
+            parent_node_year=minor_list_choice_tree.root_node.year,
+            child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
+            child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+        )
+
+        update_link_service.update_link(cmd_with_invalid_reference_link)
+        self.assertEqual(
+            minor_list_choice_tree.root_node.children[0].link_type,
+            LinkTypes.REFERENCE
+        )
+
+    def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
+        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
+            link_type=LinkTypes.REFERENCE.name,
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[1].code,
+            child_node_year=self.tree.root_node.children_as_nodes[1].year,
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            update_link_service.update_link(cmd_with_invalid_reference_link)
+
+        self.assertIsInstance(
+            e.exception.exceptions[0],
+            exception.ReferenceLinkNotAllowedException
+        )
+
+    def test_update_link_properties(self):
+        valid_cmd = UpdateLinkCommandFactory(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.tree.root_node.children_as_nodes[1].code,
+            child_node_year=self.tree.root_node.children_as_nodes[1].year,
+            comment='Un commentaire',
+            comment_english='This is a comment',
+            relative_credits=5
+        )
+        result = update_link_service.update_link(valid_cmd)
+        self.assertEqual(result.link_type, valid_cmd.link_type)
+        self.assertEqual(result.access_condition, valid_cmd.access_condition)
+        self.assertEqual(result.is_mandatory, valid_cmd.is_mandatory)
+        self.assertEqual(result.block, valid_cmd.block)
+        self.assertEqual(result.comment, valid_cmd.comment)
+        self.assertEqual(result.comment_english, valid_cmd.comment_english)
+        self.assertEqual(result.relative_credits, valid_cmd.relative_credits)

@@ -30,7 +30,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-import osis_common
 from base.models.enums.link_type import LinkTypes
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
@@ -38,8 +37,8 @@ from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.node import NodeIdentity
@@ -47,27 +46,29 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.service.read import get_program_tree_service
-from program_management.forms.tree.update import UpdateLinkForm
+from program_management.forms.content import LinkForm
+from base.forms.exceptions import InvalidFormException
 from program_management.models.enums.node_type import NodeType
 
 
 class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/link_update_inner.html"
     permission_required = "base.change_link_data"
-    form_class = UpdateLinkForm
+    form_class = LinkForm
 
     @cached_property
-    def parent_node(self) -> dict:
-        return {"element_code": self.kwargs.get('parent_code'), "element_year": self.kwargs.get('parent_year')}
+    def parent_node(self) -> 'Node':
+        return self.program_tree.root_node
 
     @cached_property
-    def node_to_update(self) -> dict:
-        return {"element_code": self.kwargs.get('child_code'), "element_year": self.kwargs.get('child_year')}
+    def child_node(self) -> 'Node':
+        node_identity = node.NodeIdentity(self.kwargs.get('child_code'), self.kwargs.get('child_year'))
+        return node_repository.NodeRepository.get(node_identity)
 
     @cached_property
     def program_tree(self) -> ProgramTree:
         return get_program_tree_service.get_program_tree(command.GetProgramTree(
-            code=self.parent_node['element_code'], year=self.parent_node['element_year']
+            code=self.kwargs.get('parent_code'), year=self.kwargs.get('parent_year')
         ))
 
     def get_permission_object(self):
@@ -75,10 +76,8 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def get_form_kwargs(self) -> dict:
         return {
-            'parent_node_code': self.parent_node["element_code"],
-            'parent_node_year': self.parent_node["element_year"],
-            'node_to_update_code': self.node_to_update["element_code"],
-            'node_to_update_year': self.node_to_update["element_year"],
+            'parent_obj': self.parent_node,
+            'child_obj': self.child_node,
         }
 
     def get_form(self, form_class=None):
@@ -89,9 +88,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["is_parent_a_minor_major_option_list_choice"] = self._is_parent_a_minor_major_option_list_choice()
-        context_data["node"] = node_repository.NodeRepository.get(node.NodeIdentity(
-            self.node_to_update["element_code"], self.node_to_update["element_year"]
-        ))
+        context_data["node"] = self.child_node
         self._format_title_with_version(context_data["node"])
 
         node_elem = context_data["node"]
@@ -101,14 +98,13 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
         return context_data
 
-    def form_valid(self, form: UpdateLinkForm):
+    def form_valid(self, form: LinkForm):
         try:
             link = form.save()
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            form.add_error(field=None, error=business_exception.messages)
+            display_success_messages(self.request, self.get_success_message(link))
+            return super().form_valid(form)
+        except InvalidFormException:
             return self.form_invalid(form)
-        display_success_messages(self.request, self.get_success_message(link))
-        return super().form_valid(form)
 
     def get_success_message(self, link: 'Link'):
         return _("The link \"%(node)s\" has been updated.") % {"node": self.__get_node_str(link.child)}
@@ -140,8 +136,8 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def _get_initial_form_kwargs(self, obj):
         return {
-            'comment': obj.comment,
-            'comment_english': obj.comment_english,
+            'comment_fr': obj.comment,
+            'comment_en': obj.comment_english,
             'access_condition': obj.access_condition,
             'is_mandatory': obj.is_mandatory,
             'link_type': obj.link_type.name if isinstance(obj.link_type, LinkTypes) else obj.link_type,
@@ -152,7 +148,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
         }
 
     def _format_title_with_version(self, node):
-        node_identity = NodeIdentity(code=self.node_to_update["element_code"], year=self.node_to_update["element_year"])
+        node_identity = self.child_node.entity_id
         try:
             tree_version = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
             node.version = tree_version.version_name

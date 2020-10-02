@@ -111,3 +111,21 @@ class BusinessListValidator(BusinessValidator):
         for validator in self.validators:
             validator.validate()
             self.add_messages(validator.messages)
+
+
+class MultipleBusinessExceptions(Exception):
+    def __init__(self, exceptions: List):
+        self.exceptions = exceptions
+
+
+class MultipleExceptionBusinessListValidator(BusinessListValidator):
+    def validate(self):
+        exceptions = []
+        for validator in self.validators:
+            try:
+                validator.validate()
+            except Exception as e:
+                exceptions.append(e)
+
+        if exceptions:
+            raise MultipleBusinessExceptions(exceptions=exceptions)

@@ -8,29 +8,23 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.forms.exceptions import InvalidFormException
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain import exception, group
-from education_group.ddd.domain.exception import GroupNotFoundException
-from education_group.ddd.service.read import get_group_service, get_multiple_groups_service
+from education_group.ddd.domain import exception
+from education_group.ddd.service.read import get_group_service
 from osis_common.ddd import interface
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.forms import content as content_forms
-from education_group.templatetags.academic_year_display import display_as_academic_year
-from learning_unit.ddd import command as command_learning_unit_year
-from learning_unit.ddd.business_types import *
-from learning_unit.ddd.domain import learning_unit_year
-from learning_unit.ddd.service.read import get_multiple_learning_unit_years_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_exception
-from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
-from program_management.ddd.service.write import bulk_update_link_service
-from program_management.models.enums.node_type import NodeType
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
+from program_management.forms import content as content_forms
+from program_management.models.enums.node_type import NodeType
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -72,11 +66,13 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if self.content_formset.is_valid():
-            updated_links = self.update_links()
-
-            success_messages = self.get_success_msg_updated_links(updated_links)
-            display_success_messages(request, success_messages, extra_tags='safe')
-            return HttpResponseRedirect(self.get_success_url())
+            try:
+                updated_links = self.content_formset.save()
+                success_messages = self.get_success_msg_updated_links(updated_links)
+                display_success_messages(request, success_messages, extra_tags='safe')
+                return HttpResponseRedirect(self.get_success_url())
+            except InvalidFormException:
+                pass
 
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -92,21 +88,6 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_cancel_url(self) -> str:
         return self.get_success_url()
 
-    def update_links(self) -> List['Link']:
-        update_link_commands = [
-            self._convert_form_to_update_link_command(form) for form in self.content_formset.forms if form.has_changed()
-        ]
-
-        if not update_link_commands:
-            return []
-
-        cmd_bulk = command_program_management.BulkUpdateLinkCommand(
-            parent_node_code=self.kwargs['code'],
-            parent_node_year=self.kwargs['year'],
-            update_link_cmds=update_link_commands
-        )
-        return bulk_update_link_service.bulk_update_links(cmd_bulk)
-
     def get_attach_path(self) -> Optional['Path']:
         return self.request.GET.get('path_to') or None
 
@@ -117,7 +98,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             initial=self._get_content_formset_initial_values(),
             form_kwargs=[
                 {'parent_obj': self.get_group_obj(), 'child_obj': child}
-                for child in self.get_children_objs()
+                for child in self.get_children()
             ]
         )
 
@@ -134,39 +115,9 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return get_program_tree_service.get_program_tree(get_cmd)
 
     @functools.lru_cache()
-    def get_children_objs(self) -> List[Union['Group', 'LearningUnitYear']]:
-        children_objs = self.__get_children_group_objs() + self.__get_children_learning_unit_year_objs()
-        return sorted(
-            children_objs,
-            key=lambda child_obj: next(
-                order for order, node in enumerate(self.get_program_tree_obj().root_node.get_direct_children_as_nodes())
-                if (isinstance(child_obj, group.Group) and node.code == child_obj.code) or
-                (isinstance(child_obj, learning_unit_year.LearningUnitYear) and node.code == child_obj.acronym)
-            )
-        )
-
-    def __get_children_group_objs(self) -> List['Group']:
-        get_group_cmds = [
-            command.GetGroupCommand(code=node.code, year=node.year)
-            for node
-            in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
-                ignore_children_from={NodeType.LEARNING_UNIT}
-            )
-        ]
-        if get_group_cmds:
-            return get_multiple_groups_service.get_multiple_groups(get_group_cmds)
-        return []
-
-    def __get_children_learning_unit_year_objs(self) -> List['LearningUnitYear']:
-        get_learning_unit_cmds = [
-            command_learning_unit_year.GetLearningUnitYearCommand(code=node.code, year=node.year)
-            for node in self.get_program_tree_obj().root_node.get_direct_children_as_nodes(
-                take_only={NodeType.LEARNING_UNIT}
-            )
-        ]
-        if get_learning_unit_cmds:
-            return get_multiple_learning_unit_years_service.get_multiple_learning_unit_years(get_learning_unit_cmds)
-        return []
+    def get_children(self) -> List['Node']:
+        program_tree = self.get_program_tree_obj()
+        return program_tree.root_node.children_as_nodes
 
     def get_success_msg_updated_links(self, links: List['Link']) -> List[str]:
         messages = []
@@ -210,20 +161,3 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'comment_fr': link.comment,
             'comment_en': link.comment_english
         } for link in children_links]
-
-    def _convert_form_to_update_link_command(
-            self,
-            form: 'content_forms.LinkForm') -> command_program_management.UpdateLinkCommand:
-        return command_program_management.UpdateLinkCommand(
-            child_node_code=form.child_obj.code if isinstance(form.child_obj, group.Group) else form.child_obj.acronym,
-            child_node_year=form.child_obj.year,
-            access_condition=form.cleaned_data.get('access_condition', False),
-            is_mandatory=form.cleaned_data.get('is_mandatory', True),
-            block=form.cleaned_data.get('block'),
-            link_type=form.cleaned_data.get('link_type'),
-            comment=form.cleaned_data.get('comment_fr'),
-            comment_english=form.cleaned_data.get('comment_en'),
-            relative_credits=form.cleaned_data.get('relative_credits'),
-            parent_node_code=self.get_group_obj().code,
-            parent_node_year=self.get_group_obj().year
-        )

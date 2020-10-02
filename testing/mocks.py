@@ -92,17 +92,3 @@ class MockPatcherMixin:
         self.addCleanup(repository_patcher.stop)
 
         return repository_patcher.start()
-
-    def mock_repository(
-            self,
-            repository_path: str,
-            root_entities: List['interface.RootEntity'] = None) -> 'FakeRepository':
-        class_name = "Fake" + repository_path.split('.')[-1]
-        fake_repo = type(class_name, (FakeRepository,), {
-            "root_entities": root_entities or list()
-        })
-
-        repo_patcher = mock.patch(repository_path, new=fake_repo)
-        self.addCleanup(repo_patcher.stop)
-
-        return repo_patcher.start()

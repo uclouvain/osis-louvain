@@ -30,8 +30,10 @@ import factory.fuzzy
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import GroupType, TrainingType
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.models.enums.node_type import NodeType
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
 class ProgramTreeIdentityFactory(factory.Factory):
@@ -94,7 +96,8 @@ def _tree_builder(data: Dict) -> 'Node':
     _data = data.copy()
     children = _data.pop("children", [])
 
-    node = NodeGroupYearFactory(**_data)
+    node = _node_builder(_data)
+
     for child_data in children:
         child_node = _tree_builder(child_data)
         LinkFactory(parent=node, child=child_node)
@@ -102,5 +105,24 @@ def _tree_builder(data: Dict) -> 'Node':
     return node
 
 
+def _node_builder(data: Dict) -> 'Node':
+    node_factory = NodeGroupYearFactory
+    if data["node_type"] == NodeType.LEARNING_UNIT:
+        node_factory = NodeLearningUnitYearFactory
+    return node_factory(**data)
+
+
+def _build_authorized_relationships(root_node: 'Node') -> 'AuthorizedRelationshipList':
+    all_links = root_node.get_all_children()
+    relationships = [
+        AuthorizedRelationshipObjectFactory(parent_type=link.parent.node_type, child_type=link.child.node_type)
+        for link in all_links
+    ]
+    return AuthorizedRelationshipList(relationships)
+
+
 def tree_builder(data: Dict) -> 'ProgramTree':
-    return ProgramTreeFactory(root_node=_tree_builder(data))
+    root_node = _tree_builder(data)
+    authorized_relationships = _build_authorized_relationships(root_node)
+    return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+

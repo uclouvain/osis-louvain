@@ -278,8 +278,8 @@ class TestAttachNodeFormFields(SimpleTestCase):
             'is_mandatory',
             'block',
             'link_type',
-            'comment',
-            'comment_english'
+            'comment_fr',
+            'comment_en'
         ]
         self.assertCountEqual(expected_fields, actual_fields)
 

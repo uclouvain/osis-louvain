@@ -30,6 +30,9 @@
     {{ content_formset.media }}
     <div class="panel panel-default">
         <div class="panel-body" data-formset-prefix="{{ content_formset.prefix }}">
+            {% for form in content_formset.forms %}
+                {% bootstrap_form_errors form %}
+            {% endfor %}
             <table class="table">
                 <thead>
                 <tr>

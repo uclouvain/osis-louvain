@@ -538,7 +538,7 @@ class ProgramTree(interface.RootEntity):
         )
 
         validators_by_business_action.UpdateLinkValidatorList(
-            parent_node,
+            self,
             child_node,
             link_updated
         ).validate()

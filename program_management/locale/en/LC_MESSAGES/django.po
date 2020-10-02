@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 15:02+0200\n"
+"POT-Creation-Date: 2020-10-05 12:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -268,6 +268,7 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+#, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
 "program."
@@ -372,6 +373,12 @@ msgid "Lecturing vol."
 msgstr ""
 
 msgid "Legend"
+msgstr ""
+
+#, python-format
+msgid ""
+"Link between %(parent)s and %(child)s cannot be of reference type because of "
+"its children: %(children)s"
 msgstr ""
 
 msgid "Link type"
