@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-28 11:59+0200\n"
+"POT-Creation-Date: 2020-10-05 09:24+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -60,10 +60,6 @@ msgstr ""
 #, python-format
 msgid "%(number_extended)s object(s) extended and %(number_error)s error(s)"
 msgstr "%(number_extended)s objet(s)  reporté(s) et %(number_error)s erreur(s)"
-
-#, python-format
-msgid "%(number_notifications)s unread notification(s)"
-msgstr "%(number_notifications)s notification(s) non lu(s)"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -497,9 +493,6 @@ msgstr "Ville de l'institution"
 msgid "Classes"
 msgstr "Classes"
 
-msgid "Clear notifications"
-msgstr "Supprimer notifications"
-
 msgid "Click on the map to set the location"
 msgstr "Cliquez sur la carte pour définir l'emplacement"
 
@@ -822,9 +815,6 @@ msgstr "Fin de cycle"
 
 msgid "End year"
 msgstr "Année de fin"
-
-msgid "Ending date"
-msgstr "Date de fin"
 
 msgid "Ending of course registration"
 msgstr "Fin inscription aux cours"
@@ -1634,7 +1624,7 @@ msgid "No. Session"
 msgstr "No. session"
 
 msgid "Non academic"
-msgstr "Non académiques"
+msgstr "Non académique"
 
 msgid "Non academic CREF"
 msgstr "Non académique CREF"
@@ -1676,10 +1666,6 @@ msgstr "Non requis"
 msgid "Note encoding"
 msgstr "Encodage des notes"
 
-#, python-format
-msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr "Notification%(number_unread_notifications|pluralize)s"
-
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
 
@@ -1710,9 +1696,6 @@ msgstr "Ouvert aux externes"
 
 msgid "Open minor"
 msgstr "Mineure d’ouverture"
-
-msgid "Opening date"
-msgstr "Date d'ouverture"
 
 msgid "Operation"
 msgstr "Opération"

@@ -8,8 +8,6 @@
         <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
         <th>{% trans 'Title' %}</th>
         <th>{% trans 'Cred. rel./abs.' %}</th>
-        <th>{% trans 'Min. credits' %}</th>
-        <th>{% trans 'Max. credits' %}</th>
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
         <th>{% trans 'Formations' %}</th>
@@ -23,23 +21,32 @@
             {% url 'element_identification' row.link.parent.year row.link.parent.code as url_parent_identification %}
             <a href="{{ url_parent_identification }}">{{ row.link.parent.code | default_if_none:'' }}</a>
         </td>
-        <td>{{ row.link.parent.title | default_if_none:'' }}{{ row.link_parent_version_label }}</td>
-        <td>{{ row.link.parent.group_title_fr | default_if_none:'' }}{% if row.link_parent_version_title %} {{ row.link_parent_version_title }}{% endif %}</td>
+        <td>{{ row.link.parent.title | default_if_none:'' }}{{ row.version_details.version_label | default_if_none:'' }}</td>
+        <td>{{ row.link.parent.group_title_fr | default_if_none:'' }} {{ row.version_details.title | default_if_none:'' }}</td>
         <td>
             {{ row.link.relative_credits | default_if_none:'-' }} /
             {{ row.link.child.credits.normalize | default_if_none:'-' }}
         </td>
-        <td>{{ row.link.min_credits | default_if_none:'-' }}</td>
-        <td>{{ row.link.max_credits | default_if_none:'-' }}</td>
         <td>{{ row.link.is_mandatory | yesno:_("yes,no") | title }}</td>
         <td>{{ row.link.block | default_if_none:'-' }}</td>
         <td>
-            {% for root_node in row.root_nodes %}
-                {# TODO: Compute URL #}
-                {% url 'element_identification' root_node.year root_node.code as url_root_identification %}
-                <a href="{{ url_root_identification }}">
-                    {{ root_node.title }}{{ row.root_version_label }}</a>
-                {% if not forloop.last %} - {% endif %}
+            {% for root in row.training_nodes %}
+                <ul>
+                    <li>
+                        <a href="{{ root.direct_gathering.url }}">
+                            {{ root.direct_gathering.parent.title }}{{ root.version_name }}
+                        </a>
+                        {% if root.root_nodes %}
+                            <ul><li>
+                                {% for root_node in root.root_nodes %}
+                                    {% if forloop.first %}{% trans 'Included in' %} : {% else %} - {% endif %}
+                                    <a href="{{ root_node.url }}">{{ root_node.root.title }}{{ root_node.version_name }}</a>
+                                    {% if forloop.last %}{% endif %}
+                                {% endfor %}</li>
+                            </ul>
+                        {% endif %}
+                    </li>
+                </ul>
             {% empty %}
                 -
             {% endfor %}

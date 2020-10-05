@@ -556,21 +556,21 @@ class TestRowHeight(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.root_node = NodeGroupYearFactory(node_id=1, code='c1', node_type=TrainingType.PGRM_MASTER_120)
+        cls.root_node = NodeGroupYearFactory(node_id=1, code='C1', node_type=TrainingType.PGRM_MASTER_120)
         cls.academic_year = AcademicYearFactory(year=cls.root_node.year)
-        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='c2', year=cls.academic_year.year)
+        cls.group_level_1 = NodeGroupYearFactory(node_id=2, code='C2', year=cls.academic_year.year)
         LinkFactory(parent=cls.root_node,
                     child=cls.group_level_1)
 
-        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='c3', year=cls.academic_year.year)
+        cls.group_level_1_1 = NodeGroupYearFactory(node_id=3, code='C3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1,
                     child=cls.group_level_1_1)
 
-        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='ue1', year=cls.academic_year.year)
+        cls.ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=4, code='UE1', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
                     child=cls.ue_level_group_level_1_1)
         second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(node_id=5,
-                                                                      code='ue2',
+                                                                      code='UE2',
                                                                       year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_1_1,
                     child=second_ue_level_group_level_1_1)
@@ -586,7 +586,7 @@ class TestRowHeight(TestCase):
                                                    year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2,
                     child=cls.group_level_2_1)
-        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='ue3', year=cls.academic_year.year)
+        cls.ue_level_group_level_2_1 = NodeLearningUnitYearFactory(node_id=9, code='UE3', year=cls.academic_year.year)
         LinkFactory(parent=cls.group_level_2_1,
                     child=cls.ue_level_group_level_2_1)
         cls.group_level_2_2 = NodeGroupYearFactory(node_id=8,
@@ -604,15 +604,15 @@ class TestRowHeight(TestCase):
 
         element_ue_1 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_1_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue1', academic_year=cls.academic_year)
+                                                          acronym='UE1', academic_year=cls.academic_year)
                                                       )
         element_ue_2 = ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue2', academic_year=cls.academic_year)
+                                                          acronym='UE2', academic_year=cls.academic_year)
                                                       )
         element_ue_3 = ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_1.node_id,
                                                       learning_unit_year=LearningUnitYearFactory(
-                                                          acronym='ue3', academic_year=cls.academic_year)
+                                                          acronym='UE3', academic_year=cls.academic_year)
                                                       )
         ElementLearningUnitYearFactory(id=cls.ue_level_group_level_2_2.node_id,
                                        learning_unit_year=LearningUnitYearFactory(academic_year=cls.academic_year))
@@ -643,7 +643,7 @@ class TestRowHeight(TestCase):
         self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def test_exclude_options_list_for_2M(self):
-        self._assert_correct_ue_present_in_xls2(self.tree, ['ue1', 'ue2', 'ue3'])
+        self._assert_correct_ue_present_in_xls2(self.tree, ['UE1', 'UE2', 'UE3'])
 
     def test_do_not_exclude_options_list_if_not_2M(self):
         bachelor_root_node = NodeGroupYearFactory(node_type=TrainingType.BACHELOR, year=self.academic_year.year)
@@ -656,10 +656,10 @@ class TestRowHeight(TestCase):
         LinkFactory(parent=group_level_1,
                     child=group_level_1_1)
 
-        ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='ue21', node_id=100, year=self.academic_year.year)
+        ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='UE21', node_id=100, year=self.academic_year.year)
         LinkFactory(parent=group_level_1_1,
                     child=ue_level_group_level_1_1)
-        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='ue22',
+        second_ue_level_group_level_1_1 = NodeLearningUnitYearFactory(code='UE22',
                                                                       node_id=101,
                                                                       year=self.academic_year.year)
         LinkFactory(parent=group_level_1_1,
@@ -671,26 +671,26 @@ class TestRowHeight(TestCase):
         LinkFactory(parent=bachelor_root_node,
                     child=group_level_2)
 
-        ue_level_group_level_2 = NodeLearningUnitYearFactory(code='ue23', node_id=102, year=self.academic_year.year)
+        ue_level_group_level_2 = NodeLearningUnitYearFactory(code='UE23', node_id=102, year=self.academic_year.year)
         LinkFactory(parent=group_level_2,
                     child=ue_level_group_level_2)
         bachelor_tree = ProgramTreeFactory(root_node=bachelor_root_node)
         # TODO : remplacer ce qui suit pour un accès plus direct
         ElementLearningUnitYearFactory(id=ue_level_group_level_1_1.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(acronym='ue21',
+                                       learning_unit_year=LearningUnitYearFactory(acronym='UE21',
                                                                                   academic_year=self.academic_year))
         ElementLearningUnitYearFactory(id=second_ue_level_group_level_1_1.node_id,
                                        learning_unit_year=LearningUnitYearFactory(
-                                           acronym='ue22',
+                                           acronym='UE22',
                                            academic_year=self.academic_year
                                        )
                                        )
         ElementLearningUnitYearFactory(id=ue_level_group_level_2.node_id,
-                                       learning_unit_year=LearningUnitYearFactory(acronym='ue23',
+                                       learning_unit_year=LearningUnitYearFactory(acronym='UE23',
                                                                                   academic_year=self.academic_year)
                                        )
 
-        self._assert_correct_ue_present_in_xls2(bachelor_tree, ['ue21', 'ue22', 'ue23'])
+        self._assert_correct_ue_present_in_xls2(bachelor_tree, ['UE21', 'UE22', 'UE23'])
 
     def _assert_correct_ue_present_in_xls2(self, tree, ues):
         data = _build_excel_lines_ues(CustomXlsForm({}), tree)

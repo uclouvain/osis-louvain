@@ -152,3 +152,11 @@ def get_mini_training_available_tabs():
         SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
         SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
     }
+
+
+def validate_active_tab(tab_urls):
+    for tab, tab_dict in tab_urls.items():
+        if not tab == Tab.IDENTIFICATION and tab_dict['active'] and tab_dict['display']:
+            return tab_urls
+    tab_urls[Tab.IDENTIFICATION]['active'] = True
+    return tab_urls

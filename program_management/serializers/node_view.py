@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 
 from django.templatetags.static import static
 from django.urls import reverse
@@ -226,3 +226,19 @@ def get_program_tree_version_title(node_identity: 'NodeIdentity',
             else:
                 return "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
     return ''
+
+
+def get_program_tree_version_dict(tree_versions: List['ProgramTreeVersion'],
+                                  language: str) -> Dict:
+
+    version_info = {}
+    if tree_versions:
+        program_tree_version = tree_versions[0]
+        version_info['version_label'] = program_tree_version.version_label
+        if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
+            version_info['title'] = "[{}]".format(program_tree_version.title_en)
+        else:
+            version_info['title'] = \
+                "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
+
+    return version_info

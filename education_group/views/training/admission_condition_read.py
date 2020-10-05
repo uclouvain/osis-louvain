@@ -54,6 +54,7 @@ class TrainingReadAdmissionCondition(TrainingRead):
             "can_edit_information":
                 self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "training": training,
+            "update_text_url": self.get_update_text_url(),
             "common_admission_condition": self.get_common_admission_condition(),
             "admission_condition": self.get_admission_condition(),
         }
@@ -105,4 +106,13 @@ class TrainingReadAdmissionCondition(TrainingRead):
             training.acronym,
             training.year,
             language
+        )
+
+    def get_update_text_url(self) -> str:
+        return reverse(
+            'education_group_year_admission_condition_update_text',
+            kwargs={
+                'year': self.node_identity.year,
+                'code': self.node_identity.code
+            }
         )

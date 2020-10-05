@@ -603,7 +603,9 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #schedule_type,
 .of_unversioned_field #group_title_fr,
 .of_unversioned_field #group_title_en,
-.of_unversioned_field #status
+.of_unversioned_field #status,
+.of_unversioned_field #partial_title_fr,
+.of_unversioned_field #partial_title_en
 {
     color: grey;
 }

@@ -94,6 +94,11 @@ class LearningUnitYearFactory(DjangoModelFactory):
     periodicity = factory.Iterator(learning_unit_year_periodicity.PERIODICITY_TYPES, getter=operator.itemgetter(0))
     summary_locked = False
 
+    @factory.post_generation
+    def gen_acronym(self, create, extracted, **kwargs):
+        if self.acronym:
+            self.acronym = self.acronym.upper()
+
 
 class LearningUnitYearWithComponentsFactory(LearningUnitYearFactory):
     lecturing_component = factory.PostGeneration(

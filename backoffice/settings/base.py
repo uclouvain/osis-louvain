@@ -84,7 +84,6 @@ INSTALLED_APPS = (
     'ajax_select',
     'django_celery_beat',
     'django_celery_results',
-    'notifications',
     'django_filters',
     'hijack',
     'compat',
@@ -118,7 +117,6 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
-    'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
@@ -185,6 +183,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
+PERMISSION_CACHE_ENABLED = os.environ.get('PERMISSION_CACHE_ENABLED', 'True').lower() == 'true'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

@@ -107,7 +107,7 @@
         <br>
         {% if education_group_year.is_finality %}
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12" id="partial_title_fr">
                     {% bootstrap_label _("Partial title in French") label_class='d-block'%}
                     <p>{{ education_group_year.titles.partial_title_fr | default_if_none:'-' }}</p>
                 </div>
@@ -132,7 +132,7 @@
         <br>
         {% if education_group_year.is_finality %}
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12" id="partial_title_en">
                     {% bootstrap_label _("Partial title in English") label_class='d-block'%}
                     <p>{{ education_group_year.titles.partial_title_en | default_if_none:'-' }}</p>
                 </div>

@@ -47,6 +47,7 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
             "admission_requirements_label": self.get_admission_requirements_label(),
             "can_edit_information":
                 self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
+            "update_text_url": self.get_update_text_url(),
             "mini_training": self.get_mini_training()
         }
 
@@ -61,3 +62,12 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
     def __get_admission_condition(self):
         mini_training = self.get_mini_training()
         return admission_condition.get_admission_condition(mini_training.acronym, mini_training.academic_year.year)
+
+    def get_update_text_url(self) -> str:
+        return reverse(
+            'education_group_year_admission_condition_update_text',
+            kwargs={
+                'year': self.node_identity.year,
+                'code': self.node_identity.code
+            }
+        )

@@ -48,7 +48,7 @@ class EducationGroupOrganization(models.Model):
     enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
                                choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
-                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value,
+                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.name,
                                verbose_name=_('UCL Diploma'))
     is_producing_cerfificate = models.BooleanField(default=False, verbose_name=_('Producing certificat'))
     is_producing_annexe = models.BooleanField(default=False, verbose_name=_('Producing annexe'))

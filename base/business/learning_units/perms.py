@@ -114,13 +114,13 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
 
 def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
     return check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
-           is_year_editable(learning_unit_year, raise_exception) and \
-           not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-           (learning_unit_year.is_partim() or _has_no_applications_in_future_years(learning_unit_year,
-                                                                                   raise_exception)) and \
-           is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-           _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
-                                                                          raise_exception) and \
+           is_year_editable(learning_unit_year, raise_exception) and (
+                   learning_unit_year.is_partim() or
+                   _has_no_applications_in_future_years(learning_unit_year, raise_exception)
+           ) and is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
+           _is_person_eligible_to_modify_end_date_based_on_container_type(
+               learning_unit_year, person, raise_exception
+           ) and \
            is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 
@@ -597,7 +597,7 @@ def _is_calendar_opened_to_edit_educational_information_force_majeure_section(*,
 
     now = datetime.datetime.now(tz=get_tzinfo())
     value = convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+            convert_date_to_datetime(submission_dates["end_date"])
     if not value:
         raise PermissionDenied(permission_denied_msg)
 

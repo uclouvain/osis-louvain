@@ -34,9 +34,9 @@ class TestUserAttachedToManagementEntity(TestCase):
             academic_year=cls.academic_year,
             management_entity=cls.entity_version_level_1.entity
         )
-        cls.person = PersonFactory()
 
     def setUp(self):
+        self.person = PersonFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -204,10 +204,10 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
 class TestIsEditionProgramPeriodOpen(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
         cls.group_year = GroupYearFactory()
 
     def setUp(self):
+        self.user = UserFactory()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,
@@ -407,9 +407,8 @@ class TestIsElementOnlyInsideStandardProgram(TestCase):
         cls.group_year = GroupYearFactory(education_group_type__group=True)
         ElementFactory(group_year=cls.group_year)
 
-        cls.user = UserFactory.build()
-
     def setUp(self):
+        self.user = UserFactory.build()
         self.predicate_context_mock = mock.patch(
             "rules.Predicate.context",
             new_callable=mock.PropertyMock,

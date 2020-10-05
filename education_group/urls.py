@@ -155,57 +155,87 @@ urlpatterns = [
         ])),
     ])),
     path('general_information/<int:year>/', include([
-        path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
-        path(
-            'common/update',
-            general_information.UpdateCommonGeneralInformation.as_view(),
-            name="update_common_general_information"
-        ),
-        path('common/publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
-        path(
-            'common-bachelor/',
-            general_information.CommonBachelorAdmissionCondition.as_view(),
-            name="common_bachelor_admission_condition"
-        ),
-        path(
-            'common-bachelor/publish',
-            general_information.publish_common_admission_conditions,
-            {'redirect_view': 'common_bachelor_admission_condition'},
-            name="publish_common_bachelor_admission_condition"
-        ),
-        path(
-            'common-aggregate/',
-            general_information.CommonAggregateAdmissionCondition.as_view(),
-            name="common_aggregate_admission_condition"
-        ),
-        path(
-            'common-aggregate/publish',
-            general_information.publish_common_admission_conditions,
-            {'redirect_view': 'common_aggregate_admission_condition'},
-            name="publish_common_aggregate_admission_condition"
-        ),
-        path(
-            'common-master/',
-            general_information.CommonMasterAdmissionCondition.as_view(),
-            name="common_master_admission_condition"
-        ),
-        path(
-            'common-master/publish',
-            general_information.publish_common_admission_conditions,
-            {'redirect_view': 'common_master_admission_condition'},
-            name="publish_common_master_admission_condition"
-        ),
-        path(
-            'common-master-specialized/',
-            general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
-            name="common_master_specialized_admission_condition"
-        ),
-        path(
-            'common-master-specialized/publish',
-            general_information.publish_common_admission_conditions,
-            {'redirect_view': 'common_master_specialized_admission_condition'},
-            name="publish_common_master_specialized_admission_condition"
-        ),
+        path('common/', include([
+            path('', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
+            path(
+                'update',
+                general_information.UpdateCommonGeneralInformation.as_view(),
+                name="update_common_general_information"
+            ),
+            path('publish', general_information.publish_common_pedagogy, name="publish_common_general_information"),
+        ])),
+        path('common-bachelor/', include([
+            path(
+                '',
+                general_information.CommonBachelorAdmissionCondition.as_view(),
+                name="common_bachelor_admission_condition"
+            ),
+            path(
+                'update',
+                general_information.UpdateCommonBachelorAdmissionCondition.as_view(),
+                name="update_common_bachelor_admission_condition"
+            ),
+            path(
+                'publish',
+                general_information.publish_common_admission_conditions,
+                {'redirect_view': 'common_bachelor_admission_condition'},
+                name="publish_common_bachelor_admission_condition"
+            ),
+        ])),
+        path('common-aggregate/', include([
+            path(
+                '',
+                general_information.CommonAggregateAdmissionCondition.as_view(),
+                name="common_aggregate_admission_condition"
+            ),
+            path(
+                'update',
+                general_information.UpdateCommonAggregateAdmissionCondition.as_view(),
+                name="update_common_aggregate_admission_condition"
+            ),
+            path(
+                'publish',
+                general_information.publish_common_admission_conditions,
+                {'redirect_view': 'common_aggregate_admission_condition'},
+                name="publish_common_aggregate_admission_condition"
+            ),
+        ])),
+        path('common-master/', include([
+            path(
+                '',
+                general_information.CommonMasterAdmissionCondition.as_view(),
+                name="common_master_admission_condition"
+            ),
+            path(
+                'update',
+                general_information.UpdateCommonMasterAdmissionCondition.as_view(),
+                name="update_common_master_admission_condition"
+            ),
+            path(
+                'publish',
+                general_information.publish_common_admission_conditions,
+                {'redirect_view': 'common_master_admission_condition'},
+                name="publish_common_master_admission_condition"
+            ),
+        ])),
+        path('common-master-specialized/', include([
+            path(
+                '',
+                general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
+                name="common_master_specialized_admission_condition"
+            ),
+            path(
+                'update',
+                general_information.UpdateCommonMasterSpecializedAdmissionCondition.as_view(),
+                name="update_common_master_specialized_admission_condition"
+            ),
+            path(
+                'publish',
+                general_information.publish_common_admission_conditions,
+                {'redirect_view': 'common_master_specialized_admission_condition'},
+                name="publish_common_master_specialized_admission_condition"
+            ),
+        ])),
     ])),
     path('<int:year>/<acronym:acronym>/', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
     path('configuration/', include([

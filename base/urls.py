@@ -45,7 +45,7 @@ from attribution.views import attribution, tutor_application
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
-    my_osis, entity, student, notifications
+    my_osis, entity, student
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
@@ -309,11 +309,6 @@ urlpatterns = [
     url(r'^ajax_select/', include(ajax_select_urls)),
     path('geocoding', base.views.geocoding.geocode),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
-    url(r'^notifications/', include([
-        url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
-        url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
-    ])),
-
 ]
 
 if settings.DEBUG:

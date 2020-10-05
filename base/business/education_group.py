@@ -40,6 +40,7 @@ from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
 from base.models.program_manager import is_program_manager
+from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 
 from osis_common.document import xls_build
@@ -145,17 +146,17 @@ def create_xls(user, found_education_groups_param, filters, order_data):
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def prepare_xls_content(found_education_groups):
+def prepare_xls_content(found_education_groups: List[GroupYear]) -> List:
     return [extract_xls_data_from_education_group(eg) for eg in found_education_groups]
 
 
-def extract_xls_data_from_education_group(an_education_group):
+def extract_xls_data_from_education_group(an_education_group: GroupYear) -> List:
     return [
         an_education_group.academic_year.name,
         an_education_group.complete_title_fr,
         an_education_group.title,
         an_education_group.education_group_type,
-        an_education_group.management_entity_version.acronym,
+        an_education_group.management_entity_version.acronym if an_education_group.management_entity_version else '',
         an_education_group.partial_acronym
     ]
 
@@ -214,14 +215,14 @@ def create_xls_administrative_data(user, education_group_years_qs, filters, orde
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def _get_translated_header_titles():
-    translated_hearders = []
+def _get_translated_header_titles() -> List[str]:
+    translated_headers = []
     for title in EDUCATION_GROUP_TITLES_ADMINISTRATIVE:
         if title != SESSIONS_COLUMNS:
-            translated_hearders.append(str(_(title)))
+            translated_headers.append(str(_(title)))
         else:
-            translated_hearders.extend(_get_translated_header_session_columns())
-    return translated_hearders
+            translated_headers.extend(_get_translated_header_session_columns())
+    return translated_headers
 
 
 def _get_translated_header_session_columns():

@@ -140,9 +140,11 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_training_version': osis_role_predicates.always_deny(
                     message=_('Training version can only be created by central manager')
                 ),
-            'program_management.change_training_version': osis_role_predicates.always_deny(
-                    message=_('Training version can only be modified by central manager')
-                ),
+            'program_management.change_training_version':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_program_edition_period_open,
             'program_management.delete_permanently_training_version': osis_role_predicates.always_deny(
                     message=_('Training version can only be deleted by central manager')
                 ),

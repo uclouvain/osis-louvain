@@ -95,7 +95,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             None
         )
 
-    def test_should_not_be_valid_when_node_to_attach_contains_finalities_with_end_date_greater_than_parent_program(self):
+    def test_should_be_invalid_when_node_to_attach_contains_finalities_with_end_date_greater_than_parent_program(self):
         tree_to_attach_data = {
             "node_type": GroupType.FINALITY_120_LIST_CHOICE,
             "children": [
@@ -136,7 +136,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             None
         )
 
-    def test_should_be_valid_when_node_to_attach_contains_finalities_that_have_lower_or_equal_end_date_to_parent_program(self):
+    def test_valid_when_node_to_attach_contains_finalities_that_have_lower_or_equal_end_date_to_parent_program(self):
         tree_to_attach_data = {
             "node_type": GroupType.FINALITY_120_LIST_CHOICE,
             "children": [
@@ -156,7 +156,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             )
         )
 
-    def test_invalid_when_node_to_attach_contains_options_not_contained_in_option_list_of_choice_of_parent_program(self):
+    def test_invalid_when_node_to_attach_contains_options_not_contained_in_option_list_of_parent_program(self):
         tree_to_attach_data = {
             "node_type": TrainingType.MASTER_MA_120,
             "end_year": 2017,
@@ -207,3 +207,18 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
                 self.fake_program_tree_repository,
                 self.fake_tree_version_repository
             ))
+
+    def test_valid_when_attach_option_to_option_list_of_parent_program(self):
+        tree_to_attach_data = {"node_type": MiniTrainingType.OPTION, "code": "OPTC", "year": 2018}
+
+        tree_to_attach = tree_builder(tree_to_attach_data)
+        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+
+        self.assertValidatorNotRaises(
+            _validate_end_date_and_option_finality.ValidateFinalitiesEndDateAndOptions(
+                self.tree.root_node.children_as_nodes[1],
+                tree_to_attach.root_node,
+                self.fake_program_tree_repository,
+                self.fake_tree_version_repository
+            )
+        )

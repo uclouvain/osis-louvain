@@ -13,6 +13,7 @@ from education_group.auth.scope import Scope
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
+from osis_role.cache import predicate_cache
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.service import identity_search
 from program_management.ddd.repositories import load_tree_version, \
@@ -21,32 +22,40 @@ from program_management.models.element import Element
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_training_versions_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all()
+    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
     return _are_all_removable(self, user, groups, 'program_management.delete_training_version')
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_mini_training_versions_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all()
+    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
     return _are_all_removable(self, user, groups, 'program_management.delete_minitraining_version')
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_trainings_removable(self, user, training_root):
-    training_roots = training_root.group.groupyear_set.all()
+    training_roots = training_root.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
     return _are_all_removable(self, user, training_roots, 'base.delete_training')
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_minitrainings_removable(self, user, minitraining_root):
-    minitraining_roots = minitraining_root.group.groupyear_set.all()
+    minitraining_roots = minitraining_root.group.groupyear_set.all().select_related(
+        'education_group_type',
+        'management_entity'
+    )
     return _are_all_removable(self, user, minitraining_roots, 'base.delete_minitraining')
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def are_all_groups_removable(self, user, group_year):
-    groups = group_year.group.groupyear_set.all()
+    groups = group_year.group.groupyear_set.all().select_related('education_group_type', 'management_entity')
     return _are_all_removable(self, user, groups, 'base.delete_group')
 
 
@@ -77,6 +86,7 @@ def is_not_orphan_group(self, user, education_group_year=None):
     message=_("You cannot change/delete a education group existing before %(limit_year)s") %
     {"limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 )
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_education_group_year_older_or_equals_than_limit_settings_year(
         self,
         user: User,
@@ -89,6 +99,7 @@ def is_education_group_year_older_or_equals_than_limit_settings_year(
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_education_group_type_authorized_according_to_user_scope(
         self,
         user: User,
@@ -105,6 +116,7 @@ def is_education_group_type_authorized_according_to_user_scope(
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not attached to the management entity"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_user_attached_to_management_entity(
         self,
         user: User,
@@ -120,6 +132,7 @@ def is_user_attached_to_management_entity(
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You must create the version of the concerned training and then attach that version"
                                 " inside this version"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_element_only_inside_standard_program(
         self,
         user: User,
@@ -146,17 +159,20 @@ def is_element_only_inside_standard_program(
 
 @predicate(bind=True)
 @predicate_failed_msg(message=EventPermEducationGroupEdition.error_msg)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_program_edition_period_open(self, user, group_year: 'GroupYear' = None):
     return EventPermEducationGroupEdition(obj=group_year, raise_exception=False).is_open()
 
 
 @predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_continuing_education_group_year(self, user, obj: Union['GroupYear', 'EducationGroupYear'] = None):
     return obj and obj.education_group_type.name in TrainingType.continuing_education_types()
 
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The scope of the user is limited and prevents this action to be performed"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_user_linked_to_all_scopes_of_management_entity(self, user, obj: Union['GroupYear', 'EducationGroupYear']):
     if obj:
         user_scopes = {

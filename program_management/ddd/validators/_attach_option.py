@@ -40,41 +40,46 @@ class AttachOptionsValidator(BusinessValidator):
     this options must exist in parent context (2m)
     """
 
-    def __init__(self, tree_version_2m: 'ProgramTreeVersion', tree_from_node_to_add: 'ProgramTree', *args):
+    def __init__(
+            self,
+            tree_version_2m: 'ProgramTreeVersion',
+            tree_from_node_to_add: 'ProgramTree',
+            node_to_paste_to: 'Node',
+            *args
+    ):
         super(AttachOptionsValidator, self).__init__()
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
             assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
             assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.tree_from_node_to_add = tree_from_node_to_add
         self.node_to_add = tree_from_node_to_add.root_node
+        self.node_to_paste_to = node_to_paste_to
         self.tree_version_2m = tree_version_2m
 
-    def get_options_from_finalities(self):
-        options_from_finalities = set()
-        for finality in self.tree_from_node_to_add.get_all_finalities():
-            options_from_finalities |= finality.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
-        if self.node_to_add.is_finality():
-            options_from_finalities |= self.node_to_add.get_all_children_as_nodes(
-                take_only={MiniTrainingType.OPTION}
-            )
-        return options_from_finalities
+    def get_options_to_attach(self):
+        options = self.tree_from_node_to_add.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
+        if self.node_to_add.is_option():
+            options.add(self.tree_from_node_to_add.root_node)
+        return options
 
     def validate(self):
-        options_from_finalities = self.get_options_from_finalities()
-        if options_from_finalities:
-            options_from_2m = self.tree_version_2m.tree.root_node.get_all_children_as_nodes(
-                take_only={MiniTrainingType.OPTION},
-                ignore_children_from=set(TrainingType.finality_types_enum())
-            )
-            missing_options = options_from_finalities - options_from_2m
-            if missing_options:
+        if not(self._is_node_to_paste_to_inside_a_finality() or self._is_tree_to_add_a_finality()):
+            return
+
+        options_to_attach = self.get_options_to_attach()
+        if options_to_attach:
+            options_from_2m_option_list = self.tree_version_2m.tree.get_2m_option_list()
+            options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
+            if options_to_attach_not_present_in_2m_option_list:
                 self.add_error_message(
                     ngettext(
                         "Option \"%(code)s\" must be present in %(root_code)s program.",
                         "Options \"%(code)s\" must be present in %(root_code)s program.",
-                        len(missing_options)
+                        len(options_to_attach_not_present_in_2m_option_list)
                     ) % {
-                        "code": ', '.join(self._display_inconsistent_nodes(missing_options)),
+                        "code": ', '.join(
+                            self._display_inconsistent_nodes(options_to_attach_not_present_in_2m_option_list)
+                        ),
                         "root_code": formatter.format_program_tree_version_identity(self.tree_version_2m.entity_id)
                     }
                 )
@@ -84,3 +89,13 @@ class AttachOptionsValidator(BusinessValidator):
         version_identities = identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identities(node_identities)
         return [formatter.format_program_tree_version_identity(version_identity)
                 for version_identity in version_identities]
+
+    def _is_node_to_paste_to_inside_a_finality(self) -> bool:
+        finalities = self.tree_version_2m.get_tree().root_node.get_finality_list()
+        nodes_inside_finalities = finalities.copy()
+        for finality in finalities:
+            nodes_inside_finalities |= set(finality.children_as_nodes)
+        return self.node_to_paste_to in nodes_inside_finalities
+
+    def _is_tree_to_add_a_finality(self):
+        return self.tree_from_node_to_add.root_node.is_finality()

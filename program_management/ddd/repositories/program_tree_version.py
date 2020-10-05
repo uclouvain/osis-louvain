@@ -24,6 +24,8 @@
 #
 ##############################################################################
 import contextlib
+import functools
+import operator
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -180,6 +182,8 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_name: str = None,
             offer_acronym: str = None,
             is_transition: bool = False,
+            code: str = None,
+            year: int = None,
             **kwargs
     ) -> List['ProgramTreeVersion']:
         qs = GroupYear.objects.all().order_by(
@@ -212,7 +216,10 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             qs = qs.filter(educationgroupversion__offer__acronym=offer_acronym)
         if is_transition is not None:
             qs = qs.filter(educationgroupversion__is_transition=is_transition)
-
+        if year is not None:
+            qs = qs.filter(educationgroupversion__offer__academic_year__year=year)
+        if code is not None:
+            qs = qs.filter(partial_acronym=code)
         results = []
         for record_dict in qs:
             results.append(_instanciate_tree_version(record_dict))

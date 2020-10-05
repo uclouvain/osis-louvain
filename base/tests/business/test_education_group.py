@@ -69,8 +69,6 @@ NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
 class EducationGroupTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
         # Create structure
         cls._create_basic_entity_structure()
 
@@ -79,6 +77,10 @@ class EducationGroupTestCase(TestCase):
             management_entity=cls.chim_entity,
             academic_year=cls.academic_year
         )
+
+    def setUp(self) -> None:
+        self.person = PersonFactory()
+        self.user = self.person.user
 
     @classmethod
     def _create_basic_entity_structure(cls):

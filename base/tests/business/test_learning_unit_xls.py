@@ -85,7 +85,7 @@ class TestLearningUnitXls(TestCase):
         cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
-                                                         credits=50)
+                                                         credits=10)
         cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
         cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
@@ -207,7 +207,7 @@ class TestLearningUnitXls(TestCase):
     def create_version(cls, direct_parent_type):
         cls.learning_unit_yr_version = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                                learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
-                                                               credits=50)
+                                                               credits=10)
         cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
         cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
             academic_year=cls.academic_year,
