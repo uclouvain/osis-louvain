@@ -82,7 +82,6 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(fact
     leads_to_diploma = None
     printing_title = None
     professional_title = None
-    aims = None
     constraint_type = None
     min_constraint = None
     max_constraint = None

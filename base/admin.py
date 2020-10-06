@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib import admin
 
-from base.auth.roles import entity_manager
+from base.auth.roles import entity_manager, program_manager
 from base.models import *
 from base.models import validation_rule, education_group_achievement, education_group_detailed_achievement
 

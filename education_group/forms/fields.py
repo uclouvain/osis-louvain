@@ -1,6 +1,7 @@
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.forms import ModelChoiceField
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
@@ -34,7 +35,8 @@ class ManagementEntitiesChoiceField(EntityRoleChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            qs |= EntityVersion.objects.filter(acronym=self.initial)
+            date = timezone.now()
+            qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
         return qs
 
     def clean(self, value):

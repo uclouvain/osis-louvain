@@ -46,6 +46,7 @@ class TrainingReadIdentification(TrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "education_group_year": self.get_training(),  # TODO: Rename to training (DDD concept)
+            "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
         }
 

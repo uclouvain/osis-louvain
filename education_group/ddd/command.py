@@ -107,7 +107,6 @@ class CreateTrainingCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
@@ -183,7 +182,6 @@ class CreateAndPostponeTrainingAndProgramTreeCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
@@ -241,7 +239,6 @@ class UpdateTrainingAndGroupCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
     max_constraint = attr.ib(type=Optional[int])
@@ -249,6 +246,14 @@ class UpdateTrainingAndGroupCommand(interface.CommandRequest):
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateCertificateAimsCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
 
 @attr.s(frozen=True, slots=True)
@@ -434,7 +439,6 @@ class PostponeTrainingAndGroupModificationCommand(interface.CommandRequest):
     leads_to_diploma = attr.ib(type=Optional[bool])
     printing_title = attr.ib(type=Optional[str])
     professional_title = attr.ib(type=Optional[str])
-    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
     constraint_type = attr.ib(type=Optional[str])
     min_constraint = attr.ib(type=Optional[int])
     max_constraint = attr.ib(type=Optional[int])
@@ -442,6 +446,14 @@ class PostponeTrainingAndGroupModificationCommand(interface.CommandRequest):
     remark_en = attr.ib(type=Optional[str])
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeCertificateAimsCommand(interface.CommandRequest):
+    postpone_from_acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)
+
+    aims = attr.ib(type=Optional[List[Tuple[AimCode, AimSection]]])
 
 
 @attr.s(frozen=True, slots=True)
@@ -533,3 +545,9 @@ class PublishCommonAdmissionCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class PublishCommonPedagogyCommand(interface.CommandRequest):
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyCertificateAimsToNextYearCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    postpone_from_year = attr.ib(type=int)

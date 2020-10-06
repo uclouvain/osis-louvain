@@ -85,7 +85,6 @@ class PostponeTrainingAndGroupModificationCommandFactory(factory.Factory):
     leads_to_diploma = True
     printing_title = ''
     professional_title = ''
-    aims = factory.LazyFunction(lambda: list())
     constraint_type = None
     min_constraint = None
     max_constraint = None

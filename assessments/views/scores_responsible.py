@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -38,6 +38,7 @@ from attribution.models.attribution import Attribution
 from base import models as mdl_base
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
+from osis_role.contrib.views import permission_required
 
 
 class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):

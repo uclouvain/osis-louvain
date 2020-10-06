@@ -1899,6 +1899,18 @@ msgstr ""
 msgid "Program manager"
 msgstr ""
 
+msgid "Program manager is not allowed to modify a group"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a link"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a minitraining"
+msgstr ""
+
+msgid "Program manager is not allowed to modify a specific version"
+msgstr ""
+
 msgid "Program managers"
 msgstr ""
 
@@ -2478,6 +2490,9 @@ msgid ""
 msgstr ""
 
 msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "The user is not linked to this training"
 msgstr ""
 
 #, python-format

@@ -1959,6 +1959,20 @@ msgstr "Commission du programme"
 msgid "Program manager"
 msgstr "Gestionnaire de parcours étudiant"
 
+msgid "Program manager is not allowed to modify a group"
+msgstr ""
+"Le gestionnaire de parcours étudiant ne peut pas modifier un groupement"
+
+msgid "Program manager is not allowed to modify a link"
+msgstr "Le gestionnaire de parcours étudiant ne peut pas modifier un lien"
+
+msgid "Program manager is not allowed to modify a minitraining"
+msgstr ""
+"Le gestionnaire de parcours étudiant ne peut pas modifier une mini-formation"
+
+msgid "Program manager is not allowed to modify a specific version"
+msgstr "Le gestionnaire de parcours étudiant ne peut pas modifier une version particulière"
+
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
 
@@ -2575,6 +2589,9 @@ msgstr ""
 msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
+
+msgid "The user is not linked to this training"
+msgstr "L'utilisateur n'est pas lié à cette formation"
 
 #, python-format
 msgid ""

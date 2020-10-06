@@ -86,7 +86,6 @@ class TrainingRepository(interface.AbstractRepository):
         education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
-        _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod
@@ -95,7 +94,9 @@ class TrainingRepository(interface.AbstractRepository):
         education_group_year_db_obj = _update_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
-        _save_certificate_aims(training, education_group_year_db_obj)
+        # FIXME : certificate aims should be handled in another domain
+        if training.diploma.aims is not None:
+            _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod

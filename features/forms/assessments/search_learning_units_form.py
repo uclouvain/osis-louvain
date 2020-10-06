@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models import program_manager
+from base.auth.roles import program_manager
 from features.pages.assessments import pages
 
 

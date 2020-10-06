@@ -79,12 +79,18 @@ class CreateTrainingValidatorList(business_validator.BusinessListValidator):
             AcronymRequiredValidator(training.acronym),
             AcronymAlreadyExistValidator(training.acronym),
             StartYearEndYearValidator(training),
-            CertificateAimType2Validator(training),
         ]
         super().__init__()
 
 
 class UpdateTrainingValidatorList(business_validator.BusinessListValidator):
+
+    def __init__(self, training: 'Training'):
+        self.validators = []
+        super().__init__()
+
+
+class UpdateCertificateAimsValidatorList(business_validator.BusinessListValidator):
 
     def __init__(self, training: 'Training'):
         self.validators = [

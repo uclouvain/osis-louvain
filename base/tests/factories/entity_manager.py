@@ -26,10 +26,10 @@
 import factory
 
 from base.tests.factories.structure import StructureFactory
-from osis_role.contrib.tests.factories import EntityModelFactory
+from osis_role.contrib.tests.factories import EntityRoleModelFactory
 
 
-class EntityManagerFactory(EntityModelFactory):
+class EntityManagerFactory(EntityRoleModelFactory):
     class Meta:
         model = "base.EntityManager"
         django_get_or_create = ('person', 'entity',)

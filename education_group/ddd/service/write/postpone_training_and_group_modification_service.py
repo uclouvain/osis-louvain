@@ -95,7 +95,6 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
                 leads_to_diploma=postpone_cmd.leads_to_diploma,
                 printing_title=postpone_cmd.printing_title,
                 professional_title=postpone_cmd.professional_title,
-                aims=postpone_cmd.aims,
                 constraint_type=postpone_cmd.constraint_type,
                 min_constraint=postpone_cmd.min_constraint,
                 max_constraint=postpone_cmd.max_constraint,

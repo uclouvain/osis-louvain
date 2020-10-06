@@ -107,3 +107,24 @@ class ConflictedFields(interface.DomainService):
                 break
             current_mini_training = next_year_mini_training
         return conflicted_fields
+
+    @classmethod
+    def get_conflicted_certificate_aims(cls, training_id: 'TrainingIdentity') -> List[Year]:
+        current_training = TrainingRepository.get(training_id)
+        conflicted_aims = []
+
+        for year in itertools.count(current_training.year + 1):
+            try:
+                next_year_training_identity = attr.evolve(
+                    current_training.entity_id,
+                    year=current_training.entity_id.year + 1
+                )
+                next_year_training = TrainingRepository.get(next_year_training_identity)
+                if current_training.has_conflicted_certificate_aims(next_year_training):
+                    conflicted_aims.append(year)
+            except TrainingNotFoundException:
+                break
+            if conflicted_aims:
+                break
+            current_training = next_year_training
+        return conflicted_aims

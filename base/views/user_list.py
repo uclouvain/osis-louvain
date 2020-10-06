@@ -37,7 +37,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums.groups import TUTOR
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):

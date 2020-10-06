@@ -33,14 +33,13 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
-from base.models.academic_year import AcademicYear
 from base.models.enums import structure_type
 from base.tests.factories import structure
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
-from base.tests.factories.group import EntityManagerGroupFactory, ProgramManagerGroupFactory
+from base.tests.factories.group import EntityManagerGroupFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
@@ -301,10 +300,6 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
 class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        group = ProgramManagerGroupFactory()
-        group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
-        group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
-
         cls.academic_year = AcademicYearFactory(current=True)
 
         # FIXME: Old structure model [To remove]
@@ -329,12 +324,10 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             management_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(
-            group=group,
             education_group=cls.education_group_year.education_group,
             offer_year__academic_year=cls.academic_year,
             offer_year__corresponding_education_group_year=None
         )
-        cls.program_manager.person.user.groups.add(group)
         offer_enrollment = OfferEnrollmentFactory(
             education_group_year=cls.education_group_year,
             offer_year=cls.program_manager.offer_year

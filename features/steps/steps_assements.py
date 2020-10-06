@@ -27,7 +27,7 @@ import random
 from behave import *
 from behave.runner import Context
 
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 from features.forms.assessments import search_learning_units_form, encode_students_score_form, \
     double_encode_students_score_form, encode_xlsx_score
 from features.pages.assessments import pages

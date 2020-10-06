@@ -1,10 +1,11 @@
 from abc import ABC
 from typing import List
 
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
+
+from education_group.ddd.business_types import *
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
-from django.utils.translation import gettext_lazy as _, ngettext_lazy
-from education_group.ddd.business_types import *
 
 
 class TrainingNotFoundException(Exception):
@@ -261,7 +262,8 @@ class AbstractConsistencyException(ABC):
             "remark": _("Remark"),
             "professional_title": _("Professionnal title"),
             "printing_title": _('Diploma title'),
-            "leads_to_diploma": _('Leads to diploma/certificate')
+            "leads_to_diploma": _('Leads to diploma/certificate'),
+            "certificate_aims": _("certificate aims"),
         }.get(field_name, field_name)
 
 
@@ -274,4 +276,8 @@ class TrainingCopyConsistencyException(AbstractConsistencyException, BusinessExc
 
 
 class MiniTrainingCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass
+
+
+class CertificateAimsCopyConsistencyException(AbstractConsistencyException, BusinessException):
     pass

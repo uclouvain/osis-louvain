@@ -35,7 +35,7 @@ from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.domain import training
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
+from education_group.ddd.domain._diploma import Diploma
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -128,8 +128,7 @@ def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGrou
             leads_to_diploma=cmd.leads_to_diploma,
             printing_title=cmd.printing_title,
             professional_title=cmd.professional_title,
-            aims=[DiplomaAim(entity_id=DiplomaAimIdentity(section, code), description="")
-                  for code, section in (cmd.aims or [])]
+            aims=None
         ),
         schedule_type=ScheduleTypeEnum[cmd.schedule_type]
     )

@@ -5,7 +5,7 @@ import factory
 from base.models.academic_year import current_academic_year
 from base.models.enums import learning_container_year_types
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 from base.models.student import Student
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory

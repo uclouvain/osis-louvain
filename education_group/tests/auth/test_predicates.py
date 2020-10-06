@@ -5,7 +5,8 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
+    GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -163,7 +164,7 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         education_group_type_managed = EducationGroupYearFactory(
             education_group_type__name=TrainingType.BACHELOR.name
         )
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name],)
+        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name], )
 
         self.assertFalse(
             predicates.is_education_group_type_authorized_according_to_user_scope(

@@ -123,7 +123,6 @@ def __convert_to_postpone_training_and_group_modification_command(
         leads_to_diploma=cmd.leads_to_diploma,
         printing_title=cmd.printing_title,
         professional_title=cmd.professional_title,
-        aims=cmd.aims,
         constraint_type=cmd.constraint_type,
         min_constraint=cmd.min_constraint,
         max_constraint=cmd.max_constraint,

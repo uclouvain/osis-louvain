@@ -660,3 +660,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .osis-select .select2-selection__rendered li {
     white-space: pre-line;
 }
+
+.cursor-not-allowed, .cursor-not-allowed * {
+    cursor: not-allowed !important;
+}

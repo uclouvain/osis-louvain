@@ -1109,7 +1109,7 @@ class TestLearningUnitComponents(TestCase):
     def setUp(self):
         self.client.force_login(self.a_superuser)
 
-    @mock.patch('base.models.program_manager.is_program_manager')
+    @mock.patch('base.auth.roles.program_manager.is_program_manager')
     def test_learning_unit_components(self, mock_program_manager):
         mock_program_manager.return_value = True
 

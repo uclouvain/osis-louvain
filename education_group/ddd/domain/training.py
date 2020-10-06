@@ -43,7 +43,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
+from education_group.ddd.domain._diploma import Diploma
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -86,6 +86,16 @@ class TrainingBuilder:
             )
         return training_next_year
 
+    def copy_aims_to_next_year(
+            self,
+            training_from: 'Training',
+            training_repository: 'TrainingRepository'
+    ) -> 'Training':
+        identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
+        training_next_year = training_repository.get(identity_next_year)
+        training_next_year.update_aims_from_other_training(training_from)
+        return training_next_year
+
     def create_training(self, command: 'CreateTrainingCommand') -> 'Training':
         training_identity = TrainingIdentity(command.abbreviated_title, command.year)
 
@@ -95,15 +105,6 @@ class TrainingBuilder:
                 StudyDomain(
                     entity_id=StudyDomainIdentity(dom[0], dom[1]),
                     domain_name=None,
-                )
-            )
-
-        command_aims = []
-        for aim in command.aims:
-            command_aims.append(
-                DiplomaAim(
-                    entity_id=DiplomaAimIdentity(code=aim[0], section=aim[1]),
-                    description=None,
                 )
             )
 
@@ -179,10 +180,10 @@ class TrainingBuilder:
             ),
             academic_type=utils.get_enum_from_str(command.academic_type, AcademicTypes),
             diploma=Diploma(
+                aims=None,
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
                 professional_title=command.professional_title,
-                aims=command_aims,
             ),
         )
         CreateTrainingValidatorList(training).validate()
@@ -284,7 +285,6 @@ class Training(interface.RootEntity):
         return self
 
     def update_from_other_training(self, other_training: 'Training'):
-        old_diploma = self.diploma
         fields_not_to_update = (
             "year", "acronym", "academic_year", "entity_id", "entity_identity", "identity_through_years",
         )
@@ -294,10 +294,17 @@ class Training(interface.RootEntity):
             value = getattr(other_training, field)
             setattr(self, field, value)
 
-        if self.diploma and old_diploma:
-            self.diploma = attr.evolve(self.diploma, aims=old_diploma.aims)
-        elif self.diploma and not old_diploma:
-            self.diploma = attr.evolve(self.diploma, aims=[])
+    def update_aims(self, data: 'UpdateDiplomaData'):
+        self._update_aims(data.diploma)
+        validators = validators_by_business_action.UpdateCertificateAimsValidatorList(self)
+        validators.validate()
+
+    def update_aims_from_other_training(self, other_training: 'Training'):
+        self._update_aims(other_training.diploma)
+
+    def _update_aims(self, diploma: Diploma):
+        if self.diploma:
+            self.diploma = attr.evolve(self.diploma, aims=diploma.aims if diploma else [])
 
     def has_same_values_as(self, other_training: 'Training') -> bool:
         return not bool(self.get_conflicted_fields(other_training))
@@ -327,6 +334,9 @@ class Training(interface.RootEntity):
             conflicted_fields.append("professional_title")
 
         return conflicted_fields
+
+    def has_conflicted_certificate_aims(self, other: 'Training'):
+        return self.diploma.aims != other.diploma.aims
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)
@@ -361,4 +371,9 @@ class UpdateTrainingData:
     funding = attr.ib(type=Funding, default=None)
     hops = attr.ib(type=HOPS, default=None)
     co_graduation = attr.ib(type=CoGraduation, default=None)
+    diploma = attr.ib(type=Diploma, default=None)
+
+
+@attr.s(frozen=True, slots=True, kw_only=True)
+class UpdateDiplomaData:
     diploma = attr.ib(type=Diploma, default=None)

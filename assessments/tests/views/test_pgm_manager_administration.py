@@ -32,7 +32,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory

@@ -32,7 +32,7 @@ from base.models.enums import academic_calendar_type
 from base.models.enums.mandate_type import MandateTypes
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 from education_group.views.serializers import training_administrative_dates as serializer
 from education_group.views.training.common_read import TrainingRead, Tab
 

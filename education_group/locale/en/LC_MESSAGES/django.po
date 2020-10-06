@@ -17,6 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid " with certificate aims"
+msgstr ""
+
 #, python-format
 msgid ""
 "%(count_enrollment)d student is enrolled in the mini-training "
@@ -158,6 +161,12 @@ msgid "Central managers"
 msgstr ""
 
 msgid "Certificate aim can only be edited by program manager"
+msgstr ""
+
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
 msgstr ""
 
 msgid "Clear clipboard"
@@ -562,6 +571,9 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
+msgid "Select one or multiple certificate aims"
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
@@ -686,7 +698,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
 msgstr ""
 
 #, python-brace-format

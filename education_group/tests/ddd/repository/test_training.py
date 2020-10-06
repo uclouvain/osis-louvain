@@ -25,8 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.certificate_aim import CertificateAim
-from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb, EducationGroupYear
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums.education_group_types import TrainingType
@@ -65,15 +63,10 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         cls.isced_domain = DomainIscedFactoryModelDb()
         cls.entity_version = EntityVersionModelDbFactory()
         cls.campus = CampusModelDbFactory()
-        cls.certificate_aim = CertificateAimModelDbFactory()
 
         study_domain_identity = StudyDomainIdentityFactory(
             decree_name=cls.study_domain.decree.name,
             code=cls.study_domain.code
-        )
-        diploma_aim_identity = DiplomaAimIdentityFactory(
-            code=cls.certificate_aim.code,
-            section=cls.certificate_aim.section
         )
         campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
         training_identity = TrainingIdentityFactory(year=cls.year)
@@ -92,9 +85,6 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             secondary_domains=[
                 StudyDomainFactory(entity_id=study_domain_identity)
             ],
-            diploma__aims=[
-                DiplomaAimFactory(entity_id=diploma_aim_identity)
-            ]
         )
 
     def test_fields_mapping(self):
@@ -121,15 +111,6 @@ class TestTrainingRepositoryCreateMethod(TestCase):
                 code=self.training.secondary_domains[0].entity_id.code,
                 decree__name=self.training.secondary_domains[0].entity_id.decree_name
             )
-        )
-
-        # Certificate aims
-        qs_aims = EducationGroupCertificateAim.objects.filter(education_group_year=education_group_year)
-        self.assertEqual(1, qs_aims.count())
-        educ_group_certificate_aim = qs_aims.get()
-        self.assertEqual(
-            educ_group_certificate_aim.certificate_aim,
-            CertificateAim.objects.get(code=self.training.diploma.aims[0].entity_id.code)
         )
 
 

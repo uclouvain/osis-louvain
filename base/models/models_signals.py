@@ -51,7 +51,7 @@ def _add_person_to_group(person):
     if mdl.tutor.find_by_person(person):
         _assign_group(person, "tutors")
     # Check PgmManager
-    if mdl.program_manager.find_by_person(person):
+    if base.auth.roles.program_manager.find_by_person(person):
         _assign_group(person, 'program_managers')
 
 
@@ -117,22 +117,8 @@ def add_to_tutors_group(sender, instance, **kwargs):
         instance.person.user.groups.add(tutors_group)
 
 
-@receiver(post_save, sender=mdl.program_manager.ProgramManager)
-def add_to_pgm_managers_group(sender, instance, **kwargs):
-    if kwargs.get('created', True) and instance.person.user:
-        pgm_managers_group = Group.objects.get(name='program_managers')
-        instance.person.user.groups.add(pgm_managers_group)
-
-
 @receiver(post_delete, sender=mdl.tutor.Tutor)
 def remove_from_tutor_group(sender, instance, **kwargs):
     if instance.person.user:
         tutors_group = Group.objects.get(name='tutors')
         instance.person.user.groups.remove(tutors_group)
-
-
-@receiver(post_delete, sender=mdl.program_manager.ProgramManager)
-def remove_from_pgm_managers_group(sender, instance, **kwargs):
-    if instance.person.user and not mdl.program_manager.find_by_user(instance.person.user):
-        pgm_managers_group = Group.objects.get(name='program_managers')
-        instance.person.user.groups.remove(pgm_managers_group)

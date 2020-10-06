@@ -38,9 +38,12 @@ from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.domain.exception import TrainingCopyConsistencyException, \
+    CertificateAimsCopyConsistencyException, MaximumCertificateAimType2Reached
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
+from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
+    postpone_certificate_aims_modification
 from education_group.forms import training as training_forms
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -51,8 +54,9 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.domain.exception import Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities
-from program_management.ddd.service.write import delete_training_with_program_tree_service, \
-    postpone_training_and_program_tree_modifications_service
+from program_management.ddd.service.write import delete_training_with_program_tree_service
+from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
+    postpone_training_and_program_tree_modifications
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -75,21 +79,47 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     @transaction.non_atomic_requests
     def post(self, request, *args, **kwargs):
-        deleted_trainings = []
         updated_trainings = []
+        updated_aims_trainings = []
 
         if self.training_form.is_valid():
-            deleted_trainings = self.delete_training()
-            if not self.training_form.errors:
+            self.delete_training()
+            if not self.training_form.errors and not self._changed_certificate_aims_only():
                 updated_trainings = self.update_training()
 
+            if 'certificate_aims' in self.training_form.changed_data:
+                updated_aims_trainings = self.update_certificate_aims()
+
             if not self.training_form.errors:
-                success_messages = self.get_success_msg_updated_trainings(updated_trainings)
-                success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
+                success_messages = self.build_success_messages(
+                    updated_aims_trainings,
+                    updated_trainings
+                )
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
+
+    def build_success_messages(self, updated_aims_trainings, updated_trainings):
+        success_messages = []
+
+        # get success msg on deleted trainings before splitting results
+        if updated_trainings:
+            success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
+
+        updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
+        updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
+        updated_aims_trainings = list(set(updated_aims_trainings).difference(updated_trainings_with_aims))
+
+        success_messages += self.get_success_msg_updated_trainings(updated_trainings)
+        success_messages += self.get_success_msg_updated_trainings_with_aims(updated_trainings_with_aims)
+        success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
+
+        return success_messages
+
+    # TODO : pull out this in a dedicated view for aims
+    def _changed_certificate_aims_only(self):
+        return len(self.training_form.changed_data) == 1 and 'certificate_aims' in self.training_form.changed_data
 
     def get_tabs(self) -> List:
         tab_to_display = self.request.GET.get('tab', Tab.IDENTIFICATION.name)
@@ -122,10 +152,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return self.get_success_url()
 
     def update_training(self) -> List['TrainingIdentity']:
+        updated_training_identities = []
+
         try:
             postpone_modification_command = self._convert_form_to_postpone_modification_cmd(self.training_form)
-            return postpone_training_and_program_tree_modifications_service.\
-                postpone_training_and_program_tree_modifications(postpone_modification_command)
+            updated_training_identities = postpone_training_and_program_tree_modifications(
+                postpone_modification_command
+            )
         except exception.ContentConstraintTypeMissing as e:
             self.training_form.add_error("constraint_type", e.message)
         except (exception.ContentConstraintMinimumMaximumMissing,
@@ -136,11 +169,32 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.training_form.add_error("end_year", e.message)
         except TrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
-            return [
+            updated_training_identities = [
                 TrainingIdentity(acronym=self.get_training_obj().acronym, year=year)
                 for year in range(self.get_training_obj().year, e.conflicted_fields_year)
             ]
-        return []
+
+        return updated_training_identities
+
+    # TODO : pull out this in a dedicated view for aims
+    def update_certificate_aims(self):
+        updated_aims_training_identities = []
+
+        try:
+            postpone_aims_modification_command = self._convert_form_to_postpone_aims_modification_cmd(
+                self.training_form)
+            updated_aims_training_identities = postpone_certificate_aims_modification(
+                postpone_aims_modification_command
+            )
+        except MaximumCertificateAimType2Reached as e:
+            self.training_form.add_error("certificate_aims", e.message)
+        except CertificateAimsCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
+            updated_aims_training_identities = [
+                TrainingIdentity(acronym=self.get_training_obj().acronym, year=year)
+                for year in range(self.get_training_obj().year, e.conflicted_fields_year)
+            ]
+        return updated_aims_training_identities
 
     def delete_training(self) -> List['TrainingIdentity']:
         end_year = self.training_form.cleaned_data["end_year"]
@@ -176,7 +230,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             event_perm_obj=self.get_permission_object(),
             training_type=self.get_training_obj().type.name,
             attach_path=self.get_attach_path(),
-            initial=self._get_training_form_initial_values()
+            initial=self._get_training_form_initial_values(),
+            training=self.get_permission_object(),
         )
 
     @functools.lru_cache()
@@ -197,13 +252,24 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get_permission_object(self) -> Optional[GroupYear]:
         return get_object_or_none(
-            GroupYear.objects.select_related('academic_year', 'management_entity'),
+            GroupYear.objects.select_related('academic_year', 'management_entity', 'educationgroupversion__offer'),
             academic_year__year=self.kwargs['year'],
             partial_acronym=self.kwargs['code']
         )
 
-    def get_success_msg_updated_trainings(self, training_identites: List["TrainingIdentity"]) -> List[str]:
-        return [self._get_success_msg_updated_training(identity) for identity in training_identites]
+    # TODO : discard this when a dedicated view for aims is available
+    def get_success_msg_updated_trainings_with_aims(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_training(identity, with_aims=True) for identity in training_identities]
+
+    def get_success_msg_updated_trainings(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_training(identity, with_aims=False) for identity in training_identities]
+
+    # TODO : pull out this in a dedicated view for aims
+    def get_success_msg_updated_aims_only(self, training_identities: List["TrainingIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_success_msg_updated_aims(identity) for identity in training_identities]
 
     def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
         last_identity = trainings_identities[-1]
@@ -221,13 +287,28 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return [delete_message]
         return []
 
-    def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity') -> str:
+    def _sort_by_year(self, training_identites: List[TrainingIdentity]):
+        return sorted(training_identites, key=lambda x: x.year)
+
+    def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity', with_aims: bool) -> str:
+        message = _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated")
+        if with_aims:
+            message = "{} {}".format(message, _("with certificate aims"))
+        return self._get_success_msg_updated(training_identity, message)
+
+    # TODO : pull out this in a dedicated view for aims
+    def _get_success_msg_updated_aims(self, training_identity: 'TrainingIdentity') -> str:
+        message = _("Certificate aims only for training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
+                    "have been successfully updated.")
+        return self._get_success_msg_updated(training_identity, message)
+
+    def _get_success_msg_updated(self, training_identity: 'TrainingIdentity', message: str):
         link = reverse_with_get(
             'education_group_read_proxy',
             kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
             get={"tab": Tab.IDENTIFICATION.value}
         )
-        return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully updated.") % {
+        return message % {
             "link": link,
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),
@@ -376,9 +457,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             leads_to_diploma=cleaned_data['leads_to_diploma'],
             printing_title=cleaned_data['diploma_printing_title'],
             professional_title=cleaned_data['professional_title'],
-            aims=[
-                (aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])
-            ],
             constraint_type=cleaned_data['constraint_type'],
             min_constraint=cleaned_data['min_constraint'],
             max_constraint=cleaned_data['max_constraint'],
@@ -387,6 +465,18 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             organization_name=cleaned_data['teaching_campus'].organization.name
             if cleaned_data["teaching_campus"] else None,
             schedule_type=cleaned_data["schedule_type"],
+        )
+
+    # TODO : pull out this in a dedicated view for aims
+    def _convert_form_to_postpone_aims_modification_cmd(
+            self,
+            form: training_forms.UpdateTrainingForm
+    ) -> command.PostponeCertificateAimsCommand:
+        cleaned_data = form.cleaned_data
+        return command.PostponeCertificateAimsCommand(
+            postpone_from_acronym=cleaned_data['acronym'],
+            postpone_from_year=cleaned_data['academic_year'].year,
+            aims=[(aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])],
         )
 
     def _convert_form_to_delete_trainings_command(

@@ -43,6 +43,7 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
+            "permission_object": self.get_permission_object()
         }
 
     def get_related_history(self):

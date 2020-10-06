@@ -65,7 +65,7 @@ class DiplomaAim(interface.Entity):
 
 @attr.s(frozen=True, slots=True)
 class Diploma(interface.ValueObject):
+    aims = attr.ib(type=List['DiplomaAim'])
     leads_to_diploma = attr.ib(type=bool, default=False)
     printing_title = attr.ib(type=str, default='')
     professional_title = attr.ib(type=str, default='')
-    aims = attr.ib(type=List['DiplomaAim'], factory=list)

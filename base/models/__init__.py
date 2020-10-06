@@ -45,7 +45,6 @@ from base.models import person_address
 from base.models import person_entity
 from base.models import prerequisite
 from base.models import prerequisite_item
-from base.models import program_manager
 from base.models import proposal_learning_unit
 from base.models import session_exam
 from base.models import session_exam_calendar

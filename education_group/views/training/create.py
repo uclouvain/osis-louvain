@@ -17,7 +17,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    AcronymAlreadyExist, StartYearGreaterThanEndYear, MaximumCertificateAimType2Reached, CodeAlreadyExistException
+    AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -132,9 +132,6 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except StartYearGreaterThanEndYear as e:
                 training_form.add_error('end_year', e.message)
                 training_form.add_error('academic_year', '')
-            except MaximumCertificateAimType2Reached as e:
-                training_form.add_error('certificate_aims', e.message)
-                training_form.add_error('section', '')
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))
@@ -294,9 +291,6 @@ def _convert_training_form_to_data_for_service(training_form: CreateTrainingForm
         'leads_to_diploma': training_form.cleaned_data['leads_to_diploma'],
         'printing_title': training_form.cleaned_data['diploma_printing_title'],
         'professional_title': training_form.cleaned_data['professional_title'],
-        'aims': [
-            (aim.code, aim.section) for aim in (training_form.cleaned_data['certificate_aims'] or [])
-        ],
         'constraint_type': training_form.cleaned_data['constraint_type'],
         'min_constraint': training_form.cleaned_data['min_constraint'],
         'max_constraint': training_form.cleaned_data['max_constraint'],

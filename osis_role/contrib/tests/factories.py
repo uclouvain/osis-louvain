@@ -26,6 +26,8 @@
 import factory
 from django.contrib.auth.models import Permission
 
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory
 
@@ -49,10 +51,26 @@ class RoleModelFactory(factory.DjangoModelFactory):
         self.person.user.groups.get(name=self.group_name).permissions.set(permissions)
 
 
-class EntityModelFactory(RoleModelFactory):
+class EntityRoleModelFactory(RoleModelFactory):
     class Meta:
         abstract = True
         django_get_or_create = ('person', 'entity',)
 
     entity = factory.SubFactory(EntityFactory)
     with_child = False
+
+
+class EducationGroupRoleModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'education_group',)
+
+    education_group = factory.SubFactory(EducationGroupFactory)
+
+
+class EducationGroupYearRoleModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'education_group',)
+
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)

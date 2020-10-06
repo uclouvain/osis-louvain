@@ -26,7 +26,8 @@
 from django.db.models import QuerySet, Q
 
 from base.auth.roles.entity_manager import EntityManager
-from base.models import program_manager, entity_version
+from base.models import entity_version
+from base.auth.roles import program_manager
 from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 

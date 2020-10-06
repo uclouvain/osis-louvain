@@ -16,6 +16,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "with certificate aims"
+msgstr "avec attendus du diplôme"
+
 #, python-format
 msgid ""
 "%(count_enrollment)d student is enrolled in the mini-training "
@@ -169,6 +172,14 @@ msgid "Certificate aim can only be edited by program manager"
 msgstr ""
 "Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
 "programme"
+
+#, python-format
+msgid ""
+"Certificate aims only for training <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> have been successfully updated."
+msgstr ""
+"Les attendus du diplôme de <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> ont été modifiés avec succès"
 
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
@@ -587,6 +598,9 @@ msgstr "Diffusion des notes"
 msgid "Search..."
 msgstr "Recherche..."
 
+msgid "Select one or multiple certificate aims"
+msgstr "Choisissez un ou plusieurs attendus du diplôme"
+
 msgid "Session"
 msgstr "Session"
 
@@ -725,7 +739,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-"successfully updated."
+"successfully updated"
 msgstr ""
 "La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a été "
 "modifiée avec succès"
