@@ -23,22 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 
 from base.models import organization_address
-from base.models.enums.organization_type import EMBASSY, ACADEMIC_PARTNER
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.organization import organization_address_delete
-from reference.tests.factories.country import CountryFactory
 
 
 class OrganizationViewTestCase(TestCase):
@@ -75,177 +70,3 @@ class OrganizationViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, "organization/organizations.html")
         self.assertEqual(response.context["object_list"][0], self.organization)
-
-
-class TestOrganizationAutocomplete(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.super_user = SuperUserFactory()
-        cls.url = reverse("organization_autocomplete")
-
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
-            country__iso_code='BE',
-            is_main=True
-        )
-        OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
-            country__iso_code='FR',
-            is_main=True
-        )
-
-    def setUp(self):
-        self.client.force_login(user=self.super_user)
-
-    def test_when_filter_without_country_data_forwarded_result_found(self):
-        response = self.client.get(self.url, data={'q': 'univ'})
-
-        expected_results = [{'text': self.organization.name,
-                             'selected_text': self.organization.name,
-                             'id': str(self.organization.pk)}]
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, expected_results)
-
-    def test_when_filter_without_country_data_forwarded_no_result_found(self):
-        response = self.client.get(self.url, data={'q': 'Grace'})
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
-
-    def test_when_filter_with_country_data_forwarded_result_found(self):
-        response = self.client.get(
-            self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
-        )
-        expected_results = [{'text': self.organization.name,
-                             'selected_text': self.organization.name,
-                             'id': str(self.organization.pk)}]
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, expected_results)
-
-    def test_when_filter_with_country_data_forwarded_no_result_found(self):
-        country = CountryFactory(iso_code='FR')
-        response = self.client.get(
-            self.url,
-            data={'forward': '{"country": "%s"}' % country.pk}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
-
-    def test_when_filter_with_country_data_forwarded_no_result_found_case_not_main(self):
-        self.organization_address.is_main = False
-        self.organization_address.save()
-        response = self.client.get(
-            self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
-
-
-class TestCountryAutocomplete(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.super_user = SuperUserFactory()
-        cls.url = reverse("country-autocomplete")
-        cls.country = CountryFactory(name="Narnia")
-        OrganizationAddressFactory(country=cls.country)
-
-    def test_when_filter(self):
-        self.client.force_login(user=self.super_user)
-        response = self.client.get(self.url, data={'q': 'nar'})
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-
-        expected_results = [{'text': self.country.name, 'selected_text': self.country.name, 'id': str(self.country.pk)}]
-
-        self.assertListEqual(results, expected_results)
-
-
-class TestCampusAutocomplete(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.super_user = SuperUserFactory()
-        cls.url = reverse("campus-autocomplete")
-
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
-            country__iso_code='BE',
-            is_main=True
-        )
-        cls.campus = CampusFactory(organization=cls.organization)
-        CampusFactory(organization=OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
-            country__iso_code='FR',
-            is_main=True
-        ).organization)
-
-    def setUp(self):
-        self.client.force_login(user=self.super_user)
-
-    def test_when_filter_without_country_data_forwarded_result_found(self):
-        response = self.client.get(self.url, data={'q': 'univ'})
-
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, expected_results)
-
-    def test_when_filter_without_country_data_forwarded_no_result_found(self):
-        response = self.client.get(self.url, data={'q': 'Grace'})
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
-
-    def test_when_filter_with_country_data_forwarded_result_found(self):
-        response = self.client.get(
-            self.url,
-            data={'forward': '{"country_external_institution": "%s"}' % self.organization_address.country.pk}
-        )
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, expected_results)
-
-    def test_when_filter_with_country_data_forwarded_no_result_found(self):
-        country = CountryFactory(iso_code='FR')
-
-        response = self.client.get(
-            self.url,
-            data={'forward': '{"country_external_institution": "%s"}' % country.pk}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
-
-
-def _get_results_from_autocomplete_response(response):
-    json_response = str(response.content, encoding='utf8')
-    return json.loads(json_response)['results']

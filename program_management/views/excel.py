@@ -33,6 +33,9 @@ from program_management.business.excel import EducationGroupYearLearningUnitsPre
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
 from program_management.business.excel_ue_in_of import EducationGroupYearLearningUnitsContainedToExcel
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.ddd import command as command_pgrm
+from program_management.ddd.service.read import node_identity_service
+from program_management.ddd.repositories.node import NodeRepository
 
 
 @login_required
@@ -70,10 +73,11 @@ def get_learning_units_is_prerequisite_for_excel(request, year, code):
 @login_required
 @permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
-def get_learning_units_of_training_for_excel(request, year, code):
-    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None),
+def get_learning_units_of_training_for_excel(request, year: int, code: str):
+    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None, year=year, code=code),
                                                             year,
                                                             code).to_excel()
+
     response = HttpResponse(excel['workbook'], content_type=CONTENT_TYPE_XLS)
     filename = "{workbook_name}.xlsx".format(
         workbook_name=str(_("LearningUnitList-%(year)s-%(acronym)s") % {

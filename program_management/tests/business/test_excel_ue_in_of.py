@@ -33,14 +33,13 @@ from attribution.ddd.domain.attribution import Attribution
 from attribution.tests.ddd.factories.teacher import TeacherFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
-from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
@@ -97,29 +96,34 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         cls.node_2 = GroupElementYearFactory(parent_element=cls.element_root, child_element=cls.child_2)
         cls.node_2_1 = GroupElementYearFactory(parent_element=cls.child_2, child_element=cls.child_2_1)
 
+        cls.root_node = NodeGroupYearFactory(node_id=cls.element_root.pk)
+
     def test_header_lines_without_optional_titles(self):
-        custom_xls_form = CustomXlsForm({})
+        custom_xls_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         expected_headers = FIX_TITLES
 
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_header_lines_with_optional_titles(self):
-        custom_xls_form = CustomXlsForm({
-            'required_entity': 'on',
-            'allocation_entity': 'on',
-            'credits': 'on',
-            'periodicity': 'on',
-            'active': 'on',
-            'quadrimester': 'on',
-            'session_derogation': 'on',
-            'volume': 'on',
-            'teacher_list': 'on',
-            'proposition': 'on',
-            'english_title': 'on',
-            'language': 'on',
-            'specifications': 'on',
-            'description_fiche': 'on',
-        }
+        custom_xls_form = CustomXlsForm(
+            {
+                'required_entity': 'on',
+                'allocation_entity': 'on',
+                'credits': 'on',
+                'periodicity': 'on',
+                'active': 'on',
+                'quadrimester': 'on',
+                'session_derogation': 'on',
+                'volume': 'on',
+                'teacher_list': 'on',
+                'proposition': 'on',
+                'english_title': 'on',
+                'language': 'on',
+                'specifications': 'on',
+                'description_fiche': 'on',
+            },
+            year=self.root_node.year,
+            code=self.root_node.code
         )
 
         expected_headers = \
@@ -250,7 +254,7 @@ class TestContent(TestCase):
         self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=SUPPRESSION_COLOR)), [5])
 
     def test_no_optional_data_to_add(self):
-        form = CustomXlsForm({})
+        form = CustomXlsForm({}, year=self.parent_node.year, code=self.parent_node.code)
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': False,
                               'has_proposition': False,
@@ -284,7 +288,10 @@ class TestContent(TestCase):
                               'language': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
-                              })
+                              },
+                             year=self.parent_node.year,
+                             code=self.parent_node.code
+                             )
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': True,
                               'has_proposition': True,
@@ -328,7 +335,7 @@ class TestContent(TestCase):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
-                              [self.luy.periodicity])
+                              [dict(PERIODICITY_TYPES)[self.luy.periodicity]])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
@@ -413,9 +420,6 @@ class TestContent(TestCase):
                                                    teaching_material_2.title))
 
     def test_build_specifications_cols(self):
-        # lang_fr = FrenchLanguageFactory()
-        # lang_en = EnglishLanguageFactory()
-
         achievement_1 = AchievementFactory(code_name="A1", text_fr="Text fr", text_en="Text en")
         achievement_2 = AchievementFactory(code_name="A2", text_fr="Text fr", text_en=None)
         achievement_3 = AchievementFactory(code_name="A3", text_fr=None, text_en="    ")
@@ -540,7 +544,7 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
         main_gathering_str = ''
 
     expected = [luy.acronym,
-                luy.year,
+                u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
                 luy.full_title_fr,
                 luy.type.value if luy.type else '',
                 luy.subtype if luy.subtype else '',
@@ -622,12 +626,12 @@ class TestRowHeight(TestCase):
         cls.luy_count = len(cls.learning_units)
 
     def test_row_height_not_populated(self):
-        custom_form = CustomXlsForm({})
+        custom_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
         self.assertDictEqual(data.get('row_height'), {})
 
     def test_row_height_populated(self):
-        custom_form = CustomXlsForm({'description_fiche': 'on'})
+        custom_form = CustomXlsForm({'description_fiche': 'on'}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
 
         self.assertDictEqual(data.get('row_height'), {
@@ -637,7 +641,7 @@ class TestRowHeight(TestCase):
         })
 
     def test_header_line(self):
-        custom_form = CustomXlsForm({})
+        custom_form = CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code)
         data = _build_excel_lines_ues(custom_form, self.tree)
         # First line (Header line) is always bold
         self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
@@ -693,7 +697,7 @@ class TestRowHeight(TestCase):
         self._assert_correct_ue_present_in_xls2(bachelor_tree, ['UE21', 'UE22', 'UE23'])
 
     def _assert_correct_ue_present_in_xls2(self, tree, ues):
-        data = _build_excel_lines_ues(CustomXlsForm({}), tree)
+        data = _build_excel_lines_ues(CustomXlsForm({}, year=self.root_node.year, code=self.root_node.code), tree)
         content = data['content']
         del content[0]
         self.assertEqual(len(content), len(ues))

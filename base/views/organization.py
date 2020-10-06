@@ -23,10 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import BooleanField, OuterRef, Q, Prefetch, Subquery
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -36,11 +35,8 @@ from django_filters.views import FilterView
 
 from base.forms.organization import OrganizationFilter
 from base.forms.organization_address import OrganizationAddressForm
-from base.models.campus import Campus
-from base.models.enums.organization_type import ACADEMIC_PARTNER
 from base.models.organization import Organization
 from base.models.organization_address import OrganizationAddress
-from reference.models.country import Country
 
 
 class OrganizationSearch(PermissionRequiredMixin, FilterView):
@@ -118,59 +114,3 @@ def organization_address_delete(request, organization_address_id):
     )
     organization_address.delete()
     return HttpResponseRedirect(reverse("organization_read", args=[organization_address.organization.pk]))
-
-
-class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Organization.objects.filter(type=ACADEMIC_PARTNER)
-
-        country = self.forwarded.get('country', None)
-        if country:
-            qs = qs.filter(
-                organizationaddress__is_main=True,
-                organizationaddress__country=country,
-            )
-
-        if self.q:
-            qs = qs.filter(name__icontains=self.q)
-
-        return qs.distinct().order_by('name')
-
-    def get_result_label(self, result):
-        return result.name
-
-
-class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
-
-        if self.q:
-            qs = qs.filter(name__icontains=self.q)
-
-        return qs.distinct().order_by('name')
-
-
-class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = Campus.objects.annotate(
-            organization_is_current_partner=Subquery(
-                Organization.objects.filter(
-                    pk=OuterRef('organization_id'),
-                    type=ACADEMIC_PARTNER,
-                ).values('is_current_partner')[:1],
-                output_field=BooleanField(),
-            )
-        ).filter(organization_is_current_partner=True)
-
-        country = self.forwarded.get('country_external_institution', None)
-
-        if country:
-            qs = qs.filter(organization__organizationaddress__country=country)
-
-        if self.q:
-            qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
-
-        return qs.select_related('organization').order_by('organization__name').distinct()
-
-    def get_result_label(self, result):
-        return "{} ({})".format(result.organization.name, result.name)

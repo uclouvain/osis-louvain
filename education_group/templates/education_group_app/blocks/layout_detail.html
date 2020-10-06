@@ -108,6 +108,7 @@
                 </div>
             </div>
         </div>
+        {% include "education_group/blocks/modal/custom_xls.html" %}
         <div class="panel-footer text-right" style="padding-right: 30px;">
             {% block bottom_action_bar %}
                 {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
@@ -126,9 +127,7 @@
             </div>
         </div>
     </div>
-    {% if education_group_year %}
-        {% include "education_group/blocks/modal/custom_xls.html" %}
-    {% endif %}
+
     <script>
         const tree = JSON.parse('{{ tree | escapejs }}');
     </script>

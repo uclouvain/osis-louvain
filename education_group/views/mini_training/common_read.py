@@ -55,6 +55,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.forms.custom_xls import CustomXlsForm
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -136,6 +137,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,

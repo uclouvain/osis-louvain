@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -34,14 +33,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
-from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, \
-    MiniTrainingEducationGroupTypeFactory, \
-    GroupEducationGroupTypeFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -53,8 +48,6 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.forms.education_groups import GroupFilter, STANDARD, PARTICULAR
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, create_with_version
-from education_group.models.group_year import GroupYear
-from program_management.models.education_group_version import EducationGroupVersion
 
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
@@ -456,48 +449,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"], [self.group_year_arke2a])
-
-
-class TestEducationGroupTypeAutoComplete(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.trainings = EducationGroupTypeFactory.create_batch(2)
-        cls.minitrainings = MiniTrainingEducationGroupTypeFactory.create_batch(3)
-        cls.groups = GroupEducationGroupTypeFactory.create_batch(1)
-
-        cls.url = reverse("education_group_type_autocomplete")
-        cls.person = PersonFactory()
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-
-    def test_without_category(self):
-        response = self.client.get(self.url)
-        json_response = response.json()
-        self.assertEqual(6, len(json_response["results"]))
-
-    def test_with_category_set(self):
-        tuples_category_with_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
-        for category, expected_result in tuples_category_with_expected_result:
-            with self.subTest(category=category):
-                response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
-                json_response = response.json()
-                self.assertEqual(expected_result, len(json_response["results"]))
-
-    def test_with_search_query_case_insentive_on_display_value_set(self):
-        education_group_type = self.trainings[0]
-        search_term = education_group_type.get_name_display().upper()
-
-        response = self.client.get(self.url, data={"forward": json.dumps({"category": TRAINING}), "q": search_term})
-        json_response = response.json()
-
-        expected_response = {
-            'id': str(education_group_type.pk),
-            'selected_text': education_group_type.get_name_display(),
-            'text': education_group_type.get_name_display()
-        }
-        self.assertEqual(len(json_response["results"]), 1)
-        self.assertEqual(json_response["results"][0], expected_response)
 
 
 class TestEducationGroupDataSearchFilterWithVersion(TestCase):

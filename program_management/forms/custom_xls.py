@@ -25,6 +25,7 @@
 ##############################################################################
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 
 class CustomXlsForm(forms.Form):
@@ -44,12 +45,10 @@ class CustomXlsForm(forms.Form):
     specifications = forms.BooleanField(required=False, label=_('Specifications'))
     description_fiche = forms.BooleanField(required=False, label=_('Description fiche'))
 
-    def __init__(self, *args, path: 'Path' = None, **kwargs):
+    def __init__(self, *args, year: int = None, code: str = None, **kwargs):
         super().__init__(*args, **kwargs)
-        if path:
-            self.node = self.get_current_node_id(path)
-        else:
-            self.node = None
+        self.url_action = reverse('education_group_learning_units_contains',
+                                  kwargs={'year': year, 'code': code})
 
     def get_optional_data(self):
         data = []
@@ -58,7 +57,3 @@ class CustomXlsForm(forms.Form):
                 if self.cleaned_data[field]:
                     data.append(field)
         return data
-
-    def get_current_node_id(self, path):
-        nodes = path.split('|')
-        return nodes[-1]

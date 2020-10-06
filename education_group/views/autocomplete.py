@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,9 +24,33 @@
 #
 ##############################################################################
 from dal import autocomplete
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.html import format_html
 
 from base.models.certificate_aim import CertificateAim
+from base.models.education_group_type import EducationGroupType
+
+
+class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return EducationGroupType.objects.none()
+
+        qs = EducationGroupType.objects.all()
+
+        category = self.forwarded.get('category', None)
+        if category:
+            qs = qs.filter(category=category)
+        if self.q:
+            # Filtering must be done in python because translated value.
+            ids_to_keep = {result.pk for result in qs if self.q.lower() in result.get_name_display().lower()}
+            qs = qs.filter(id__in=ids_to_keep)
+
+        qs = qs.order_by_translated_name()
+        return qs
+
+    def get_result_label(self, result):
+        return format_html('{}', result.get_name_display())
 
 
 class CertificateAimAutocomplete(autocomplete.Select2QuerySetView):

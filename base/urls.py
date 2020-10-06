@@ -29,6 +29,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.urls import path
 
+import base.views.autocomplete
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -57,44 +58,34 @@ from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edi
     learning_unit_pedagogy_force_majeure_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
-from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
-from base.views.person import EmployeeAutocomplete
+from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
+    EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
+    EntityRequirementAutocomplete, EmployeeAutocomplete
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-    url(
-        r'^entity_autocomplete/$',
-        base.views.learning_units.update.EntityAutocomplete.as_view(),
-        name='entity_autocomplete'
-    ),
-    url(
-        r'^allocation_entity_autocomplete/$',
-        base.views.learning_units.update.AllocationEntityAutocomplete.as_view(),
-        name='allocation_entity_autocomplete'
-    ),
-    url(
-        r'^additional_entity_1_autocomplete/$',
-        base.views.learning_units.update.AdditionnalEntity1Autocomplete.as_view(),
-        name='additional_entity_1_autocomplete'
-    ),
-    url(
-        r'^additional_entity_2_autocomplete/$',
-        base.views.learning_units.update.AdditionnalEntity2Autocomplete.as_view(),
-        name='additional_entity_2_autocomplete'
-    ),
-    url(
-        r'^entity_requirement_autocomplete/$',
-        base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
-        name='entity_requirement_autocomplete'
-    ),
-    url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
-        name='organization_autocomplete'),
-    url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
-        name='country-autocomplete'),
-    url(r'^campus-autocomplete/$', CampusAutocomplete.as_view(),
-        name='campus-autocomplete'),
-    url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
-        name='employee_autocomplete'),
+    path('autocomplete/', include([
+        path('entities/', EntityAutocomplete.as_view(), name='entity_autocomplete'),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path('allocation-entities/', AllocationEntityAutocomplete.as_view(), name='allocation_entity_autocomplete'),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path(
+            'additional-entities-1/',
+            AdditionnalEntity1Autocomplete.as_view(),
+            name='additional_entity_1_autocomplete'
+        ),
+        # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
+        path(
+            'additional-entities-2/',
+            AdditionnalEntity2Autocomplete.as_view(),
+            name='additional_entity_2_autocomplete'
+        ),
+        path('requirement-entitites/', EntityRequirementAutocomplete.as_view(), name='entity_requirement_autocomplete'),
+        path('organizations/', OrganizationAutocomplete.as_view(), name='organization_autocomplete'),
+        path('countries/', CountryAutocomplete.as_view(), name='country-autocomplete'),
+        path('campus/', CampusAutocomplete.as_view(), name='campus-autocomplete'),
+        path('employee/', EmployeeAutocomplete.as_view(), name='employee_autocomplete'),
+    ])),
     url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
 
     url(r'^academic_actors/', include([

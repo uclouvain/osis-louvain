@@ -39,6 +39,14 @@ class Teacher:
         self.middle_name = middle_name
         self.email = email
 
+    def __eq__(self, other):
+        return self.last_name == other.last_name and \
+               self.first_name == other.first_name and \
+               self.middle_name == other.middle_name
+
+    def __hash__(self):
+        return hash(self.last_name + self.first_name + self.middle_name)
+
     @property
     def full_name(self):
         return "".join([
