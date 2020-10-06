@@ -29,6 +29,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
 from base import models as mdl
+from base.auth.roles import program_manager
 from osis_common.models.serializable_model import SerializableModel
 from osis_common.models.signals.authentication import user_created_signal, user_updated_signal
 
@@ -51,7 +52,7 @@ def _add_person_to_group(person):
     if mdl.tutor.find_by_person(person):
         _assign_group(person, "tutors")
     # Check PgmManager
-    if base.auth.roles.program_manager.find_by_person(person):
+    if program_manager.find_by_person(person):
         _assign_group(person, 'program_managers')
 
 
