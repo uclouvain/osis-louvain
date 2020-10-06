@@ -1352,6 +1352,8 @@ components:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         remark:
           type: string
+        version_name:
+          type: string
         children:
           type: array
           items:
@@ -1429,6 +1431,8 @@ components:
           minimum: 1
         constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
+        version_name:
+          type: string
         children:
           type: array
           items:

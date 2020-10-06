@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
 
 import mock
 from django.conf import settings
@@ -50,6 +49,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         BIR1BA
         |--Common Core
            |-- Learning unit year
+           |-- Access minor
         """
         self.year = 2018
         self.training = NodeGroupYearFactory(
@@ -77,6 +77,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             parent=self.common_core, child=self.learning_unit_year, relative_credits=15
         )
 
+        self.mini_training = NodeGroupYearFactory(
+            node_type=MiniTrainingType.ACCESS_MINOR,
+            year=self.year
+        )
+        self.mini_gey = LinkFactory(
+            parent=self.common_core, child=self.mini_training
+        )
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': self.training.title,
             'year': self.year
@@ -106,11 +113,12 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'remark',
             'min_constraint',
             'max_constraint',
-            'constraint_type'
+            'constraint_type',
+            'version_name'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-    def test_children_contains_expected_fields(self):
+    def test_group_children_contains_expected_fields(self):
         expected_fields = [
             'url',
             'title',
@@ -129,7 +137,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'remark',
             'min_constraint',
             'max_constraint',
-            'constraint_type'
+            'constraint_type',
         ]
         keys = self.serializer.data['children'][0].keys()
         diff = set(keys).symmetric_difference(expected_fields)
@@ -160,6 +168,10 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
+    def test_not_group_children_have_version_name_field(self):
+        element = self.serializer.data['children'][0]['children'][1]
+        self.assertIn('version_name', element.keys())
+
     def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
         luy = self.serializer.data['children'][0]['children'][0]
         self.assertEqual(luy['title'], 'COMMON')
@@ -168,7 +180,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         luy = self.serializer.data['children'][0]['children'][0]
         self.assertFalse(luy['status'])
 
-    @skip("FIXME in OSIS-4561")
     def test_ensure_not_getting_direct_child_of_reference_link(self):
         training = NodeGroupYearFactory(
             year=self.year,
@@ -183,19 +194,20 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         )
         luy = NodeLearningUnitYearFactory(year=self.year)
         LinkFactory(parent=common_core, child=luy)
+
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': training.title,
             'year': self.year
         })
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=self.training),
+            Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
-        self.assertEqual(serializer.data['children'][0]['children'][0]['code'], luy.code)
+        self.assertEqual(serializer.data['children'][0]['code'], luy.code)
 
     def test_ensure_not_getting_direct_child_of_reference_link_except_within_minor_list(self):
         training = NodeGroupYearFactory(
@@ -421,7 +433,8 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
             'partial_title',
             'min_constraint',
             'max_constraint',
-            'constraint_type'
+            'constraint_type',
+            'version_name'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data.keys()))
 
@@ -508,7 +521,8 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
             'remark',
             'min_constraint',
             'max_constraint',
-            'constraint_type'
+            'constraint_type',
+            'version_name'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data.keys()))
 
@@ -532,6 +546,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
             'partial_title',
             'min_constraint',
             'max_constraint',
-            'constraint_type'
+            'constraint_type',
+            'version_name'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data['children'][0]['children'][0].keys()))

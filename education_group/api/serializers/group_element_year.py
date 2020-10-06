@@ -118,6 +118,7 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
     min_constraint = serializers.IntegerField(source='child.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
+    version_name = serializers.SerializerMethodField()
 
     @staticmethod
     def get_node_type(obj):
@@ -142,6 +143,14 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         attr_name = '{}_title_{}'.format(field_prefix, field_suffix)
         return getattr(obj.child, attr_name) + (' {}'.format(version_title) if version_title else '')
 
+    @staticmethod
+    def get_version_name(obj):
+        version_name = get_program_tree_version_name(
+            NodeIdentity(code=obj.child.code, year=obj.child.year),
+            _get_version_of_nodes({obj.child})
+        )
+        return version_name[1:-1]  # remove [ ]
+
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
         return getattr(obj.child, 'offer_partial_title' + field_suffix)
@@ -150,6 +159,8 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         data = super().to_representation(obj)
         if not obj.child.is_training() or not self.instance.child.is_finality():
             data.pop('partial_title')
+        if obj.child.is_group():
+            data.pop('version_name')
         return data
 
 
