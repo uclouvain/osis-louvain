@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -389,7 +390,7 @@ class TestLearningUnitXls(TestCase):
             luy)
 
         expected_common = [
-            str(_(luy.periodicity.title())),
+            dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,

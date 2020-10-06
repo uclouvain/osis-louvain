@@ -444,7 +444,7 @@ msgid "Mini-Training"
 msgstr ""
 
 #, python-format
-msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -674,7 +674,7 @@ msgid "Training"
 msgstr ""
 
 #, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 
 #, python-format

@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
@@ -78,7 +79,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 update_trainings.sort(key=lambda identity: identity.year)
             if not self.mini_training_form.errors:
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)
-                success_messages += self.get_success_msg_deleted_mini_trainings(deleted_trainings)
+                success_messages += self.get_success_msg_deleted_mini_trainings(update_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -191,7 +192,20 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get_success_msg_deleted_mini_trainings(
             self,
             mini_trainings_identities: List['MiniTrainingIdentity']) -> List[str]:
-        return [self._get_success_msg_deleted_mini_training(identity) for identity in mini_trainings_identities]
+        last_identity = mini_trainings_identities[-1]
+        is_new_end_year_lower_than_initial_one = operator.is_year_lower(
+            self.mini_training_form.cleaned_data["end_year"],
+            self.mini_training_form.initial['end_year']
+        )
+        if is_new_end_year_lower_than_initial_one:
+            delete_message = _(
+                "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
+            ) % {
+                "acronym": last_identity.acronym,
+                "academic_year": display_as_academic_year(self.mini_training_form.cleaned_data["end_year"] + 1)
+            }
+            return [delete_message]
+        return []
 
     def _get_success_msg_updated_mini_training(self, mini_training_identity: 'MiniTrainingIdentity') -> str:
         link = reverse_with_get(
@@ -203,12 +217,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "link": link,
             "acronym": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year),
-        }
-
-    def _get_success_msg_deleted_mini_training(self, mini_training_identity: 'MiniTrainingIdentity') -> str:
-        return _("Mini-Training %(acronym)s (%(academic_year)s) successfully deleted.") % {
-            "acronym": mini_training_identity.acronym,
-            "academic_year": display_as_academic_year(mini_training_identity.year)
         }
 
     def _get_default_error_messages(self) -> str:

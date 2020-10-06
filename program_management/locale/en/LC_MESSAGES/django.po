@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 15:02+0200\n"
+"POT-Creation-Date: 2020-10-01 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -268,6 +268,7 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+#, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
 "program."
@@ -406,6 +407,12 @@ msgid "Mandatory"
 msgstr ""
 
 msgid "Mini-Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
 msgstr ""
 
 #, python-format
@@ -743,6 +750,12 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+#, python-format
+msgid ""
+"Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
 msgstr ""
 
 #, python-format

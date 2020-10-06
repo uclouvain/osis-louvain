@@ -303,6 +303,10 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
+msgctxt "female"
+msgid "Annual"
+msgstr ""
+
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
@@ -400,6 +404,12 @@ msgid "Begining of exam registration"
 msgstr ""
 
 msgid "Benefits and organization"
+msgstr ""
+
+msgid "Biennial even"
+msgstr ""
+
+msgid "Biennial odd"
 msgstr ""
 
 msgid "Birth Date"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -1354,7 +1354,7 @@ class TestLearningUnitProposalComparison(TestCase):
         self.assertListEqual(response.context['learning_unit_year_fields'],
                              [
                                  [_('Credits'), 5, 6.00],
-                                 [_('Periodicity'), _("biennial odd"), _("biennial even")],
+                                 [_('Periodicity'), _("Biennial odd"), _("Biennial even")],
                                  [_('Procedure'), "-", _("External")]
                              ])
 

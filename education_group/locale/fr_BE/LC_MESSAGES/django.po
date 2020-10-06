@@ -462,11 +462,10 @@ msgstr "Mini formation"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
-#, python-format
-msgid "Mini-Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La mini-formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec "
-"succès"
+"La mini-formation %(acronym)s a été supprimée avec succès "
+"à partir de %(academic_year)s."
 
 #, python-format
 msgid ""
@@ -710,10 +709,10 @@ msgstr "Intitulés"
 msgid "Training"
 msgstr "Formation"
 
-#, python-format
-msgid "Training %(acronym)s (%(academic_year)s) successfully deleted."
+msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La formation %(acronym)s (%(academic_year)s) </a> a été supprimée avec succès"
+"La formation %(acronym)s a été supprimée avec succès à partir "
+"de %(academic_year)s."
 
 #, python-format
 msgid ""

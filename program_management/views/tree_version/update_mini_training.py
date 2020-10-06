@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.utils import operator
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
@@ -62,6 +63,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         if self.mini_training_version_form.is_valid():
             version_identities = self.update_mini_training_version()
             self.display_success_messages(version_identities)
+            self.display_delete_messages(version_identities)
             if not self.mini_training_version_form.errors:
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -88,6 +90,22 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def display_delete_messages(self, version_identities: List['ProgramTreeVersionIdentity']):
+        last_identity = version_identities[-1]
+        is_new_end_year_lower_than_initial_one = operator.is_year_lower(
+            self.mini_training_version_form.cleaned_data["end_year"],
+            self.mini_training_version_form.initial['end_year']
+        )
+        if is_new_end_year_lower_than_initial_one:
+            delete_message = _(
+                "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
+            ) % {
+                "offer_acronym": last_identity.offer_acronym,
+                "acronym": last_identity.version_name,
+                "academic_year": display_as_academic_year(self.mini_training_version_form.cleaned_data["end_year"] + 1)
+            }
+            display_success_messages(self.request, delete_message, extra_tags='safe')
 
     def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)

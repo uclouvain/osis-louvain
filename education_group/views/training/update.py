@@ -32,6 +32,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
@@ -84,7 +85,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             if not self.training_form.errors:
                 success_messages = self.get_success_msg_updated_trainings(updated_trainings)
-                success_messages += self.get_success_msg_deleted_trainings(deleted_trainings)
+                success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
                 display_success_messages(request, success_messages, extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
@@ -205,7 +206,20 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return [self._get_success_msg_updated_training(identity) for identity in training_identites]
 
     def get_success_msg_deleted_trainings(self, trainings_identities: List['TrainingIdentity']) -> List[str]:
-        return [self._get_success_msg_deleted_training(identity) for identity in trainings_identities]
+        last_identity = trainings_identities[-1]
+        is_new_end_year_lower_than_initial_one = operator.is_year_lower(
+            self.training_form.cleaned_data["end_year"].year if self.training_form.cleaned_data["end_year"] else None,
+            self.training_form.initial['end_year']
+        )
+        if is_new_end_year_lower_than_initial_one:
+            delete_message = _(
+                "Training %(acronym)s successfully deleted from %(academic_year)s."
+            ) % {
+                "acronym": last_identity.acronym,
+                "academic_year": display_as_academic_year(self.training_form.cleaned_data["end_year"].year + 1)
+            }
+            return [delete_message]
+        return []
 
     def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity') -> str:
         link = reverse_with_get(
@@ -217,12 +231,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "link": link,
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),
-        }
-
-    def _get_success_msg_deleted_training(self, training_identity: 'TrainingIdentity') -> str:
-        return _("Training %(acronym)s (%(academic_year)s) successfully deleted.") % {
-            "acronym": training_identity.acronym,
-            "academic_year": display_as_academic_year(training_identity.year)
         }
 
     def _get_default_error_messages(self) -> str:

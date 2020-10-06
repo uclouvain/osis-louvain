@@ -314,6 +314,10 @@ msgstr "Et"
 msgid "Annual"
 msgstr "Annuel"
 
+msgctxt "female"
+msgid "Annual"
+msgstr "Annuelle"
+
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
 
@@ -416,6 +420,12 @@ msgstr "Début inscriptions aux examens"
 
 msgid "Benefits and organization"
 msgstr "Atouts et organisation"
+
+msgid "Biennial even"
+msgstr "Bisannuelle paire"
+
+msgid "Biennial odd"
+msgstr "Bisannuelle impaire"
 
 msgid "Birth Date"
 msgstr "Date de naissance"

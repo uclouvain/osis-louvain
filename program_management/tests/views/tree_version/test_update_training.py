@@ -216,6 +216,8 @@ class TestTrainingVersionUpdatePostView(TestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
+    @mock.patch("program_management.views.tree_version.update_training.TrainingVersionUpdateView."
+                "display_delete_messages", return_vlaue=None)
     @mock.patch('program_management.views.tree_version.update_training.TrainingVersionUpdateView'
                 '._convert_form_to_update_training_version_command', return_value=None)
     @mock.patch('program_management.views.tree_version.update_training.version'

@@ -29,14 +29,13 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
 from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, PostponeProgramTreeCommand, \
-    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateProgramTreeVersionEndDateCommand
+from program_management.ddd import command as pgm_cmd
 from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service, \
     update_program_tree_version_end_date_service
 
 
 def postpone_mini_training_and_program_tree_modifications(
-        update_command: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+        update_command: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:
     update_program_tree_version_end_date_service.update_program_tree_version_end_date(
         __convert_to_update_program_tree_version_end_date_command(update_command)
@@ -52,7 +51,7 @@ def postpone_mini_training_and_program_tree_modifications(
         consistency_error = e
 
     postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
+        pgm_cmd.PostponeProgramTreeCommand(
             from_code=update_command.code,
             from_year=update_command.year,
             offer_acronym=update_command.abbreviated_title,
@@ -60,7 +59,7 @@ def postpone_mini_training_and_program_tree_modifications(
     )
 
     postpone_tree_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
+        pgm_cmd.PostponeProgramTreeVersionCommand(
             from_offer_acronym=update_command.abbreviated_title,
             from_version_name="",
             from_year=update_command.year,
@@ -73,7 +72,7 @@ def postpone_mini_training_and_program_tree_modifications(
 
 
 def __convert_to_postpone_mini_training_and_group_modification_command(
-        mini_training_cmd: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+        mini_training_cmd: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> command.PostponeMiniTrainingAndGroupModificationCommand:
     return command.PostponeMiniTrainingAndGroupModificationCommand(
         code=mini_training_cmd.code,
@@ -98,9 +97,9 @@ def __convert_to_postpone_mini_training_and_group_modification_command(
 
 
 def __convert_to_update_program_tree_version_end_date_command(
-        cmd: PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
-) -> UpdateProgramTreeVersionEndDateCommand:
-    return UpdateProgramTreeVersionEndDateCommand(
+        cmd: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+) -> pgm_cmd.UpdateProgramTreeVersionEndDateCommand:
+    return pgm_cmd.UpdateProgramTreeVersionEndDateCommand(
         from_offer_acronym=cmd.abbreviated_title,
         from_version_name="",
         from_year=cmd.year,

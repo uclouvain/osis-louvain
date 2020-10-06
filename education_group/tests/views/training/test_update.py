@@ -64,6 +64,8 @@ class TestTrainingUpdateView(TestCase):
         self.assertTrue("training_form" in context)
         self.assertTemplateUsed(response, "education_group_app/training/upsert/update.html")
 
+    @mock.patch("education_group.views.training.update.TrainingUpdateView."
+                "get_success_msg_deleted_trainings", return_value=[])
     @mock.patch("education_group.views.training.update.TrainingUpdateView.get_training_obj")
     @mock.patch("education_group.ddd.service.read.get_group_service.get_group")
     @mock.patch("education_group.views.training.update.TrainingUpdateView.update_training")
@@ -76,7 +78,8 @@ class TestTrainingUpdateView(TestCase):
             delete_training,
             update_training,
             mock_get_group,
-            mock_get_training
+            mock_get_training,
+            *mocks
     ):
         mock_get_training.return_value = TrainingFactory()
         mock_get_group.return_value = GroupFactory()

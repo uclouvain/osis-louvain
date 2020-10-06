@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 15:02+0200\n"
+"POT-Creation-Date: 2020-10-01 14:32+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -290,6 +290,7 @@ msgstr "Mode d'évaluation des acquis des étudiants"
 msgid "Export"
 msgstr "Exporter"
 
+#, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
 "program."
@@ -300,8 +301,8 @@ msgstr[0] ""
 "La finalité \"%(acronym)s\" a une date de fin plus grande que la formation "
 "%(root_acronym)s."
 msgstr[1] ""
-"Les finalités \"%(acronym)s\" ont une date de fin plus grande que la formation "
-"%(root_acronym)s."
+"Les finalités \"%(acronym)s\" ont une date de fin plus grande que la "
+"formation %(root_acronym)s."
 
 msgid "Firstname"
 msgstr "Prénom"
@@ -436,6 +437,13 @@ msgstr "Obligatoire"
 
 msgid "Mini-Training"
 msgstr "Mini-Formation"
+
+msgid ""
+"Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
+msgstr ""
+"La mini-formation %(offer_acronym)s[%(acronym)s] "
+"a été supprimée avec succés à partir de %(academic_year)s."
 
 #, python-format
 msgid ""
@@ -794,6 +802,13 @@ msgstr "Intitulé en français"
 
 msgid "Training"
 msgstr "Formation"
+
+msgid ""
+"Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
+"%(academic_year)s."
+msgstr ""
+"La formation %(offer_acronym)s[%(acronym)s] "
+"a été supprimée avec succés à partir de %(academic_year)s."
 
 #, python-format
 msgid ""
