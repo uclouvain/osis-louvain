@@ -26,6 +26,8 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Case, When, Q, Value, CharField
+from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -33,6 +35,7 @@ from reversion.admin import VersionAdmin
 from base.models import entity_version
 from base.models.campus import Campus
 from base.models.entity import Entity
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -49,6 +52,48 @@ class GroupYearVersionManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(educationgroupversion__isnull=False).select_related(
             'group', 'educationgroupversion'
+        )
+
+
+class GroupYearQuerySet(models.QuerySet):
+    def annotate_full_titles(self):
+        return self.annotate(
+            full_title_fr=Case(
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories())
+                    & Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
+                    then=Concat(
+                        'educationgroupversion__offer__title',
+                        Value(' ['),
+                        'educationgroupversion__title_fr',
+                        Value(']')
+                    )
+                ),
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories()),
+                    then='educationgroupversion__offer__title'
+                ),
+                default='title_fr',
+                output_field=CharField(),
+            ),
+            full_title_en=Case(
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories())
+                    & Q(educationgroupversion__title_en__isnull=False) & ~Q(educationgroupversion__title_en=''),
+                    then=Concat(
+                        'educationgroupversion__offer__title_english',
+                        Value(' ['),
+                        'educationgroupversion__title_en',
+                        Value(']')
+                    )
+                ),
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories()),
+                    then='educationgroupversion__offer__title_english'
+                ),
+                default='title_en',
+                output_field=CharField(),
+            )
         )
 
 
@@ -156,8 +201,8 @@ class GroupYear(models.Model):
         on_delete=models.PROTECT
     )
 
-    objects = GroupYearManager()
-    objects_version = GroupYearVersionManager()
+    objects = GroupYearManager.from_queryset(GroupYearQuerySet)()
+    objects_version = GroupYearVersionManager.from_queryset(GroupYearQuerySet)()
 
     class Meta:
         unique_together = ("partial_acronym", "academic_year")
@@ -181,8 +226,20 @@ class GroupYear(models.Model):
             result = self.group.delete()
         return result
 
-    @property
-    def complete_title(self):
+    def get_full_title_fr(self):
+        if self.education_group_type.category in Categories.training_categories():
+            full_title_fr = self.educationgroupversion.offer.title
+            if self.educationgroupversion.title_fr:
+                full_title_fr += "[ " + self.educationgroupversion.title_fr + " ]"
+            return full_title_fr
+        return self.title_fr
+
+    def get_full_title_en(self):
+        if self.education_group_type.category in Categories.training_categories():
+            full_title_en = self.educationgroupversion.offer.title_english
+            if self.educationgroupversion.title_en:
+                full_title_en += "[ " + self.educationgroupversion.title_en + " ]"
+            return full_title_en
         return self.title_fr
 
     @property

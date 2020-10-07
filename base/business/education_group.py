@@ -122,14 +122,15 @@ def prepare_xls_content(found_education_groups: List[GroupYear]) -> List:
     return [extract_xls_data_from_education_group(eg) for eg in found_education_groups]
 
 
-def extract_xls_data_from_education_group(an_education_group: GroupYear) -> List:
+def extract_xls_data_from_education_group(group_year: GroupYear) -> List:
+    """ At this stage, the group_year has been annotated with property complete_title_fr / full_title_fr"""
     return [
-        an_education_group.academic_year.name,
-        an_education_group.complete_title_fr,
-        an_education_group.title,
-        an_education_group.education_group_type,
-        an_education_group.management_entity_version.acronym if an_education_group.management_entity_version else '',
-        an_education_group.partial_acronym
+        group_year.academic_year.name,
+        group_year.complete_title_fr,
+        group_year.full_title_fr,
+        group_year.education_group_type,
+        group_year.management_entity_version.acronym if group_year.management_entity_version else '',
+        group_year.partial_acronym
     ]
 
 

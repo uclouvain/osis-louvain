@@ -85,8 +85,8 @@
                         {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
                     <div class="col-md-6">
-                        {% bootstrap_label form.title_fr.label %}
-                        {% bootstrap_field form.title_fr show_label=False %}
+                        {% bootstrap_label form.full_title_fr.label %}
+                        {% bootstrap_field form.full_title_fr show_label=False %}
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
@@ -205,7 +205,7 @@
                         return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
-                {"name": "title", "targets": 2, "data": "title"},
+                {"name": "full_title_fr", "targets": 2, "data": "full_title_fr"},
                 {"name": "type", "targets": 3,  "data": "education_group_type_text"},
                 {"name": "management_entity", "targets": 4, "data": "management_entity"},
                 {"name": "code", "targets": 5, "data": "code"}

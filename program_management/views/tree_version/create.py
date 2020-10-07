@@ -170,8 +170,8 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
         version_name=form.cleaned_data.get("version_name"),
         year=form.tree_version_identity.year,
         is_transition=False,
-        title_en=form.cleaned_data.get("title_english"),
-        title_fr=form.cleaned_data.get("title"),
+        title_en=form.cleaned_data.get("version_title_en"),
+        title_fr=form.cleaned_data.get("version_title_fr"),
         end_year=form.cleaned_data.get("end_year"),
     )
 

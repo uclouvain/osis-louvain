@@ -27,11 +27,13 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
+from base.models.enums.education_group_categories import Categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 
 
 class TestGroupYear(TestCase):
@@ -42,9 +44,25 @@ class TestGroupYear(TestCase):
                          "{} ({})".format(group_yr.acronym,
                                           group_yr.academic_year))
 
-    def test_complete_title(self):
-        group_year = GroupYearFactory()
-        self.assertEqual(group_year.complete_title, group_year.title_fr)
+    def test_get_full_title_fr_case_group_type(self):
+        group_year = GroupYearFactory(education_group_type__category=Categories.GROUP)
+        self.assertEqual(group_year.get_full_title_fr(), group_year.title_fr)
+
+    def test_get_full_title_en_case_group_type(self):
+        group_year = GroupYearFactory(education_group_type__category=Categories.GROUP)
+        self.assertEqual(group_year.get_full_title_en(), group_year.title_en)
+
+    def test_get_full_title_fr_case_standard_training_type(self):
+        standard_version = StandardEducationGroupVersionFactory()
+
+        expected_title = standard_version.offer.title + "[ " + standard_version.title_fr + " ]"
+        self.assertEqual(standard_version.root_group.get_full_title_fr(), expected_title)
+
+    def test_get_full_title_en_case_standard_training_type(self):
+        standard_version = StandardEducationGroupVersionFactory()
+
+        expected_title = standard_version.offer.title_english + "[ " + standard_version.title_en + " ]"
+        self.assertEqual(standard_version.root_group.get_full_title_en(), expected_title)
 
 
 class TestGroupYearSave(TestCase):

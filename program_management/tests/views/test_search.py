@@ -52,7 +52,7 @@ from program_management.tests.factories.education_group_version import Education
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
 
-FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
+FILTER_DATA = {"acronym": ["LBIR"], "full_title_fr": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
 TITLE_EDPH3 = "Edph training 3 [120], sciences"
 
@@ -332,7 +332,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
                           '{}$'.format(self.group_year_edph2.title_fr)
                           ]
         for search_string in search_strings:
-            response = self.client.get(self.url, data={"title_fr": search_string})
+            response = self.client.get(self.url, data={"full_title_fr": search_string})
 
             self.assertTemplateUsed(response, SEARCH_TEMPLATE)
 
@@ -340,9 +340,9 @@ class TestEducationGroupDataSearchFilter(TestCase):
             self.assertIsInstance(context["form"], self.form_class)
             self.assertCountEqual(context["object_list"], [self.group_year_edph2])
 
-    def test_search_with_title_regex(self):
+    def test_search_with_full_title_regex(self):
         search_strings = ['^Edph training ',
-                          ', sciences$',
+                          '{}]$'.format(self.group_year_edph3.educationgroupversion.title_fr),
                           '^ph trai',
                           '120',
                           '[120]'
@@ -356,7 +356,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         ]
 
         for idx, search_string in enumerate(search_strings):
-            response = self.client.get(self.url, data={"title_fr": search_string})
+            response = self.client.get(self.url, data={"full_title_fr": search_string})
 
             self.assertTemplateUsed(response, SEARCH_TEMPLATE)
 
