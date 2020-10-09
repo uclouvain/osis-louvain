@@ -384,7 +384,6 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
 
 class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
-
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),
@@ -392,12 +391,18 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
         disabled=True,
         required=False
     )
+    academic_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_("Validity"),
+        required=False,
+        disabled=True,
+        to_field_name="year"
+    )
 
     def __init__(self, *args, event_perm_obj=None, **kwargs):
         self.event_perm_obj = event_perm_obj
 
         super().__init__(*args, **kwargs)
-        self.fields["academic_year"].label = _('Validity')
         self.__init_end_year_field()
         self.__init_certificate_aims_field()
 

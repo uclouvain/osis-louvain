@@ -183,13 +183,17 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
         required=False,
         to_field_name="year"
     )
+    academic_year = forms.ModelChoiceField(
+        queryset=AcademicYear.objects.all(),
+        label=_("Validity"),
+        required=False,
+        disabled=True,
+        to_field_name="year"
+    )
 
     def __init__(self, *args, event_perm_obj=None, **kwargs):
         self.event_perm_obj = event_perm_obj
-
         super().__init__(*args, **kwargs)
-        self.fields["academic_year"].label = _('Validity')
-        self.fields["academic_year"].disabled = True
         self.__init_end_year_field()
 
     def __init_end_year_field(self):
