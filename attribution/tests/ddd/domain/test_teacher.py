@@ -44,3 +44,26 @@ class TestInitTeacher(SimpleTestCase):
             first_name=" Machin",
         )
         self.assertEqual(obj.full_name, 'TRUC Machin')
+
+
+class TestTeacherHash(SimpleTestCase):
+
+    def test_assert_equals(self):
+        obj_1 = TeacherFactory(
+            last_name="Truc",
+            first_name="Machin",
+            middle_name="Chose"
+        )
+        obj_2 = TeacherFactory(
+            last_name="Truc",
+            first_name="Machin",
+            middle_name="Chose"
+        )
+
+        self.assertEqual(obj_1, obj_2)
+
+    def test_assert_not_equals(self):
+        obj_1 = TeacherFactory()
+        obj_2 = TeacherFactory()
+
+        self.assertNotEqual(obj_1, obj_2)

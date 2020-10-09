@@ -46,7 +46,7 @@ class TestStr(SimpleTestCase):
             parent=NodeGroupYearFactory(code='parent', year=2019),
             child=NodeLearningUnitYearFactory(code='child', year=2018)
         )
-        expected_result = 'parent (2019) - child (2018)'
+        expected_result = 'parent (2019-20) - child (2018-19)'
         self.assertEqual(expected_result, str(link))
 
 

@@ -109,10 +109,10 @@ class TestStr(SimpleTestCase):
         self.node_learning_unit = NodeLearningUnitYearFactory(code=code, year=year)
 
     def test_node_group_year_str(self):
-        self.assertEqual(str(self.node_group_year), 'Code (2019)')
+        self.assertEqual(str(self.node_group_year), 'Code (2019-20)')
 
     def test_node_learning_unit_str(self):
-        self.assertEqual(str(self.node_learning_unit), 'Code (2019)')
+        self.assertEqual(str(self.node_learning_unit), 'Code (2019-20)')
 
 
 class TestGetChildrenTypes(SimpleTestCase):

@@ -465,6 +465,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             organization_name=cleaned_data['teaching_campus'].organization.name
             if cleaned_data["teaching_campus"] else None,
             schedule_type=cleaned_data["schedule_type"],
+            decree_category=cleaned_data["decree_category"]
         )
 
     # TODO : pull out this in a dedicated view for aims

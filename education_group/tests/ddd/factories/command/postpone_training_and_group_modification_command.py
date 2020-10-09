@@ -28,6 +28,7 @@ import operator
 import factory.fuzzy
 
 from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -92,3 +93,4 @@ class PostponeTrainingAndGroupModificationCommandFactory(factory.Factory):
     remark_en = None
     can_be_funded = True
     organization_name = factory.Sequence(lambda n: 'Organization%d' % n)
+    decree_category = DecreeCategories.BAC.name

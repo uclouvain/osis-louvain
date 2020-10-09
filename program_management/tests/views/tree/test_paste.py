@@ -37,6 +37,7 @@ from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -248,39 +249,26 @@ class TestPasteNodeView(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/paste_inner.html')
 
-    @mock.patch('program_management.ddd.repositories.node.NodeRepository.get')
-    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    def test_format_title_version_when_unavailable(self, mock_get_tree, mock_get_node):
-        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
 
-        mock_get_node.return_value = subgroup_to_attach
-        mock_get_tree.return_value = ProgramTreeFactory()
-
-        # To path :  BIR1BA ---> LBIR101G
-        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        with self.assertRaises(osis_common.ddd.interface.BusinessException):
-            self.client.get(
-                self.url,
-                data={
-                    "path": path,
-                    "codes": [subgroup_to_attach.code],
-                    "year": subgroup_to_attach.year
-                }
-            )
-
-
-@override_flag('education_group_update', active=True)
 class TestPasteWithCutView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.root_element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.group_type = GroupEducationGroupTypeFactory()
+        cls.root_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type=cls.group_type
+        )
         cls.group_element_year = GroupElementYearFactory(
             parent_element__group_year__academic_year=cls.academic_year,
-            child_element__group_year__academic_year=cls.academic_year
+            parent_element__group_year__education_group_type=cls.group_type,
+
+            child_element__group_year__academic_year=cls.academic_year,
+            child_element__group_year__education_group_type=cls.group_type,
         )
         cls.selected_element = ElementGroupYearFactory(
-            group_year__academic_year=cls.academic_year
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type=cls.group_type
         )
         GroupElementYearFactory(
             parent_element=cls.root_element,

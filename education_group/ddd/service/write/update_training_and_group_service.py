@@ -25,6 +25,7 @@ from django.db import transaction
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
+from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -130,7 +131,8 @@ def __convert_command_to_update_training_data(cmd: command.UpdateTrainingAndGrou
             professional_title=cmd.professional_title,
             aims=None
         ),
-        schedule_type=ScheduleTypeEnum[cmd.schedule_type]
+        schedule_type=ScheduleTypeEnum[cmd.schedule_type],
+        decree_category=DecreeCategories[cmd.decree_category] if cmd.decree_category else None
     )
 
 

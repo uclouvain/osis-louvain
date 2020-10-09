@@ -87,7 +87,11 @@
         <div class="row">
             <div id="decree_category" class="col-md-12">
                 {% bootstrap_label _("Decree category") label_class='d-block'%}
-                <p>{{ education_group_year.decree_category.name }} - {{ education_group_year.decree_category.value }}</p>
+                <p>
+                    {% if education_group_year.decree_category.value %}
+                        {{ education_group_year.decree_category.name }} - {{ education_group_year.decree_category.value }}
+                    {% endif %}
+                </p>
             </div>
         </div>
         <br>

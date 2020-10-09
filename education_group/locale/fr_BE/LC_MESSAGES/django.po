@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-02 11:25+0200\n"
+"POT-Creation-Date: 2020-10-07 14:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,9 +15,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-msgid "with certificate aims"
-msgstr "avec attendus du diplôme"
 
 #, python-format
 msgid ""
@@ -473,10 +470,11 @@ msgstr "Mini formation"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
 msgid "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La mini-formation %(acronym)s a été supprimée avec succès "
-"à partir de %(academic_year)s."
+"La mini-formation %(acronym)s a été supprimée avec succès à partir de "
+"%(academic_year)s."
 
 #, python-format
 msgid ""
@@ -723,10 +721,11 @@ msgstr "Intitulés"
 msgid "Training"
 msgstr "Formation"
 
+#, python-format
 msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
-"La formation %(acronym)s a été supprimée avec succès à partir "
-"de %(academic_year)s."
+"La formation %(acronym)s a été supprimée avec succès à partir de "
+"%(academic_year)s."
 
 #, python-format
 msgid ""
@@ -942,3 +941,6 @@ msgstr "indéfini"
 
 msgid "unspecified"
 msgstr "indéterminé"
+
+msgid "with certificate aims"
+msgstr "avec attendus du diplôme"

@@ -26,6 +26,7 @@
 import factory.fuzzy
 
 from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 
@@ -89,3 +90,4 @@ class UpdateTrainingAndGroupCommandFactory(factory.Factory):
     can_be_funded = None
     organization_name = "ORG"
     schedule_type = ScheduleTypeEnum.DAILY.name
+    decree_category = DecreeCategories.BAC.name

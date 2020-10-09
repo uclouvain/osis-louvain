@@ -23,53 +23,84 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
-from mock import patch
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from program_management.ddd.validators._match_version import MatchVersionValidator
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree import tree_builder
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    SpecificProgramTreeVersionFactory
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository, \
+    get_fake_program_tree_version_repository
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
 class TestMatchVersionValidator(TestValidatorValidateMixin, SimpleTestCase):
-
     def setUp(self):
-        self.academic_year = AcademicYearFactory.build(current=True)
-        self.tree = ProgramTreeVersionFactory().tree
-        self.node_to_attach = ProgramTreeVersionFactory().tree.root_node
+        tree_data = {
+            "node_type": TrainingType.PGRM_MASTER_120,
+            "end_year": 2019,
+            "children": [
+                {
+                    "node_type": GroupType.FINALITY_120_LIST_CHOICE
+                },
+                {
+                    "node_type": GroupType.OPTION_LIST_CHOICE,
+                    "children": [
+                        {"node_type": MiniTrainingType.OPTION, "code": "OPTA", "year": 2019},
+                        {"node_type": MiniTrainingType.OPTION, "code": "OPTB", "year": 2019}
+                    ]
+                }
+            ]
+        }
+        self.tree = tree_builder(tree_data)
+        self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
 
-    @patch(
-        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity',
-    )
-    def test_should_not_raise_exception_when_versions_match(self, mock_node_identity):
-        identity_values = {'year': self.academic_year, 'version_name': '', 'is_transition': False}
-        mock_node_identity.side_effect = [
-            ProgramTreeVersionIdentity(offer_acronym=self.tree.root_node.code, **identity_values),
-            ProgramTreeVersionIdentity(offer_acronym=self.node_to_attach.code, **identity_values)
-        ]
-        self.assertValidatorNotRaises(MatchVersionValidator(self.tree, self.node_to_attach))
+    def test_should_not_raise_exception_when_versions_match(self):
+        tree_to_attach = tree_builder({"node_type": TrainingType.MASTER_MA_120, "end_year": 2019})
+        tree_to_attach_version = StandardProgramTreeVersionFactory(tree=tree_to_attach)
 
-    @patch(
-        'program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch.get_from_node_identity',
-    )
-    def test_should_raise_exception_when_versions_mismatch(self, mock_node_identity):
-        identity_values = {'year': self.academic_year, 'is_transition': False}
-        mock_node_identity.side_effect = [
-            ProgramTreeVersionIdentity(offer_acronym=self.tree.root_node.code, version_name='A', **identity_values),
-            ProgramTreeVersionIdentity(offer_acronym=self.node_to_attach.code, version_name='B', **identity_values)
-        ]
+        fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
+        fake_tree_version_repository = get_fake_program_tree_version_repository([
+            self.tree_version, tree_to_attach_version
+        ])
+
+        self.assertValidatorNotRaises(
+            MatchVersionValidator(
+                node_to_paste_to=self.tree.root_node,
+                node_to_add=tree_to_attach.root_node,
+                tree_repository=fake_program_tree_repository,
+                tree_version_repository=fake_tree_version_repository
+            )
+        )
+
+    def test_should_raise_exception_when_versions_mismatch(self):
+        tree_to_attach = tree_builder({"node_type": TrainingType.MASTER_MA_120, "end_year": 2019})
+        tree_to_attach_version = SpecificProgramTreeVersionFactory(tree=tree_to_attach)
+
+        fake_program_tree_repository = get_fake_program_tree_repository([self.tree, tree_to_attach])
+        fake_tree_version_repository = get_fake_program_tree_version_repository([
+            self.tree_version, tree_to_attach_version
+        ])
+
         expected_message = _(
-            '%(node_to_add)s version must be the same as %(root_node)s version'
+            "%(node_to_add)s [%(node_to_add_version)s] version must be the same as %(node_to_paste_to)s "
+            "and all of it's parent's version [%(version_mismatched)s]"
         ) % {
-            'node_to_add': "{} - {}[{}]".format(self.node_to_attach.code, self.node_to_attach.code, 'B'),
-            'root_node': "{} - {}[{}]".format(self.tree.root_node.code, self.tree.root_node.code, 'A')
+            'node_to_add': str(tree_to_attach.root_node),
+            'node_to_add_version': tree_to_attach_version.version_name,
+
+            'node_to_paste_to': str(self.tree.root_node),
+            'version_mismatched': _("Standard")
         }
 
         self.assertValidatorRaises(
-            MatchVersionValidator(self.tree, self.node_to_attach),
+            MatchVersionValidator(
+                node_to_paste_to=self.tree.root_node,
+                node_to_add=tree_to_attach.root_node,
+                tree_repository=fake_program_tree_repository,
+                tree_version_repository=fake_tree_version_repository
+            ),
             [expected_message]
         )

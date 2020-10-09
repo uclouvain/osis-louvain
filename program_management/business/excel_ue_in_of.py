@@ -65,7 +65,8 @@ from program_management.forms.custom_xls import CustomXlsForm
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd import command
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
-
+from osis_common.ddd.interface import BusinessException
+from learning_unit.ddd.repository.load_achievement import load_achievements
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -142,20 +143,9 @@ EXCLUDE_UE_KEY = 'exclude_ue'
 class EducationGroupYearLearningUnitsContainedToExcel:
 
     def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
-        self._get_program_tree_version(year, code)
+        self.program_tree_version = _get_program_tree_version(year, code)
         self._get_program_tree(year, code)
         self.custom_xls_form = custom_xls_form
-
-    def _get_program_tree_version(self, year: int, code: str):
-        get_cmd = command.GetProgramTreeVersionFromNodeCommand(
-            code=code,
-            year=year
-        )
-        try:
-            self.program_tree_version = get_program_tree_version_from_node_service.get_program_tree_version_from_node(
-                get_cmd)
-        except ProgramTreeVersionNotFoundException:
-            self.program_tree_version = None
 
     def _get_program_tree(self, year: int, code: str):
         if self.program_tree_version:
@@ -170,11 +160,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
             'title':
-                "{}{}".format(
-                    self.hierarchy.root_node.title,
-                    self.program_tree_version.version_label
-                )
-                if self.program_tree_version else self.hierarchy.root_node.title,
+                _get_xls_title(self.hierarchy, self.program_tree_version),
             'year': self.hierarchy.root_node.year
         }
 
@@ -204,8 +190,8 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
             if learning_unit_years:
                 luy = learning_unit_years[0]
 
-                link = tree.get_first_link_occurence_using_node(child_node)
                 parents_data = get_explore_parents(tree.get_parents(path))
+                link = tree.get_link(parents_data[DIRECT_GATHERING_KEY], child_node)
 
                 if not parents_data[EXCLUDE_UE_KEY]:
                     content.append(_get_optional_data(
@@ -367,7 +353,8 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
     if optional_data_needed['has_language']:
         data.append(luy.main_language)
     if optional_data_needed['has_specifications']:
-        specifications_data = _build_specifications_cols(luy.achievements, luy.specifications)
+        achievements = load_achievements(luy.acronym, luy.year)
+        specifications_data = _build_specifications_cols(achievements, luy.specifications)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
     if optional_data_needed['has_description_fiche']:
@@ -394,7 +381,7 @@ def _build_validate_html_list_to_string(value_param, method):
     return ""
 
 
-def _build_specifications_cols(achievements: List[Achievement], specifications: Specifications):
+def _build_specifications_cols(achievements: List['Achievement'], specifications: Specifications):
     dict_achievement = _build_achievements(achievements)
     return SpecificationsCols(
         themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed, html2text),
@@ -463,10 +450,13 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 
 def _build_main_gathering_label(gathering_node: 'Node') -> str:
-    return "{} - {}".format(
-        gathering_node.title,
-        gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr) \
-        if gathering_node else ''
+    if gathering_node:
+        pgm_tree_version = _get_program_tree_version(gathering_node.year, gathering_node.code)
+        return "{}{} - {}".format(
+            gathering_node.title,
+            pgm_tree_version.version_label if pgm_tree_version else '',
+            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr)
+    return '-'
 
 
 def volumes_information(lecturing_volume, practical_volume):
@@ -514,3 +504,22 @@ def _get_distinct_teachers(luy):
         if attribution.teacher not in teachers:
             teachers.append(attribution.teacher)
     return teachers
+
+
+def _get_program_tree_version(year: int, code: str):
+    get_cmd = command.GetProgramTreeVersionFromNodeCommand(
+        code=code,
+        year=year
+    )
+    try:
+        return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
+            get_cmd)
+    except (BusinessException, ProgramTreeVersionNotFoundException):
+        return None
+
+
+def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
+    return "{}{}".format(
+        tree.root_node.title,
+        program_tree_version.version_label
+    ) if program_tree_version else tree.root_node.title

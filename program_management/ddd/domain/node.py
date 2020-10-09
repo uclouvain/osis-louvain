@@ -40,6 +40,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
@@ -190,7 +191,7 @@ class Node(interface.Entity):
         return NodeIdentity(self.code, self.year)
 
     def __str__(self):
-        return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
+        return '%(code)s (%(year)s)' % {'code': self.code, 'year': display_as_academic_year(self.year)}
 
     @property
     def pk(self):

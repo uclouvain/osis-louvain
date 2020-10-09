@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-01 14:32+0200\n"
+"POT-Creation-Date: 2020-10-07 11:17+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -35,8 +35,14 @@ msgid "%(node)s has been moved"
 msgstr "%(node)s a été déplacé"
 
 #, python-format
-msgid "%(node_to_add)s version must be the same as %(root_node)s version"
-msgstr "La version de %(node_to_add)s doit être la même que %(root_node)s."
+msgid ""
+"%(node_to_add)s [%(node_to_add_version)s] version must be the same as "
+"%(node_to_paste_to)s and all of it's parent's version "
+"[%(version_mismatched)s]"
+msgstr ""
+"La version %(node_to_add)s [%(node_to_add_version)s] doit être identique à celle de "
+"%(node_to_paste_to)s et de tous ses parents "
+"[%(version_mismatched)s]"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -232,9 +238,6 @@ msgstr "Commentaire"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "Copied element"
-msgstr "Elément copié"
-
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
 
@@ -246,9 +249,6 @@ msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "crédits"
-
-msgid "Cut element"
-msgstr "Elément coupé"
 
 msgid "Decree category"
 msgstr "Catégorie décret"
@@ -438,12 +438,13 @@ msgstr "Obligatoire"
 msgid "Mini-Training"
 msgstr "Mini-Formation"
 
+#, python-format
 msgid ""
 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
 "%(academic_year)s."
 msgstr ""
-"La mini-formation %(offer_acronym)s[%(acronym)s] "
-"a été supprimée avec succés à partir de %(academic_year)s."
+"La mini-formation %(offer_acronym)s[%(acronym)s] a été supprimée avec succés "
+"à partir de %(academic_year)s."
 
 #, python-format
 msgid ""
@@ -803,12 +804,13 @@ msgstr "Intitulé en français"
 msgid "Training"
 msgstr "Formation"
 
+#, python-format
 msgid ""
 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
 "%(academic_year)s."
 msgstr ""
-"La formation %(offer_acronym)s[%(acronym)s] "
-"a été supprimée avec succés à partir de %(academic_year)s."
+"La formation %(offer_acronym)s[%(acronym)s] a été supprimée avec succés à "
+"partir de %(academic_year)s."
 
 #, python-format
 msgid ""

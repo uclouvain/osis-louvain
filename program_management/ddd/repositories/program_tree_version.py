@@ -254,14 +254,14 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         return _search_versions_from_offer_ids(list(offer_ids))
 
     @classmethod
-    def search_all_versions_from_root_nodes(cls, node_identities: List['Node']) -> List['ProgramTreeVersion']:
+    def search_all_versions_from_root_nodes(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersion']:
         offer_ids = _search_by_node_entities(list(node_identities))
         return _search_versions_from_offer_ids(offer_ids)
 
     @classmethod
     def search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
-        root_nodes = [tree.root_node for tree in trees]
-        tree_versions = cls.search_all_versions_from_root_nodes(root_nodes)
+        root_nodes_identities = [tree.root_node.entity_id for tree in trees]
+        tree_versions = cls.search_all_versions_from_root_nodes(root_nodes_identities)
 
         result = []
         for tree_version in tree_versions:
@@ -304,7 +304,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
     )
 
 
-def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
+def _search_by_node_entities(entity_ids: List['NodeIdentity']) -> List[int]:
     if bool(entity_ids):
 
         qs = EducationGroupVersion.objects.all().values_list('offer_id', flat=True)
@@ -317,7 +317,7 @@ def _search_by_node_entities(entity_ids: List['Node']) -> List[int]:
     return []
 
 
-def _build_where_clause(node_identity: 'Node') -> Q:
+def _build_where_clause(node_identity: 'NodeIdentity') -> Q:
     return Q(
         Q(
             root_group__partial_acronym=node_identity.code,

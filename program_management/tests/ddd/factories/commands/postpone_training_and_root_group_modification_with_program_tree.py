@@ -26,6 +26,7 @@
 import factory.fuzzy
 
 from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from program_management.ddd import command
 
@@ -90,3 +91,4 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(fact
     can_be_funded = None
     organization_name = "ORG"
     schedule_type = ScheduleTypeEnum.DAILY.name
+    decree_category = DecreeCategories.BAC.name

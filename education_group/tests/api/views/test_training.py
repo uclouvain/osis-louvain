@@ -245,7 +245,8 @@ class FilterTrainingTestCase(APITestCase):
 
         versions = EducationGroupVersion.objects.filter(
             offer__education_group_type__category=education_group_categories.TRAINING,
-            offer__academic_year__year__gte=query_string['from_year']
+            offer__academic_year__year__gte=query_string['from_year'],
+            is_transition=False
         ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(

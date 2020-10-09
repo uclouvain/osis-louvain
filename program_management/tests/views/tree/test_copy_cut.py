@@ -24,7 +24,6 @@
 from unittest import mock
 
 from django import urls, http
-from django.utils.translation import gettext_lazy as _
 from django.test import TestCase
 
 from base.tests.factories.person import PersonFactory
@@ -47,25 +46,18 @@ class TestCopyToCache(TestCase):
 
     @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
     def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_ue(self, mock_copy_service):
-        response = self.client.post(self.url, data={
+        self.client.post(self.url, data={
             "element_code": "LOSIS2548",
             "element_year": 2015,
         })
         copy_command = command.CopyElementCommand(self.person.user.id, "LOSIS2548", 2015)
         mock_copy_service.assert_called_with(copy_command)
-        self.assertEqual(
-            response.json(),
-            {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
-                clipboard_title=_("Copied element"),
-                object_str="LOSIS2548 - 2015"
-            )}
-        )
 
     @mock.patch("program_management.ddd.service.write.copy_element_service.copy_element_service")
     def test_should_call_copy_element_service_when_view_is_called_via_post_request_for_group(self, mock_copy_service):
         root_node = ElementGroupYearFactory()
 
-        response = self.client.post(self.url, data={
+        self.client.post(self.url, data={
             "element_code": root_node.group_year.partial_acronym,
             "element_year": root_node.group_year.academic_year.year,
         })
@@ -74,18 +66,6 @@ class TestCopyToCache(TestCase):
                                                   root_node.group_year.academic_year.year)
 
         mock_copy_service.assert_called_with(copy_command)
-
-        self.assertEqual(
-            response.json(),
-            {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
-                clipboard_title=_("Copied element"),
-                object_str="{} - {}{} - {}".format(root_node.group_year.partial_acronym,
-                                                   root_node.group_year.acronym,
-                                                   '',
-                                                   root_node.group_year.academic_year.year
-                                                   )
-            )}
-        )
 
 
 class TestCutToCache(TestCase):
@@ -103,18 +83,11 @@ class TestCutToCache(TestCase):
 
     @mock.patch("program_management.ddd.service.write.cut_element_service.cut_element_service")
     def test_should_call_copy_element_service_when_view_is_called_via_post_request(self, mock_cut_service):
-        response = self.client.post(self.url, data={
+        self.client.post(self.url, data={
             "element_code": "WMD200M",
             "element_year": 2021,
             "path_to_detach": "DROI2033M|WMD199M",
         })
         copy_command = command.CutElementCommand(self.person.user.id, "WMD200M", 2021, "DROI2033M|WMD199M")
         mock_cut_service.assert_called_with(copy_command)
-        self.assertEqual(
-            response.json(),
-            {"success_message": "<strong>{clipboard_title}</strong><br>{object_str}".format(
-                clipboard_title=_("Cut element"),
-                object_str="WMD200M - 2021"
-            )}
-        )
 
