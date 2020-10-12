@@ -143,7 +143,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'program_management.change_training_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_program_edition_period_open,
             'program_management.delete_permanently_training_version': osis_role_predicates.always_deny(
                     message=_('Training version can only be deleted by central manager')
@@ -156,7 +156,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'program_management.change_minitraining_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_program_edition_period_open,
             'program_management.delete_permanently_minitraining_version':
                 predicates.are_all_mini_training_versions_removable,

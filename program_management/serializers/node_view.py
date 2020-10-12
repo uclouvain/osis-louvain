@@ -96,7 +96,7 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, tree: 'ProgramT
         'search_url': None,
         'has_prerequisite': link.child.has_prerequisite,
         'is_prerequisite': link.child.is_prerequisite,
-        'css_class': __get_css_class(link),
+        'class': __get_css_class(link),
         'element_type': NodeType.LEARNING_UNIT.name,
         'title': __get_title(link),
     })
@@ -104,13 +104,11 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, tree: 'ProgramT
 
 
 def __get_css_class(link: 'Link'):
-    return {
-               ProposalType.CREATION: "proposal proposal_creation",
-               ProposalType.MODIFICATION: "proposal proposal_modification",
-               ProposalType.TRANSFORMATION: "proposal proposal_transformation",
-               ProposalType.TRANSFORMATION_AND_MODIFICATION: "proposal proposal_transformation_modification",
-               ProposalType.SUPPRESSION: "proposal proposal_suppression"
-           }.get(link.child.proposal_type) or ""
+    return {ProposalType.CREATION.name: "proposal proposal_creation",
+            ProposalType.MODIFICATION.name: "proposal proposal_modification",
+            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
+            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
+            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"}.get(link.child.proposal_type) or ""
 
 
 def __get_title(obj: 'Link') -> str:
