@@ -118,11 +118,11 @@
     <div id="clipboard" class="alert alert-info " role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
         <div style="display: inline-block;">
             <div class="pull-right">
-                <button type="button" class="close clear-clipboard" data-url="{% url "education_group_clear_clipboard" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                <button type="button" class="close clear-clipboard" data-url="{% url "clear_element_selected" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
                     <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
                 </button>
             </div>
-            <div id="clipboard_content" class="pull-left">
+            <div class="body pull-left">
                 {{ selected_element_clipboard | safe }}
             </div>
         </div>

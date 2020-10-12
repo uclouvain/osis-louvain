@@ -127,7 +127,11 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
     def get_path(self) -> str:
         path = self.request.GET.get('path')
         if path is None:
-            root_element = Element.objects.get(group_year__educationgroupversion__offer_id=self.kwargs['offer_id'])
+            root_element = Element.objects.get(
+                group_year__educationgroupversion__offer_id=self.kwargs['offer_id'],
+                group_year__educationgroupversion__version_name='',
+                group_year__educationgroupversion__is_transition=False
+            )
             path = str(root_element.pk)
         return path
 

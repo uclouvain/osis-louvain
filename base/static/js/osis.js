@@ -145,10 +145,12 @@ var browser_supported_versions = {
 
 
 function displayInfoMessage(jsonResponse, containerId) {
-    let message_info_container = document.getElementById(containerId);
-    message_info_container.innerHTML = jsonResponse['success_message'];
-    message_info_container.style.display = "block";
-    message_info_container.style.visibility = "visible";
+    let messageInfoContainer = document.getElementById(containerId);
+
+    let bodyContainer = messageInfoContainer.querySelector(".body") ?? messageInfoContainer;
+    bodyContainer.innerHTML = jsonResponse['success_message'];
+    messageInfoContainer.style.display = "block";
+    messageInfoContainer.style.visibility = "visible";
 }
 
 function displaySuccessMessage(message) {

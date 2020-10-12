@@ -32,8 +32,6 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import QueryDict
 
-from osis_common.decorators.deprecated import deprecated
-
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
