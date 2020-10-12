@@ -85,6 +85,7 @@ urlpatterns = [
          tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('clear_element_selected/', tree.copy_cut.clear_element_selected, name='clear_element_selected'),
     path('<int:year>/quick_search/', include([
         path(
             'learning_unit/',

@@ -24,9 +24,13 @@
 from unittest import mock
 
 from django import urls, http
+from django.http import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse
 from django.test import TestCase
+from django.urls import reverse
 
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
+from base.utils.cache import ElementCache
 from program_management.ddd import command
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -91,3 +95,41 @@ class TestCutToCache(TestCase):
         copy_command = command.CutElementCommand(self.person.user.id, "WMD200M", 2021, "DROI2033M|WMD199M")
         mock_cut_service.assert_called_with(copy_command)
 
+
+class TestClearElementSelected(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("clear_element_selected")
+        cls.person = PersonFactory()
+
+    def setUp(self) -> None:
+        self.client.force_login(self.person.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+
+        response = self.client.post(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_with_permission_get_method(self):
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "method_not_allowed.html")
+        self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    def test_user_with_permission_post_method_not_ajax(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+
+    def test_user_with_permission_post_method_ajax(self):
+        response = self.client.post(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, JsonResponse.status_code)
+
+    def test_clipboard_is_cleared(self):
+        luy = LearningUnitYearFactory()
+
+        element_cache = ElementCache(self.person.user_id)
+        element_cache.save_element_selected(luy.acronym, luy.academic_year.year)
+        self.assertTrue(element_cache.cached_data)
+        self.client.post(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertIsNone(element_cache.cached_data)

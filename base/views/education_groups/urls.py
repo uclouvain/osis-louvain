@@ -26,7 +26,6 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
-from base.views.education_groups.clear_clipboard import clear_clipboard
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
@@ -34,11 +33,6 @@ from education_group import urls as education_group_urls
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
-    url(
-        r'^clear_clipboard/$',
-        clear_clipboard,
-        name='education_group_clear_clipboard'
-    ),
     url(r'^(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),

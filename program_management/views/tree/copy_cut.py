@@ -22,9 +22,10 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_http_methods, require_POST
 
+from base.utils.cache import ElementCache
 from education_group.views.mixin import ElementSelectedClipBoardSerializer
 
 from program_management.ddd import command
@@ -55,3 +56,12 @@ def cut_to_cache(request):
 
     success_msg = ElementSelectedClipBoardSerializer(request).get_selected_element_clipboard_message()
     return JsonResponse({'success_message': success_msg})
+
+
+@login_required
+@require_POST
+def clear_element_selected(request):
+    if request.is_ajax():
+        ElementCache(request.user.pk).clear()
+        return JsonResponse({})
+    return HttpResponseBadRequest()
