@@ -42,12 +42,12 @@ class EntityVersionAddressAdmin(VersionAdmin, OsisModelAdmin):
 
 class EntityVersionAddress(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
-    city = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=255)
     street = models.CharField(max_length=255, blank=True)
     street_number = models.CharField(max_length=12, blank=True)
     postal_code = models.CharField(max_length=32, blank=True)
     state = models.CharField(max_length=255, blank=True)
-    country = models.ForeignKey('reference.Country', on_delete=models.PROTECT, blank=True, null=True)
+    country = models.ForeignKey('reference.Country', on_delete=models.PROTECT)
     entity_version = models.ForeignKey('EntityVersion', on_delete=models.PROTECT)
     location = PointField(blank=True, null=True)
     is_main = models.BooleanField(default=False)
