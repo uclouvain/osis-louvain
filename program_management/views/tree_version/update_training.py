@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -11,6 +11,7 @@ from django.views import View
 
 from base.models import entity_version
 from base.utils import operator
+from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from education_group.ddd import command as command_education_group
@@ -72,9 +73,11 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         return self.get(request, *args, **kwargs)
 
     def get_success_url(self) -> str:
-        return reverse(
+        get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
+        return reverse_with_get(
             'element_identification',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
+            get=get_data
         )
 
     def display_success_messages(self, identities: List['ProgramTreeVersionIdentity']) -> None:

@@ -229,11 +229,12 @@ class TestTrainingVersionUpdatePostView(TestCase):
                 '.update_and_postpone_training_version', return_value=[])
     def test_assert_update_training_service_called(self, mock_update_training, mock_program_tree_version_repo, *mock):
         mock_program_tree_version_repo.return_value = self.training_version_obj
-        response = self.client.post(self.url, {})
+        url_with_querystring = self.url + "?path_to=123786|5656565"
 
+        response = self.client.post(url_with_querystring, {})
         expected_redirect = reverse(
             'element_identification',
             kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
-        )
+        ) + "?path=123786|5656565"
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
         self.assertTrue(mock_update_training.called)

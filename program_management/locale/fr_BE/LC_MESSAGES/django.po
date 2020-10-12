@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-07 11:17+0200\n"
+"POT-Creation-Date: 2020-10-09 11:09+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -40,9 +40,8 @@ msgid ""
 "%(node_to_paste_to)s and all of it's parent's version "
 "[%(version_mismatched)s]"
 msgstr ""
-"La version %(node_to_add)s [%(node_to_add_version)s] doit être identique à celle de "
-"%(node_to_paste_to)s et de tous ses parents "
-"[%(version_mismatched)s]"
+"La version %(node_to_add)s [%(node_to_add_version)s] doit être identique à "
+"celle de %(node_to_paste_to)s et de tous ses parents [%(version_mismatched)s]"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -238,6 +237,9 @@ msgstr "Commentaire"
 msgid "Content"
 msgstr "Contenu"
 
+msgid "Continue"
+msgstr "Continuer"
+
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
 
@@ -360,6 +362,24 @@ msgstr "Stage"
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
+
+#, python-format
+msgctxt "female"
+msgid ""
+"It is impossible to create a %(category)s under a parent type of "
+"%(parent_type)s"
+msgstr ""
+"Il n'est pas possible de créer une %(category)s sous un parent de type "
+"%(parent_type)s"
+
+#, python-format
+msgctxt "male"
+msgid ""
+"It is impossible to create a %(category)s under a parent type of "
+"%(parent_type)s"
+msgstr ""
+"Il n'est pas possible de créer un %(category)s sous un parent de type "
+"%(parent_type)s"
 
 #, python-format
 msgid ""

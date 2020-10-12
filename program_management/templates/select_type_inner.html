@@ -25,15 +25,21 @@
 
 <div class="modal-content" id="form-modal-content">
     <div id="form-modal-body" class="modal-body">
-        <form method="post" id="form_education_group_type" action="{{ request.path }}?{{ request.GET.urlencode }}">
-            {% csrf_token %}
-            {% bootstrap_field form.name %}
-        </form>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% else %}
+            <form method="post" id="form_education_group_type" action="{{ request.path }}?{{ request.GET.urlencode }}">
+                {% csrf_token %}
+                {% bootstrap_field form.name %}
+            </form>
+        {% endif %}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-primary"
-               onclick="$('#form_education_group_type').submit();"/>
+        {% if not error %}
+            <input type="submit" value="{% trans "Continue" %}" class="btn btn-primary"
+                   onclick="$('#form_education_group_type').submit();"/>
+        {% endif %}
     </div>
 </div>
 

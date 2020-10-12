@@ -27,10 +27,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from django.views.generic import FormView
+from django.utils.translation import pgettext_lazy
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from base.views.mixins import AjaxTemplateMixin
+from education_group.ddd import command as command_education_group
+from education_group.ddd.service.read import get_group_service
+from program_management.ddd import command as command_program_management
+from program_management.ddd.service.read import node_identity_service
 from program_management.forms.select_type import SelectTypeForm
 
 
@@ -55,6 +60,12 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
             'path_to': self.request.GET.get('path_to')
         }
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        if self.has_path_to() and len(context_data['form'].fields['name'].choices) <= 1:
+            context_data["error"] = self.get_error()
+        return context_data
+
     def form_valid(self, form):
         self.kwargs["type"] = form.cleaned_data["name"]
         return super().form_valid(form)
@@ -70,6 +81,37 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
         if self.kwargs["type"] in TrainingType.get_names():
             url = reverse('training_create', kwargs={'type': self.kwargs['type']})
 
-        if "path_to" in self.request.GET:
+        if self.has_path_to():
             url += "?path_to={}".format(self.request.GET['path_to'])
         return url
+
+    def get_error(self):
+        parent_group = self.get_parent_group_obj()
+        if self.kwargs['category'] == Categories.GROUP.name:
+            error = pgettext_lazy(
+                "male",
+                "It is impossible to create a %(category)s under a parent type of %(parent_type)s"
+            )
+        else:
+            error = pgettext_lazy(
+                "female",
+                "It is impossible to create a %(category)s under a parent type of %(parent_type)s"
+            )
+        return error % {
+            'category': str(Categories.get_value(self.kwargs['category'])).lower(),
+            'parent_type': str(parent_group.type.value).lower()
+        }
+
+    def has_path_to(self) -> bool:
+        return "path_to" in self.request.GET
+
+    def get_parent_group_obj(self) -> 'Group':
+        parent_element_id = self.request.GET['path_to'].split("|")[-1]
+        node_identity = node_identity_service.get_node_identity_from_element_id(
+            command_program_management.GetNodeIdentityFromElementId(element_id=parent_element_id)
+        )
+
+        get_cmd = command_education_group.GetGroupCommand(
+            code=node_identity.code, year=node_identity.year
+        )
+        return get_group_service.get_group(get_cmd)

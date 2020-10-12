@@ -132,6 +132,11 @@ def get_admission_condition_lines(acronym: str, year: int, language: str):
 
 def get_common_admission_condition(offer_type: str, year: int):
     try:
+        offer_type = TrainingType.PGRM_MASTER_120.name if offer_type in [
+            TrainingType.PGRM_MASTER_180_240.name,
+            TrainingType.MASTER_M1.name
+        ] else offer_type
+
         common_of_same_type = AdmissionCondition.objects.filter(
             education_group_year__acronym__startswith='common-',
             education_group_year__academic_year__year=year,
