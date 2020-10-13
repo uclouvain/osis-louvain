@@ -262,9 +262,15 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # HOPS panel
     hops_fields = ('ares_code', 'ares_graca', 'ares_authorization')
-    ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False)
-    ares_graca = forms.CharField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False)
-    ares_authorization = forms.CharField(label=_('ARES ability'), widget=forms.TextInput(), required=False)
+    ares_code = forms.IntegerField(label=_('ARES study code'), widget=forms.TextInput(), required=False,
+                                   validators=[MinValueValidator(1), MaxValueValidator(9999)],
+                                   )
+    ares_graca = forms.IntegerField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False,
+                                    validators=[MinValueValidator(1), MaxValueValidator(9999)],
+                                    )
+    ares_authorization = forms.IntegerField(label=_('ARES ability'), widget=forms.TextInput(), required=False,
+                                            validators=[MinValueValidator(1), MaxValueValidator(9999)],
+                                            )
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
         max_digits=7,
