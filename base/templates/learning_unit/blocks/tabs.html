@@ -30,7 +30,7 @@
 {% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id as url_attributions %}
 {% url 'learning_unit_specifications' learning_unit_year_id=learning_unit_year.id as url_specifications %}
 
-{% url 'learning_unit' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_identification_with_code_and_year %}
+{% url 'learning_unit' acronym=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_identification_with_code_and_year %}
 {% url 'learning_unit_formations' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_formations_with_code_and_year %}
 {% url 'learning_unit_components' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_components_with_code_and_year %}
 {% url 'learning_unit_pedagogy' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_pedagogy_with_code_and_year %}
