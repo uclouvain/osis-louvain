@@ -1,17 +1,18 @@
-from typing import Union
+from typing import List
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import formset_factory, BaseFormSet
 
+import program_management.ddd.domain.exception
+from base.forms.exceptions import InvalidFormException
 from base.forms.utils import choice_field
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
-from education_group.ddd.domain.group import Group
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
-from osis_common.ddd import interface
+from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.validators import _block_validator, _relative_credits
+from program_management.ddd.service.write import bulk_update_link_service, update_link_service
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
 class LinkForm(forms.Form):
@@ -23,7 +24,7 @@ class LinkForm(forms.Form):
     comment_fr = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     comment_en = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
-    def __init__(self, *args, parent_obj: Group = None, child_obj: Union[Group, LearningUnitYear] = None, **kwargs):
+    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):
         self.parent_obj = parent_obj
         self.child_obj = child_obj
         super().__init__(*args, **kwargs)
@@ -42,7 +43,7 @@ class LinkForm(forms.Form):
                 'comment_en',
             )
         elif self.is_a_child_minor_major_option_list_choice() and \
-                self.parent_obj.type.name in TrainingType.get_names():
+                self.parent_obj.node_type.name in TrainingType.get_names():
             fields_to_exclude = (
                 'relative_credits',
                 'is_mandatory',
@@ -63,34 +64,48 @@ class LinkForm(forms.Form):
             )
         [self.fields.pop(field_name) for field_name in fields_to_exclude]
 
-    def clean_block(self):
-        cleaned_block_type = self.cleaned_data.get('block', None)
-        try:
-            _block_validator.BlockValidator(cleaned_block_type).validate()
-        except interface.BusinessExceptions as business_exception:
-            raise ValidationError(business_exception.messages)
-        return cleaned_block_type
-
-    def clean_relative_credits(self):
-        cleaned_relative_credits = self.cleaned_data.get('relative_credits', None)
-        try:
-            _relative_credits.RelativeCreditsValidator(cleaned_relative_credits).validate()
-        except (
-                exception.RelativeCreditShouldBeGreaterOrEqualsThanZero,
-                exception.RelativeCreditShouldBeLowerOrEqualThan999
-        ) as e:
-            raise ValidationError(e.message)
-        return cleaned_relative_credits
-
     def is_a_link_with_child_of_learning_unit(self):
-        return isinstance(self.child_obj, LearningUnitYear)
+        return self.child_obj.is_learning_unit()
 
     def is_a_parent_minor_major_option_list_choice(self):
         return self.parent_obj and self.parent_obj.is_minor_major_option_list_choice()
 
     def is_a_child_minor_major_option_list_choice(self):
-        return isinstance(self.child_obj, Group) and \
-               self.child_obj.is_minor_major_option_list_choice()
+        return self.child_obj.is_minor_major_option_list_choice()
+
+    def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
+        return command.UpdateLinkCommand(
+            child_node_code=self.child_obj.code,
+            child_node_year=self.child_obj.year,
+            access_condition=self.cleaned_data.get('access_condition', False),
+            is_mandatory=self.cleaned_data.get('is_mandatory', True),
+            block=self.cleaned_data.get('block'),
+            link_type=self.cleaned_data.get('link_type'),
+            comment=self.cleaned_data.get('comment_fr'),
+            comment_english=self.cleaned_data.get('comment_en'),
+            relative_credits=self.cleaned_data.get('relative_credits'),
+            parent_node_code=self.parent_obj.code,
+            parent_node_year=self.parent_obj.year
+        )
+
+    def save(self):
+        if self.is_valid():
+            try:
+                return update_link_service.update_link(self.generate_update_link_command())
+            except MultipleBusinessExceptions as e:
+                self.handle_save_exception(e)
+        raise InvalidFormException()
+
+    def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
+        for e in business_exceptions.exceptions:
+            if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
+                    isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException):
+                self.add_error("link_type", e.message)
+            elif isinstance(e, exception.InvalidBlockException):
+                self.add_error("block", e.message)
+            elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
+                    isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
+                self.add_error("relative_credits", e.message)
 
 
 class BaseContentFormSet(BaseFormSet):
@@ -98,6 +113,29 @@ class BaseContentFormSet(BaseFormSet):
         if self.form_kwargs:
             return self.form_kwargs[index]
         return {}
+
+    def generate_bulk_update_link_command(self) -> 'command.BulkUpdateLinkCommand':
+        changed_forms = [form for form in self.forms if form.has_changed()]
+        update_link_commands = [form.generate_update_link_command() for form in changed_forms]
+
+        bulk_command = command.BulkUpdateLinkCommand(
+            parent_node_year=self.forms[0].parent_obj.year,
+            parent_node_code=self.forms[0].parent_obj.code,
+            update_link_cmds=update_link_commands
+        )
+        return bulk_command
+
+    def save(self) -> List['Link']:
+        if self.is_valid():
+            try:
+                cmd = self.generate_bulk_update_link_command()
+                return bulk_update_link_service.bulk_update_links(cmd)
+            except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
+                for form in self.forms:
+                    if e.exceptions.get(form.generate_update_link_command()):
+                        form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
+
+        raise InvalidFormException()
 
 
 ContentFormSet = formset_factory(form=LinkForm, formset=BaseContentFormSet, extra=0)

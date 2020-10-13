@@ -426,6 +426,14 @@ msgstr "Vol. PM"
 msgid "Legend"
 msgstr "Légende"
 
+#, python-format
+msgid ""
+"Link between %(parent)s and %(child)s cannot be of reference type because of "
+"its children: %(children)s"
+msgstr ""
+"Lien entre %(parent)s et %(child)s ne peut pas être de type référence à "
+"cause des enfants: %(children)s"
+
 msgid "Link type"
 msgstr "Type de lien"
 

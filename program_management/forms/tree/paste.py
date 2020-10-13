@@ -28,14 +28,13 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
-import osis_common.ddd.interface
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.exception import RelativeCreditShouldBeGreaterOrEqualsThanZero, \
-    RelativeCreditShouldBeLowerOrEqualThan999
+    RelativeCreditShouldBeLowerOrEqualThan999, InvalidBlockException
 from program_management.ddd.repositories import load_node, load_authorized_relationship, node as node_repository
 from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _block_validator, _relative_credits
@@ -101,8 +100,8 @@ class PasteNodeForm(forms.Form):
     is_mandatory = forms.BooleanField(required=False)
     block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
-    comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
-    comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
+    comment_fr = forms.CharField(widget=forms.widgets.Textarea, required=False)
+    comment_en = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
     def __init__(
@@ -123,8 +122,8 @@ class PasteNodeForm(forms.Form):
         cleaned_block_type = self.cleaned_data.get('block', None)
         try:
             _block_validator.BlockValidator(cleaned_block_type).validate()
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            raise ValidationError(business_exception.messages)
+        except InvalidBlockException as e:
+            raise ValidationError(e.message)
         return cleaned_block_type
 
     def clean_relative_credits(self):
@@ -150,8 +149,8 @@ class PasteNodeForm(forms.Form):
             is_mandatory=self.cleaned_data.get("is_mandatory", True),
             block=self.cleaned_data.get("block"),
             link_type=self.cleaned_data.get("link_type"),
-            comment=self.cleaned_data.get("comment", ""),
-            comment_english=self.cleaned_data.get("comment_english", ""),
+            comment=self.cleaned_data.get("comment_fr", ""),
+            comment_english=self.cleaned_data.get("comment_en", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
             path_where_to_detach=self.path_to_detach
         )
@@ -178,8 +177,8 @@ class PasteToMinorMajorListChoiceForm(PasteNodeForm):
     is_mandatory = None
     block = None
     link_type = None
-    comment = None
-    comment_english = None
+    comment_fr = None
+    comment_en = None
     relative_credits = None
 
     def _create_paste_command(self) -> command.PasteElementCommand:
@@ -206,8 +205,8 @@ class PasteToOptionListChoiceForm(PasteNodeForm):
     is_mandatory = None
     block = None
     link_type = None
-    comment = None
-    comment_english = None
+    comment_fr = None
+    comment_en = None
     relative_credits = None
 
 

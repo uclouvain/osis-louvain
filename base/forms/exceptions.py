@@ -21,24 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import re
-from typing import Optional
-
-from base.ddd.utils import business_validator
-from program_management.ddd.domain import exception
 
 
-class BlockValidator(business_validator.BusinessValidator):
-    def __init__(self, block: Optional[int]):
-        super().__init__()
-        self.block = block
-
-    def validate(self, *args, **kwargs):
-        if self.block is None:
-            return
-
-        block_regex = r"1?2?3?4?5?6?"
-        match_result = re.fullmatch(block_regex, str(self.block))
-
-        if not match_result:
-            raise exception.InvalidBlockException()
+class InvalidFormException(Exception):
+    pass

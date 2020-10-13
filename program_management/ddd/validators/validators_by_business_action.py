@@ -26,10 +26,9 @@
 
 import osis_common.ddd.interface
 from base.ddd.utils import business_validator
-from base.ddd.utils.business_validator import BusinessListValidator
+from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.validators import _validate_end_date_and_option_finality
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
@@ -79,7 +78,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 PasteAuthorizedRelationshipValidator(tree, node_to_paste, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
+                AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateFinalitiesEndDateAndOptions(
                     tree.get_node(path),
@@ -102,7 +101,7 @@ class PasteNodeValidatorList(business_validator.BusinessListValidator):
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_paste, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
-                AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
+                AuthorizedLinkTypeValidator(tree, node_to_paste, link_type),
                 BlockValidator(block),
                 ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path, tree_repository)
             ]
@@ -239,15 +238,15 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class UpdateLinkValidatorList(business_validator.BusinessListValidator):
+class UpdateLinkValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
-            parent_node: 'Node',
+            tree: 'ProgramTree',
             child_node: 'Node',
             link: 'Link',
     ):
         self.validators = [
-            AuthorizedLinkTypeValidator(parent_node, child_node, link.link_type),
+            AuthorizedLinkTypeValidator(tree, child_node, link.link_type),
             BlockValidator(link.block),
             RelativeCreditsValidator(link.relative_credits)
         ]

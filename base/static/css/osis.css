@@ -664,3 +664,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .cursor-not-allowed, .cursor-not-allowed * {
     cursor: not-allowed !important;
 }
+
+.modal-xl {
+    width: 1300px;
+}

@@ -392,6 +392,12 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
+#, python-format
+msgid ""
+"Link between %(parent)s and %(child)s cannot be of reference type because of "
+"its children: %(children)s"
+msgstr ""
+
 msgid "Link type"
 msgstr ""
 

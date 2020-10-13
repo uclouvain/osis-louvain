@@ -33,24 +33,17 @@
         <div id="form-modal-body" class="modal-body">
             <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}">
                 {% csrf_token %}
-                {{ form.management_form }}
-                {{ form.media }}
-                {% bootstrap_form_errors form %}
-                {% if is_parent_a_minor_major_option_list_choice %}
-                    {% include 'blocks/link_form_inner/minor_major_option_inner.html' %}
-                {% else %}
-                    {% if has_group_year_form %}
-                        {% include 'blocks/link_form_inner/group_inner.html' %}
-                    {% else %}
-                        {% include 'blocks/link_form_inner/learning_unit_inner.html' %}
-                    {% endif %}
-                {% endif %}
+                {% bootstrap_formset_errors content_formset %}
+
+                {% include "program_management/content/block/content_form_table.html" %}
+
+                {% include "blocks/modal/confirmation_modal.html" %}
             </form>
 
             <script src="{% static 'js/jquery.formset.js' %}"></script>
             <script>
                 $(document).ready(function() {
-                    document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                    document.getElementById("modal_dialog_id").classList.add("modal-xl");
                     $('.link-formset').formset({
                         prefix: '{{ formset.prefix }}',
                         addText: '',

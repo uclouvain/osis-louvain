@@ -23,6 +23,7 @@
 # ############################################################################
 import factory.fuzzy
 
+from base.tests.factories.group_element_year import _generate_block_value
 from program_management.ddd import command
 
 
@@ -37,9 +38,9 @@ class UpdateLinkCommandFactory(factory.Factory):
     child_node_code = factory.Sequence(lambda n: 'Code%02d' % n)
     child_node_year = factory.Faker("random_int")
 
-    access_condition = None
-    is_mandatory = None
-    block = None
+    access_condition = factory.Faker('pybool')
+    is_mandatory = factory.Faker('pybool')
+    block = factory.LazyFunction(_generate_block_value)
     link_type = None
     comment = ""
     comment_english = ""

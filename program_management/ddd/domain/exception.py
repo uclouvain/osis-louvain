@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Iterable, Dict, List
 
 from django.utils.translation import gettext_lazy as _
 
 from osis_common.ddd.interface import BusinessException, BusinessExceptions
 from program_management.ddd.business_types import *
+
+BLOCK_MAX_AUTHORIZED_VALUE = 6
 
 
 class RelativeCreditShouldBeGreaterOrEqualsThanZero(BusinessException):
@@ -154,3 +156,50 @@ class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException)
             "acronym": finality.title
         }
         super().__init__(message, **kwargs)
+
+
+class ReferenceLinkNotAllowedWithLearningUnitException(BusinessException):
+    def __init__(self, learning_unit_node: 'Node', **kwargs):
+        message = _("You are not allowed to create a reference with a learning unit %(child_node)s") % {
+            "child_node": learning_unit_node
+        }
+        super().__init__(message, **kwargs)
+
+
+class LinkShouldBeReferenceException(BusinessException):
+    def __init__(self, parent_node: 'Node', child_node: 'Node', **kwargs):
+        message = _("Link type should be reference between %(parent)s and %(child)s") % {
+            "parent": parent_node,
+            "child": child_node
+        }
+        super().__init__(message, **kwargs)
+
+
+class ReferenceLinkNotAllowedException(BusinessException):
+    def __init__(self, parent_node: 'Node', child_node: 'Node', reference_childrens: Iterable['Node'], **kwargs):
+        message = _(
+            "Link between %(parent)s and %(child)s cannot be of reference type "
+            "because of its children: %(children)s"
+        ) % {
+            "parent": self._format_node(parent_node),
+            "child": self._format_node(child_node),
+            "children": ", ".join([self._format_node(reference_children) for reference_children in reference_childrens])
+        }
+        super().__init__(message, **kwargs)
+
+    def _format_node(self, node: 'Node') -> str:
+        return "{} - {} ({})".format(node.title, node.code, node.node_type.value)
+
+
+class InvalidBlockException(BusinessException):
+    def __init__(self):
+        message = _(
+            "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+            "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+        ) % {'max_authorized_value': BLOCK_MAX_AUTHORIZED_VALUE}
+        super().__init__(message)
+
+
+class BulkUpdateLinkException(Exception):
+    def __init__(self, exceptions: Dict[str, 'MultipleBusinessExceptions']):
+        self.exceptions = exceptions
