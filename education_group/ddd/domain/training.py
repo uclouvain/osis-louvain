@@ -373,6 +373,7 @@ class UpdateTrainingData:
     co_graduation = attr.ib(type=CoGraduation, default=None)
     diploma = attr.ib(type=Diploma, default=None)
     decree_category = attr.ib(type=DecreeCategories, default=None)
+    rate_code = attr.ib(type=RateCode, default=None)
 
 
 @attr.s(frozen=True, slots=True, kw_only=True)

@@ -102,7 +102,8 @@ def create_and_postpone_orphan_training(create_training_cmd: command.CreateTrain
             remark_en=cmd.remark_en,
             organization_name=cmd.teaching_campus_organization_name,
             schedule_type=cmd.schedule_type,
-            decree_category=cmd.decree_category
+            decree_category=cmd.decree_category,
+            rate_code=cmd.rate_code
         )
     )
 

@@ -92,3 +92,4 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(fact
     organization_name = "ORG"
     schedule_type = ScheduleTypeEnum.DAILY.name
     decree_category = DecreeCategories.BAC.name
+    rate_code = None

@@ -642,6 +642,7 @@ class PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(interface.C
     organization_name = attr.ib(type=str)
     schedule_type = attr.ib(type=str)
     decree_category = attr.ib(type=str)
+    rate_code = attr.ib(type=Optional[str])
 
 
 @attr.s(frozen=True, slots=True)

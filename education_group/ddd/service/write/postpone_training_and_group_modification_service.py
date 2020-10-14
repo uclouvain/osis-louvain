@@ -103,6 +103,7 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
                 organization_name=postpone_cmd.organization_name,
                 schedule_type=postpone_cmd.schedule_type,
                 decree_category=postpone_cmd.decree_category,
+                rate_code=postpone_cmd.rate_code
             )
         )
     ]
