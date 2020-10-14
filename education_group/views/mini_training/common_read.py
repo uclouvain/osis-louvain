@@ -51,7 +51,6 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
@@ -108,8 +107,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @functools.lru_cache()
     def get_object(self):
@@ -136,7 +137,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "node": self.get_object(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
+            "tree_json_url": self.get_tree_json_url(),
             "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "education_group_version": self.get_education_group_version(),
             "academic_year_choices": get_academic_year_choices(
@@ -204,6 +205,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             kwargs={'year': self.node_identity.year, 'code': self.node_identity.code},
             get={"path": self.get_path(), "tab": self.active_tab.name}
         )
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
 
     def get_update_permission_name(self) -> str:
         if self.current_version.is_standard_version:

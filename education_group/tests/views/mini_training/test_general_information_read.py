@@ -113,7 +113,10 @@ class TestMiniTrainingReadGeneralInformation(TestCase):
             'publish_general_information', args=["2019", "LBIOL100P"]
         ) + "?path=" + str(self.mini_training_version.root_group.element.pk)
         self.assertEqual(response.context['publish_url'], expected_publish_url)
-        self.assertIsInstance(response.context['tree'], str)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertFalse(response.context['can_edit_information'])
 

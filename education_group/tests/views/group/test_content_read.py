@@ -84,7 +84,8 @@ class TestGroupReadContent(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.element_group_year.group_year)
         self.assertEqual(response.context['update_permission_name'], "base.change_link_data")
-        self.assertIsInstance(response.context['tree'], str)
+        expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.element_group_year.pk})
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['children'], List)
 

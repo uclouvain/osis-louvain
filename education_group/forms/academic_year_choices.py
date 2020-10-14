@@ -34,7 +34,6 @@ from program_management.ddd.domain.service.node_identities_search import NodeIde
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch
 
 
-# FIXME :: Create a service to return List['NodeIdentity']
 def get_academic_year_choices(
         node_identity: 'NodeIdentity',
         path: 'Path',
@@ -46,21 +45,20 @@ def get_academic_year_choices(
     )
     node_ids = NodeIdentitiesSearch().search_from_code(node_identity.code)
 
-    result = []
-    for node_id in node_ids:
-        with contextlib.suppress(KeyError):
-            result.append(
-                (
-                    _get_href(
-                        node_identity=node_id,
-                        path='|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids),
-                        active_view_name=active_view_name,
-                    ),
-                    node_id.year
-                )
-            )
+    result = [
+        (_get_href(node_id, _get_path(map_element_id_by_year, element_ids, node_id), active_view_name), node_id.year)
+        for node_id in node_ids
+    ]
     return result
 
 
 def _get_href(node_identity: 'NodeIdentity', path: 'Path', active_view_name: str) -> str:
-    return reverse(active_view_name, args=[node_identity.year, node_identity.code]) + "?path=%s" % path
+    return reverse(active_view_name, args=[node_identity.year, node_identity.code]) + \
+           ("?path=%s" % path if path else '')
+
+
+def _get_path(map_element_id_by_year, element_ids: List[int], node_id: 'NodeIdentity') -> 'Path':
+    try:
+        return '|'.join(str(map_element_id_by_year[elem_id][node_id.year]) for elem_id in element_ids)
+    except KeyError:
+        return ''

@@ -79,11 +79,11 @@ class TestPersistPrerequisite(TestCase):
         self.node.prerequisite = NullPrerequisite()
         _persist_prerequisite._persist(self.root_node, self.node)
 
-        prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id
-        )
-        self.assertFalse(
-            PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
+        self.assertQuerysetEqual(
+            Prerequisite.objects.filter(
+                education_group_version__root_group__element__pk=self.root_node.node_id
+            ),
+            []
         )
 
     def test_should_create_prerequisite(self):
@@ -131,10 +131,9 @@ class TestPersistPrerequisite(TestCase):
         self.node.prerequisite = NullPrerequisite()
         _persist_prerequisite._persist(self.root_node, self.node)
 
-        prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id
+        self.assertQuerysetEqual(
+            Prerequisite.objects.filter(
+                education_group_version__root_group__element__pk=self.root_node.node_id
+            ),
+            []
         )
-        self.assertFalse(
-            PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
-        )
-

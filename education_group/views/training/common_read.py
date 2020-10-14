@@ -58,7 +58,6 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
@@ -106,15 +105,17 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         try:
             root_element_id = self.get_object().pk
             return EducationGroupVersion.objects.select_related(
-                'offer__academic_year', 'root_group'
+                'offer__academic_year', 'root_group', 'root_group__academic_year'
             ).get(root_group__element__pk=root_element_id)
         except (EducationGroupVersion.DoesNotExist, Element.DoesNotExist):
             raise Http404
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @functools.lru_cache()
     def get_object(self) -> 'Node':
@@ -139,7 +140,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
             "node_path": self.get_path(),
-            "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "academic_year_choices": get_academic_year_choices(
                 self.node_identity,
@@ -153,6 +153,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "tree_json_url": self.get_tree_json_url(),
             "create_group_url": self.get_create_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
@@ -239,6 +240,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 'create_education_group_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_training_version"

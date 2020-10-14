@@ -125,7 +125,6 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         context = response.context
         self.assertIsInstance(context['root'], GroupYear)  # TODO : Should be NodeGroupYear instead
-        self.assertTrue('tree' in context)
         self.assertTrue(context['show_prerequisites'])
 
     @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")

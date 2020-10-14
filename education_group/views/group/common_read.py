@@ -53,7 +53,6 @@ from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundExcepti
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -77,8 +76,10 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     @functools.lru_cache()
     def get_tree(self):
-        root_element_id = self.get_path().split("|")[0]
-        return load_tree.load(int(root_element_id))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.get_path().split("|")[0])
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -106,7 +107,6 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             **super().get_context_data(**kwargs),
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
-            "tree":  json.dumps(program_tree_view_serializer(self.get_tree())),
             "form_xls_custom": CustomXlsForm(year=self.get_object().year, code=self.get_object().code),
             "group": self.get_group(),
             "node": self.get_object(),
@@ -139,6 +139,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "delete_group_url": self.get_delete_group_url(),
             "create_training_url": self.get_create_training_url(),
             "create_mini_training_url": self.get_create_mini_training_url(),
+            "tree_json_url": self.get_tree_json_url(),
             "is_root_node": is_root_node,
         }
 
@@ -184,6 +185,9 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
     def get_delete_group_url(self):
         return reverse('group_delete', kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}) + \
                "?path={}".format(self.get_path())
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
 
     def get_tab_urls(self):
         tab_urls = OrderedDict({

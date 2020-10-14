@@ -94,7 +94,10 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['education_group_version'], self.mini_training_version)
         self.assertEqual(response.context['update_permission_name'], "base.change_minitraining")
         self.assertEqual(response.context['create_version_permission_name'], "base.add_minitraining_version")
-        self.assertIsInstance(response.context['tree'], str)
+        expected_tree_json_url = reverse('tree_json', kwargs={
+            'root_id': self.mini_training_version.root_group.element.pk
+        })
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['history'], QuerySet)
 

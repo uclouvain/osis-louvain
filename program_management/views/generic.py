@@ -47,7 +47,6 @@ from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.ddd.business_types import *
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.domain.node import NodeIdentity
@@ -86,7 +85,10 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
 
     @cached_property
     def program_tree(self):
-        return load_tree.load(int(self.kwargs['root_element_id']))
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.kwargs['root_element_id'])
 
     @cached_property
     def node(self):
@@ -117,7 +119,7 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         context['root_id'] = self.program_tree.root_node.pk
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
-        context['tree'] = json.dumps(program_tree_view_serializer(self.current_version.get_tree()))
+        context['tree_json_url'] = self.get_tree_json_url()
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
         context['selected_element_clipboard'] = self.get_selected_element_clipboard_message()
@@ -139,3 +141,6 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
 
     def get_permission_object(self):
         return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})

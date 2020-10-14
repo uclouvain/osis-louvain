@@ -90,7 +90,7 @@ class TestTrainingReadContent(TestCase):
         self.assertEqual(response.context['education_group_version'], self.training_version)
 
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
-        self.assertIsInstance(response.context['tree'], str)
+        self.assertIsInstance(response.context['tree_json_url'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['utilization_rows'], List)
 

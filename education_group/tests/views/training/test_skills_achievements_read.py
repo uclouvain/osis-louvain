@@ -112,7 +112,7 @@ class TestTrainingReadSkillAchievementsRead(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.training_version)
-        self.assertIsInstance(response.context['tree'], str)
+        self.assertIsInstance(response.context['tree_json_url'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['achievements'], List)
         self.assertIn("can_edit_information", response.context)

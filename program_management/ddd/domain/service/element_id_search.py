@@ -37,6 +37,7 @@ ElementId = int
 Year = int
 STANDARD = ''
 
+
 class ElementIdByYearSearch(interface.DomainService):
 
     def search_from_element_ids(

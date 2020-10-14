@@ -114,7 +114,8 @@ class TestGroupReadGeneralInformation(TestCase):
             'publish_general_information', args=["2018", "LTRONC100B"]
         ) + "?path=" + str(self.element_group_year.pk)
         self.assertEqual(response.context['publish_url'], expected_publish_url)
-        self.assertIsInstance(response.context['tree'], str)
+        expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.element_group_year.pk})
+        self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertFalse(response.context['can_edit_information'])
 

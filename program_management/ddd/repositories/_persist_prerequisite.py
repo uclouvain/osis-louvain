@@ -41,7 +41,11 @@ def _persist(
         node_group_year: NodeGroupYear,
         node_learning_unit_year_obj: NodeLearningUnitYear,
 ) -> None:
-    education_group_version_obj = EducationGroupVersion.objects.get(root_group__element__pk=node_group_year.node_id)
+    try:
+        education_group_version_obj = EducationGroupVersion.objects.get(root_group__element__pk=node_group_year.node_id)
+    except EducationGroupVersion.DoesNotExist:
+        return
+
     learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
         element__id=node_learning_unit_year_obj.node_id
     )
@@ -52,8 +56,11 @@ def _persist(
         learning_unit_year=learning_unit_year_obj,
         defaults={"main_operator": prerequisite.main_operator}
     )
-    _delete_prerequisite_items(prerequisite_model_obj)
-    _persist_prerequisite_items(prerequisite_model_obj, prerequisite)
+
+    if prerequisite.prerequisite_item_groups:
+        _persist_prerequisite_items(prerequisite_model_obj, prerequisite)
+    else:
+        prerequisite_model_obj.delete()
 
 
 def _delete_prerequisite_items(prerequisite_model_obj: prerequisite_model.Prerequisite):
@@ -66,6 +73,7 @@ def _persist_prerequisite_items(
         prerequisite_model_obj: prerequisite_model.Prerequisite,
         prerequisite_domain_obj: prerequisite_domain.Prerequisite
 ):
+    _delete_prerequisite_items(prerequisite_model_obj)
     for group_number, group in enumerate(prerequisite_domain_obj.prerequisite_item_groups, 1):
         for position, item in enumerate(group.prerequisite_items, 1):
 

@@ -158,7 +158,7 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(response.context['create_version_permission_name'], "base.add_training_version")
         self.assertIsInstance(response.context['education_group_year'], Training)
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
-        self.assertIsInstance(response.context['tree'], str)
+        self.assertIsInstance(response.context['tree_json_url'], str)
         self.assertIsInstance(response.context['node'], NodeGroupYear)
         self.assertIsInstance(response.context['history'], QuerySet)
         self.assertIn('current_version', response.context)

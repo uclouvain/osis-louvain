@@ -65,6 +65,7 @@ urlpatterns = [
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
     # NEW VERSION URL - Program management
     path('<int:root_id>/', include([
+        path('tree/', tree.read.tree_json_view, name='tree_json'),
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),

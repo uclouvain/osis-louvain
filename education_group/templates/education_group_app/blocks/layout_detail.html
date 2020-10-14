@@ -31,11 +31,10 @@
                 <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
             </div>
             <div class="panel-body">
-                <div class="row" id="panel_file_tree" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
+                <div class="row" id="panel_file_tree" data-jsonUrl="{{ tree_json_url }}" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
             </div>
         </div>
         <div id="split-bar"></div>
-
     </div>
 {% endblock %}
 
@@ -128,10 +127,5 @@
         </div>
     </div>
 
-    <script>
-        const tree = JSON.parse('{{ tree | escapejs }}');
-    </script>
-    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}">
-    </script>
-
+    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}"></script>
 {% endblock content %}
