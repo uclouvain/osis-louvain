@@ -97,7 +97,7 @@ def _get_form_class(
 
 class PasteNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
-    is_mandatory = forms.BooleanField(required=False)
+    is_mandatory = forms.BooleanField(required=False, initial=True)
     block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     comment_fr = forms.CharField(widget=forms.widgets.Textarea, required=False)

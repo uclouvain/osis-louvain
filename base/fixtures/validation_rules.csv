@@ -262,16 +262,16 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.code,REQUIRED,100Q
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3 numbers</li>
-<li><b>Q</b></li>
+<li><b>Q</b> or <b>W</b></li>
 </ul>
-Examples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>","Code d’une Attestation de participation est composée de:
+Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation de participation est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b></li>
+<li><b>Q</b> ou <b>W</b></li>
 </ul>
-Exemples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>",Ex: LACHA100Q
+Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LACHA100Q
 base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.code,REQUIRED,100W,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ww])$",,"Code of Certificate of success is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -292,14 +292,14 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.code,REQUIRED,10
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3 numbers</li>
-<li><b>Q</b> or <b>>W</b></li>
+<li><b>Q</b> or <b>W</b></li>
 </ul>
 Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’obtention de crédits est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b> or <b>>W</b></li>
+<li><b>Q</b> ou <b>W</b></li>
 </ul>
 Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LPCDI100W
 base.validationrule,TrainingForm.BACHELOR.code,REQUIRED,100B,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Bb])$",,"Code of Bachelor is composed of:

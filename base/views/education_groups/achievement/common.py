@@ -54,8 +54,13 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'path': self.request.GET['path']
+            'path': self.get_path()
         }
+
+    def get_path(self) -> str:
+        if self.request.method == 'POST':
+            return self.request.POST['path']
+        return self.request.GET['path']
 
     def get_success_url(self):
         prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
