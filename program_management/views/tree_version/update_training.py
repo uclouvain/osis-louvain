@@ -278,7 +278,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "teaching_campus": group_obj.teaching_campus.name,
             "enrollment_campus": training_obj.enrollment_campus.name,
             "other_campus_activities": training_obj.other_campus_activities.value
-            if training_obj.other_language_activities else None,
+            if training_obj.other_campus_activities else None,
 
             "can_be_funded": training_obj.funding.can_be_funded,
             "funding_direction": training_obj.funding.funding_orientation.value
