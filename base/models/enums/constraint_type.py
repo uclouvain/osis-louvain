@@ -38,5 +38,5 @@ CONSTRAINT_TYPE = (
 
 
 class ConstraintTypeEnum(ChoiceEnum):
-    CREDITS = _("credits")
+    CREDITS = _("Credits")
     NUMBER_OF_ELEMENTS = _("Number of elements")
