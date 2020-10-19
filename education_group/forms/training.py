@@ -384,6 +384,11 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
 
 class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
+    acronym = UpperCaseCharField(
+        max_length=15,
+        label=_("Acronym/Short title"),
+        disabled=True,
+    )
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),

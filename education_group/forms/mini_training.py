@@ -170,6 +170,12 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
 
 
 class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
+    abbreviated_title = UpperCaseCharField(
+        max_length=40,
+        label=_("Acronym/Short title"),
+        required=True,
+        disabled=True,
+    )
     start_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start academic year'),

@@ -110,7 +110,7 @@
         {% include "education_group/blocks/modal/custom_xls.html" %}
         <div class="panel-footer text-right" style="padding-right: 30px;">
             {% block bottom_action_bar %}
-                {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+                {% include 'education_group/blocks/dropdown/identification_actions_bar.html' with dropdirection="dropup"%}
             {% endblock %}
         </div>
     </div>
