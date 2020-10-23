@@ -29,7 +29,7 @@ because what is available complements or replaces existing business applications
 OSIS is writen in
 [Python](https://www.python.org/) 3.5,
 [HTML5](https://www.w3.org/TR/html5/) and uses
-[Django](https://www.djangoproject.com/) 1.11 as web framework.
+[Django](https://www.djangoproject.com/) 2.2 as web framework.
 To know more about the code and the collaboration of the community, please visit
 our [OpenHub](https://www.openhub.net/p/osis-louvain) page.
 

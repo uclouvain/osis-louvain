@@ -35,9 +35,16 @@ from base.models.enums.education_group_types import GroupType, MiniTrainingType,
 from base.tests.factories.education_group_year import EducationGroupYearCommonFactory, \
     TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from cms.enums.entity_name import OFFER_YEAR
+from cms.enums.entity_name import OFFER_YEAR, GROUP_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.repositories import load_tree
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
@@ -46,6 +53,14 @@ class GeneralInformationSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.group = GroupYearFactory(
+            academic_year=cls.egy.academic_year,
+            partial_acronym=cls.egy.partial_acronym,
+            education_group_type__name=cls.egy.education_group_type.name
+        )
+        StandardEducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
+        element = ElementFactory(group_year=cls.group)
+
         cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
@@ -55,7 +70,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
             TranslatedTextFactory(
                 reference=cls.common_egy.id,
@@ -66,7 +82,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
             TranslatedTextFactory(
                 reference=cls.egy.id,
@@ -81,10 +98,16 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
+        cls.tree = load_tree.load(element.id)
         cls.serializer = GeneralInformationSerializer(
-            cls.egy, context={
+            cls.tree.root_node, context={
                 'language': cls.language,
-                'acronym': cls.egy.acronym
+                'acronym': cls.egy.acronym,
+                'offer': cls.egy,
+                'group': GroupFactory(
+                    type=cls.group.education_group_type,
+                    entity_identity=GroupIdentity(code=cls.group.partial_acronym, year=cls.group.academic_year.year)
+                )
             }
         )
 
@@ -100,11 +123,11 @@ class GeneralInformationSerializerTestCase(TestCase):
         expected_fields = [
             'language',
             'acronym',
-            'title',
             'year',
             'education_group_type',
             'education_group_type_text',
-            'sections'
+            'sections',
+            'title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -134,12 +157,24 @@ class GeneralInformationSerializerTestCase(TestCase):
         ):
             TranslatedTextLabelFactory(
                 language=self.language,
-                text_label__label=WELCOME_INTRODUCTION
+                text_label__label=WELCOME_INTRODUCTION,
+                text_label__entity=OFFER_YEAR
+            )
+            node = NodeGroupYearFactory(
+                node_id=self.group.element.id,
+                node_type=self.egy.education_group_type,
             )
             welcome_introduction_section = GeneralInformationSerializer(
-                self.egy, context={
+                node, context={
                     'language': self.language,
-                    'acronym': self.egy.acronym
+                    'acronym': self.egy.acronym,
+                    'group': GroupFactory(
+                        type=self.group.education_group_type,
+                        entity_identity=GroupIdentity(
+                            code=self.group.partial_acronym,
+                            year=self.group.academic_year.year
+                        )
+                    )
                 }
             ).data['sections'][0]
             self.assertIsNone(welcome_introduction_section['content'])
@@ -158,6 +193,13 @@ class IntroOffersSectionTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.group = GroupYearFactory(
+            academic_year=cls.egy.academic_year,
+            partial_acronym=cls.egy.partial_acronym,
+            education_group_type__name=cls.egy.education_group_type.name
+        )
+        StandardEducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
+        cls.element = ElementFactory(group_year=cls.group)
         EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
 
@@ -171,56 +213,76 @@ class IntroOffersSectionTestCase(TestCase):
 
     def test_get_intro_offers(self):
         gey = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
-            child_branch__partial_acronym="TESTTC"
+            parent_element=self.element,
+            child_element__group_year__education_group_type__name=GroupType.COMMON_CORE.name,
+            child_element__group_year__partial_acronym="TESTTC"
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
     def test_get_intro_option_offer(self):
         gey = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
+            parent_element=self.element,
+            child_element__group_year__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
         )
         gey_option = GroupElementYearFactory(
-            parent=gey.child_branch,
-            child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
-            child_branch__partial_acronym="TESTOPTION"
+            parent_element=gey.child_element,
+            child_element__group_year__education_group_type__name=MiniTrainingType.OPTION.name,
+            child_element__group_year__partial_acronym="TESTOPTION"
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
+        StandardEducationGroupVersionFactory(root_group=gey_option.child_element.group_year)
+        intro_offer_section = self._get_pertinent_intro_section(gey_option)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testoption')
 
     def test_get_intro_finality_offer(self):
         g = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
+            parent_element=self.element,
+            child_element__group_year__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
         gey = GroupElementYearFactory(
-            parent=g.parent,
-            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
-            child_branch__partial_acronym="TESTFINA",
+            parent_element=g.child_element,
+            child_element__group_year__education_group_type__name=TrainingType.MASTER_MD_120.name,
+            child_element__group_year__partial_acronym="TESTFINA",
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        StandardEducationGroupVersionFactory(root_group=gey.child_element.group_year)
+        intro_offer_section = self._get_pertinent_intro_section(gey)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
 
-    def _get_pertinent_intro_section(self, gey, egy):
+    def _get_pertinent_intro_section(self, gey):
+        if gey.child_element.group_year.education_group_type.name in GroupType.get_names():
+            entity = GROUP_YEAR
+            reference = gey.child_element.group_year_id
+        else:
+            entity = OFFER_YEAR
+            reference = gey.child_element.group_year.educationgroupversion.offer_id
+
         TranslatedTextLabelFactory(
             text_label__label=INTRODUCTION,
             language=self.language,
+            text_label__entity=entity
         )
         TranslatedTextFactory(
             text_label__label=INTRODUCTION,
             language=self.language,
-            entity=OFFER_YEAR,
-            reference=gey.child_branch.id
+            entity=entity,
+            reference=reference,
+            text_label__entity=entity
         )
+        tree = load_tree.load(self.element.id)
+        node = tree.root_node
         return GeneralInformationSerializer(
-            egy, context={
+            node, context={
                 'language': self.language,
-                'acronym': egy.acronym
+                'acronym': node.title,
+                'group': GroupFactory(
+                    type=self.group.education_group_type,
+                    entity_identity=GroupIdentity(
+                        code=self.group.partial_acronym,
+                        year=self.group.academic_year.year
+                    )
+                )
             }
         ).data['sections'][0]

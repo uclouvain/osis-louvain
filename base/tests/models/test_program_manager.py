@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models import program_manager
+from base.auth.roles import program_manager
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory

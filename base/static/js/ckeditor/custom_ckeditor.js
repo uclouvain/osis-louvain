@@ -13,3 +13,7 @@ CKEDITOR.on('instanceReady', function(e) {
     }
 
 });
+
+function destroyAllInstances() {
+    Object.values(CKEDITOR.instances).forEach((instance) => instance.destroy());
+}

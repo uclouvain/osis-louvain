@@ -18,4 +18,4 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Only letters are allowed."
-msgstr ""
+msgstr "Seulement des lettres sont acceptées."

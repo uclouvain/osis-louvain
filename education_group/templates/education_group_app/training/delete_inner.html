@@ -1,0 +1,47 @@
+{% load bootstrap3 i18n %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="modal-content" id="form-modal-content">
+    <div id="form-modal-body" class="modal-body">
+        {% include 'template_messages.html' %}
+        {% if confirmation_message %}
+            <form method="post" id="form_delete_confirm" action="{{ request.get_full_path }}">
+                {% csrf_token %}
+            </form>
+
+            <p>{{ confirmation_message }}</p>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
+                       onclick="$('#form_delete_confirm').submit();"/>
+            </div>
+        {% else %}
+             <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+             </div>
+        {% endif %}
+    </div>
+</div>

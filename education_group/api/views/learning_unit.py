@@ -28,14 +28,15 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models import group_element_year
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
@@ -44,7 +45,7 @@ class EducationGroupRootsFilter(filters.FilterSet):
     @staticmethod
     def filter_complementary_module(queryset, _, value):
         if value:
-            queryset = queryset.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
+            queryset = queryset.exclude(offer__education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
         return queryset
 
 
@@ -58,38 +59,31 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     paginator = None
 
     def get_queryset(self):
-        self.learning_unit_year = get_object_or_404(
-            LearningUnitYear.objects.all().select_related('academic_year'),
-            acronym=self.kwargs['acronym'].upper(),
-            academic_year__year=self.kwargs['year']
+        self.element = get_object_or_404(
+            Element.objects.all().select_related('learning_unit_year__academic_year'),
+            learning_unit_year__acronym=self.kwargs['acronym'].upper(),
+            learning_unit_year__academic_year__year=self.kwargs['year']
         )
-        parent_egys = EducationGroupYear.objects.filter(groupelementyear__child_leaf=self.learning_unit_year)
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [self.element],
+            additional_root_categories=[GroupType.COMPLEMENTARY_MODULE],
+            exclude_root_categories=TrainingType.finality_types_enum(),
+            as_instances=True
+        ).get(self.element.id, [])
 
-        self.education_group_root_ids = group_element_year.find_learning_unit_roots(
-            parent_egys,
-            luy=self.learning_unit_year,
-            recursive_conditions={
-                'stop': [GroupType.COMPLEMENTARY_MODULE.name],
-                'continue': TrainingType.finality_types()
-            },
-        )
-        offer_ids = [
-            offer for parent_id, offer_list in self.education_group_root_ids.items() for offer in offer_list
-        ]
-
-        return EducationGroupYear.objects.filter(
-            pk__in=offer_ids
-        ).select_related('education_group_type', 'academic_year').annotate(
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('offer__academic_year', 'offer__education_group_type').annotate(
             relative_credits=RawSQL(
                 self.get_extra_query(),
-                (self.learning_unit_year.id,)
+                (self.element.id,)
             )
         )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({
-            'learning_unit_year': self.learning_unit_year,
+            'learning_unit_year': self.element.learning_unit_year
         })
         return context
 
@@ -97,19 +91,28 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     def get_extra_query():
         return """
             WITH RECURSIVE group_element_year_children AS (
-                SELECT gey.child_branch_id, gey.child_leaf_id, gey.relative_credits
+                SELECT gey.child_element_id, gey.relative_credits
                 FROM base_groupelementyear gey
-                WHERE parent_id = (
-                    SELECT egy.id FROM base_educationgroupyear egy WHERE egy.id = base_educationgroupyear.id
+                JOIN program_management_element parent_element ON parent_element.id = gey.parent_element_id
+                JOIN education_group_groupyear parent_groupyear ON parent_groupyear.id = parent_element.group_year_id
+                JOIN program_management_educationgroupversion parent_version
+                ON parent_version.root_group_id = parent_groupyear.id
+                WHERE parent_version.id = (
+                    SELECT version.id
+                    FROM program_management_educationgroupversion version
+                    JOIN education_group_groupyear group_year ON version.root_group_id = group_year.id
+                    JOIN program_management_element element ON group_year.id = element.group_year_id
+                    WHERE version.id = program_management_educationgroupversion.id
                 )
                 UNION ALL
-                SELECT child.child_branch_id, child.child_leaf_id, child.relative_credits
+                SELECT child.child_element_id, child.relative_credits
                 FROM base_groupelementyear AS child
-                INNER JOIN group_element_year_children AS parent on parent.child_branch_id = child.parent_id
+                INNER JOIN group_element_year_children AS parent on parent.child_element_id = child.parent_element_id
             )
             SELECT geyc.relative_credits
-            FROM group_element_year_children geyc 
-            WHERE child_leaf_id = %s LIMIT 1
+            FROM group_element_year_children geyc
+            JOIN program_management_element element ON geyc.child_element_id = element.id
+            WHERE element.id = %s LIMIT 1
         """
 
 
@@ -128,9 +131,10 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year) \
-            .select_related(
-            'education_group_year__academic_year',
-            'education_group_year__education_group_type',
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
             'learning_unit_year__academic_year',
-        ).prefetch_related('prerequisiteitem_set')
+            'education_group_version__offer__academic_year',
+            'education_group_version__offer__education_group_type'
+        ).prefetch_related(
+            'prerequisiteitem_set',
+        )

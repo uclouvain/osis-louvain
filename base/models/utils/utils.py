@@ -24,9 +24,16 @@
 #
 ##############################################################################
 from enum import Enum
+from typing import List, Dict, Type
+
+from osis_common.ddd import interface
 
 
 class ChoiceEnum(Enum):
+    @classmethod
+    def all(cls):
+        return list(cls)
+
     @classmethod
     def choices(cls):
         return tuple((x.name, x.value) for x in cls)
@@ -38,6 +45,13 @@ class ChoiceEnum(Enum):
     @classmethod
     def get_names(cls):
         return [x.name for x in cls]
+
+    @classmethod
+    def get_values(cls):
+        return [x.value for x in cls]
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'ChoiceEnum':
+        return self
 
 
 def get_verbose_field_value(instance, key):
@@ -53,3 +67,19 @@ def filter_with_list_or_object(fk_name, model, **kwargs):
         fk_name + ('__in' if isinstance(kwargs[fk_name], list) else ''):
             kwargs[fk_name]
     })
+
+
+def get_enum_from_str(value: str, enum_class: Type[ChoiceEnum]):
+    """
+    :param value: The string value of the enumeration key.
+    :param enum_class: The class of an enumeration (inheriting from ChoiceEnum)
+    :return: An instance of enum_class given in parameter. Return None if the value is not a valid enumeration choice.
+    """
+    if not value:
+        return None
+    try:
+        return enum_class[value]
+    except ValueError:
+        raise interface.BusinessException(
+            "Invalid enum choice (value={}, enumeration_class={})".format(value, enum_class)
+        )

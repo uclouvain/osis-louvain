@@ -26,6 +26,9 @@
 import factory
 from django.contrib.auth.models import Permission
 
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -37,9 +40,37 @@ class RoleModelFactory(factory.DjangoModelFactory):
 
     @factory.post_generation
     def add_relevant_permissions_to_user_group(self, create, extracted, **kwargs):
-        permissions = [
-            Permission.objects.get_or_create(
-                defaults={"name": p.split('.')[1]}, codename=p.split('.')[1]
-            )[0] for p in self.rule_set().keys()
-        ]
+        permissions = []
+        for perm_name in self.rule_set().keys():
+            app_label, codename = perm_name.split('.')
+            try:
+                perm_obj = Permission.objects.get(content_type__app_label=app_label, codename=codename)
+                permissions.append(perm_obj)
+            except Permission.DoesNotExist:
+                pass
         self.person.user.groups.get(name=self.group_name).permissions.set(permissions)
+
+
+class EntityRoleModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'entity',)
+
+    entity = factory.SubFactory(EntityFactory)
+    with_child = False
+
+
+class EducationGroupRoleModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'education_group',)
+
+    education_group = factory.SubFactory(EducationGroupFactory)
+
+
+class EducationGroupYearRoleModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'education_group',)
+
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)

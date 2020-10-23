@@ -1,0 +1,35 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load i18n %}
+
+{% block title %}
+    <title>OSIS - {% trans 'Catalog configuration' %}</title>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a id="lnk_catalog_configuration" class="active">{% trans 'Configuration' %}</a></li>
+{% endblock %}
+
+
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'Configuration' %}</h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                {%  if perms.base.view_educationgroup %}
+                    <div class="col-md-1 text-center">
+                        <i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i>
+                    </div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            <a href="{% url 'common_topics_configuration' %}" id="lnk_education_groups">{% trans 'Management common topics' %}</a>
+                        </h4>
+                        <p>{% trans "Management common topics in the context of training's general informations and access conditions" %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

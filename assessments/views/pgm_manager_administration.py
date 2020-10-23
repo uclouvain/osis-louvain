@@ -38,10 +38,12 @@ from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
+from base.auth.roles import program_manager
+from base.auth.roles.entity_manager import EntityManager
 from base.models.offer_type import OfferType
 from base.models.offer_year import OfferYear
 from base.models.person import Person
-from base.models.program_manager import ProgramManager
+from base.auth.roles.program_manager import ProgramManager
 from base.views.mixins import AjaxTemplateMixin
 
 ALL_OPTION_VALUE = "-"
@@ -280,10 +282,15 @@ def get_filter_value(request, value_name):
 
 def get_administrator_entities(a_user):
     structures = []
-    for entity_managed in mdl.entity_manager.find_by_user(a_user):
-        children_acronyms = find_values('acronym', json.dumps(entity_managed.structure.serializable_object()))
-        structures.append({'root': entity_managed.structure,
-                           'structures': mdl.structure.find_by_acronyms(children_acronyms)})
+    entity_managers = EntityManager.objects.filter(
+        person__user=a_user
+    ).select_related('structure').order_by('structure__acronym')
+    for entity_manager in entity_managers:
+        children_acronyms = find_values('acronym', json.dumps(entity_manager.structure.serializable_object()))
+        structures.append({
+            'root': entity_manager.structure,
+            'structures': mdl.structure.find_by_acronyms(children_acronyms)
+        })
     return structures
 
 
@@ -303,7 +310,7 @@ def _get_programs(academic_yr, entity_list, manager_person, an_offer_type):
 
 def _get_entity_program_managers(entity, academic_yr):
     entities = get_managed_entities(entity)
-    return mdl.program_manager.find_by_management_entity(entities, academic_yr)
+    return program_manager.find_by_management_entity(entities, academic_yr)
 
 
 def find_values(key_value, json_repr):

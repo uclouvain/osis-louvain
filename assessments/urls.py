@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from django.views.i18n import JavaScriptCatalog
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
@@ -32,10 +31,6 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
-
-js_info_dict = {
-    'packages': ('assessments',)
-}
 
 urlpatterns = [
 
@@ -68,8 +63,6 @@ urlpatterns = [
         url(r'^upload/(?P<learning_unit_year_id>[0-9]+)/$',
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
     ])),
-
-    url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
 
     url(r'^offers/', include([
         url(r'^(?P<offer_year_id>[0-9]+)/', include([

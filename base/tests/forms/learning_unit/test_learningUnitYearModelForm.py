@@ -44,34 +44,34 @@ class TestCreditsValidation(TestCase):
         end_year = AcademicYearFactory(year=get_current_year())
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.learn_unit_structure = GenerateContainer(cls.academic_years[0], cls.academic_years[2])
-        cls.learning_unit_year_2017 = LearningUnitYear.objects.get(
+        cls.learning_unit_year_before_crucial_year = LearningUnitYear.objects.get(
             learning_unit=cls.learn_unit_structure.learning_unit_full,
-            academic_year=cls.academic_years[0]
+            academic_year=AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION - 1)
         )
-        cls.learning_unit_year_2018 = LearningUnitYear.objects.get(
+        cls.learning_unit_year_in_crucial_year = LearningUnitYear.objects.get(
             learning_unit=cls.learn_unit_structure.learning_unit_full,
             academic_year=cls.academic_years[1]
         )
-        cls.learning_unit_year_2019 = LearningUnitYear.objects.get(
+        cls.learning_unit_year_after_crucial_year = LearningUnitYear.objects.get(
             learning_unit=cls.learn_unit_structure.learning_unit_full,
             academic_year=cls.academic_years[2]
         )
         cls.person = PersonFactory()
 
-    def test_credits_no_decimal_in_2018(self):
-        form = self._build_form_with_decimal(self.learning_unit_year_2018)
+    def test_credits_no_decimal_in_crucial_year(self):
+        form = self._build_form_with_decimal(self.learning_unit_year_in_crucial_year)
         self._assert_not_valid(form)
 
-    def test_credits_no_decimal_after_2018(self):
-        form = self._build_form_with_decimal(self.learning_unit_year_2019)
+    def test_credits_no_decimal_after_crucial_year(self):
+        form = self._build_form_with_decimal(self.learning_unit_year_after_crucial_year)
         self._assert_not_valid(form)
 
     def test_credits_decimal_while_creating(self):
         form = self._build_form_with_decimal(None)
         self._assert_not_valid(form)
 
-    def test_credits_decimal_accepted_before_2018(self):
-        form = self._build_form_with_decimal(self.learning_unit_year_2017)
+    def test_credits_decimal_accepted_before_crucial_year(self):
+        form = self._build_form_with_decimal(self.learning_unit_year_before_crucial_year)
         self.assertTrue(form.is_valid())
 
     def _build_form_with_decimal(self, luy):

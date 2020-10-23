@@ -24,6 +24,7 @@
                     {# FIXME: Disable autocomplete because otherwise the aucomplete scroll of the last text input completed would appear at the top left of the screen when clicking on the checkbox #}
                     <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;" autocomplete="off">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
+                        <input type="hidden" name="path" value="{{ request.GET.path }}">
                         <div class="row">
                             {% block form_field %}
 
@@ -31,7 +32,7 @@
                             {% endblock form_field %}
                             <br>
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary" name="search-eg" title="search">
+                                <button id="btn-submit-quicksearch" type="submit" class="btn btn-primary" name="search-eg" title="search">
                                     <em class="fa fa-search"></em>
                                 </button>
                             </div>
@@ -86,8 +87,8 @@
        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
+        let checkUrl = "{% url 'check_tree_paste_node' %}";
+        let attachUrl = "{% url 'tree_paste_node' %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -104,16 +105,18 @@
 
         function attachElementSelected(checkUrl, attachUrl){
             return function(){
-                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
-                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
+                const boxChecked = document.querySelectorAll("input[name=selected-item]:checked")
+                const parameters = extract_ids_and_content_type_parameters(boxChecked);
                 const paramString = new URLSearchParams();
-                paramString.append("content_type", parameters["content_type"]);
-                for (let index in parameters["id"]){
-                    paramString.append("id", parameters["id"][index]);
+                paramString.append("year", parameters["year"]);
+                paramString.append("path", "{{ node_path }}");
+                for (let index in parameters["codes"]){
+                    paramString.append("codes", parameters["codes"][index]);
                 }
 
                 $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`
+                    url: `${checkUrl}?${paramString.toString()}`,
+                    dataType: 'json'
                 }).done(function(jsonResponse){
                     const error_messages = jsonResponse["error_messages"];
                     if (error_messages.length > 0) {
@@ -136,20 +139,14 @@
             };
         }
 
-        function extract_ids_and_content_type_parameters(urls){
-            let contentType = "";
-            if (urls.length === 0){
-                contentType = ""
-            }
-            else if (urls[0].includes("learning_units")){
-                contentType = "base_learningunityear";
-            }else if(urls[0].includes("educationgroups")){
-                contentType = "base_educationgroupyear";
-            }
-
-            let object_ids = urls.map((url) => getIdFromUrl(url).toString());
-
-            return {"id": object_ids, "content_type": contentType};
+        function extract_ids_and_content_type_parameters(elements){
+            codes = []
+            year = null;
+            elements.forEach((function(element){
+                codes.push(element.dataset.code);
+                year = element.dataset.year;
+            }));
+            return {"codes": codes, "year": year};
         }
 
         // FIXME This method is copy pasted. Should be extracted in a common file.

@@ -23,36 +23,66 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import F
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
-from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
+from program_management.ddd.domain import link, exception
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.models.element import Element
 
 
 class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
-    serializer_class = EducationGroupTreeSerializer
+    serializer_class = EducationGroupRootNodeTreeSerializer
     filter_backends = []
     paginator = None
-    lookup_fields = ('academic_year__year', 'acronym__iexact',)
-    lookup_url_kwargs = ('year', 'acronym',)
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
-
+        version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
 
-        education_group_year = get_object_or_404(queryset, **filter_kwargs)
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+            group_year__educationgroupversion__version_name__iexact=version_name
+        )
 
-        self.check_object_permissions(self.request, education_group_year)
+        self.check_object_permissions(self.request, element.education_group_year_obj)
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=self.kwargs.get('acronym').upper() or self.kwargs.get('partial_acronym').upper(),
+            year=self.kwargs['year'],
+            version_name=version_name.upper(),
+            is_transition=False,
+        )
 
-        return EducationGroupHierarchy(education_group_year)
+        try:
+            self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
+        except exception.ProgramTreeVersionNotFoundException:
+            self.tree_version = None
+
+        tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if hasattr(self, 'tree_version') and self.tree_version:
+            context.update(
+                {
+                    'version_name': self.tree_version.version_name,
+                    'version_title_fr': self.tree_version.title_fr,
+                    'version_title_en': self.tree_version.title_en,
+                }
+            )
+        return context
 
 
 class TrainingTreeView(EducationGroupTreeView):
@@ -60,9 +90,16 @@ class TrainingTreeView(EducationGroupTreeView):
         Return the tree of the training
     """
     name = 'trainings_tree'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.TRAINING.name
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',
     )
+    lookup_url_kwargs = ('year', 'acronym')
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('group_year')
 
 
 class MiniTrainingTreeView(EducationGroupTreeView):
@@ -70,11 +107,16 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         Return the tree of the mini-training
     """
     name = 'minitrainings_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
-    lookup_url_kwargs = ('year', 'partial_acronym',)
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.MINI_TRAINING.name
+    lookup_fields = (
+        'group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',
     )
+    lookup_url_kwargs = ('year', 'acronym',)
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.MINI_TRAINING.name,
+        group_year__educationgroupversion__is_transition=False
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('group_year')
 
 
 class GroupTreeView(EducationGroupTreeView):
@@ -82,8 +124,26 @@ class GroupTreeView(EducationGroupTreeView):
         Return the tree of the group
     """
     name = 'groups_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
+    lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.GROUP.name
-    )
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.GROUP.name
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('group_year')
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        filter_kwargs = {
+            lookup_field: self.kwargs[lookup_url_kwarg]
+            for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
+        }
+
+        element = get_object_or_404(
+            queryset,
+            **filter_kwargs,
+        )
+        self.check_object_permissions(self.request, element.education_group_year_obj)
+
+        tree = load_tree.load(element.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)

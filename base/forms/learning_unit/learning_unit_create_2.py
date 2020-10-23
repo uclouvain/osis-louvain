@@ -109,7 +109,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             return False
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
-        self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
+        self._specific_title_post_clean()
         additional_entity_1 = self.learning_container_year_form.additionnal_entity_version_1
         additional_entity_2 = self.learning_container_year_form.additionnal_entity_version_2
 
@@ -134,6 +134,9 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
                     form.add_error("repartition_volume_additional_entity_2", "")
 
         return not self.errors
+
+    def _specific_title_post_clean(self):
+        self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
 
     @staticmethod
     def _additional_entity_is_valid(additional_entity, repartition_volume_additional_entity):

@@ -157,6 +157,16 @@ If you encounter problems occuring with the specific extensions in your tests, y
 
 If you are usually launching tests with --keep-db (-k) parameter, do not forget to remove it temporarily in order to regenerate the test db.
 
+=== Installing GeoDjango libraries
+
+The project uses https://docs.djangoproject.com/en/dev/ref/contrib/gis/[GeoDjango]. The libraries needed to make work GeoDjango can be installed via the following command:
+
+    $ sudo apt-get install binutils libproj-dev gdal-bin
+
+A migration file already create the "postgis" extension for the database.
+
+IMPORTANT: The database user must have superuser in order to execute the migration file.
+
 === Installing and Configuring Django
 
 Django is a modern and lightweight web framework to support our back office and front office applications. The choice for Django was made thanks to the following advantages:

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from base.models import models_signals as mdl_signals, person as mdl_person
-from base.models.entity_manager import EntityManager
 from base.models.person import Person
 from base.models.structure import Structure
 from base.models.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import TutorGroupFactory, ProgramManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -150,11 +150,11 @@ class AddToGroupsSignalsTest(TestCase):
 
     def create_test_pgm_manager(self):
         egy = EducationGroupYearFactory(academic_year__current=True)
-        offer_year = OfferYearFactory(academic_year=egy.academic_year, acronym=egy.acronym)
+        offer_year = OfferYearFactory(corresponding_education_group_year=egy)
         return ProgramManagerFactory(offer_year=offer_year, education_group=egy.education_group, person=self.person_foo)
 
     def create_test_entity_manager(self):
-        return EntityManager.objects.create(person=self.person_foo, structure=Structure.objects.create(acronym="TEST"))
+        return EntityManagerFactory(person=self.person_foo, structure=Structure.objects.create(acronym="TEST"))
 
     def setUp(self):
         self.user_foo = User.objects.create_user('user_foo')
@@ -183,9 +183,3 @@ class AddToGroupsSignalsTest(TestCase):
         self.create_test_entity_manager()
         self.assertTrue(self.is_member('entity_managers'),
                         'entity_manager_foo should be in entity_managers group')
-
-    def test_remove_from_entity_manager_group(self):
-        faculty_administrator_foo = self.create_test_entity_manager()
-        faculty_administrator_foo.delete()
-        self.assertFalse(self.is_member('entity_managers'),
-                         'faculty_administrator_foo should not be in entity_managers group anymore')

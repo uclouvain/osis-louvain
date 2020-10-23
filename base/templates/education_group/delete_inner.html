@@ -37,6 +37,7 @@
                 {% if not request.is_ajax %}
                     <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"/>
                 {% endif %}
+                <input hidden value="{{ path }}" id="path" name="path"/>
             </form>
         </div>
 

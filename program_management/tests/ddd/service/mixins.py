@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Type
 from unittest.mock import PropertyMock, patch
 
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 
 
 class ValidatorPatcherMixin:
 
-    def mock_validator(self, validator_to_patch, messages: List[str], level: MessageLevel = MessageLevel.ERROR):
+    def mock_validator(self, validator_to_patch, messages: List[str] = None, level: MessageLevel = MessageLevel.ERROR):
         """
         Mixin used to mock the "messages" attribute of the validator passed in parameter.
         It aims to avoid too many decorators "@patch" above the tests methods.
@@ -40,8 +42,6 @@ class ValidatorPatcherMixin:
         :param level: The severity level of the messages
         :return: -
         """
-        assert validator_to_patch, "mandatory arg"
-        assert messages is not None, "mandatory arg"
         if not messages:
             messages = []
 
@@ -57,3 +57,28 @@ class ValidatorPatcherMixin:
         )
         self.addCleanup(patcher_messages.stop)
         patcher_messages.start()
+
+    def mock_validator_validate_to_raise_exception(
+            self,
+            validator_to_patch: Type[business_validator.BusinessValidator],
+            messages: List[str]
+    ):
+        patcher_validate = patch.object(
+            validator_to_patch,
+            'validate',
+            side_effect=osis_common.ddd.interface.BusinessExceptions(messages)
+        )
+        self.addCleanup(patcher_validate.stop)
+        patcher_validate.start()
+
+    def mock_validator_validate_to_not_raise_exception(
+            self,
+            validator_to_patch: Type[business_validator.BusinessValidator]
+    ):
+        patcher_validate = patch.object(
+            validator_to_patch,
+            'validate',
+            autospec=True
+        )
+        self.addCleanup(patcher_validate.stop)
+        patcher_validate.start()

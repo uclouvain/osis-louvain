@@ -32,7 +32,8 @@ from django.utils.translation import gettext as _
 
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
-    academic_year as academic_yr, offer_year, program_manager, tutor
+    academic_year as academic_yr, offer_year, tutor
+from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exceptions import JustificationValueException

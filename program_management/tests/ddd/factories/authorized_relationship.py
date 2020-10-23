@@ -29,7 +29,7 @@ from base.models.authorized_relationship import AuthorizedRelationshipObject, Au
 from base.models.enums.education_group_types import TrainingType
 
 
-class AuthorizedRelationshipFactory(factory.Factory):
+class AuthorizedRelationshipObjectFactory(factory.Factory):
 
     class Meta:
         model = AuthorizedRelationshipObject
@@ -41,8 +41,13 @@ class AuthorizedRelationshipFactory(factory.Factory):
     max_constraint = factory.fuzzy.FuzzyInteger(0, 10)
 
 
+class MandatoryRelationshipObjectFactory(AuthorizedRelationshipObjectFactory):
+    min_constraint = 1
+    max_constraint = 1
+
+
 def generate_auth_relation(obj):
-    return [AuthorizedRelationshipFactory()]
+    return [AuthorizedRelationshipObjectFactory()]
 
 
 class AuthorizedRelationshipListFactory(factory.Factory):

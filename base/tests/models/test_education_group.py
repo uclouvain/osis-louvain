@@ -24,23 +24,16 @@
 #
 ##############################################################################
 
-from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.urls import reverse
-from django.utils.translation import ngettext
 
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import GROUP
-from base.models.enums.education_group_types import TrainingType, GroupType
-from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
-from base.tests.factories.business.learning_units import GenerateAcademicYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 class EducationGroupTest(TestCase):
@@ -119,107 +112,3 @@ class EducationGroupManagerTest(TestCase):
             list(EducationGroup.objects.all()),
             list(EducationGroup.objects.having_related_training())
         )
-
-
-class TestEducationGroupAdmin(TestCase):
-    def test_apply_education_group_year_postponement(self):
-        """ Postpone to N+6 in Education Group Admin """
-        current_year = get_current_year()
-        current_academic_year = AcademicYearFactory(year=current_year)
-        end_year = AcademicYearFactory(year=current_year + 6)
-        academic_years = GenerateAcademicYear(current_academic_year, end_year)
-
-        eg = EducationGroupFactory(end_year=None)
-        EducationGroupYearFactory(
-            academic_year=academic_years[0],
-            education_group=eg
-        )
-
-        postpone_url = reverse('admin:base_educationgroup_changelist')
-
-        self.client.force_login(SuperUserFactory())
-        response = self.client.post(postpone_url, data={'action': 'apply_education_group_year_postponement',
-                                                        '_selected_action': [eg.pk]})
-
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertEqual(msg[0], ngettext(
-            "%(count)d education group has been postponed with success.",
-            "%(count)d education groups have been postponed with success.", 1
-        ) % {'count': 1})
-
-
-class TestEducationGroupConstraintEndYearOn2M(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year_2018 = AcademicYearFactory(year=2018)
-        cls.academic_year_2019 = AcademicYearFactory(year=cls.academic_year_2018.year + 1)
-        cls.academic_year_2020 = AcademicYearFactory(year=cls.academic_year_2018.year + 2)
-
-    def setUp(self):
-        # Create 2m pgrm structure as
-        #   2M
-        #   |--FINALITY_LIST
-        #      |--2MS
-        #      |--2MD
-
-        self.master_120 = TrainingFactory(
-            academic_year=self.academic_year_2018,
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            education_group__end_year=None
-        )
-        self.finality_group = GroupFactory(
-            academic_year=self.academic_year_2018,
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            education_group__end_year=None
-        )
-        GroupElementYearFactory(parent=self.master_120, child_branch=self.finality_group)
-
-        self.master_120_specialized = GroupFactory(
-            academic_year=self.academic_year_2018,
-            education_group_type__name=TrainingType.MASTER_MS_120.name,
-            education_group__end_year=None
-        )
-        GroupElementYearFactory(parent=self.finality_group, child_branch=self.master_120_specialized)
-        self.master_120_didactic = GroupFactory(
-            academic_year=self.academic_year_2018,
-            education_group_type__name=TrainingType.MASTER_MD_120.name,
-            education_group__end_year=self.academic_year_2019
-        )
-        GroupElementYearFactory(parent=self.finality_group, child_branch=self.master_120_didactic)
-
-    def test_check_end_year_constraints_case_2m_end_year_is_greater_or_equals_than_finalities(self):
-        """
-        In this test, we ensure that a root 2M can have end date which are greater or equals than his finalities
-        """
-        self.master_120_specialized.education_group.end_year = self.academic_year_2019
-        self.master_120_specialized.education_group.save()
-        self.master_120_specialized.refresh_from_db()
-
-        self.master_120.education_group._check_end_year_constraints_on_2m()
-
-    def test_check_end_year_constraints_case_2m_end_year_is_lower_than_finalities(self):
-        """
-        In this test, we ensure that a root 2M CANNOT have end date which are lower than at least one
-        end year of his finalities
-        """
-        # Set root 2M to 2019
-        self.master_120.education_group.end_year = self.academic_year_2019
-        self.master_120.education_group.save()
-        self.master_120.refresh_from_db()
-
-        with self.assertRaises(ValidationError):
-            self.master_120.education_group._check_end_year_constraints_on_2m()
-
-    def test_check_end_year_constraints_case_finality_end_year_greater_than_2m(self):
-        for edy in [self.master_120_didactic, self.master_120_specialized, self.master_120]:
-            edy.education_group.end_year = self.academic_year_2019
-            edy.education_group.save()
-            edy.education_group.refresh_from_db()
-
-        self.master_120_didactic.education_group._check_end_year_constraints_on_2m()
-
-        self.master_120_didactic.education_group.end_year = self.academic_year_2020
-        self.master_120_didactic.education_group.save()
-        self.master_120_didactic.education_group.refresh_from_db()
-        with self.assertRaises(ValidationError):
-            self.master_120_didactic.education_group._check_end_year_constraints_on_2m()

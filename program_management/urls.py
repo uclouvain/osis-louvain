@@ -24,77 +24,113 @@
 #
 ##############################################################################
 from django.conf.urls import url
-from django.urls import include
+from django.urls import include, path
 
-from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
-    groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
-    groupelementyear_management, excel, search, tree
-from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
+import program_management.views.tree.copy_cut
+import program_management.views.tree_version.check_version_name
+from program_management.views import content
+from program_management.views import groupelementyear_read, element_utilization, excel, search, \
+    tree, prerequisite_read, prerequisite_update
+from program_management.views import quick_search, create_element, publish_general_information
+from program_management.views.proxy.content import ContentRedirectView
+from program_management.views.proxy.identification import IdentificationRedirectView
+from program_management.views.tree_version import create as create_program_tree_version, update_training, \
+    update_mini_training
+from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
-    url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
-    url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
-        url(r'^content/', include([
-            url(u'^attach/', groupelementyear_create.PasteElementFromCacheToSelectedTreeNode.as_view(),
-                name='education_group_attach'),
-            url(r'^check_attach/', groupelementyear_create.AttachCheckView.as_view(),
-                name="check_education_group_attach"),
-            url(u'^create/$', groupelementyear_create.CreateGroupElementYearView.as_view(),
-                name='group_element_year_create'),
-            url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
-                    name='group_element_year_delete'),
-                url(r'^move/$', groupelementyear_create.MoveGroupElementYearView.as_view(),
-                    name='group_element_year_move'),
-                url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update")
-            ]))
-        ])),
-        url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
-        url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
-        url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
-            name="postpone_education_group"),
-        url(r'^quick_search/', include([
-            url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
-                name="quick_search_learning_unit"),
-            url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
-                name="quick_search_education_group"),
-        ])),
-    ])),
-    url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
-        url(r'^utilization/$',
-            element_utilization.LearningUnitUtilization.as_view(),
-            name='learning_unit_utilization'),
-        url(r'^prerequisite/$',
-            prerequisite_read.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite'),
-        url(r'^prerequisite/update/$',
-            prerequisite_update.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite_update'),
-    ])),
+    url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
+        groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_pdf_content"),
+    url(r'^pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/(?P<language>[a-z\-]+)',
+        groupelementyear_read.pdf_content, name="pdf_content"),
     url(
-        r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/prerequisites/$',
         excel.get_learning_unit_prerequisites_excel,
         name="education_group_learning_units_prerequisites"
     ),
     url(
-        r'reporting/(?P<education_group_year_pk>[0-9]+)/is_prerequisite_of/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/is_prerequisite_of/$',
         excel.get_learning_units_is_prerequisite_for_excel,
         name="education_group_learning_units_is_prerequisite_for"
     ),
     url(
-        r'reporting/(?P<root_id>[0-9]+)/(?P<education_group_year_pk>[0-9]+)/contains/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/contains/$',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
     ),
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
+    path('<int:root_id>/', include([
+        path('tree/', tree.read.tree_json_view, name='tree_json'),
+    ])),
+    path('<int:year>/<str:code>/content/update/', content.update.ContentUpdateView.as_view(), name='content_update'),
+    path('up/', tree.move.up, name="content_up"),
+    path('down/', tree.move.down, name="content_down"),
+    path('create_element/<str:category>', create_element.SelectTypeCreateElementView.as_view(),
+         name='create_element_select_type'),
+    path('check_paste/', tree.paste.CheckPasteView.as_view(), name="check_tree_paste_node"),
+    path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
+    path('update/<str:parent_code>/<int:parent_year>/<str:child_code>/<int:child_year>',
+         tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
+    path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
+    path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
+    path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
+    path('clear_element_selected/', tree.copy_cut.clear_element_selected, name='clear_element_selected'),
+    path('<int:year>/quick_search/', include([
+        path(
+            'learning_unit/',
+            quick_search.QuickSearchLearningUnitYearView.as_view(),
+            name="quick_search_learning_unit"
+        ),
+        path(
+            'education_group/',
+            quick_search.QuickSearchGroupYearView.as_view(),
+            name="quick_search_education_group"
+        ),
+    ])),
+    path('<int:root_element_id>/', include([
+        path('<int:child_element_id>/', include([
+            path('learning_unit/', include([
+                path('utilization/',
+                     element_utilization.LearningUnitUtilization.as_view(),
+                     name='learning_unit_utilization'),
+                path('prerequisite/',
+                     prerequisite_read.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite'),
+                path('prerequisite/update/',
+                     prerequisite_update.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite_update'),
+            ]))
+        ]))
+    ])),
 
-    # NEW VERSION URL - Program management
-    url(r'^(?P<root_id>[0-9]+)/', include([
-        url(u'^create', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
-        url(u'^update', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        url(u'^attach', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
-        url(u'^detach', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
-        url(u'^move', tree.move.MoveNodeView.as_view(), name='tree_move_node'),
+    path(
+        'training_version/<int:year>/<str:code>/update',
+        update_training.TrainingVersionUpdateView.as_view(),
+        name="training_version_update"
+    ),
+    path(
+        'mini_training_version/<int:year>/<str:code>/update',
+        update_mini_training.MiniTrainingVersionUpdateView.as_view(),
+        name="mini_training_version_update"
+    ),
+
+    path('<int:year>/<str:code>/', include([
+        path('', IdentificationRedirectView.as_view(), name='element_identification'),
+        path('content/', ContentRedirectView.as_view(), name='element_content'),
+        path(
+            'create_education_group_version/',
+            create_program_tree_version.CreateProgramTreeVersion.as_view(),
+            name="create_education_group_version"
+        ),
+        path('publish', publish_general_information.publish, name='publish_general_information'),
+        path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
+    ])),
+
+    path('<int:year>/<acronym:acronym>/', include([
+        path(
+            'check_version_name/',
+            program_management.views.tree_version.check_version_name.check_version_name,
+            name="check_version_name"
+        ),
     ])),
 ]

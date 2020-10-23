@@ -33,13 +33,17 @@ from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums import entity_name
-from cms.models import text_label, translated_text
+from cms.models import translated_text
+from cms.models.text_label import TextLabel
 from osis_common.utils.models import get_object_or_none
 from reference.models.language import EN_CODE_LANGUAGE, Language
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
-    txt_label = text_label.get_by_label_or_none('themes_discussed')
+    txt_label = get_object_or_none(
+        TextLabel,
+        label='themes_discussed'
+    )
     if txt_label:
         for lang in settings.LANGUAGES:
             translated_text.update_or_create(

@@ -34,7 +34,7 @@ from base.models import entity
 from base.models.entity import find_versions_from_entites
 from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from reference.tests.factories.country import CountryFactory
 
@@ -49,30 +49,28 @@ class EntityTest(TestCase):
         cls.date_in_2017 = factory.fuzzy.FuzzyDate(timezone.make_aware(datetime.datetime(2017, 1, 1)),
                                                    timezone.make_aware(datetime.datetime(2017, 12, 30))).fuzz()
         cls.country = CountryFactory()
-        cls.parent = EntityFactory(country=cls.country)
-        EntityVersionFactory(
-            entity=cls.parent,
-            parent=None,
-            acronym="ROOT_ENTITY",
-            start_date=cls.start_date,
-            end_date=cls.end_date
+        cls.parent = EntityWithVersionFactory(
+            country=cls.country,
+            version__acronym="ROOT_ENTITY",
+            version__start_date=cls.start_date,
+            version__end_date=cls.end_date
         )
-        cls.children = [EntityFactory(country=cls.country) for x in range(4)]
         cls.types_dict = dict(entity_type.ENTITY_TYPES)
         types = [cls.types_dict['SECTOR'],
                  cls.types_dict['FACULTY'],
                  cls.types_dict['SCHOOL'],
                  cls.types_dict['FACULTY']]
+        cls.children = [
+            EntityWithVersionFactory(
+                country=cls.country,
+                version__parent=cls.parent,
+                version__acronym="ENTITY_V_" + str(x),
+                version__start_date=cls.start_date,
+                version__end_date=cls.end_date,
+                version__entity_type=types[x]
+            ) for x in range(4)
+        ]
 
-        for x in range(4):
-            EntityVersionFactory(
-                entity=cls.children[x],
-                parent=cls.parent,
-                acronym="ENTITY_V_" + str(x),
-                start_date=cls.start_date,
-                end_date=cls.end_date,
-                entity_type=types[x]
-            )
         cls.an_entity = EntityFactory(external_id="1234567")
 
     def test_search_entities_by_version_acronym_date_in(self):
@@ -102,19 +100,26 @@ class EntityTest(TestCase):
         self.assertEqual(len(entities_with_descendants), 1)
 
     def test_find_descendants_with_multiple_parent(self):
-        parent_2 = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=parent_2, parent=None, acronym="ROOT_ENTITY_2", start_date=self.start_date,
-                             end_date=self.end_date)
-        ### Create one child entity with parent ROOT_ENTITY_2
-        child = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=child, parent=parent_2, acronym="CHILD_OF_ROOT_2", start_date=self.start_date,
-                             end_date=self.end_date)
-        ### Create one child entity with parent CHILD_OF_ROOT_2
-        child_2 = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=child_2, parent=child, acronym="CHILD_OF_CHILD", start_date=self.start_date,
-                             end_date=self.end_date)
+        parent_2 = EntityWithVersionFactory(
+            country=self.country,
+            version__acronym="ROOT_ENTITY_2",
+            version__start_date=self.start_date,
+            version__end_date=self.end_date
+        )
+        EntityWithVersionFactory(
+            country=self.country,
+            version__acronym="CHILD_OF_ROOT_2",
+            version__start_date=self.start_date,
+            version__end_date=self.end_date
+        )
+        EntityWithVersionFactory(
+            country=self.country,
+            version__acronym="CHILD_OF_CHILD",
+            version__start_date=self.start_date,
+            version__end_date=self.end_date
+        )
         entities_with_descendants = EntityVersion.objects.get_tree([self.parent, parent_2], date=self.date_in_2015)
-        self.assertEqual(len(entities_with_descendants), 8)  # 5 for parent + 3 for parent_2
+        self.assertEqual(len(entities_with_descendants), 6)
 
     def test_most_recent_acronym(self):
         most_recent_year = 2018

@@ -42,7 +42,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory, AdministrativeManagerFactory, CentralManagerFactory
+from base.tests.factories.person import FacultyManagerForUEFactory, AdministrativeManagerFactory, CentralManagerForUEFactory
 
 
 class TestPerms(TestCase):
@@ -57,7 +57,7 @@ class TestPerms(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=EntityVersionFactory().entity
         )
-        cls.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
+        cls.central_manager = CentralManagerForUEFactory('can_edit_learningunit_pedagogy')
         cls.luy = LearningUnitYearFactory(
             learning_unit=cls.learning_unit,
             academic_year=cls.current_academic_year,
@@ -75,7 +75,7 @@ class TestPerms(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
+        person_faculty_manager = FacultyManagerForUEFactory()
 
         with self.assertRaises(PermissionDenied) as perm_ex:
             is_eligible_to_modify_end_year_by_proposal(learning_unit_yr, person_faculty_manager, True)
@@ -88,7 +88,7 @@ class TestPerms(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
+        person_faculty_manager = FacultyManagerForUEFactory()
         self.assertTrue(is_eligible_to_modify_end_year_by_proposal(learning_unit_yr, person_faculty_manager, True))
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
@@ -98,7 +98,7 @@ class TestPerms(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
+        person_faculty_manager = FacultyManagerForUEFactory()
 
         with self.assertRaises(PermissionDenied) as perm_ex:
             is_eligible_to_modify_by_proposal(learning_unit_yr, person_faculty_manager, True)
@@ -111,7 +111,7 @@ class TestPerms(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
+        person_faculty_manager = FacultyManagerForUEFactory()
         self.assertTrue(is_eligible_to_modify_by_proposal(learning_unit_yr, person_faculty_manager, True))
 
     def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):

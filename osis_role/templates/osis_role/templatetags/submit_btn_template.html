@@ -1,0 +1,5 @@
+<div class="tooltip-wrapper {% if disabled %}disabled{% endif %}" data-toggle="tooltip" title="{{ error_msg }}">
+    <button type="submit" class="{{ class_btn }}" {% if disabled %}disabled{% endif %}>
+        {{ inner_html|safe }}
+    </button>
+</div>

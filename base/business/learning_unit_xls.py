@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,12 +24,14 @@
 #
 ##############################################################################
 from collections import defaultdict
+from typing import List, Dict
 
+from django.db.models import QuerySet
 from django.db.models import Subquery, OuterRef
 from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
+from openpyxl.styles import Alignment, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
@@ -37,8 +39,9 @@ from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from osis_common.document import xls_build
 
 XLS_DESCRIPTION = _('Learning units list')
@@ -50,30 +53,30 @@ TRANSFORMATION_COLOR = Color('ff6600')
 SUPPRESSION_COLOR = Color('ff0000')
 MODIFICATION_COLOR = Color('0000ff')
 CREATION_COLOR = Color('008000')
-DEFAULT_LEGEND_STYLES = {
-    Style(fill=PatternFill(patternType='solid', fgColor=CREATION_COLOR)): ['A2'],
-    Style(fill=PatternFill(patternType='solid', fgColor=MODIFICATION_COLOR)): ['A3'],
-    Style(fill=PatternFill(patternType='solid', fgColor=SUPPRESSION_COLOR)): ['A4'],
-    Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR)): ['A5'],
-    Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR)): ['A6'],
+DEFAULT_LEGEND_FILLS = {
+    PatternFill(patternType='solid', fgColor=CREATION_COLOR): ['A2'],
+    PatternFill(patternType='solid', fgColor=MODIFICATION_COLOR): ['A3'],
+    PatternFill(patternType='solid', fgColor=SUPPRESSION_COLOR): ['A4'],
+    PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR): ['A5'],
+    PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR): ['A6'],
 }
 BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
 PROPOSAL_LINE_STYLES = {
-    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR), ),
-    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR), ),
-    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR), ),
-    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR), ),
-    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR), ),
+    ProposalType.CREATION.name: Font(color=CREATION_COLOR),
+    ProposalType.MODIFICATION.name: Font(color=MODIFICATION_COLOR),
+    ProposalType.SUPPRESSION.name: Font(color=SUPPRESSION_COLOR),
+    ProposalType.TRANSFORMATION.name: Font(color=TRANSFORMATION_COLOR),
+    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR),
 }
-WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
+WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
 
-def learning_unit_titles_part1():
+def learning_unit_titles_part1() -> List[str]:
     return [
         str(_('Code')),
         str(_('Ac yr.')),
@@ -89,13 +92,13 @@ def learning_unit_titles_part1():
     ]
 
 
-def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=False):
+def prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attributions=False) -> List:
     qs = annotate_qs(learning_unit_years)
 
     if with_grp:
         qs = qs.annotate(
             closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
-        ).prefetch_related('child_leaf__parent')
+        ).prefetch_related('element')
 
     result = []
 
@@ -112,7 +115,7 @@ def prepare_xls_content(learning_unit_years, with_grp=False, with_attributions=F
     return result
 
 
-def annotate_qs(learning_unit_years):
+def annotate_qs(learning_unit_years: QuerySet) -> QuerySet:
     """ Fetch directly in the queryset all volumes data."""
 
     subquery_component = LearningComponentYear.objects.filter(
@@ -169,19 +172,19 @@ def _get_parameters_configurable_list(learning_units, titles, user):
         xls_build.FILENAME: XLS_FILENAME,
         xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: WORKSHEET_TITLE,
-        xls_build.STYLED_CELLS: {
-            WRAP_TEXT_STYLE: _get_wrapped_cells(
+        xls_build.ALIGN_CELLS: {
+            WRAP_TEXT_ALIGNMENT: _get_wrapped_cells(
                 learning_units,
                 _get_col_letter(titles, HEADER_PROGRAMS),
                 _get_col_letter(titles, HEADER_TEACHERS)
             )
         },
-        xls_build.COLORED_ROWS: _get_colored_rows(learning_units),
+        xls_build.FONT_ROWS: _get_font_rows(learning_units),
     }
     return parameters
 
 
-def _get_significant_volume(volume):
+def get_significant_volume(volume):
     if volume and volume > 0:
         return volume
     return ''
@@ -199,7 +202,7 @@ def prepare_proposal_legend_ws_data():
         ],
         xls_build.WORKSHEET_TITLE_KEY: _('Legend'),
         xls_build.STYLED_CELLS:
-            DEFAULT_LEGEND_STYLES
+            DEFAULT_LEGEND_FILLS
     }
 
 
@@ -215,7 +218,7 @@ def _get_wrapped_cells(learning_units, teachers_col_letter, programs_col_letter)
     return dict_wrapped_styled_cells
 
 
-def _get_colored_rows(learning_units):
+def _get_font_rows(learning_units):
     colored_cells = defaultdict(list)
     for idx, luy in enumerate(learning_units, start=1):
         if getattr(luy, "proposallearningunit", None):
@@ -248,21 +251,22 @@ def _get_col_letter(titles, title_search):
     return None
 
 
-def _add_training_data(learning_unit_yr):
-    return "\n".join([
+def _add_training_data(learning_unit_yr: LearningUnitYear) -> str:
+    return ("\n".join([
         _concatenate_training_data(learning_unit_yr, group_element_year)
-        for group_element_year in learning_unit_yr.child_leaf.all()
-    ])
+        for group_element_year in learning_unit_yr.element.children_elements.all()
+    ])).strip() if hasattr(learning_unit_yr, "element") else ''
 
 
-def _concatenate_training_data(learning_unit_year, group_element_year) -> str:
+def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_element_year: GroupElementYear) -> str:
     concatenated_string = ''
-    if not learning_unit_year.closest_trainings:
+    if not learning_unit_year.closest_trainings or group_element_year.parent_element.group_year is None:
         return concatenated_string
 
-    partial_acronym = group_element_year.parent.partial_acronym or ''
-    leaf_credits = "{0:.2f}".format(
-        group_element_year.child_leaf.credits) if group_element_year.child_leaf.credits else '-'
+    partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
+    credits = group_element_year.relative_credits \
+        if group_element_year.relative_credits else group_element_year.child_element.learning_unit_year.credits
+    leaf_credits = "{0:.2f}".format(credits) if credits else '-'
     nb_parents = '-' if len(learning_unit_year.closest_trainings) > 0 else ''
 
     for training in learning_unit_year.closest_trainings:
@@ -271,15 +275,19 @@ def _concatenate_training_data(learning_unit_year, group_element_year) -> str:
                 partial_acronym,
                 leaf_credits,
                 nb_parents,
-                training['acronym'],
-                training['title'],
+                __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
+                __title_with_version_title(training['title_fr'], training['version_title_fr']),
             )
             concatenated_string += training_string
 
     return concatenated_string
 
 
-def _get_data_part2(learning_unit_yr, with_attributions):
+def __title_with_version_title(title_fr: str, version_title_fr: str):
+    return title_fr + (' [{}]'.format(version_title_fr) if version_title_fr else '')
+
+
+def _get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
@@ -302,7 +310,7 @@ def _get_data_part2(learning_unit_yr, with_attributions):
     return lu_data_part2
 
 
-def _get_data_part1(learning_unit_yr):
+def _get_data_part1(learning_unit_yr: LearningUnitYear) -> List[str]:
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
     requirement_acronym = learning_unit_yr.entity_requirement
     allocation_acronym = learning_unit_yr.entity_allocation
@@ -322,7 +330,7 @@ def _get_data_part1(learning_unit_yr):
     return lu_data_part1
 
 
-def learning_unit_titles_part2():
+def learning_unit_titles_part2() -> List[str]:
     return [
         str(_('Periodicity')),
         str(_('Active')),
@@ -340,7 +348,7 @@ def learning_unit_titles_part2():
     ]
 
 
-def learning_unit_titles_part_1():
+def learning_unit_titles_part_1() -> List[str]:
     return [
         str(_('Code')),
         str(_('Ac yr.')),
@@ -360,7 +368,7 @@ def prepare_ue_xls_content(found_learning_units):
     return [extract_xls_data_from_learning_unit(lu) for lu in found_learning_units]
 
 
-def extract_xls_data_from_learning_unit(learning_unit_yr):
+def extract_xls_data_from_learning_unit(learning_unit_yr: LearningUnitYear) -> List[str]:
     return [
         learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
         xls_build.translate(learning_unit_yr.learning_container_year.container_type)
@@ -405,15 +413,15 @@ def create_xls_attributions(user, found_learning_units, filters):
                   xls_build.FILENAME: XLS_FILENAME,
                   xls_build.HEADER_TITLES: titles,
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
-                  xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
-                                           Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
-                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT): [0]}
+                  xls_build.BORDER_CELLS: {xls_build.BORDER_TOP: cells_with_top_border},
+                  xls_build.FONT_CELLS: {Font(color=Color('00FFFFFF')): cells_with_white_font},
+                  xls_build.FONT_ROWS: {BOLD_FONT: [0]}
                   }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def prepare_xls_content_with_attributions(found_learning_units, nb_columns):
+def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_columns: int) -> Dict:
     data = []
     qs = annotate_qs(found_learning_units)
     cells_with_top_border = []
@@ -465,11 +473,23 @@ def _get_attribution_detail(an_attribution):
 
 
 def volume_information(learning_unit_yr):
-    return [_get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
-            _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
-            _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+    return [get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+            get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+            get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
             learning_unit_yr.pm_classes or 0,
-            _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
-            _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
-            _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
             learning_unit_yr.pp_classes or 0]
+
+
+def __acronym_with_version_label(acronym: str, is_transition: bool, version_name: str) -> str:
+    if version_name or is_transition:
+        if version_name == '':
+            version_label = '[Transition]' if is_transition else ''
+        elif is_transition:
+            version_label = '[{}-Transition]'.format(version_name)
+        else:
+            version_label = '[{}]'.format(version_name)
+        return "{}{}".format(acronym, version_label)
+    return acronym

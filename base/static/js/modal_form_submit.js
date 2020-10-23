@@ -4,6 +4,9 @@ function redirect_after_success(modal, xhr) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
     } else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
+        if(xhr["force_reload"]){
+            window.location.reload();
+        }
     } else {
         window.location.reload();
     }
@@ -49,11 +52,10 @@ var formAjaxSubmit = function (form, modal) {
     });
 };
 
-
-
-
 // CKEDITOR needs to dynamically bind the textareas during an XMLHttpRequest requests
 function bindTextArea() {
+    //clean instances before binding to avoid error on CKEDITOR.replace with same instance id
+    destroyAllInstances();
     $("textarea[data-type='ckeditortype']").each(function () {
         CKEDITOR.replace($(this).attr('id'), $(this).data('config'));
     });

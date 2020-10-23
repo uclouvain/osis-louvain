@@ -103,7 +103,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             container_type=learning_container_year_types.COURSE
         )
         cls.number_classes = 5
-        cls.entity_version = EntityVersionFactory(start_date=datetime.now(), end_date=datetime(3000, 1, 1))
+        cls.entity_version = EntityVersionFactory(start_date=datetime.now(), end_date=None)
         cls.entity = cls.entity_version.entity
 
     def test_edit_learning_unit_full_annual_end_date_gt_old_end_date_with_start_date_gt_now(self):
@@ -604,7 +604,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, 3)]
         luy = LearningUnitYearFullFactory(
             learning_unit__end_year=None,
-            academic_year=academic_years[0]
+            academic_year=academic_years[0],
+            learning_container_year__requirement_entity=self.entity
         )
         for anac in academic_years[1:]:
             LearningUnitYearFullFactory(

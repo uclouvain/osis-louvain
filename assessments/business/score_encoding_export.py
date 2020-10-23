@@ -37,6 +37,7 @@ from openpyxl.styles.borders import Border, Side, BORDER_MEDIUM
 from openpyxl.styles import Style
 from base.models.enums import peps_type
 from base.models.student_specific_profile import StudentSpecificProfile
+from osis_common.decorators.download import set_download_cookie
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
@@ -64,6 +65,7 @@ BORDER_LEFT = Border(
     )
 
 
+@set_download_cookie
 def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active

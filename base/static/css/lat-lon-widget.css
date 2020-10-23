@@ -1,0 +1,15 @@
+.lat-lon--widget input[type=number] {
+    margin-bottom: 1em;
+}
+.lat-lon--map {
+    height: 300px;
+}
+
+.geocode-results {
+    padding: 1em 0;
+}
+.geocode-results ol li {
+    margin: .5em;
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -1,0 +1,10 @@
+{% load i18n static %}
+
+<tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+    {{ form.id }}
+    <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">
+        {% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}
+    </td>
+    <td>{{ node.code }}</td>
+    <td>{{ form.access_condition }}</td>
+</tr>

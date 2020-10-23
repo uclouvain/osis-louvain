@@ -84,12 +84,12 @@ INSTALLED_APPS = (
     'ajax_select',
     'django_celery_beat',
     'django_celery_results',
-    'notifications',
     'django_filters',
     'hijack',
     'compat',
     'hijack_admin',
     'reversion',
+    'django.contrib.gis',
 )
 
 
@@ -117,14 +117,13 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
-    'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
 
 INTERNAL_IPS = ()
 # check if we are testing right now
-TESTING = 'test' in sys.argv
+TESTING = 'test' in sys.argv or 'behave_runner' in sys.argv[0]
 if TESTING:
     # add test packages that have specific models for tests
     INSTALLED_APPS += ('osis_common.tests', )
@@ -173,7 +172,7 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get("DATABASE_NAME", 'osis_local'),
         'USER': os.environ.get("POSTGRES_USER", 'osis'),
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD", 'osis'),
@@ -184,6 +183,7 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
+PERMISSION_CACHE_ENABLED = os.environ.get('PERMISSION_CACHE_ENABLED', 'True').lower() == 'true'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -362,6 +362,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'functional': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         'send_mail': {
             'handlers': ['console'],
             'level': 'DEBUG',
@@ -401,14 +406,16 @@ ESB_REFRESH_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_PEDAGOGY_ENDPOINT')
 ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT')
 ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMISSION_ENDPOINT')
 ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT')
+ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
 # Selenium Testing
+FUNCTIONAL_LOGGER = "functional"
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
     'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', "geckodriver"),
-    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'false',
+    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'False').lower() == 'true',
     'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
     'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080)),
     'TAKE_SCREEN_ON_FAILURE': os.environ.get('SELENIUM_TAKE_SCREENSHOTS', 'True').lower() == 'true',
@@ -477,3 +484,16 @@ LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://u
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)
+
+# GIS-related
+MAPBOX = {
+    'ACCESS_TOKEN': os.environ.get("MAPBOX_ACCESS_TOKEN", ''),
+    'CSS_PATHS': os.environ.get(
+        "MAPBOX_CSS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css',
+    ).split(' '),
+    'JS_PATHS': os.environ.get(
+        "MAPBOX_JS_PATHS",
+        'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
+    ).split(' '),
+}

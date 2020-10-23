@@ -102,7 +102,7 @@ class TextLabel(models.Model):
 def get_highest_order(parent=None):
     """Return the highest order value in the context of parent"""
     query = TextLabel.objects.filter(parent=parent) \
-                     .aggregate(models.Max('order'))
+        .aggregate(models.Max('order'))
     return query.get('order__max', None)
 
 
@@ -113,16 +113,8 @@ def shift_text_label(parent, start_order):
 
 
 def reorganise_order(parent):
-    list_to_reorder = list(TextLabel.objects.filter(parent=parent) \
-                           .order_by('order'))
+    list_to_reorder = list(TextLabel.objects.filter(parent=parent).order_by('order'))
     for index, text_label in enumerate(list_to_reorder, 1):
         if text_label.order != index:
             text_label.order = index
             super(TextLabel, text_label).save()
-
-
-def get_by_label_or_none(label):
-    try:
-        return TextLabel.objects.get(label=label)
-    except TextLabel.DoesNotExist:
-        return None

@@ -1,5 +1,5 @@
 model,pk,status_field,fields/initial_value,fields/regex_rule,fields/regex_error_message,fields/help_text_en,fields/help_text_fr,fields/placeholder
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2A,REQUIRED,2A,"^([A-Za-z]{2,4})(2)([Aa])$",,"Acronym of Aggregation is composed of:
+base.validationrule,TrainingForm.AGGREGATION.acronym,REQUIRED,2A,"^([A-Za-z]{2,4})(2)([Aa])$",,"Acronym of Aggregation is composed of:
 <ul>
 <li>2-4 letters + <b>2A</b></li>
 </ul>
@@ -8,7 +8,7 @@ Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Aggégation est composé
 <li>2-4 lettres + <b>2A</b></li>
 </ul>
 Exemples: <i>ARKE2A, BIOL2A, HIST2A</i>",Ex: BIOL2A
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_8FC,REQUIRED,8FC,"^([A-Za-z]{2,4})(8)([Ff])([Cc])$",,"Acronym of Certificate of Participation is composed of:
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.acronym,REQUIRED,8FC,"^([A-Za-z]{2,4})(8)([Ff])([Cc])$",,"Acronym of Certificate of Participation is composed of:
 <ul>
 <li>2-4 letters + <b>8FC</b></li>
 </ul>
@@ -17,7 +17,7 @@ Examples: <i>ACHA8FC, BARO8FC, CHAN8FC</i>","Sigle d’une Attestation de partic
 <li>2-4 lettres + <b>8FC</b></li>
 </ul>
 Exemples: <i>ACHA8FC, BARO8FC, CHAN8FC</i>",Ex: ACHA8FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_7FC,REQUIRED,7FC,"^([A-Za-z]{2,4})(7)([Ff])([Cc])$",,"Acronym of Certificate of Success is composed of:
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.acronym,REQUIRED,7FC,"^([A-Za-z]{2,4})(7)([Ff])([Cc])$",,"Acronym of Certificate of Success is composed of:
 <ul>
 <li>2-4 letters + <b>7FC</b></li>
 </ul>
@@ -26,7 +26,7 @@ Examples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>","Sigle d’une Attestation de réuss
 <li>2-4 lettres + <b>7FC</b></li>
 </ul>
 Exemples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>",Ex: FITN7FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_9FC,REQUIRED,9FC,"^([A-Za-z]{2,4})(9)([Ff])([Cc])$",,"Acronym of Certificate of holding credits is composed of:
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.acronym,REQUIRED,9FC,"^([A-Za-z]{2,4})(9)([Ff])([Cc])$",,"Acronym of Certificate of holding credits is composed of:
 <ul>
 <li>2-4 letters + <b>9FC</b></li>
 </ul>
@@ -35,7 +35,7 @@ Examples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>","Sigle d’une Attestation d’obten
 <li>2-4 lettres + <b>9FC</b></li>
 </ul>
 Exemples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>",Ex: PCDI9FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_1BA,REQUIRED,1BA,"^([A-Za-z]{2,4})(1)([Bb])([Aa])$",,"Acronym of Bachelor credits is composed of:
+base.validationrule,TrainingForm.BACHELOR.acronym,REQUIRED,1BA,"^([A-Za-z]{2,4})(1)([Bb])([Aa])$",,"Acronym of Bachelor credits is composed of:
 <ul>
 <li>2-4 letters + <b>1BA</b></li>
 </ul>
@@ -44,7 +44,7 @@ Examples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>","Sigle d’un Bachelier est composé
 <li>2-4 lettres + <b>1BA</b></li>
 </ul>
 Exemples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>",Ex: BIOL1BA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CE,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"Acronym of Certificate is composed of:
+base.validationrule,TrainingForm.CERTIFICATE.acronym,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"Acronym of Certificate is composed of:
 <ul>
 <li>2-4 letters + 1 number among 2 and 9 + <b>CE</b></li>
 </ul>
@@ -53,7 +53,7 @@ Examples: <i>ETES9CE</i>","Sigle d’un Certificat est composé de:
 <li>2-4 lettres + 1 chiffre parmi 2 et 9 + <b>CE</b></li>
 </ul>
 Exemples: <i>ETES9CE</i>",Ex: ETES9CE
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
+base.validationrule,TrainingForm.CAPAES.acronym,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
 <ul>
 <li>2-4 letters + <b>2CE</b></li>
 </ul>
@@ -62,7 +62,7 @@ Examples: <i>CAPA2CE</i>","Sigle d’un CAPAES est composé de
 <li>2-4 lettres + <b>2CE</b></li>
 </ul>
 Exemples: <i>CAPA2CE</i>",Ex: CAPA2CE
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3CE,REQUIRED,3CE,"^([A-Za-z]{2,4})(3)([Cc])([Ee])$",,"Acronym of Research certificate is composed of:
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.acronym,REQUIRED,3CE,"^([A-Za-z]{2,4})(3)([Cc])([Ee])$",,"Acronym of Research certificate is composed of:
 <ul>
 <li>2-4 letters + <b>3CE</b></li>
 </ul>
@@ -71,7 +71,7 @@ Examples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>","Sigle d’un Certificat de recherch
 <li>2-4 lettres + <b>3CE</b></li>
 </ul>
 Exemples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>",Ex: DROI3CE
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_1FC,REQUIRED,1FC,"^([A-Za-z]{2,4})(1)([Ff])([Cc])$",,"Acronym of University first cycle certificate is composed of:
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.acronym,REQUIRED,1FC,"^([A-Za-z]{2,4})(1)([Ff])([Cc])$",,"Acronym of University first cycle certificate is composed of:
 <ul>
 <li>2-4 letters + <b>1FC</b></li>
 </ul>
@@ -80,16 +80,16 @@ Examples: <i>RESE1FC, DICI1FC, PACC1FC</i>","Sigle d’un Certificat d’univers
 <li>2-4 lettres + <b>1FC</b></li>
 </ul>
 Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",Ex: DICI1FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2FC,REQUIRED,2FC,"^([A-Za-z]{2,4})(2)([Ff])([Cc])$",,"Acronym of University second cycle certificate is composed of:
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.acronym,REQUIRED,2FC,"^([A-Za-z]{2,4})(2)([Ff])([Cc])$",,"Acronym of University second cycle certificate is composed of:
 <ul>
-<li>2-4 letters + <b>12FC</b></li>
+<li>2-4 letters + <b>2FC</b></li>
 </ul>
 Examples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’université 2ème cycle est composé de:
 <ul>
-<li>2-4 lettres + <b>12FC</b></li>
+<li>2-4 lettres + <b>2FC</b></li>
 </ul>
 Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",Ex: ANSO2FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CA,REQUIRED,CA,"^([A-Za-z]{2,4})[ ]([Cc])([Aa])$",,"Acronym of Access contest is composed of:
+base.validationrule,TrainingForm.ACCESS_CONTEST.acronym,REQUIRED,CA,"^([A-Za-z]{2,4})[ ]([Cc])([Aa])$",,"Acronym of Access contest is composed of:
 <ul>
 <li>2-4 letters + space + <b>CA</b></li>
 </ul>
@@ -98,7 +98,7 @@ Examples: <i>MED CA</i>","Sigle d’un Concours d’accès est composé de:
 <li>2-4 lettres + espace + <b>CA</b></li>
 </ul>
 Exemples: <i>MED CA</i>",Ex: MED CA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_LV,REQUIRED,LV,"^([A-Za-z]{2,4})[ ]([Ll])([Vv])$",,"Acronym of Language classes is composed of:
+base.validationrule,TrainingForm.LANGUAGE_CLASS.acronym,REQUIRED,LV,"^([A-Za-z]{2,4})[ ]([Ll])([Vv])$",,"Acronym of Language classes is composed of:
 <ul>
 <li>2-4 letters + space + <b>LV</b></li>
 </ul>
@@ -107,7 +107,7 @@ Examples: <i>ALLE LV, JAPO LV, FRAN LV</i>","Sigle d’un Cours de langue est co
 <li>2-4 lettres + espace + <b>LV</b></li>
 </ul>
 Exemples: <i>ALLE LV, JAPO LV, FRAN LV</i>",Ex: FRAN LV
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ](([Ii][Ss])|([Ii][Ss]\/([A-Za-z]{1,2}))|([Ii][Nn]))$",,"Acronym of Isolated class is composed of:
+base.validationrule,TrainingForm.ISOLATED_CLASS.acronym,REQUIRED,IS,"^([A-Za-z]{2,4})[ ](([Ii][Ss])|([Ii][Ss]\/([A-Za-z]{1,2}))|([Ii][Nn]))$",,"Acronym of Isolated class is composed of:
 <ul>
 <li>2-4 letters </li> <li>space</li> <li> <b>IS</b> <u>OR</u> <b>IS/</b> + letters <u>OR</u> <b>IN</b></li>
 </ul>
@@ -116,7 +116,7 @@ Examples: <i>ACTU IS, SC IS/G, SC IN</i>","Sigle d’un Cours isolés est compos
 <li>2-4 lettres </li> <li> espace </li> <li> <b>IS</b> <u>OU</u> <b>IS/</b> + lettres <u>OU</u> <b>IN</b></li>
 </ul>
 Exemples: <i>ACTU IS, SC IS/G, SC IN</i>","Ex: ACTU IS,SC IS/G,SC IN"
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)(([Dd][Pp])|([Dd]))$",,"Acronym of PhD is composed of:
+base.validationrule,TrainingForm.PHD.acronym,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)(([Dd][Pp])|([Dd]))$",,"Acronym of PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3DP</b> or <b>3D</b></li>
 </ul>
@@ -125,7 +125,7 @@ Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un Doctorat est composé de
 <li>2-4 lettres + <b>3DP</b> ou <b>3D</b></li>
 </ul>
 Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: ART3DP
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)((([Ff])([Pp]))|(([Ff])([Dd])))$",,"Acronym of Formation PhD is composed of:
+base.validationrule,TrainingForm.FORMATION_PHD.acronym,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)((([Ff])([Pp]))|(([Ff])([Dd])))$",,"Acronym of Formation PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3FP</b> or <b>3FD</b></li>
 </ul>
@@ -134,7 +134,7 @@ Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <li>2-4 lettres + <b>3FP</b> ou <b>3FD</b></li>
 </ul>
 Exemples: <i>ART3FD</i>",Ex: ART3FD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"Acronym of Junior year is composed of:
+base.validationrule,TrainingForm.JUNIOR_YEAR.acronym,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"Acronym of Junior year is composed of:
 <ul>
 <li>2-4 letters + space + <b>JY</b></li>
 </ul>
@@ -143,7 +143,7 @@ Examples: <i>TECC JY</i>","Sigle d’un Junior Year  est composé de:
 <li>2-4 lettres + espace + <b>JY</b></li>
 </ul>
 Exemples: <i>TECC JY</i>",Ex: TECC JY
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M120,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 120 is composed of:
+base.validationrule,TrainingForm.PGRM_MASTER_120.acronym,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
 </ul>
@@ -152,7 +152,7 @@ Examples: <i>ACTU2M, GBIO2M, BBMC2M</i>","Sigle d’un Master en 120 crédits (p
 <li>2-4 lettres + <b>2M</b></li>
 </ul>
 Exemples: <i>ACTU2M, GBIO2M, BBMC2M</i>",Ex: BBMC2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MA120,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"Acronym of Master MA 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MA_120.acronym,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"Acronym of Master MA 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MA</b></li>
 </ul>
@@ -161,7 +161,7 @@ Examples: <i>BBMC2MA, FILO2MA, INGE2MA</i>","Sigle d’un Master en 120 crédits
 <li>2-4 lettres + <b>2MA</b></li>
 </ul>
 Exemples: <i>BBMC2MA, FILO2MA, INGE2MA</i>",Ex: BBMC2MA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MD120,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"Acronym of Master MD 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MD_120.acronym,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"Acronym of Master MD 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MD</b></li>
 </ul>
@@ -170,7 +170,7 @@ Examples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>","Sigle d’un Master en 120 crédits 
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",Ex: BBMC2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MS_120.acronym,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
@@ -179,7 +179,7 @@ Examples: <i>ACTU2MS/SA, BBMC2MS/BT, FYAP2MS/G</i>","Sigle d’un Master en 120 
 <li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",Ex: BBMC2MS/BT
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M180,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 180-240 is composed of:
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.acronym,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
 </ul>
@@ -188,7 +188,7 @@ Examples: <i>MED2M</i>","Sigle d’un Master en 180-240 crédits (programme) est
 <li>2-4 lettres + <b>2M</b></li>
 </ul>
 Exemples: <i>MED2M</i>",Ex: MED2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MA180,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"Acronym of Master MA 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MA_180_240.acronym,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"Acronym of Master MA 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MA</b></li>
 </ul>
@@ -197,7 +197,7 @@ Examples: <i>MED2MA</i>","Sigle d’un Master en 180-240 crédits à finalité a
 <li>2-4 lettres + <b>2MA</b></li>
 </ul>
 Exemples: <i>MED2MA</i>",Ex: MED2MA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MD180,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"Acronym of Master MD 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MD_180_240.acronym,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"Acronym of Master MD 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MD</b></li>
 </ul>
@@ -206,7 +206,7 @@ Examples: <i>MED2MD</i>","Sigle d’un Master en 180-240 crédits à finalité d
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>MED2MD</i>",Ex: MED2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MS_180_240.acronym,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
@@ -215,7 +215,7 @@ Examples: <i>MED2MS/G, MED2MS/SG</i>","Sigle d’un Master en 180-240 crédits �
 <li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>MED2MS/G, MED2MS/SG</i>",Ex: MED2MS/G
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M1,REQUIRED,2M1,"^([A-Za-z]{2,4})(2)([Mm])(1)$",,"Acronym of Master 60 is composed of:
+base.validationrule,TrainingForm.MASTER_M1.acronym,REQUIRED,2M1,"^([A-Za-z]{2,4})(2)([Mm])(1)$",,"Acronym of Master 60 is composed of:
 <ul>
 <li>2-4 letters + <b>2M1</b></li>
 </ul>
@@ -224,7 +224,7 @@ Examples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>","Sigle d’un Master en 60 crédits 
 <li>2-4 lettres + <b>2M1</b></li>
 </ul>
 Exemples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>",Ex: BIOL2M1
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MC,REQUIRED,2MC,"^([A-Za-z]{2,4})(2)([Mm])([Cc])$",,"Acronym of Master of specialist is composed of:
+base.validationrule,TrainingForm.MASTER_MC.acronym,REQUIRED,2MC,"^([A-Za-z]{2,4})(2)([Mm])([Cc])$",,"Acronym of Master of specialist is composed of:
 <ul>
 <li>2-4 letters + <b>2MC</b></li>
 </ul>
@@ -233,7 +233,7 @@ Examples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>","Sigle d’un Master de spécialisat
 <li>2-4 lettres + <b>2MC</b></li>
 </ul>
 Exemples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>",Ex: BRAS2MC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_ST,REQUIRED,ST,"^([A-Za-z]{2,4})[ ]([Ss])([Tt])$",,"Acronym of Internship is composed of:
+base.validationrule,TrainingForm.INTERNSHIP.acronym,REQUIRED,ST,"^([A-Za-z]{2,4})[ ]([Ss])([Tt])$",,"Acronym of Internship is composed of:
 <ul>
 <li>2-4 letters + space + <b>ST</b></li>
 </ul>
@@ -242,7 +242,7 @@ Examples: <i>DRT ST, AGRO ST, STAT ST</i>","Sigle d’un Stagiaire est composé 
 <li>2-4 lettres + espace + <b>ST</b></li>
 </ul>
 Exemples: <i>DRT ST, AGRO ST, STAT ST</i>",Ex: AGRO ST
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2A,REQUIRED,200E,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ee])$",,"Code of Aggregation is composed of:
+base.validationrule,TrainingForm.AGGREGATION.code,REQUIRED,200E,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ee])$",,"Code of Aggregation is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -257,22 +257,22 @@ Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Aggrégation est 
 <li><b>E</b></li>
 </ul>
 Exemples: <i>LHIST200E, LEDPH200E, LPSP200E</i>",Ex: LBIOL200E
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_8FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of participation is composed of:
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.code,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of participation is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3 numbers</li>
-<li><b>Q</b></li>
+<li><b>Q</b> or <b>W</b></li>
 </ul>
-Examples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>","Code d’une Attestation de participation est composée de:
+Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation de participation est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b></li>
+<li><b>Q</b> ou <b>W</b></li>
 </ul>
-Exemples: <i>WHDCO100Q, LFLES100Q, WHCON100Q</i>",Ex: LACHA100Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_7FC,REQUIRED,100W,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ww])$",,"Code of Certificate of success is composed of:
+Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LACHA100Q
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.code,REQUIRED,100W,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ww])$",,"Code of Certificate of success is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -284,25 +284,25 @@ Examples: <i>LFITN100W</i>","Code d’une Attestation de réussite est composée
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b></li>
+<li><b>W</b></li>
 </ul>
 Exemples: <i>LFITN100W</i>",Ex: LFITN100W
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_9FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of holding credits is composed of:
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.code,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([QwqW])$",,"Code of Certificate of holding credits is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3 numbers</li>
-<li><b>Q</b> or <b>>W</b></li>
+<li><b>Q</b> or <b>W</b></li>
 </ul>
 Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’obtention de crédits est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
-<li><b>Q</b> or <b>>W</b></li>
+<li><b>Q</b> ou <b>W</b></li>
 </ul>
 Exemples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>",Ex: LPCDI100W
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_1BA,REQUIRED,100B,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Bb])$",,"Code of Bachelor is composed of:
+base.validationrule,TrainingForm.BACHELOR.code,REQUIRED,100B,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Bb])$",,"Code of Bachelor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -317,7 +317,7 @@ Examples: <i>LBIOL100B</i>","Code d’un Bachelier est composé de:
 <li><b>B</b></li>
 </ul>
 Exemples: <i>LBIOL100B</i>",Ex: LBIOL100B
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of CAPAES is composed of:
+base.validationrule,TrainingForm.CAPAES.code,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of CAPAES is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -332,7 +332,7 @@ Examples: <i>LCAPA300Q</i>","Code d’un CAPAES est composé de:
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LCAPA300Q</i>",Ex: LCAPA300Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Certificate is composed of:
+base.validationrule,TrainingForm.CERTIFICATE.code,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -347,7 +347,7 @@ Examples: <i>LETES300Q</i>","Code d’un Certificat est composé de:
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LETES300Q</i>",Ex: LETES300Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Research certificate is composed of:
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.code,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Research certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -362,7 +362,7 @@ Examples: <i>LAGRO300Q, LSST300Q, WMD303Q</i>","Code d’un Certificat de recher
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LAGRO300Q, LSST300Q, WMD303Q</i>",Ex: LAGRO300Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_1FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of University first cycle certificate is composed of:
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.code,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of University first cycle certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -377,7 +377,7 @@ Examples: <i>LDICI100Q, LMARH100Q, LPAFA100Q</i>","Code d’un Certificat d’un
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LDICI100Q, LMARH100Q, LPAFA100Q</i>",Ex: LDICI100Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2FC,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of University second cycle certificate is composed of:
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.code,REQUIRED,100Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of University second cycle certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -392,7 +392,7 @@ Examples: <i>LACSS100Q, WANIM100Q, LADAP100Q</i>","Code d’un Certificat d’un
 <li><b>Q</b></li>
 </ul>
 Exemples: <i>LACSS100Q, WANIM100Q, LADAP100Q</i>",Ex: LACSS100Q
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_CA,REQUIRED,100Z,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Zz])$",,"Code of Access contest is composed of:
+base.validationrule,TrainingForm.ACCESS_CONTEST.code,REQUIRED,100Z,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Zz])$",,"Code of Access contest is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -407,7 +407,7 @@ Examples: <i>LMED100Z</i>","Code d’un Concours d’accès est composé de:
 <li><b>Z</b></li>
 </ul>
 Exemples: <i>LMED100Z</i>",Ex: LMED100Z
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_LV,REQUIRED,100L,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ll])$",,"Code of Language class is composed of:
+base.validationrule,TrainingForm.LANGUAGE_CLASS.code,REQUIRED,100L,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ll])$",,"Code of Language class is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -422,7 +422,7 @@ Examples: <i>LERAS100L, LJAPO100L, LFRAN100L</i>","Code d’un Cours de langue e
 <li><b>L</b></li>
 </ul>
 Exemples: <i>LERAS100L, LJAPO100L, LFRAN100L</i>",Ex: LERAS100L
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_IS,REQUIRED,900X,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Xx])$",,"Code of Isolated class is composed of:
+base.validationrule,TrainingForm.ISOLATED_CLASS.code,REQUIRED,900X,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Xx])$",,"Code of Isolated class is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -437,7 +437,7 @@ Examples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>","Code d’un Cours isolé est 
 <li><b>X</b></li>
 </ul>
 Exemples: <i>WCDEN900X, LARCB900X, LCHIM900X</i>",Ex: LACTU900X
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3DP,REQUIRED,300D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of PhD is composed of:
+base.validationrule,TrainingForm.PHD.code,REQUIRED,300D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of PhD is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -452,7 +452,7 @@ Examples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>","Code d’un Doctorat est comp
 <li><b>D</b></li>
 </ul>
 Exemples: <i>LBAUR300D, MCOMM300D, LAGRO300D</i>",Ex: LAGRO300D
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3FP,REQUIRED,330D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Formation PhD is composed of:
+base.validationrule,TrainingForm.FORMATION_PHD.code,REQUIRED,330D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Formation PhD is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -467,7 +467,7 @@ Examples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>","Code d’une Formation doctor
 <li><b>D</b></li>
 </ul>
 Exemples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>",Ex: LBAUR330D
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_JY,REQUIRED,100Y,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Yy])$",,"Code of Junior Year is composed of:
+base.validationrule,TrainingForm.JUNIOR_YEAR.code,REQUIRED,100Y,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Yy])$",,"Code of Junior Year is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -482,7 +482,7 @@ Examples: <i>LTECC100Y</i>","Code d’un Junior year est composé de:
 <li><b>Y</b></li>
 </ul>
 Exemples: <i>LTECC100Y</i>",Ex: LTECC100Y
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M120,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 120 is composed of:
+base.validationrule,TrainingForm.PGRM_MASTER_120.code,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -497,7 +497,7 @@ Examples: <i>LBBMC200M, MINGM200M, LGESE200M</i>","Code d’un Master en 120 cr�
 <li><b>M</b></li>
 </ul>
 Exemples: <i>LBBMC200M, MINGM200M, LGESE200M</i>",Ex: LBBMC200M
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MA120,REQUIRED,200A,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Aa])$",,"Code of Master MA 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MA_120.code,REQUIRED,200A,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Aa])$",,"Code of Master MA 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -512,7 +512,7 @@ Examples: <i>LCLAS200A, LFILO200A, LCLIM200A</i>","Code d’un Master en 120 cr�
 <li><b>A</b></li>
 </ul>
 Exemples: <i>LCLAS200A, LFILO200A, LCLIM200A</i>",Ex: LCLAS200A
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MD120,REQUIRED,200D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Master MD 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MD_120.code,REQUIRED,200D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Master MD 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -527,7 +527,7 @@ Examples: <i>LEBIB200D, LGEOG200D, LTHEO200D</i>","Code d’un Master en 120 cr�
 <li><b>D</b></li>
 </ul>
 Exemples: <i>LEBIB200D, LGEOG200D, LTHEO200D</i>",Ex: LEBIB200D
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MS120,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])(.*)$",,"Code of Master MS 120 is composed of:
+base.validationrule,TrainingForm.MASTER_MS_120.code,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])(.*)$",,"Code of Master MS 120 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -542,7 +542,7 @@ Examples: <i>LBBMC200S, LARKE200S, LROGE200S</i>","Code d’un Master en 120 cr�
 <li><b>S</b></li>
 </ul>
 Exemples: <i>LBBMC200S, LARKE200S, LROGE200S</i>",Ex: LBBMC200S
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M180,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 180-240 is composed of:
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.code,REQUIRED,200M,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$",,"Code of Program master 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -557,7 +557,7 @@ Examples: <i>WMD200M</i>","Code d’un Master en 180-240 crédits (programme) es
 <li><b>M</b></li>
 </ul>
 Exemples: <i>WMD200M</i>",Ex: WMD200M
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MA180,REQUIRED,200A,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Aa])$",,"Code of Master MA 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MA_180_240.code,REQUIRED,200A,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Aa])$",,"Code of Master MA 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -572,7 +572,7 @@ Examples: <i>WMED200A</i>","Code d’un Master en 180-240 crédits à finalité 
 <li><b>A</b></li>
 </ul>
 Exemples: <i>WMED200A</i>",Ex: LBBMC200A
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MD180,REQUIRED,200D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Master MD 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MD_180_240.code,REQUIRED,200D,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$",,"Code of Master MD 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -587,7 +587,7 @@ Examples: <i>WMED200D</i>","Code d’un Master en 180-240 crédits à finalité 
 <li><b>D</b></li>
 </ul>
 Exemples: <i>WMED200D</i>",Ex: LBBMC200D
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MS180,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])$",,"Code of Master MS 180-240 is composed of:
+base.validationrule,TrainingForm.MASTER_MS_180_240.code,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])$",,"Code of Master MS 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -602,7 +602,7 @@ Examples: <i>WMD200S</i>","Code d’un Master en 180-240 crédits à finalité s
 <li><b>S</b></li>
 </ul>
 Exemples: <i>WMD200S</i>",Ex: LBBMC200S
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2M1,REQUIRED,200U,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Uu])$",,"Code of Master 60 is composed of:
+base.validationrule,TrainingForm.MASTER_M1.code,REQUIRED,200U,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Uu])$",,"Code of Master 60 is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -617,7 +617,7 @@ Examples: <i>LHIST200U, LCHIM200U, MSPOM200U</i>","Code d’un Master en 60 cré
 <li><b>U</b></li>
 </ul>
 Exemples: <i>LHIST200U, LCHIM200U, MSPOM200U</i>",Ex: LHIST200U
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MC,REQUIRED,200C,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Cc])$",,"Code of Master of specialist is composed of:
+base.validationrule,TrainingForm.MASTER_MC.code,REQUIRED,200C,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Cc])$",,"Code of Master of specialist is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -632,7 +632,7 @@ Examples: <i>LEURO200C, LDRIN200C, LEDUC200C</i>","Code d’un Master en spécia
 <li><b>C</b></li>
 </ul>
 Exemples: <i>LEURO200C, LDRIN200C, LEDUC200C</i>",Ex: LEURO200C
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_ST,REQUIRED,100H,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Hh])$",,"Code of Internship is composed of:
+base.validationrule,TrainingForm.INTERNSHIP.code,REQUIRED,100H,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Hh])$",,"Code of Internship is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -647,574 +647,578 @@ Examples: <i>LDRT100H, LMD100H, LTECO100H</i>","Code d’un Stagiaire est compos
 <li><b>H</b></li>
 </ul>
 Exemples: <i>LDRT100H, LMD100H, LTECO100H</i>",Ex: LDRT100H
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2A,REQUIRED,Agrégation de l'enseignement secondaire supérieur (),^(Agrégation de l'enseignement secondaire supérieur \()(.+)(\))$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_8FC,REQUIRED,Attestation de participation : ,^(Attestation de participation : )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_7FC,REQUIRED,Attestation de réussite : ,^(Attestation de réussite : )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_9FC,REQUIRED,Attestation d'obtention de crédits : ,^(Attestation d'obtention de crédits : )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_1BA,REQUIRED,Bachelier en ,^(Bachelier en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2CE,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_CE,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3CE,REQUIRED,Certificat de recherche en ,^(Certificat de recherche )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_1FC,REQUIRED,Certificat d'université : ,^(Certificat d'université : )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2FC,REQUIRED,Certificat,^(Certificat )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_CA,REQUIRED,Préparation concours d'accès ,^(Préparation concours d'accès)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_LV,REQUIRED,Langue ,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_IS,REQUIRED,Cours isolé(s) ,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3DP,REQUIRED,Doctorat en ,^(Doctorat en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3FP,REQUIRED,Formation doctorale en ,^(Formation doctorale en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_JY,REQUIRED,Baccalauréat par affiliation ,^(Baccalauréat par affiliation)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M120,REQUIRED,Master [120] en ,^(Master \[120\] )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA120,REQUIRED,"Master [120] en , à finalité approfondie ","^(Master \[120\] )(.+)(\, à finalité approfondie)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD120,REQUIRED,"Master [120] en , à finalité didactique ","^(Master \[120\] )(.+)(\, à finalité didactique)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS120,REQUIRED,"Master [120] en , à finalité spécialisée ",^(Master \[120\] )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M180,REQUIRED,Master [180] en,^(Master \[)(180|240)(\] )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA180,REQUIRED,"Master [180] en , à finalité approfondie ","^(Master \[)(180|240)(\] )(.+)(\, à finalité approfondie)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD180,REQUIRED,"Master [180] en , à finalité didactique ","^(Master \[)(180|240)(\] )(.+)(\, à finalité didactique)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS180,REQUIRED,"Master [180] en , à finalité spécialisée ","^(Master \[)(180|240)(\] )(.+)(\, à finalité spécialisée)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M1,REQUIRED,Master [60] en ,^(Master \[60\] )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MC,REQUIRED,Master de spécialisation en ,^(Master de spécialisation )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_ST,REQUIRED,Stagiaire ,^(Stagiaire)(.*)$,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2A,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_8FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_7FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_9FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_1BA,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_3CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_1FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_CA,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_LV,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_IS,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_3DP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_3FP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_JY,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2M120,DISABLED,False,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MA120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MD120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MS120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2M180,DISABLED,False,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MA180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MD180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MS180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2M1,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2MC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_ST,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2A,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_1BA,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_3DP,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_3FP,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2M120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MA120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MD120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MS120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2M180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MA180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MD180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MS180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2M1,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_2MC,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.main_domain.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2A,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_8FC,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_7FC,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_9FC,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_1BA,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2CE,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_CE,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_3CE,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_1FC,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2FC,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_CA,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_LV,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_IS,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_3DP,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_3FP,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_JY,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2M120,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MA120,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MD120,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MS120,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2M180,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MA180,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MD180,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MS180,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2M1,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_2MC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.secondary_domains.osis.education_group_type_ST,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2A,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_8FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_7FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_9FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_1BA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_3CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_1FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2FC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_CA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_LV,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_IS,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_3DP,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_3FP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_JY,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2M120,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MA120,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MD120,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MS120,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2M180,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MA180,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MD180,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MS180,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2M1,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_2MC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.university_certificate.osis.education_group_type_ST,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2A,REQUIRED,2,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_1BA,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_3DP,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_3FP,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2M120,REQUIRED,4,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MA120,REQUIRED,4,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MD120,REQUIRED,4,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MS120,REQUIRED,4,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2M180,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MA180,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MD180,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MS180,REQUIRED,6,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2M1,REQUIRED,2,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_2MC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration.osis.education_group_type_ST,REQUIRED,1,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2A,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_8FC,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_7FC,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_9FC,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_1BA,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_CE,REQUIRED,NON_ACADEMIC,^(NON_ACADEMIC|NON_ACADEMIC_CREF)$,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2CE,FIXED,NON_ACADEMIC_CREF,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_3CE,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_1FC,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2FC,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_CA,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_LV,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_IS,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_3DP,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_3FP,FIXED,NON_ACADEMIC_CREF,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_JY,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2M120,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MA120,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MD120,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MS120,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2M180,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MA180,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MD180,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MS180,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2M1,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_2MC,FIXED,ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.academic_type.osis.education_group_type_ST,FIXED,NON_ACADEMIC,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2A,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_1BA,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_3DP,REQUIRED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_3FP,REQUIRED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2M120,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MA120,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MD120,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MS120,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2M180,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MA180,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MD180,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MS180,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2M1,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_2MC,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.duration_unit.osis.education_group_type_ST,FIXED,QUADRIMESTER,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2A,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_8FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_7FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_9FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_1BA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_3CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_1FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_CA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_LV,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_IS,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_3DP,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_3FP,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_JY,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2M120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MA120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MD120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MS120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2M180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MA180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MD180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MS180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2M1,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_2MC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.dissertation.osis.education_group_type_ST,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2A,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_1BA,REQUIRED,180,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_3DP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_3FP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2M120,REQUIRED,120,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MA120,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MD120,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MS120,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2M180,REQUIRED,180,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MA180,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MD180,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MS180,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2M1,REQUIRED,60,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_2MC,REQUIRED,60,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2A,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_8FC,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_7FC,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_9FC,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_1BA,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_CE,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2CE,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_3CE,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_1FC,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2FC,REQUIRED,ADAPTED,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_CA,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_LV,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_IS,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_3DP,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_3FP,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_JY,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2M120,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MA120,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MD120,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MS120,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2M180,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MA180,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MD180,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MS180,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2M1,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_2MC,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_ST,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2A,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_8FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_7FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_9FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_1BA,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_3CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_1FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_CA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_LV,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_IS,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_3DP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_3FP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_JY,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2M120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MA120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MD120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MS120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2M180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MA180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MD180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MS180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2M1,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_2MC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding.osis.education_group_type_ST,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2A,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_1BA,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_3DP,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_3FP,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2M120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MA120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MD120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MS120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2M180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MA180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MD180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MS180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2M1,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_2MC,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2A,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_8FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_7FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_9FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_1BA,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2CE,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_3CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_1FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_CA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_LV,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_IS,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_3DP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_3FP,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_JY,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2M120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MA120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MD120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MS120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2M180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MA180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MD180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MS180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2M1,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_2MC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.funding_cud.osis.education_group_type_ST,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2A,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_1BA,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_3DP,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_3FP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2M120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MA120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MD120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MS120,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2M180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MA180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MD180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MS180,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2M1,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_2MC,ALERT,,,,,,
-base.validationrule,base_educationgroupyear.funding_direction_cud.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2A,FIXED,AESS,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_8FC,FIXED,FCONT,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_7FC,FIXED,FCONT,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_9FC,FIXED,FCONT,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_1BA,FIXED,BAC,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2CE,FIXED,CAPS,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_1FC,FIXED,FCONT,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2FC,FIXED,FCONT,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_3DP,FIXED,DOCB,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_3FP,FIXED,FODO,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2M120,FIXED,MA2X,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MA120,FIXED,MA2A,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MD120,FIXED,MA2D,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MS120,FIXED,MA2S,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2M180,FIXED,MA2X,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MA180,FIXED,MA2M,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MD180,FIXED,MA2M,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MS180,FIXED,MA2M,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2M1,FIXED,MA1,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_2MC,FIXED,MACO,,,,,
-base.validationrule,base_educationgroupyear.decree_category.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2A,FIXED,AESS_CAPAES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_8FC,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_7FC,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_9FC,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_1BA,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2CE,FIXED,AESS_CAPAES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_3CE,FIXED,AESS_CAPAES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_1FC,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2FC,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_CA,FIXED,ACCESS_CONTEST,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_LV,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_3DP,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_3FP,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_JY,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2M120,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MA120,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MD120,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MS120,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2M180,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MA180,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MD180,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MS180,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2M1,FIXED,MINERVAL_COMPLETE,,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_2MC,REQUIRED,,^(MINERVAL_COMPLETE|ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION)$,,,,
-base.validationrule,base_educationgroupyear.rate_code.osis.education_group_type_ST,FIXED,NO_ADDITIONAL_FEES,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2A,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_8FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_7FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_9FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_1BA,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_3CE,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_1FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2FC,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_CA,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_LV,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_IS,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_3DP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_3FP,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_JY,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2M120,DISABLED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MA120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MD120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MS120,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2M180,DISABLED,False,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MA180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MD180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MS180,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2M1,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_2MC,REQUIRED,True,,,,,
-base.validationrule,base_educationgroupyear.joint_diploma.osis.education_group_type_ST,REQUIRED,False,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2A,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_1BA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_3DP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_3FP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2M120,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MA120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MD120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MS120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2M180,DISABLED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MA180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MD180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MS180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2M1,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_2MC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.diploma_printing_title.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2A,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_8FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_7FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_9FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_1BA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_3CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_1FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_CA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_LV,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_IS,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_3DP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_3FP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_JY,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2M120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MA120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MD120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MS120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2M180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MA180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MD180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MS180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2M1,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_2MC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_ST,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2A,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_8FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_7FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_9FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_1BA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_3CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_1FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_CA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_LV,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_IS,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_3DP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_3FP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_JY,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2M120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MA120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MD120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MS120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2M180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MA180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MD180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MS180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2M1,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_ST,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_commoncore,REQUIRED,100T,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$",,"Code of Common core is composed of:
+base.validationrule,TrainingForm.AGGREGATION.title_fr,REQUIRED,Agrégation de l'enseignement secondaire supérieur (),^(Agrégation de l'enseignement secondaire supérieur \()(.+)(\))$,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.title_fr,REQUIRED,Attestation de participation : ,^(Attestation de participation : )(.+)$,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.title_fr,REQUIRED,Attestation de réussite : ,^(Attestation de réussite : )(.+)$,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.title_fr,REQUIRED,Attestation d'obtention de crédits : ,^(Attestation d'obtention de crédits : )(.+)$,,,,
+base.validationrule,TrainingForm.BACHELOR.title_fr,REQUIRED,Bachelier en ,^(Bachelier en )(.+)$,,,,
+base.validationrule,TrainingForm.CAPAES.title_fr,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
+base.validationrule,TrainingForm.CERTIFICATE.title_fr,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.title_fr,REQUIRED,Certificat de recherche en ,^(Certificat de recherche )(.+)$,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.title_fr,REQUIRED,Certificat d'université : ,^(Certificat d'université : )(.+)$,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.title_fr,REQUIRED,Certificat,^(Certificat )(.+)$,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.title_fr,REQUIRED,Préparation concours d'accès ,^(Préparation concours d'accès)(.*)$,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.title_fr,REQUIRED,Langue ,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.title_fr,REQUIRED,Cours isolé(s) ,,,,,
+base.validationrule,TrainingForm.PHD.title_fr,REQUIRED,Doctorat en ,^(Doctorat en )(.+)$,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.title_fr,REQUIRED,Formation doctorale en ,^(Formation doctorale en )(.+)$,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.title_fr,REQUIRED,Baccalauréat par affiliation ,^(Baccalauréat par affiliation)(.*)$,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.title_fr,REQUIRED,Master [120] en ,^(Master \[120\] )(.+)$,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.title_fr,REQUIRED,"Master [120] en , à finalité approfondie ","^(Master \[120\] )(.+)(\, à finalité approfondie)(.*)$",,,,
+base.validationrule,TrainingForm.MASTER_MD_120.title_fr,REQUIRED,"Master [120] en , à finalité didactique ","^(Master \[120\] )(.+)(\, à finalité didactique)(.*)$",,,,
+base.validationrule,TrainingForm.MASTER_MS_120.title_fr,REQUIRED,"Master [120] en , à finalité spécialisée ",^(Master \[120\] )(.+)$,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.title_fr,REQUIRED,Master [180] en,^(Master \[)(180|240)(\] )(.+)$,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.title_fr,REQUIRED,"Master [180] en , à finalité approfondie ","^(Master \[)(180|240)(\] )(.+)(\, à finalité approfondie)(.*)$",,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.title_fr,REQUIRED,"Master [180] en , à finalité didactique ","^(Master \[)(180|240)(\] )(.+)(\, à finalité didactique)(.*)$",,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.title_fr,REQUIRED,"Master [180] en , à finalité spécialisée ","^(Master \[)(180|240)(\] )(.+)(\, à finalité spécialisée)(.*)$",,,,
+base.validationrule,TrainingForm.MASTER_M1.title_fr,REQUIRED,Master [60] en ,^(Master \[60\] )(.+)$,,,,
+base.validationrule,TrainingForm.MASTER_MC.title_fr,REQUIRED,Master de spécialisation en ,^(Master de spécialisation )(.+)$,,,,
+base.validationrule,TrainingForm.INTERNSHIP.title_fr,REQUIRED,Stagiaire ,^(Stagiaire)(.*)$,,,,
+base.validationrule,TrainingForm.AGGREGATION.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.BACHELOR.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CAPAES.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PHD.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.is_enrollment_enabled,DISABLED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.is_enrollment_enabled,DISABLED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_M1.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MC.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.is_enrollment_enabled,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.has_online_re_registration,DISABLED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.has_online_re_registration,DISABLED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.has_partial_deliberation,DISABLED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.has_partial_deliberation,DISABLED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.CAPAES.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.main_domain,ALERT,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.main_domain,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.CAPAES.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.PHD.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.secondary_domains,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.secondary_domains,DISABLED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.BACHELOR.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CAPAES.produce_university_certificate,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.produce_university_certificate,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.produce_university_certificate,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.produce_university_certificate,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PHD.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.produce_university_certificate,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_M1.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MC.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.produce_university_certificate,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.duration,REQUIRED,2,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.CAPAES.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.duration,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.duration,REQUIRED,4,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.duration,REQUIRED,4,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.duration,REQUIRED,4,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.duration,REQUIRED,4,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.duration,REQUIRED,6,,,,,
+base.validationrule,TrainingForm.MASTER_M1.duration,REQUIRED,2,,,,,
+base.validationrule,TrainingForm.MASTER_MC.duration,REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.duration,REQUIRED,1,,,,,
+base.validationrule,TrainingForm.AGGREGATION.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.BACHELOR.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.academic_type,REQUIRED,NON_ACADEMIC,^(NON_ACADEMIC|NON_ACADEMIC_CREF)$,,,,
+base.validationrule,TrainingForm.CAPAES.academic_type,FIXED,NON_ACADEMIC_CREF,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.PHD.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.academic_type,FIXED,NON_ACADEMIC_CREF,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_M1.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.MASTER_MC.academic_type,FIXED,ACADEMIC,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.academic_type,FIXED,NON_ACADEMIC,,,,,
+base.validationrule,TrainingForm.AGGREGATION.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.duration_unit,REQUIRED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.duration_unit,REQUIRED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.duration_unit,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_M1.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.MASTER_MC.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.duration_unit,FIXED,QUADRIMESTER,,,,,
+base.validationrule,TrainingForm.AGGREGATION.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.BACHELOR.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CAPAES.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PHD.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_M1.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MC.has_dissertation,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.has_dissertation,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.credits,REQUIRED,180,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.credits,REQUIRED,120,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.credits,REQUIRED,180,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.credits,REQUIRED,30,,,,,
+base.validationrule,TrainingForm.MASTER_M1.credits,REQUIRED,60,,,,,
+base.validationrule,TrainingForm.MASTER_MC.credits,REQUIRED,60,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.credits,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.BACHELOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.CAPAES.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.schedule_type,REQUIRED,ADAPTED,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.PHD.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_M1.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.MASTER_MC.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,TrainingForm.AGGREGATION.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.BACHELOR.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CAPAES.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PHD.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_M1.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MC.can_be_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.can_be_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.funding_direction,ALERT,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.funding_direction,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.BACHELOR.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CAPAES.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PHD.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_M1.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MC.can_be_international_funded,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.can_be_international_funded,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.international_funding_orientation,ALERT,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.international_funding_orientation,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.decree_category,FIXED,AESS,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.decree_category,FIXED,FCONT,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.decree_category,FIXED,FCONT,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.decree_category,FIXED,FCONT,,,,,
+base.validationrule,TrainingForm.BACHELOR.decree_category,FIXED,BAC,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.decree_category,FIXED,CAPS,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.decree_category,FIXED,FCONT,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.decree_category,FIXED,FCONT,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.decree_category,FIXED,DOCB,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.decree_category,FIXED,FODO,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.decree_category,FIXED,MA2X,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.decree_category,FIXED,MA2A,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.decree_category,FIXED,MA2D,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.decree_category,FIXED,MA2S,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.decree_category,FIXED,MA2X,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.decree_category,FIXED,MA2M,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.decree_category,FIXED,MA2M,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.decree_category,FIXED,MA2M,,,,,
+base.validationrule,TrainingForm.MASTER_M1.decree_category,FIXED,MA1,,,,,
+base.validationrule,TrainingForm.MASTER_MC.decree_category,FIXED,MACO,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.decree_category,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.rate_code,FIXED,AESS_CAPAES,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.BACHELOR.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.CAPAES.rate_code,FIXED,AESS_CAPAES,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.rate_code,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.rate_code,FIXED,AESS_CAPAES,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.rate_code,FIXED,ACCESS_CONTEST,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.rate_code,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_M1.rate_code,FIXED,MINERVAL_COMPLETE,,,,,
+base.validationrule,TrainingForm.MASTER_MC.rate_code,REQUIRED,AESS_CAPAES,^(MINERVAL_COMPLETE|ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION)$,,,,
+base.validationrule,TrainingForm.INTERNSHIP.rate_code,FIXED,NO_ADDITIONAL_FEES,,,,,
+base.validationrule,TrainingForm.AGGREGATION.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.BACHELOR.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.CAPAES.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PHD.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.leads_to_diploma,DISABLED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.leads_to_diploma,DISABLED,False,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_M1.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.MASTER_MC.leads_to_diploma,REQUIRED,True,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.leads_to_diploma,REQUIRED,False,,,,,
+base.validationrule,TrainingForm.AGGREGATION.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.diploma_printing_title,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.diploma_printing_title,DISABLED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.diploma_printing_title,REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.diploma_printing_title,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.enrollment_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMMON_CORE.code,REQUIRED,100T,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$",,"Code of Common core is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1229,7 +1233,12 @@ Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (
 <li><b>T</b></li>
 </ul>
 Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>",Ex: LARKE100T
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_complementarymodule,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,"Code of Complementary module is composed of:
+base.validationrule,GroupForm.COMMON_CORE.abbreviated_title,REQUIRED,,,,,,Ex: TCBIOL2M
+base.validationrule,GroupForm.COMMON_CORE.title_fr,REQUIRED,Contenu:,,,,,
+base.validationrule,GroupForm.COMMON_CORE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMMON_CORE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMMON_CORE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.code,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,"Code of Complementary module is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1244,7 +1253,12 @@ Examples: <i>MAPHM280K, LDATI111K, LMATH100K</i>","Code d’un Module complémen
 <li><b>K</b></li>
 </ul>
 Exemples: <i>MAPHM280K, LDATI111K, LMATH100K</i>",Ex: LBIOL100K
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_minorlistchoice,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.abbreviated_title,REQUIRED,,,,,,Ex: BIOL1PM
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_fr,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.code,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1259,7 +1273,12 @@ Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix m
 <li><b>G</b></li>
 </ul>
 Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>",Ex: LBIOL100G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Major list choice is composed of:
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: MINEURESBIOL1BA
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Mineures,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.code,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Major list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1274,7 +1293,12 @@ Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composée d
 <li><b>G</b></li>
 </ul>
 Exemples: <i>LMAJ400G</i>",Ex: LBIOL200G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: MAJEURES
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Majeures,,,,,
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.MAJOR_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.code,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1289,7 +1313,12 @@ Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix O
 <li><b>G</b></li>
 </ul>
 Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>",Ex: LBIOL300G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality120listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 120 list choice  is composed of:
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: OPTIONSBIOL2M
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Options,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.code,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 120 list choice  is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1304,7 +1333,12 @@ Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix d
 <li><b>G</b></li>
 </ul>
 Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>",Ex: LBIOL400G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality180listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 180 list choice is composed of:
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.title_fr,REQUIRED,Liste au choix de Finalités,,,,,
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.code,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 180 list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1319,7 +1353,12 @@ Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de f
 <li><b>G</b></li>
 </ul>
 Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>",Ex: LBIOL400G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Mobility partnership list choice is composed of:
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.title_fr,REQUIRED,Liste au choix de Finalités,,,,,
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.code,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Mobility partnership list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1334,7 +1373,12 @@ Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité e
 <li><b>G</b></li>
 </ul>
 Exemples: <i>LGENT500G</i>",Ex: LBIOL500G
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_subgroup,REQUIRED,R,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: PARTENARIATS
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Partenariat mobilité,,,,,
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.management_entity,REQUIRED,,,,,,
+base.validationrule,GroupForm.SUB_GROUP.code,REQUIRED,R,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1349,34 +1393,12 @@ Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>","Code d’un Sous-groupe est c
 <li><b>R</b></li>
 </ul>
 Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LACTU900R
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,Ex: TCBIOL2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,Ex: BIOL1PM
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,Ex: MINEURESBIOL1BA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,Ex: MAJEURES
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,Ex: OPTIONSBIOL2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Contenu:,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_majorlistchoice,REQUIRED,Liste au choix Majeures,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_optionlistchoice,REQUIRED,Liste au choix Options,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_finality120listchoice,REQUIRED,Liste au choix de Finalités,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_finality180listchoice,REQUIRED,Liste au choix de Finalités,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,Liste au choix Partenariat mobilité,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_subgroup,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_commoncore,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_complementarymodule,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_subgroup,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
+base.validationrule,GroupForm.SUB_GROUP.abbreviated_title,REQUIRED,,,,,,Ex: TPCHOIX
+base.validationrule,GroupForm.SUB_GROUP.title_fr,REQUIRED,,,,,,
+base.validationrule,GroupForm.SUB_GROUP.teaching_campus,REQUIRED,,,,,,
+base.validationrule,GroupForm.SUB_GROUP.academic_year,REQUIRED,,,,,,
+base.validationrule,GroupForm.SUB_GROUP.management_entity,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.code,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1391,7 +1413,7 @@ Examples: <i>LBIOL100P, WFARM100P, LSINF110P</i>","Code d’un Approfondissement
 <li><b>P</b></li>
 </ul>
 Exemples: <i>LBIOL100P, WFARM100P, LSINF110P</i>",Ex: LBIOL100P
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_sociatyminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Society minor is composed of:
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Society minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1406,7 +1428,7 @@ Examples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>","Code d’une Mineure de soci�
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>",Ex: LCUCR100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_accessminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Access minor is composed of:
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Access minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1421,7 +1443,7 @@ Examples: <i>LECON100I, LISP100I, LLING100I</i>","Code d’une Mineure d’accè
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LECON100I, LISP100I, LLING100I</i>",Ex: LECON100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_openminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Open minor is composed of:
+base.validationrule,MiniTrainingForm.OPEN_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Open minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1436,7 +1458,7 @@ Examples: <i>LANTI100I, WSBIM100I, LMPME100I</i>","Code d’une Mineure d’ouve
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LANTI100I, WSBIM100I, LMPME100I</i>",Ex: LANTI100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Disciplinary complement minor is composed of:
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.code,REQUIRED,100I,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ii])$",,"Code of Disciplinary complement minor is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1451,7 +1473,7 @@ Examples: <i>LALLE100I, LCHIM100I, LITA100I</i>","Code d’une Mineure compléme
 <li><b>I</b></li>
 </ul>
 Exemples: <i>LALLE100I, LCHIM100I, LITA100I</i>",Ex: LALLE100I
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_fsaspeciality,REQUIRED,100J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,"Code of FSA speciality is composed of:
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.code,REQUIRED,100J,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Jj])$",,"Code of FSA speciality is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1466,7 +1488,7 @@ Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (m
 <li><b>J</b></li>
 </ul>
 Exemples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>",Ex: LPSP100J
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_option,REQUIRED,100O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
+base.validationrule,MiniTrainingForm.OPTION.code,REQUIRED,100O,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Oo])$",,"Code of Option is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1481,7 +1503,7 @@ Examples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>","Code d’une Option est compo
 <li><b>O</b></li>
 </ul>
 Exemples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>",Ex: LFYAP100O
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnership,REQUIRED,100V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.code,REQUIRED,100V,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Vv])$",,"Code of Mobility partnership is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
@@ -1496,132 +1518,132 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_deepening,REQUIRED,,,,,,Ex: APPBIOL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_sociatyminor,REQUIRED,,,,,,Ex: MINDD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_accessminor,REQUIRED,,,,,,Ex: MINECON
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_openminor,REQUIRED,,,,,,Ex: MINCULTS
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,Ex: MINANGL
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,Ex: MAJPSY
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_deepening,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_sociatyminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_accessminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_openminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_disciplinarycomplementminor,REQUIRED,30,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_fsaspeciality,NOT_REQUIRED,40,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_option,NOT_REQUIRED,15,,,,,
-base.validationrule,base_educationgroupyear.credits.osis.education_group_type_mobilitypartnership,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_deepening,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_sociatyminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_accessminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_openminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_disciplinarycomplementminor,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_fsaspeciality,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_option,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.schedule_type.osis.education_group_type_mobilitypartnership,REQUIRED,DAILY,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_deepening,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_accessminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_openminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2A,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_8FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_7FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_9FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_1BA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3CE,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_1FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2FC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_CA,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_LV,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_IS,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3DP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3FP,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_JY,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MA120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MD120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MS120,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MA180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MD180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MS180,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M1,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MC,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_ST,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_deepening,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_accessminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_openminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_option,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2A,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_1BA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_3DP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_3FP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2M120,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MA120,REQUIRED,Finalité approfondie ,^(Finalité approfondie)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MD120,REQUIRED,Finalité didactique ,^(Finalité didactique)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MS120,REQUIRED,Finalité spécialisée ,^(Finalité spécialisée)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2M180,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MA180,REQUIRED,Finalité approfondie ,^(Finalité approfondie)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MD180,REQUIRED,Finalité didactique ,^(Finalité didactique)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MS180,REQUIRED,Finalité spécialisée ,^(Finalité spécialisée)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2M1,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_2MC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2A,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_8FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_7FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_9FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_1BA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_3CE,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_1FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2FC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_CA,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_LV,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_IS,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_3DP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_3FP,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_JY,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2M120,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MA120,REQUIRED,Research Focus ,^(Research Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MD120,REQUIRED,Teaching Focus ,^(Teaching Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MS120,REQUIRED,Professional Focus ,^(Professional Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2M180,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MA180,REQUIRED,Research Focus ,^(Research Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MD180,REQUIRED,Teaching Focus ,^(Teaching Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MS180,REQUIRED,Professional Focus ,^(Professional Focus)(.*)$,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2M1,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2MC,NOT_REQUIRED,,,,,,
-base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_ST,NOT_REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,,,,,Ex: APPBIOL
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINDD
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINECON
+base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINCULTS
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,,,,,Ex: MINANGL
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,,,,,Ex: MAJPSY
+base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
+base.validationrule,MiniTrainingForm.DEEPENING.title_fr,REQUIRED,Approfondissement en,^(.*)$,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.title_fr,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.title_fr,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
+base.validationrule,MiniTrainingForm.OPTION.title_fr,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.title_fr,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.credits,REQUIRED,30,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.credits,NOT_REQUIRED,40,,,,,
+base.validationrule,MiniTrainingForm.OPTION.credits,NOT_REQUIRED,15,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.credits,NOT_REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.OPTION.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.schedule_type,REQUIRED,DAILY,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPTION.teaching_campus,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.teaching_campus,REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_M1.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DEEPENING.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPEN_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.OPTION.title_en,REQUIRED,,,,,,
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.title_en,REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.partial_title_fr,REQUIRED,Finalité approfondie ,^(Finalité approfondie)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.partial_title_fr,REQUIRED,Finalité didactique ,^(Finalité didactique)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.partial_title_fr,REQUIRED,Finalité spécialisée ,^(Finalité spécialisée)(.*)$,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.partial_title_fr,REQUIRED,Finalité approfondie ,^(Finalité approfondie)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.partial_title_fr,REQUIRED,Finalité didactique ,^(Finalité didactique)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.partial_title_fr,REQUIRED,Finalité spécialisée ,^(Finalité spécialisée)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_M1.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.partial_title_fr,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.AGGREGATION.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.BACHELOR.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CAPAES.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.CERTIFICATE.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ACCESS_CONTEST.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.LANGUAGE_CLASS.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.ISOLATED_CLASS.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PHD.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.FORMATION_PHD.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.JUNIOR_YEAR.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_120.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_120.partial_title_en,REQUIRED,Research Focus,^(Research Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_120.partial_title_en,REQUIRED,Teaching Focus,^(Teaching Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_120.partial_title_en,REQUIRED,Professional Focus,^(Professional Focus)(.*)$,,,,
+base.validationrule,TrainingForm.PGRM_MASTER_180_240.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MA_180_240.partial_title_en,REQUIRED,Research Focus,^(Research Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MD_180_240.partial_title_en,REQUIRED,Teaching Focus,^(Teaching Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_MS_180_240.partial_title_en,REQUIRED,Professional Focus,^(Professional Focus)(.*)$,,,,
+base.validationrule,TrainingForm.MASTER_M1.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.MASTER_MC.partial_title_en,NOT_REQUIRED,,,,,,
+base.validationrule,TrainingForm.INTERNSHIP.partial_title_en,NOT_REQUIRED,,,,,,

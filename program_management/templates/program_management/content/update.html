@@ -1,0 +1,80 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load i18n static %}
+{% load bootstrap3 %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li>
+        {% if group_obj.is_training %}
+            {{ group_obj.abbreviated_title }}
+        {% else %}
+            {{ group_obj.code }}
+        {% endif %}
+    </li>
+    {% if version.version_name %}
+    <li>
+        {{ version.version_name }}
+    </li>
+    {% endif %}
+    <li class="active">
+        {% trans 'Update Content' %}
+    </li>
+{% endblock breadcrumb %}
+
+{% block header_content %}
+    <div class="page-header">
+        <h2>{{ group_obj.abbreviated_title }} {% if version.version_label %} {{ version.version_label }} {% endif %}- {{ group_obj.academic_year }}</h2>
+        <h3>
+            {% if group_obj.is_finality %}
+                {{ group_obj.titles.partial_title_fr }}
+            {% else %}
+                {{ group_obj.titles.title_fr }}
+            {% endif %} {% if version.title_fr %} [{{ version.title_fr }}]{% endif %}
+        </h3>
+    </div>
+{% endblock header_content %}
+
+{% block content %}
+    <form id="UpdateContentForm" class="education_group_form" method="POST" novalidate>
+        {% csrf_token %}
+        {% bootstrap_formset_errors content_formset %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% include "blocks/forms/create_cancel_buttons.html" %}
+            </div>
+
+            {% include "blocks/tabs.html" %}
+
+            <div class="panel-footer text-right">
+                {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+            </div>
+        </div>
+        {% include "blocks/modal/confirmation_modal.html" %}
+    </form>
+
+    <script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>
+{% endblock content %}

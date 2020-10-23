@@ -1,12 +1,12 @@
 {% load i18n format %}
 
 
-<form action="{{ action_url }}" method="post">
+<form action="{{ obj.url_action }}" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right {{ additional_class }}" role="group" aria-label="actions">
 
         <a title="{% trans 'Update' %}" class="trigger_modal"
-           data-url="{{ update_url }}">
+           data-url="{{ obj.url_update }}">
             <span class="glyphicon glyphicon-edit"></span>
         </a>
 
@@ -20,7 +20,7 @@
             <i class="fa fa-arrow-down"></i>
         </button>
 
-        <a title="{% trans 'delete' %}" class="trigger_modal" data-url="{{ delete_url }}" >
+        <a title="{% trans 'delete' %}" class="trigger_modal" data-url="{{ obj.url_delete }}" >
             <span class="glyphicon glyphicon-remove"></span>
         </a>
     </div>

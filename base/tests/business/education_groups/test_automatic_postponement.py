@@ -23,168 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
-from unittest.mock import Mock
-
-from django.db import Error
 from django.test import TestCase
 
-from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponementToN6, \
-    ReddotEducationGroupAutomaticPostponement
+from base.business.education_groups.automatic_postponement import ReddotEducationGroupAutomaticPostponement
 from base.models.admission_condition import AdmissionConditionLine
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_categories import MINI_TRAINING
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.admission_condition import AdmissionConditionLineFactory
-from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.translated_text import TranslatedTextFactory
-
-
-class TestFetchEducationGroupToPostpone(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_year = get_current_year()
-        cls.academic_years = [AcademicYearFactory(year=i) for i in range(cls.current_year, cls.current_year + 7)]
-
-    def setUp(self):
-        self.education_group = EducationGroupFactory(end_year=None)
-
-    def test_fetch_education_group_to_postpone_to_N6(self):
-        education_group_years_to_postpone = EducationGroupYearFactory.create_batch(
-            2,
-            education_group__end_year=None,
-            academic_year=self.academic_years[-4]
-        )
-
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
-
-        self.assertFalse(errors)
-
-        self.assertCountEqual(
-            [egy.academic_year for egy in result],
-            [self.academic_years[6]] * 2
-        )
-        self.assertCountEqual(
-            [egy.education_group for egy in result],
-            [egy.education_group for egy in education_group_years_to_postpone]
-        )
-
-        self.assertEqual(EducationGroupYear.objects.count(), 8)
-
-    def test_if_structure_is_postponed(self):
-        parent = EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-2],
-        )
-        mandatory_child = GroupFactory(
-            academic_year=self.academic_years[-2],
-        )
-        not_mandatory_child = GroupFactory(
-            academic_year=self.academic_years[-2],
-        )
-        GroupElementYearFactory(parent=parent, child_branch=mandatory_child)
-        GroupElementYearFactory(parent=parent, child_branch=not_mandatory_child)
-        AuthorizedRelationshipFactory(
-            parent_type=parent.education_group_type,
-            child_type=mandatory_child.education_group_type,
-            min_count_authorized=1
-        )
-        AuthorizedRelationshipFactory(
-            parent_type=parent.education_group_type,
-            child_type=not_mandatory_child.education_group_type,
-            min_count_authorized=0
-        )
-
-        self.assertEqual(EducationGroupYear.objects.count(), 3)
-
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
-
-        self.assertEqual(len(result), 1)
-        self.assertFalse(errors)
-
-        self.assertEqual(result[0].education_group, self.education_group)
-        self.assertEqual(result[0].groupelementyear_set.count(), 1)
-
-    def test_egy_to_not_duplicated(self):
-        # The education group is over
-        self.education_group.end_year = self.academic_years[-2]
-        self.education_group.save()
-
-        EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-2],
-        )
-        self.assertEqual(EducationGroupYear.objects.count(), 1)
-        postponement = EducationGroupAutomaticPostponementToN6()
-
-        self.assertQuerysetEqual(postponement.to_duplicate, [])
-
-        result, errors = postponement.postpone()
-        self.assertEqual(len(result), 0)
-        self.assertFalse(errors)
-
-    def test_do_not_duplicate_11BA(self):
-        TrainingFactory(
-            education_group_type__name=TrainingType.BACHELOR.name,
-            acronym="OSIS11BA"
-        )
-
-        postponement = EducationGroupAutomaticPostponementToN6()
-
-        self.assertQuerysetEqual(postponement.queryset, [])
-
-    def test_egy_already_duplicated(self):
-        EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-2],
-        )
-        EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-1],
-        )
-        self.assertEqual(EducationGroupYear.objects.count(), 2)
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
-        self.assertEqual(len(result), 0)
-        self.assertFalse(errors)
-
-    @mock.patch(
-        'base.business.education_groups.automatic_postponement.EducationGroupAutomaticPostponementToN6.extend_obj')
-    def test_egy_to_duplicate_with_error(self, mock_method):
-        mock_method.side_effect = Mock(side_effect=Error("test error"))
-
-        egy_with_error = EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-2],
-        )
-        self.assertEqual(EducationGroupYear.objects.count(), 1)
-
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
-        self.assertTrue(mock_method.called)
-        self.assertEqual(errors, [egy_with_error.education_group])
-        self.assertEqual(len(result), 0)
-
-    def test_education_group_wrong_mini_training(self):
-        egt = EducationGroupTypeFactory(name=MiniTrainingType.OPTION.name, category=MINI_TRAINING)
-        EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-2],
-            education_group_type=egt
-        )
-        queryset = EducationGroupAutomaticPostponementToN6().get_queryset()
-
-        self.assertQuerysetEqual(queryset, [])
 
 
 class TestReddotEducationGroupAutomaticPostponement(TestCase):
@@ -251,48 +104,3 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
         postponer.postpone()
         self.assertEqual(len(postponer.result), 0)
         self.assertEqual(len(postponer.errors), 0)
-
-
-class TestSerializePostponement(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        current_year = get_current_year()
-        cls.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
-        cls.egys = [EducationGroupYearFactory() for _ in range(10)]
-
-    def test_empty_results_and_errors(self):
-        result_dict = EducationGroupAutomaticPostponementToN6().serialize_postponement_results()
-        self.assertDictEqual(result_dict, {
-            "msg": EducationGroupAutomaticPostponementToN6.msg_result % {
-                "number_extended": 0,
-                "number_error": 0
-            },
-            "errors": []
-        })
-
-    def test_empty_errors(self):
-        postponement = EducationGroupAutomaticPostponementToN6()
-
-        postponement.result = self.egys
-
-        result_dict = postponement.serialize_postponement_results()
-        self.assertDictEqual(result_dict, {
-            "msg": postponement.msg_result % {
-                "number_extended": len(self.egys),
-                "number_error": 0
-            },
-            "errors": []
-        })
-
-    def test_with_errors_and_results(self):
-        postponement = EducationGroupAutomaticPostponementToN6()
-        postponement.result = self.egys[:5]
-        postponement.errors = [str(egy) for egy in self.egys[5:]]
-        result_dict = postponement.serialize_postponement_results()
-        self.assertDictEqual(result_dict, {
-            "msg": postponement.msg_result % {
-                "number_extended": len(self.egys[:5]),
-                "number_error": len(self.egys[5:])
-            },
-            "errors": [str(egy) for egy in self.egys[5:]]
-        })

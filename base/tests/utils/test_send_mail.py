@@ -29,7 +29,6 @@ from django.test import TestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.models import test_person, test_academic_year, test_offer_year, \
@@ -138,32 +137,6 @@ class TestSendMessage(TestCase):
         self.assertIsNone(args.get('attachment'))
 
     @patch("osis_common.messaging.send_message.send_messages")
-    def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
-        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
-        self.assertEqual(len(args.get('receivers')), 1)
-        self.assertIsNone(args.get('attachment'))
-
-    @patch("osis_common.messaging.send_message.send_messages")
-    def test_send_mail_after_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
-        edgy_same_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        edgy_not_same_year = EducationGroupYearFactory(academic_year=self.academic_year.past())
-
-        send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
-            self.statistics_data,
-            [edgy_same_year, edgy_not_same_year],
-            []
-        )
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
-        self.assertEqual(len(args.get('receivers')), 1)
-        self.assertIsNone(args.get('attachment'))
-
-        self.assertEqual(args['template_base_data']['egys_postponed'], 2)
-        self.assertCountEqual(args['template_base_data']['egys_postponed_qs'], [edgy_same_year, edgy_not_same_year])
-
-    @patch("osis_common.messaging.send_message.send_messages")
     @patch("osis_common.messaging.message_config.create_table")
     def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
@@ -249,6 +222,7 @@ class TestSendMessage(TestCase):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, True), 'All the scores are encoded.')
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
                          'Toutes les notes ont été soumises.')
+
 
 def add_message_template_txt():
     msg_template = message_template.MessageTemplate(

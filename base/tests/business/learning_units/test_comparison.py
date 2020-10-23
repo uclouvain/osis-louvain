@@ -119,13 +119,18 @@ class LearningUnitYearComparaisonTest(TestCase):
         acronym_used_twice = 'PM1'
         acronym_used_once = 'PM2'
 
-        l_comp_yr_current = LearningComponentYearFactory(acronym=acronym_used_twice,
-                                                         planned_classes=1)
-        LearningClassYearFactory(learning_component_year=l_comp_yr_current)
-        l_comp_yr_previous = LearningComponentYearFactory(acronym=acronym_used_twice,
-                                                          planned_classes=1)
-        l_comp_yr_next = LearningComponentYearFactory(acronym=acronym_used_once,
-                                                      planned_classes=1)
+        l_comp_yr_current = LearningComponentYearFactory(
+            acronym=acronym_used_twice,
+            planned_classes=1
+        )
+        l_comp_yr_previous = LearningComponentYearFactory(
+            acronym=acronym_used_twice,
+            planned_classes=0
+        )
+        l_comp_yr_next = LearningComponentYearFactory(
+            acronym=acronym_used_once,
+            planned_classes=0
+        )
 
         data = compare_learning_component_year(l_comp_yr_current, l_comp_yr_previous, l_comp_yr_next)
         self.assertEqual(data.get('acronym'),

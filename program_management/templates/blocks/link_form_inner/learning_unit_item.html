@@ -1,0 +1,15 @@
+{% load bootstrap3 i18n static %}
+
+<tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+    {{ form.id }}
+    <td >{{ form.initial.code }}</td>
+    <td>
+        {% with form.initial.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
+            {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
+        {% endwith %}
+    </td>
+    <td>{{ form.is_mandatory }}</td>
+    <td>{% bootstrap_field form.block show_label=False %}</td>
+    <td>{% bootstrap_field form.comment_fr show_label=False %}</td>
+    <td>{% bootstrap_field form.comment_en show_label=False %}</td>
+</tr>

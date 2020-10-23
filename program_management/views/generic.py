@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
-
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.views.generic import UpdateView, DetailView
+from django.views.generic import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views.education_groups import perms
-from base.views.education_groups.detail import CatalogGenericDetailView
-from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from base.views.mixins import FlagMixin, AjaxTemplateMixin
+from education_group.models.group_year import GroupYear
+from education_group.views.mixin import ElementSelectedClipBoardMixin
+from osis_common.utils.models import get_object_or_none
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.models.enums.node_type import NodeType
+from program_management.ddd.business_types import *
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -50,7 +61,7 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
 
 
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
@@ -58,18 +69,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
     # FlagMixin
     flag = "education_group_update"
 
-    # RulesRequiredMixin
-    raise_exception = True
-    rules = [perms.can_change_education_group]
-
-    def _call_rule(self, rule):
-        """ The permission is computed from the education_group_year """
-        return rule(self.request.user, self.education_group_year)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['root'] = self.kwargs["root_id"]
-        return context
+    permission_required = 'base.change_link_data'
 
     @property
     def education_group_year(self):
@@ -78,73 +78,69 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
+    def get_permission_object(self) -> GroupYear:
+        return self.get_object().parent_element.group_year
 
-@method_decorator(login_required, name='dispatch')
-class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = LearningUnitYear
-    context_object_name = "learning_unit_year"
-    pk_url_kwarg = 'learning_unit_year_id'
 
-    raise_exception = True
-    rules = [perms.can_change_education_group]
-
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_root())
-
+class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
     def get_person(self):
         return get_object_or_404(Person, user=self.request.user)
-
-    def get_root(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     @cached_property
-    def education_group_year_hierarchy(self):
-        return EducationGroupHierarchy(self.get_root())
+    def program_tree(self):
+        return load_tree.load(self.get_root_id())
+
+    def get_root_id(self) -> int:
+        return int(self.kwargs['root_element_id'])
+
+    @cached_property
+    def node(self):
+        node = self.program_tree.get_node_by_id_and_type(
+            int(self.kwargs['child_element_id']),
+            NodeType.LEARNING_UNIT
+        )
+        if node is None:
+            raise Http404
+        return node
+
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(
+            NodeIdentity(code=self.program_tree.root_node.code, year=self.program_tree.root_node.year))
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        root = self.get_root()
         context['person'] = self.get_person()
+        # TODO: use DDD instead
+        root = GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
         context['root'] = root
-        context['root_id'] = self.kwargs.get("root_id")
-        context['parent'] = root
-        context['tree'] = json.dumps(self.education_group_year_hierarchy.to_json())
-
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['root_id'] = self.program_tree.root_node.pk
+        context['parent'] = self.program_tree.root_node
+        context['node'] = self.node
+        context['tree_json_url'] = self.get_tree_json_url()
+        context['tree_root_id'] = self.get_root_id()
+        context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
+        context['selected_element_clipboard'] = self.get_selected_element_clipboard_message()
+        context['xls_ue_prerequisites'] = reverse("education_group_learning_units_prerequisites",
+                                                  args=[root.academic_year.year, root.partial_acronym]
+                                                  )
+        context['xls_ue_is_prerequisite'] = reverse("education_group_learning_units_is_prerequisite_for",
+                                                    args=[root.academic_year.year, root.partial_acronym]
+                                                    )
+        # TODO: Remove when DDD is implemented on learning unit year...
+        context['learning_unit_year'] = get_object_or_none(
+            LearningUnitYear,
+            element__pk=self.kwargs['child_element_id']
+        )
         return context
 
+    def show_prerequisites(self, root_node: 'NodeGroupYear'):
+        return root_node.node_type not in NO_PREREQUISITES
 
-@method_decorator(login_required, name='dispatch')
-class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
-    model = LearningUnitYear
-    context_object_name = "learning_unit_year"
-    pk_url_kwarg = 'learning_unit_year_id'
-
-    permission_required = 'base.can_access_education_group'
-    raise_exception = True
-
-    def get_person(self):
-        return get_object_or_404(Person, user=self.request.user)
-
-    def get_root(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        root = self.get_root()
-        self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
-        # TODO remove parent in context
-        context['person'] = self.get_person()
-        context['root'] = root
-        context['root_id'] = root.pk
-        context['parent'] = root
-        context['tree'] = json.dumps(self.hierarchy.to_json())
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['show_prerequisites'] = self.show_prerequisites(root)
-        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
-        return context
-
-    def show_prerequisites(self, education_group_year):
-        return education_group_year.education_group_type.name not in NO_PREREQUISITES
+    def get_tree_json_url(self) -> str:
+        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})

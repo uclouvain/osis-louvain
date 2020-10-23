@@ -32,13 +32,11 @@ import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, active_status, schedule_type
-from base.models.enums.constraint_type import CREDITS
 from base.models.enums.duration_unit import DURATION_UNIT
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
@@ -54,12 +52,23 @@ def generate_title(education_group_year):
     return '{obj.academic_year} {gen_str}'.format(obj=education_group_year, gen_str=string_generator()).lower()
 
 
+def generate_partial_acronym():
+    sigle_ele = "".join(random.sample(string.ascii_uppercase, k=5))
+    cnum = "".join(random.sample(string.digits, k=3))
+    subdivision = random.choice(string.ascii_uppercase)
+    return "{sigle_ele}{cnum}{subdivision}".format(
+        sigle_ele=sigle_ele,
+        cnum=cnum,
+        subdivision=subdivision
+    )
+
+
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EducationGroupYear
         django_get_or_create = ('partial_acronym', 'academic_year',)
 
-    education_group = factory.SubFactory(EducationGroupFactory)
+    education_group = factory.SubFactory("base.tests.factories.education_group.EducationGroupFactory")
     academic_year = factory.SubFactory(AcademicYearFactory)
     acronym = ""
     partial_acronym = ""
@@ -70,19 +79,13 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
-    main_teaching_campus = factory.SubFactory(CampusFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
-    min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
-    max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
-    remark = factory.fuzzy.FuzzyText(length=255)
-    remark_english = factory.fuzzy.FuzzyText(length=255)
     active = active_status.ACTIVE
     schedule_type = schedule_type.DAILY
     weighting = True
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)
-    constraint_type = CREDITS
     linked_with_epc = False
     primary_language = factory.SubFactory(LanguageFactory)
     enrollment_campus = factory.SubFactory(CampusFactory)
@@ -102,7 +105,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
             if self.partial_acronym == "":
                 self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
         except KeyError:
-            self.partial_acronym = string_generator(7)
+            self.partial_acronym = generate_partial_acronym()
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
@@ -129,8 +132,8 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearBachelorFactory(EducationGroupYearCommonBachelorFactory):
-    acronym = 'actu1ba'
-    partial_acronym = 'actu1ba'
+    acronym = 'ACTU1BA'
+    partial_acronym = 'ACTU1BA'
 
 
 class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
@@ -164,8 +167,8 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
-    acronym = 'actu2m'
-    partial_acronym = 'actu2m'
+    acronym = 'ACTU2M'
+    partial_acronym = 'ACTU2M'
 
 
 class EducationGroupYearCommonFactory(EducationGroupYearFactory):
@@ -175,4 +178,14 @@ class EducationGroupYearCommonFactory(EducationGroupYearFactory):
         'base.tests.factories.education_group_type.EducationGroupTypeFactory',
         name=MiniTrainingType.DEEPENING.name,
         category=education_group_categories.MINI_TRAINING
+    )
+
+
+class ContinuingEducationTrainingFactory(EducationGroupYearFactory):
+    acronym = 'acronym-FC'
+    partial_acronym = 'acronym-FC'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        category=education_group_categories.TRAINING,
+        name=factory.fuzzy.FuzzyChoice(TrainingType.continuing_education_types())
     )

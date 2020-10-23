@@ -59,7 +59,7 @@ class ProposalLearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
@@ -88,7 +88,7 @@ class ProposalLearningUnitFilter(FilterSet):
         field_name="proposallearningunit__entity_id",
         label=_('Folder entity'),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     folder = filters.NumberFilter(
         field_name="proposallearningunit__folder_id",
@@ -102,14 +102,14 @@ class ProposalLearningUnitFilter(FilterSet):
         label=_('Proposal type'),
         choices=_get_sorted_choices(ProposalType.choices()),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     proposal_state = filters.ChoiceFilter(
         field_name="proposallearningunit__state",
         label=_('Proposal status'),
         choices=_get_sorted_choices(ProposalState.choices()),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     search_type = filters.CharFilter(
         field_name="acronym",

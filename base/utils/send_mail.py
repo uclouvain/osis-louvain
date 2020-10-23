@@ -165,62 +165,6 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
     return message_service.send_messages(message_content)
 
 
-def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(statistics_context: dict):
-    html_template_ref = 'egy_before_auto_postponement_html'
-    txt_template_ref = 'egy_before_auto_postponement_txt'
-
-    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(
-        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
-    ).distinct()
-    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {
-        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past(),
-        'current_academic_year': statistics_context['max_academic_year_to_postpone'],
-
-        # Use len instead of count() (it's buggy when a queryset is built with a difference())
-        'egys_to_postpone': len(statistics_context['to_duplicate']),
-        'egys_already_existing': statistics_context['already_duplicated'].count(),
-        'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
-    }
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
-                                                            template_base_data, None, None)
-    return message_service.send_messages(message_content)
-
-
-def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
-        statistics_context: dict, egys_postponed: list, egys_with_errors: list):
-
-    html_template_ref = 'egy_after_auto_postponement_html'
-    txt_template_ref = 'egy_after_auto_postponement_txt'
-
-    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(
-        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
-    ).distinct()
-    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {
-        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past(),
-        'current_academic_year': statistics_context['max_academic_year_to_postpone'],
-        'egys_postponed': len(egys_postponed),
-        'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
-        'egys_already_existing': statistics_context['already_duplicated'].count(),
-        'egys_already_existing_qs': statistics_context['already_duplicated'].order_by(
-          'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
-        'egys_ending_this_year_qs': statistics_context['ending_on_max_academic_year'].order_by(
-          'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_with_errors': egys_with_errors
-    }
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
-                                                            template_base_data, None, None)
-    return message_service.send_messages(message_content)
-
-
-def __sort_education_group_type(egy):
-    return (egy.education_group_type.name, egy.acronym)
-
-
 def send_mail_cancellation_learning_unit_proposals(manager, tuple_proposals_results, research_criteria):
     html_template_ref = 'learning_unit_proposal_canceled_html'
     txt_template_ref = 'learning_unit_proposal_canceled_txt'

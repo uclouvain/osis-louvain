@@ -26,7 +26,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from base.models import offer, program_manager, academic_year
+from base.models import offer, academic_year
+from base.auth.roles import program_manager
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 

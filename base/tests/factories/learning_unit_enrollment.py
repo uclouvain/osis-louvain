@@ -37,8 +37,7 @@ class LearningUnitEnrollmentFactory(factory.django.DjangoModelFactory):
         model = "base.LearningUnitEnrollment"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     date_enrollment = datetime.datetime.now()
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)

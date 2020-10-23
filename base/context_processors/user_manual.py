@@ -31,7 +31,7 @@ UNDEFINED_VIEW_NAME = "UNDEFINED"
 
 GLOBAL = UserManual(
     name="global",
-    url="http://uclouvain.github.io/osis/assets/user_manual_fr.pdf",
+    url="https://uclouvain.be/osis",
     contextual_paths=[]
 )
 

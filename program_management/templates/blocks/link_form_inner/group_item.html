@@ -1,0 +1,12 @@
+{% load bootstrap3 i18n static %}
+
+<tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+    {{ form.id }}
+    <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
+    <td>{{ node.code }}</td>
+    <td>{{ form.is_mandatory }}</td>
+    <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>
+    <td style="word-wrap: break-word; min-width: 125px;max-width: 125px;">{% if form.link_type %}{% bootstrap_field form.link_type show_label=False %}{% else %}-{% endif %}</td>
+    <td>{% bootstrap_field form.comment_fr show_label=False %}</td>
+    <td>{% bootstrap_field form.comment_en show_label=False %}</td>
+</tr>

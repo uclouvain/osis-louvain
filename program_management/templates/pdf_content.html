@@ -14,7 +14,7 @@
             margin: 2cm 1cm 2cm 1cm;
 
             @top-right {
-                content: "{% trans 'Academic year' %} {{ root.academic_year }} \A {{ root.verbose_title|safe }}";
+                content: "{% trans 'Academic year' %} {{ root.academic_year }} \A {{ title|safe }}";
                 white-space: pre-line;
                 font-size: 11px;
             }
@@ -52,7 +52,7 @@
     <div class="list-group">
         <div class="container" style="font-size: 11px;">
             <div style="font-weight: bold;text-decoration: underline; ">
-                {% trans "Registration form for the content of" %} {{ root.verbose_title }}
+                {% trans "Registration form for the content of" %} {{ title }}
             </div>
             <br>
             <div>
