@@ -24,14 +24,13 @@
 #
 ##############################################################################
 import re
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models, connection
+from django.db import models
 from django.db.models import Count, Min, When, Case, Max
-from django.db.models.signals import post_delete
-from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -45,17 +44,13 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
-from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
-from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
+from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
-from cms.enums.entity_name import OFFER_YEAR
-from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
-from osis_common.utils.models import get_object_or_none
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -64,7 +59,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     raw_id_fields = (
         'education_group_type', 'academic_year',
         'education_group', 'enrollment_campus',
-        'main_teaching_campus', 'primary_language'
+        'primary_language'
     )
     search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk', 'id']
 
@@ -128,51 +123,8 @@ class EducationGroupYearManager(SerializableModelManager):
         return self.get_queryset().get_nearest_years(year)
 
 
-class HierarchyQuerySet(models.QuerySet):
-    def get_parents(self):
-        with connection.cursor() as cursor:
-            child_pks = self.values_list('pk', flat=True)
-            cmd_sql = """
-             WITH RECURSIVE group_element_year_parent AS (
-                    SELECT parent_id
-                    FROM base_groupelementyear
-                    WHERE child_branch_id IN (%s)
-                    UNION ALL
-                    SELECT parent.parent_id
-                    FROM base_groupelementyear as parent
-                    INNER JOIN group_element_year_parent AS child on child.parent_id = parent.child_branch_id
-                )
-              SELECT distinct parent_id FROM group_element_year_parent;
-            """ % ','.join(["%s"] * len(child_pks))
-            cursor.execute(cmd_sql, list(child_pks))
-            education_group_year_pks = [row[0] for row in cursor.fetchall()]
-        return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
-
-    def get_children(self):
-        with connection.cursor() as cursor:
-            parent_pks = self.values_list('pk', flat=True)
-            cmd_sql = """
-                WITH RECURSIVE group_element_year_children AS (
-                    SELECT child_branch_id
-                    FROM base_groupelementyear
-                    WHERE parent_id IN (%s)
-                    UNION ALL
-                    SELECT child.child_branch_id
-                    FROM base_groupelementyear AS child
-                    INNER JOIN group_element_year_children AS parent on parent.child_branch_id = child.parent_id
-                    WHERE child.child_branch_id is not null
-                )
-                SELECT distinct child_branch_id FROM group_element_year_children;
-            """ % ','.join(["%s"] * len(parent_pks))
-            cursor.execute(cmd_sql, list(parent_pks))
-            education_group_year_pks = [row[0] for row in cursor.fetchall()]
-        return EducationGroupYear.objects.filter(pk__in=education_group_year_pks)
-
-
 class EducationGroupYear(SerializableModel):
     objects = EducationGroupYearManager()
-    hierarchy = HierarchyQuerySet.as_manager()
-
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -197,6 +149,7 @@ class EducationGroupYear(SerializableModel):
     partial_title = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in French")
     )
@@ -204,6 +157,7 @@ class EducationGroupYear(SerializableModel):
     partial_title_english = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in English")
     )
@@ -287,15 +241,6 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("Enrollment campus"),
-        on_delete=models.PROTECT
-    )
-
-    main_teaching_campus = models.ForeignKey(
-        'Campus',
-        blank=True,
-        null=True,
-        related_name='teaching',
-        verbose_name=_("Learning location"),
         on_delete=models.PROTECT
     )
 
@@ -433,41 +378,6 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_("credits"),
     )
 
-    remark = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark")
-    )
-
-    remark_english = models.TextField(
-        blank=True,
-        default="",
-        verbose_name=_("remark in english")
-    )
-
-    min_constraint = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("minimum constraint"),
-        validators=[MinValueValidator(1)]
-    )
-
-    max_constraint = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("maximum constraint"),
-        validators=[MinValueValidator(1)]
-    )
-
-    constraint_type = models.CharField(
-        max_length=20,
-        choices=CONSTRAINT_TYPE,
-        default=None,
-        blank=True,
-        null=True,
-        verbose_name=_("type of constraint")
-    )
-
     main_domain = models.ForeignKey(
         "reference.domain",
         on_delete=models.PROTECT,
@@ -487,6 +397,7 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("ISCED domain"),
+        limit_choices_to={'is_ares': True},
     )
 
     management_entity = models.ForeignKey(
@@ -588,8 +499,13 @@ class EducationGroupYear(SerializableModel):
         verbose_name = _("Education group year")
         unique_together = (
             ('education_group', 'academic_year'),
-            ('partial_acronym', 'academic_year')
+            ('partial_acronym', 'academic_year'),
+            ('acronym', 'academic_year'),
         )
+        index_together = [
+            ("acronym", "academic_year"),
+            ('partial_acronym', 'academic_year'),
+        ]
 
     def __str__(self):
         return "{} - {} - {}".format(
@@ -599,20 +515,12 @@ class EducationGroupYear(SerializableModel):
         )
 
     @property
-    def type(self):
-        return self.education_group_type.name
-
-    @property
     def is_option(self):
-        return self.type == MiniTrainingType.OPTION.name
+        return self.education_group_type.name == MiniTrainingType.OPTION.name
 
     @property
     def is_finality(self):
-        return self.type in TrainingType.finality_types()
-
-    @property
-    def is_attestation(self):
-        return self.type in TrainingType.attestation_types()
+        return self.education_group_type.name in TrainingType.finality_types()
 
     @property
     def is_continuing_education_education_group_year(self):
@@ -620,19 +528,19 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_minor(self):
-        return self.type in MiniTrainingType.minors()
+        return self.education_group_type.name in MiniTrainingType.minors()
 
     @property
     def is_major(self):
-        return self.type == MiniTrainingType.FSA_SPECIALITY.name
+        return self.education_group_type.name == MiniTrainingType.FSA_SPECIALITY.name
 
     @property
     def is_deepening(self):
-        return self.type == MiniTrainingType.DEEPENING.name
+        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
 
     @property
     def is_minor_major_option_list_choice(self):
-        return self.type in GroupType.minor_major_option_list_choice()
+        return self.education_group_type.name in GroupType.minor_major_option_list_choice()
 
     @property
     def is_common(self):
@@ -648,27 +556,27 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_master120(self):
-        return self.type == TrainingType.PGRM_MASTER_120.name
+        return self.education_group_type.name == TrainingType.PGRM_MASTER_120.name
 
     @property
     def is_master60(self):
-        return self.type == TrainingType.MASTER_M1.name
+        return self.education_group_type.name == TrainingType.MASTER_M1.name
 
     @property
     def is_aggregation(self):
-        return self.type == TrainingType.AGGREGATION.name
+        return self.education_group_type.name == TrainingType.AGGREGATION.name
 
     @property
     def is_specialized_master(self):
-        return self.type == TrainingType.MASTER_MC.name
+        return self.education_group_type.name == TrainingType.MASTER_MC.name
 
     @property
     def is_bachelor(self):
-        return self.type == TrainingType.BACHELOR.name
+        return self.education_group_type.name == TrainingType.BACHELOR.name
 
     @property
     def is_master180(self):
-        return self.type == TrainingType.PGRM_MASTER_180_240.name
+        return self.education_group_type.name == TrainingType.PGRM_MASTER_180_240.name
 
     @property
     def has_common_admission_condition(self):
@@ -684,7 +592,7 @@ class EducationGroupYear(SerializableModel):
             else self.title
         return "{} ({} {})".format(title, self.credits or 0, _("credits"))
 
-    @property
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def verbose_title(self):
         if self.is_finality:
             if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
@@ -703,37 +611,11 @@ class EducationGroupYear(SerializableModel):
     def complete_title(self):
         return self.verbose_title
 
-    @property
-    def verbose_remark(self):
-        if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.remark_english
-        return self.remark
-
-    @property
-    def verbose_constraint(self):
-        msg = "from %(min)s to %(max)s credits among" \
-            if self.constraint_type == CREDITS else "from %(min)s to %(max)s among"
-        return _(msg) % {
-            "min": self.min_constraint if self.min_constraint else "",
-            "max": self.max_constraint if self.max_constraint else ""
-        }
-
-    @property
-    def verbose_duration(self):
-        if self.duration and self.duration_unit:
-            return "{} {}".format(self.duration, self.get_duration_unit_display())
-        return ""
-
     def get_absolute_url(self):
-        return reverse("education_group_read", args=[self.pk, self.pk])
-
-    @property
-    def str_domains(self):
-        ch = "{}-{}\n".format(self.main_domain.decree, self.main_domain.name) if self.main_domain else ""
-
-        for domain in self.secondary_domains.all():
-            ch += "{}-{}\n".format(domain.decree, domain.name)
-        return ch
+        return reverse(
+            'education_group_read_proxy',
+            args=[self.academic_year.year, self.acronym]
+        )
 
     @cached_property
     def administration_entity_version(self):
@@ -742,7 +624,7 @@ class EducationGroupYear(SerializableModel):
         )
 
     @cached_property
-    def management_entity_version(self):
+    def management_entity_version(self) -> Optional['entity_version.EntityVersion']:
         return entity_version.find_entity_version_according_academic_year(
             self.management_entity, self.academic_year
         )
@@ -754,27 +636,6 @@ class EducationGroupYear(SerializableModel):
                 self.publication_contact_entity, self.academic_year
             )
         return None
-
-    def parent_by_training(self):
-        """
-        Return the parent, only if the education group and its parent are a training.
-
-        In our structure, it is forbidden to have 2 training parents for a training.
-        """
-
-        if self.is_training():
-            try:
-                return get_object_or_none(
-                    EducationGroupYear,
-                    groupelementyear__child_branch=self,
-                    education_group_type__category=education_group_categories.TRAINING
-                )
-            except EducationGroupYear.MultipleObjectsReturned:
-                raise MaximumOneParentAllowedException('Only one training parent is allowed')
-
-    @cached_property
-    def children(self):
-        return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
 
     @cached_property
     def coorganizations(self):
@@ -798,30 +659,10 @@ class EducationGroupYear(SerializableModel):
     def category(self):
         return self.education_group_type.category
 
-    @property
-    def direct_parents_of_branch(self):
-        return EducationGroupYear.objects.filter(
-            groupelementyear__child_branch=self
-        ).distinct()
-
-    @property
-    def ascendants_of_branch(self):
-        ascendants = []
-
-        for parent in self.direct_parents_of_branch:
-            ascendants.append(parent)
-            ascendants += parent.ascendants_of_branch
-
-        return list(set(ascendants))
-
     def clean(self):
         self.clean_academic_year()
         self.clean_acronym()
         self.clean_partial_acronym()
-        if not self.constraint_type:
-            self.clean_constraint_type()
-        else:
-            self.clean_min_max()
         self.clean_duration_data()
 
     def clean_academic_year(self):
@@ -829,28 +670,6 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({
                 'academic_year': _("You cannot create/update an education group before %(limit_year)s") % {
                                 "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
-            })
-
-    def clean_constraint_type(self):
-        # If min or max has been set, constraint_type is required
-        if self.min_constraint is not None or self.max_constraint is not None:
-            raise ValidationError({'constraint_type': _("This field is required.")})
-
-    def clean_min_max(self):
-        # If constraint_type has been set, min OR max are required
-        if self.min_constraint is None and self.max_constraint is None:
-            raise ValidationError({
-                'min_constraint': _("You should precise at least minimum or maximum constraint"),
-                'max_constraint': '',
-            })
-
-        if self.min_constraint is not None and self.max_constraint is not None and \
-                self.min_constraint > self.max_constraint:
-            raise ValidationError({
-                'max_constraint': _("%(max)s must be greater or equals than %(min)s") % {
-                    "max": _("maximum constraint").title(),
-                    "min": _("minimum constraint").title(),
-                }
             })
 
     def clean_duration_data(self):
@@ -956,35 +775,12 @@ class EducationGroupYear(SerializableModel):
             return None
 
 
-def search(**kwargs):
-    qs = EducationGroupYear.objects
-
-    if "id" in kwargs:
-        if isinstance(kwargs['id'], list):
-            qs = qs.filter(id__in=kwargs['id'])
-        else:
-            qs = qs.filter(id=kwargs['id'])
-    if "academic_year" in kwargs:
-        qs = qs.filter(academic_year=kwargs['academic_year'])
-    if kwargs.get("acronym"):
-        qs = qs.filter(acronym__icontains=kwargs['acronym'])
-    if kwargs.get("title"):
-        qs = qs.filter(title__icontains=kwargs['title'])
-    if "education_group_type" in kwargs:
-        if isinstance(kwargs['education_group_type'], list):
-            qs = qs.filter(education_group_type__in=kwargs['education_group_type'])
-        else:
-            qs = qs.filter(education_group_type=kwargs['education_group_type'])
-    elif kwargs.get('category'):
-        qs = qs.filter(education_group_type__category=kwargs['category'])
-
-    if kwargs.get("partial_acronym"):
-        qs = qs.filter(partial_acronym__icontains=kwargs['partial_acronym'])
-
-    if kwargs.get("enrollment_states"):
-        qs = qs.filter(offerenrollment__enrollment_state__in=kwargs['enrollment_states'])
-
-    return qs.select_related('education_group_type', 'academic_year')
+def have_link_with_epc(acronym: str, year: int) -> bool:
+    return EducationGroupYear.objects.filter(
+        acronym=acronym,
+        academic_year__year=year,
+        linked_with_epc=True
+    ).exists()
 
 
 # TODO :: Annotate/Count() in only 1 query instead of 2
@@ -998,9 +794,12 @@ def find_with_enrollments_count(learning_unit_year):
 
 
 def _count_education_group_enrollments_by_id(education_groups_years):
-    educ_groups = search(id=[educ_group.id for educ_group in education_groups_years],
-                         enrollment_states=[SUBSCRIBED, PROVISORY]) \
-        .annotate(count_formation_enrollments=Count('offerenrollment')).values('id', 'count_formation_enrollments')
+    educ_groups = EducationGroupYear.objects.filter(
+        pk__in=[educ_group.id for educ_group in education_groups_years],
+        offerenrollment__enrollment_state__in=[SUBSCRIBED, PROVISORY]
+    ).annotate(
+        count_formation_enrollments=Count('offerenrollment')
+    ).values('id', 'count_formation_enrollments')
     return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
 
 
@@ -1008,8 +807,3 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
     return EducationGroupYear.objects \
         .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
-
-
-@receiver(post_delete, sender=EducationGroupYear)
-def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

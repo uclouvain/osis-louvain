@@ -1,0 +1,50 @@
+{% load static %}
+{% load i18n format education_group group_element_year osis_role %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="container-align-items-center" aria-label="actions">
+
+    {% if not up_disabled %}
+        <form id="form_up_{{ link.child.code }}" method="POST"
+              action="{% url 'content_up' %}">
+            {% csrf_token %}
+            <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+            {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
+        </form>
+    {% endif %}
+
+    {% if not down_disabled %}
+        <form id="form_down_{{ link.child.code }}" method="POST"
+              action="{% url 'content_down' %}">
+            {% csrf_token %}
+            <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+
+            {% submit_btn_has_perm inner_html='<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year class_btn='btn-link nopadding' %}
+        </form>
+    {% endif %}
+
+    {% url 'tree_detach_node' as detach_url %}
+    {% a_tag_modal_has_perm url=detach_url|addstr:'?path='|addstr:node_path|addstr:"|"|addstr:link.child.node_id text='<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' perm='base.change_link_data' user=user obj=group_year %}
+</div>

@@ -30,7 +30,7 @@ from rest_framework.reverse import reverse
 
 from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -38,6 +38,10 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList, EducationGroupRootsList
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -49,25 +53,30 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        relative_credits = 15
-        group = GroupFactory(academic_year=cls.academic_year)
-        cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
-        GroupElementYearFactory(parent=cls.training, child_branch=group, child_leaf=None)
-        cls.group_element_year = GroupElementYearFactory(
-            parent=group, child_leaf=cls.luy, child_branch=None, relative_credits=relative_credits
+        cls.version = EducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__academic_year=cls.training.academic_year
         )
-
-        url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
-            'acronym': cls.luy.acronym,
-            'year': cls.academic_year.year,
-        })
-        cls.offer = EducationGroupYear.objects.filter(id=cls.training.id).annotate(
+        root_element = ElementFactory(group_year=cls.version.root_group)
+        group = GroupYearFactory(academic_year=cls.academic_year)
+        group_element = ElementFactory(group_year=group)
+        cls.luy = LearningUnitYearFactory(academic_year=cls.academic_year)
+        luy_element = ElementFactory(learning_unit_year=cls.luy)
+        GroupElementYearFactory(parent_element=root_element, child_element=group_element)
+        relative_credits = 15
+        cls.group_element_year = GroupElementYearFactory(
+            parent_element=group_element, child_element=luy_element, relative_credits=relative_credits)
+        cls.annotated_version = EducationGroupVersion.objects.filter(id=cls.version.id).annotate(
             relative_credits=Value(relative_credits, output_field=IntegerField())
         ).first()
-        cls.serializer = EducationGroupRootsListSerializer(cls.offer, context={
+        url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={
+            'acronym': cls.luy.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = EducationGroupRootsListSerializer(cls.annotated_version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN,
-            'learning_unit_year': cls.luy,
+            'learning_unit_year': cls.luy
         })
 
     def test_contains_expected_fields(self):
@@ -99,12 +108,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
         self.assertEqual(
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
-        )
-
-    def test_get_appropriate_learning_unit_credits(self):
-        self.assertEqual(
-            self.serializer.data['learning_unit_credits'],
-            self.group_element_year.relative_credits
         )
 
 
@@ -143,11 +146,11 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     def test_ensure_academic_year_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['academic_year'],
-            self.prerequisite.education_group_year.academic_year.year
+            self.prerequisite.education_group_version.offer.academic_year.year
         )
 
     def test_ensure_education_group_type_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['education_group_type'],
-            self.prerequisite.education_group_year.education_group_type.name
+            self.prerequisite.education_group_version.offer.education_group_type.name
         )

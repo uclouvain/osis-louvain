@@ -4,6 +4,9 @@ function redirect_after_success(modal, xhr) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
     } else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
+        if(xhr["force_reload"]){
+            window.location.reload();
+        }
     } else {
         window.location.reload();
     }
@@ -17,6 +20,16 @@ function addDispatchEventOnSubmitAjaxForm(e) {
 
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
+        if ($(this).hasClass("validate")){
+            inputs = document.getElementById($(this).attr("id")).elements;
+            arrayInputs = Array.from(inputs);
+            validityStates = arrayInputs.map(input => input.reportValidity())
+            isFormValid = validityStates.every(state => state === true);
+
+            if (isFormValid === false){
+                return false;
+            }
+        }
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
         addDispatchEventOnSubmitAjaxForm(e);
@@ -49,11 +62,10 @@ var formAjaxSubmit = function (form, modal) {
     });
 };
 
-
-
-
 // CKEDITOR needs to dynamically bind the textareas during an XMLHttpRequest requests
 function bindTextArea() {
+    //clean instances before binding to avoid error on CKEDITOR.replace with same instance id
+    destroyAllInstances();
     $("textarea[data-type='ckeditortype']").each(function () {
         CKEDITOR.replace($(this).attr('id'), $(this).data('config'));
     });

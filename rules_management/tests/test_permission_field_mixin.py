@@ -41,6 +41,10 @@ class CountryForm(PermissionFieldMixin, forms.ModelForm):
         model = Country
         fields = "__all__"
 
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
 
 class TestPermissionFieldMixin(TestCase):
     @classmethod

@@ -41,7 +41,7 @@ class EntityAdmin(SerializableModelAdmin):
 
 class Entity(SerializableModel):
     organization = models.ForeignKey('Organization', blank=True, null=True, on_delete=models.CASCADE)
-    external_id = models.CharField(max_length=255, unique=True, db_index=True)
+    external_id = models.CharField(max_length=255, unique=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     location = models.CharField(max_length=255, blank=True, null=True)

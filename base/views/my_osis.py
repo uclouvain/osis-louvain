@@ -134,7 +134,7 @@ def profile_attributions(request):
 def _get_data(request):
     person = mdl.person.find_by_user(request.user)
     tutor = mdl.tutor.find_by_person(person)
-    programs = mdl.program_manager.find_by_person(person).prefetch_related(
+    programs = base.auth.roles.program_manager.find_by_person(person).prefetch_related(
         Prefetch(
             'education_group__educationgroupyear_set',
             queryset=EducationGroupYear.objects.filter(

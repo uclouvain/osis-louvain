@@ -153,7 +153,9 @@ class TestLearningUnitAdmin(TestCase):
         lu = LearningUnitFactory(end_year=None)
         LearningUnitYearFactory(
             academic_year=academic_years[0],
-            learning_unit=lu
+            learning_unit=lu,
+            learning_container_year__requirement_entity=None,
+            learning_container_year__allocation_entity=None,
         )
 
         postpone_url = reverse('admin:base_learningunit_changelist')

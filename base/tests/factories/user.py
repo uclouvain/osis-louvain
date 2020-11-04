@@ -30,10 +30,8 @@ import factory
 from osis_common.utils.datetime import get_tzinfo
 
 
-def generate_email(user, domain=None):
-    if domain is None:
-        domain = factory.Faker('domain_name').generate({})
-    return '{0.first_name}.{0.last_name}@{1}'.format(user, domain).lower()
+def generate_email(user):
+    return '{0.first_name}.{0.last_name}@temp.com'.format(user).lower()
 
 
 class UserFactory(factory.django.DjangoModelFactory):

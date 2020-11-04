@@ -24,20 +24,20 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'learning_unit_utilization' root.pk learning_unit_year.pk as url_utilization_tab %}
-{% url 'learning_unit_prerequisite' root.pk learning_unit_year.pk as url_prerequisite_tab %}
-{% url 'learning_unit_prerequisite_update' root.pk learning_unit_year.pk as url_prerequisite_update_tab %}
+{% url 'learning_unit_utilization' parent.pk node.pk as url_utilization_tab %}
+{% url 'learning_unit_prerequisite' parent.pk node.pk as url_prerequisite_tab %}
+{% url 'learning_unit_prerequisite_update' parent.pk node.pk as url_prerequisite_update_tab %}
 
 
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" {% if request.path == url_utilization_tab %} class="active" {% endif %}>
-        <a id="link_utilization" href="{{ url_utilization_tab }}?tab_to_show=show_utilization{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+        <a id="link_utilization" href="{{ url_utilization_tab }}?tab_to_show=show_utilization" role="tab">
             {% trans 'Utilizations'%}
         </a>
     </li>
     {% if show_prerequisites %}
         <li role="presentation" {% if request.path == url_prerequisite_tab or request.path == url_prerequisite_update_tab %} class="active" {% endif %}>
-            <a id="link_prerequisite" href="{{ url_prerequisite_tab}}?tab_to_show=show_prerequisite{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+            <a id="link_prerequisite" href="{{ url_prerequisite_tab}}?tab_to_show=show_prerequisite" role="tab">
                 {% blocktrans count counter=2 %}Prerequisite{% plural %}Prerequisites{% endblocktrans %}
             </a>
         </li>

@@ -31,31 +31,14 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
-from base.views.mixins import RulesRequiredMixin
+from education_group.views.proxy.read import Tab
 
 
-class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
+class EducationGroupAchievementMixin(SingleObjectMixin):
     # SingleObjectMixin
     model = EducationGroupAchievement
     context_object_name = "education_group_achievement"
     pk_url_kwarg = 'education_group_achievement_pk'
-
-    def get_success_url(self):
-        # Redirect to a page fragment
-        url = reverse(
-            "education_group_skills_achievements",
-            args=[
-                self.kwargs['root_id'],
-                self.kwargs['education_group_year_id'],
-            ]
-        )
-
-        obj = getattr(self, "object", None) or self.get_object()
-        if obj:
-            # Remove the last / otherwise URL will be malformed
-            url = url.rstrip('/') + "#{}_{}".format(self.context_object_name, obj.pk)
-
-        return url
 
     @cached_property
     def person(self):
@@ -63,14 +46,29 @@ class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
 
     @cached_property
     def education_group_year(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+        return get_object_or_404(
+            EducationGroupYear, partial_acronym=self.kwargs['code'],
+            academic_year__year=self.kwargs['year']
+        )
 
-    # RulesRequiredMixin
-    raise_exception = True
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'path': self.get_path()
+        }
 
-    def _call_rule(self, rule):
-        """ Rules will be call with the person and the education_group_year"""
-        return rule(self.person, self.education_group_year)
+    def get_path(self) -> str:
+        if self.request.method == 'POST':
+            return self.request.POST['path']
+        return self.request.GET['path']
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#achievement_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_achievement_pk']
+        )
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
@@ -82,3 +80,11 @@ class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):
     @cached_property
     def education_group_achievement(self):
         return get_object_or_404(EducationGroupAchievement, pk=self.kwargs["education_group_achievement_pk"])
+
+    def get_success_url(self):
+        prefix = 'training_' if self.education_group_year.is_training() else 'mini_training_'
+        return reverse(
+            prefix + 'skills_achievements', args=[self.kwargs['year'], self.kwargs['code']]
+        ) + '?path={}&tab={}#detail_achievements_{}'.format(
+            self.request.POST['path'], Tab.SKILLS_ACHIEVEMENTS, self.kwargs['education_group_detail_achievement_pk']
+        )

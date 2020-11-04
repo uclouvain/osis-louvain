@@ -23,18 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set
+import sys
+from typing import List, Set, Union
 
+import attr
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
+from base.utils.constants import INFINITE_VALUE
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedRelationshipAdmin(OsisModelAdmin):
-    list_display = ('parent_type', 'child_type', 'changed')
+    list_display = ('parent_type', 'child_type', 'min_count_authorized', 'max_count_authorized', 'changed')
     search_fields = ['parent_type__name', 'child_type__name']
 
 
@@ -58,33 +62,23 @@ class AuthorizedRelationship(models.Model):
         return '{} - {}'.format(self.parent_type, self.child_type)
 
 
+@attr.s(slots=True, frozen=True)
 class AuthorizedRelationshipObject:
-    # Object used for typing 'parent_type' and 'child_type' as Enum
-    def __init__(
-            self,
-            parent_type: EducationGroupTypesEnum,
-            child_type: EducationGroupTypesEnum,
-            min_constraint: int,
-            max_constraint: int
-    ):
-        self.parent_type = parent_type
-        self.child_type = child_type
-        self.min_count_authorized = min_constraint
-        self.max_count_authorized = max_constraint
+    parent_type = attr.ib(type=EducationGroupTypesEnum)
+    child_type = attr.ib(type=Union[EducationGroupTypesEnum, NodeType])
+    min_count_authorized = attr.ib(type=int)
+    max_count_authorized = attr.ib(type=int, converter=lambda value: INFINITE_VALUE if value is None else value)
 
 
 class AuthorizedRelationshipList:
 
     def __init__(self, authorized_relationships: List[AuthorizedRelationshipObject]):
-        assert authorized_relationships, "You must set at least 1 authorized relation (list can't be empty)"
-        assert isinstance(authorized_relationships, list)
-        assert isinstance(authorized_relationships[0], AuthorizedRelationshipObject)
         self.authorized_relationships = authorized_relationships
 
     def get_authorized_relationship(
             self,
             parent_type: EducationGroupTypesEnum,
-            child_type: EducationGroupTypesEnum
+            child_type: Union[EducationGroupTypesEnum, NodeType]
     ) -> AuthorizedRelationshipObject:
         return next(
             (
@@ -95,11 +89,62 @@ class AuthorizedRelationshipList:
             None
         )
 
-    def is_authorized(self, parent_type: EducationGroupTypesEnum, child_type: EducationGroupTypesEnum) -> bool:
+    def is_authorized(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: Union[EducationGroupTypesEnum, NodeType]
+    ) -> bool:
         return child_type in self.get_authorized_children_types(parent_type)
 
-    def get_authorized_children_types(self, parent_type: EducationGroupTypesEnum) -> Set[EducationGroupTypesEnum]:
+    def get_authorized_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> Set[Union[EducationGroupTypesEnum, NodeType]]:
         return set(
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_type
         )
+
+    def get_ordered_mandatory_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> List[EducationGroupTypesEnum]:
+        ordered_group_types = {group_type: order for order, group_type in enumerate(GroupType.ordered())}
+        mandatory_children_types = self._get_mandatory_children_types(parent_type)
+        types_with_order_value = [
+            (child_type, ordered_group_types.get(child_type.name, 999))
+            for child_type in mandatory_children_types
+        ]
+        return [child_type for child_type, order in sorted(types_with_order_value, key=lambda tuple: tuple[1])]
+
+    def _get_mandatory_children_types(
+            self,
+            parent_type: EducationGroupTypesEnum
+    ) -> Set[EducationGroupTypesEnum]:
+        return set(
+            authorized_type.child_type
+            for authorized_type in self.authorized_relationships
+            if isinstance(authorized_type.child_type, EducationGroupTypesEnum)
+            and authorized_type.parent_type == parent_type
+            and authorized_type.min_count_authorized > 0
+        )
+
+    def update(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: Union[EducationGroupTypesEnum, NodeType],
+            min_count_authorized: int = 0,
+            max_count_authorized: int = INFINITE_VALUE):
+        current_relationship_object = self.get_authorized_relationship(parent_type, child_type)
+        self.authorized_relationships.remove(current_relationship_object)
+
+        self.authorized_relationships.append(
+            AuthorizedRelationshipObject(
+                parent_type=parent_type,
+                child_type=child_type,
+                min_count_authorized=min_count_authorized,
+                max_count_authorized=max_count_authorized)
+        )
+
+    def __copy__(self) -> 'AuthorizedRelationshipList':
+        return self.__class__(authorized_relationships=self.authorized_relationships.copy())

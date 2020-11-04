@@ -29,6 +29,9 @@ from base.models.enums.organization_type import MAIN
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
+LOUVAIN_LA_NEUVE_CAMPUS_NAME = "Louvain-la-Neuve"
+
+
 class CampusAdmin(SerializableModelAdmin):
     list_display = ('name', 'organization', 'is_administration', 'changed')
     list_filter = ('organization', 'is_administration')
@@ -56,5 +59,12 @@ def find_main_campuses():
 def find_by_id(campus_id):
     try:
         return Campus.objects.get(id=campus_id)
+    except Campus.DoesNotExist:
+        return None
+
+
+def find_by_name_and_organization_name(name, organization_name):
+    try:
+        return Campus.objects.get(name=name, organization__name=organization_name)
     except Campus.DoesNotExist:
         return None

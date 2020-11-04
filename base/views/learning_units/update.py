@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
-from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -39,12 +35,9 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitDailyManagementEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
-from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -141,7 +134,7 @@ def update_learning_unit(request, learning_unit_year_id):
 @perms.can_perform_learning_unit_modification
 def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
 
     context['learning_units'] = _get_learning_units_for_context(luy=context['learning_unit_year'],
                                                                 with_family=form_type == "full")
@@ -185,7 +178,7 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
 
-        is_postponement = bool(int(request.POST.get('postponement', 0)))
+        is_postponement = bool(int(request.POST.get('postponement', 1))) and is_not_past(form)
 
         if is_postponement and existing_proposal:
             display_success_messages(
@@ -206,46 +199,8 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
     return records
 
 
-class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        country = self.forwarded.get('country', None)
-        qs = find_additional_requirement_entities_choices()
-        if country:
-            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
-            if country != "all":
-                qs = qs.filter(entity__country_id=country)
-        else:
-            qs = find_pedagogical_entities_version().order_by('acronym')
-        if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
-        return qs
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
-
-
-class AllocationEntityAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
-        return super(AllocationEntityAutocomplete, self).get_queryset()
-
-
-class AdditionnalEntity1Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
-        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
-
-
-class AdditionnalEntity2Autocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
-        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
-
-
-class EntityRequirementAutocomplete(EntityAutocomplete):
-    def get_queryset(self):
-        return super(EntityRequirementAutocomplete, self).get_queryset()\
-            .filter(entity__in=self.request.user.person.linked_entities)
-
-    def get_result_label(self, result):
-        return format_html(result.verbose_title)
+def is_not_past(form):
+    return (
+        not isinstance(form, LearningUnitPostponementForm) or
+        (isinstance(form, LearningUnitPostponementForm) and not form.start_postponement.is_past)
+    )

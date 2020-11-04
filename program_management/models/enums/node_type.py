@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from base.models.utils.utils import ChoiceEnum
 
 
 class NodeType(ChoiceEnum):
-    EDUCATION_GROUP = 'EDUCATION_GROUP'
-    GROUP = 'GROUP'
-    LEARNING_UNIT = 'LEARNING_UNIT'
-    LEARNING_CLASS = 'LEARNING_CLASS'
+    GROUP = _('Group')
+    LEARNING_UNIT = _('Learning unit')
+    LEARNING_CLASS = _('Learning class')

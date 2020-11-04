@@ -1,5 +1,5 @@
-from . import attach
-from . import create
+from . import paste
 from . import detach
 from . import move
 from . import update
+from . import read

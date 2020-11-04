@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,39 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import html
 import re
 from collections import namedtuple, defaultdict
+from typing import Dict, List
 
-from django.conf import settings
-from django.db.models import QuerySet, Subquery, OuterRef, Case, When
-from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
+from django.utils import translation
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
-from openpyxl.styles import Style, Font
+from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
-from attribution.business import attribution_charge_new
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
-    CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
-from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
+from attribution.ddd.domain.teacher import Teacher
+from backoffice.settings.base import LANGUAGE_CODE_EN
+from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
-from base.business.learning_units.xls_generator import hyperlinks_to_string
-from base.models.education_group_year import EducationGroupYear
+from base.business.learning_unit_xls import get_significant_volume
+from base.models.enums.education_group_types import GroupType
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
+from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.group_element_year import GroupElementYear
-from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.proposal_learning_unit import find_by_learning_unit_year
-from base.models.teaching_material import TeachingMaterial
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
+from base.utils.excel import get_html_to_text
+from learning_unit.ddd.domain.achievement import Achievement
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.ddd.domain.teaching_material import TeachingMaterial
+from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
+from osis_common.ddd.interface import BusinessException
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
+    STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
-from program_management.business.utils import html2text
+from program_management.ddd import command
+from program_management.ddd.business_types import *
+from program_management.ddd.command import SearchAllVersionsFromRootNodesCommand
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.read import get_program_tree_version_from_node_service
+from program_management.ddd.service.read.search_all_versions_from_root_nodes import search_all_versions_from_root_nodes
 from program_management.forms.custom_xls import CustomXlsForm
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
@@ -140,112 +148,99 @@ FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title
 LEGEND_WB_STYLE = 'colored_cells'
 LEGEND_WB_CONTENT = 'content'
 
-RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
-    WITH last_update_info AS (
-        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
-        FROM reversion_version version
-        JOIN reversion_revision revision ON version.revision_id = revision.id
-        JOIN auth_user users ON revision.user_id = users.id
-        JOIN base_person person ON person.user_id = users.id
-        join django_content_type ct on version.content_type_id = ct.id
-        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
-        left join cms_textlabel tl on tt.text_label_id = tl.id
-        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id
-        and ct.model = 'teachingmaterial'
-        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
-        where "base_groupelementyear"."child_leaf_id" = luy.id
-        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
-        order by revision.date_created desc limit 1
-    )
-"""
-
-LAST_UPDATE_FICHE_DESCRIPTIVE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY))),
-    models_to_check=','.join(["'translatedtext'", "'teachingmaterial'"])
-) + """
-    SELECT {field_to_select} FROM last_update_info
-"""
-
-LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
-    models_to_check=','.join(["'translatedtext'"])
-) + """
-SELECT {field_to_select} FROM last_update_info
-"""
+MAIN_GATHERING_KEY = 'main_gathering'
+DIRECT_GATHERING_KEY = 'direct_gathering'
+EXCLUDE_UE_KEY = 'exclude_ue'
 
 
 class EducationGroupYearLearningUnitsContainedToExcel:
 
-    def __init__(self, root: EducationGroupYear, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
-        self.egy = egy
-
-        exclude_options = True if self.egy.is_master120 or self.egy.is_master180 else False
-        self.root_hierarchy = EducationGroupHierarchy(root=root, exclude_options=exclude_options)
-        hierarchy = EducationGroupHierarchy(root=self.egy, exclude_options=exclude_options)
-        self.learning_unit_years_parent = []
-
-        for grp in hierarchy.included_group_element_years:
-            if not grp.child_leaf:
-                continue
-            self.learning_unit_years_parent.append(grp)
+    def __init__(self, custom_xls_form: CustomXlsForm, year: int, code: str):
+        self.program_tree_version = self._get_program_tree_version(code, year)
+        self._get_program_tree(year, code)
         self.custom_xls_form = custom_xls_form
-        self._get_ordered_queryset()
-        description_fiche = False
-        specifications = False
-        force_majeure = False
 
-        if custom_xls_form.is_valid():
-            description_fiche = custom_xls_form.cleaned_data['description_fiche']
-            specifications = custom_xls_form.cleaned_data['specifications']
-            force_majeure = custom_xls_form.cleaned_data['force_majeure']
+    def _get_program_tree_version(self, code: str, year: int):
+        get_cmd = command.GetProgramTreeVersionFromNodeCommand(
+            code=code,
+            year=year
+        )
+        try:
+            return get_program_tree_version_from_node_service.get_program_tree_version_from_node(
+                get_cmd)
+        except (BusinessException, ProgramTreeVersionNotFoundException):
+            return None
 
-        if description_fiche or specifications or force_majeure:
-            self.qs = _annotate_with_description_fiche_specifications(
-                self.qs, description_fiche, specifications, force_majeure
-            )
-
-    def _get_ordered_queryset(self):
-        ids = []
-        for luy in self.learning_unit_years_parent:
-            ids.append(luy.id)
-        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
-        self.qs = GroupElementYear.objects.filter(id__in=ids).order_by(preserved)
+    def _get_program_tree(self, year: int, code: str):
+        if self.program_tree_version:
+            self.hierarchy = self.program_tree_version.get_tree()
+        else:
+            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
 
     def _to_workbook(self):
-        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs, self.root_hierarchy)
+        return generate_ue_contained_for_workbook(self.custom_xls_form, self.hierarchy)
 
-    def to_excel(self, ):
-        return save_virtual_workbook(self._to_workbook())
+    def to_excel(self):
+        return {
+            'workbook': save_virtual_workbook(self._to_workbook()),
+            'title':
+                _get_xls_title(self.hierarchy, self.program_tree_version),
+            'year': self.hierarchy.root_node.year
+        }
 
 
-def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
-    data = _build_excel_lines_ues(custom_xls_form, qs, hierarchy)
+def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, hierarchy: 'ProgramTree'):
+    data = _build_excel_lines_ues(custom_xls_form, hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
-
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
-                                        data.get('colored_cells'),
+                                        data.get('font_rows'),
                                         data.get('row_height'))
 
 
-def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
+def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     content = _get_headers(custom_xls_form)
-
     optional_data_needed = _optional_data(custom_xls_form)
-    colored_cells = defaultdict(list)
+    font_rows = defaultdict(list)
     idx = 1
 
-    for gey in qs:
-        luy = gey.child_leaf
-        content.append(_get_optional_data(_fix_data(gey, luy, hierarchy), luy, optional_data_needed, gey))
-        if getattr(luy, "proposallearningunit", None):
-            colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
-        idx += 1
+    learning_unit_years = load_multiple_by_identity(
+        [
+            LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
+            for learn_unt_child in tree.get_all_learning_unit_nodes()
+        ]
+    )
 
-    colored_cells[Style(font=BOLD_FONT)].append(0)
+    tree_versions = search_all_versions_from_root_nodes(
+        [
+            SearchAllVersionsFromRootNodesCommand(code=node.code, year=node.year)
+            for node in tree.get_all_nodes() if not node.is_learning_unit()
+        ]
+    )
+
+    for path, child_node in tree.root_node.descendents:
+        if child_node.is_learning_unit():
+            luy = next(child for child in learning_unit_years if child_node.equals(child))
+
+            parents = tree.get_parents(path)
+            parents_data = get_explore_parents(parents)
+            link = parents[0].get_direct_child(child_node.entity_id)
+
+            if not parents_data[EXCLUDE_UE_KEY]:
+                content.append(_get_optional_data(
+                    _fix_data(link, luy, parents_data, tree_versions),
+                    luy,
+                    optional_data_needed,
+                    link
+                ))
+                if luy.proposal and luy.proposal.type:
+                    font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
+                idx += 1
+
+    font_rows[BOLD_FONT].append(0)
     return {
         'content': content,
-        'colored_cells': colored_cells,
+        'font_rows': font_rows,
         'row_height':
             {'height': 30,
              'start': 2,
@@ -254,7 +249,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarc
     }
 
 
-def _optional_data(custom_xls_form):
+def _optional_data(custom_xls_form: CustomXlsForm):
     optional_data = _initialize_optional_data_dict(custom_xls_form)
 
     if custom_xls_form.is_valid():
@@ -263,39 +258,47 @@ def _optional_data(custom_xls_form):
     return optional_data
 
 
-def _initialize_optional_data_dict(custom_xls_form):
+def _initialize_optional_data_dict(custom_xls_form: CustomXlsForm):
     optional_data = {}
     for field in custom_xls_form.fields:
         optional_data['has_{}'.format(field)] = False
     return optional_data
 
 
-def _get_headers(custom_xls_form):
+def _get_headers(custom_xls_form: CustomXlsForm):
     content = list()
     content.append(FIX_TITLES + _add_optional_titles(custom_xls_form))
     return content
 
 
-def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
+def _fix_data(
+        link: 'Link',
+        luy: 'LearningUnitYear',
+        gathering: Dict[str, 'Node'],
+        tree_versions: List['ProgramTreeVersion']
+):
     data = []
 
-    main_gathering = hierarchy.get_main_parent(gey.parent.id)
-
-    data_fix = FixLineUEContained(acronym=luy.acronym,
-                                  year=luy.academic_year,
-                                  title=luy.complete_title_i18n,
-                                  type=luy.get_container_type_display(),
-                                  subtype=luy.get_subtype_display(),
-                                  gathering=_build_gathering_content(gey.parent),
-                                  main_gathering=_build_main_gathering_content(main_gathering),
-                                  block=gey.block or '',
-                                  mandatory=str.strip(yesno(gey.is_mandatory)))
+    title = luy.full_title_fr
+    if translation.get_language() == LANGUAGE_CODE_EN:
+        title = luy.full_title_en
+    data_fix = FixLineUEContained(
+        acronym=luy.acronym,
+        year=u"%s-%s" % (luy.year, str(luy.year + 1)[-2:]),
+        title=title,
+        type=luy.type.value if luy.type else '',
+        subtype=dict(LEARNING_UNIT_YEAR_SUBTYPES)[luy.subtype] if luy.subtype else '',
+        gathering=_build_direct_gathering_label(gathering[DIRECT_GATHERING_KEY]),
+        main_gathering=_build_main_gathering_label(gathering[MAIN_GATHERING_KEY], tree_versions),
+        block=link.block or '',
+        mandatory=str.strip(yesno(link.is_mandatory))
+    )
     for name in data_fix._fields:
         data.append(getattr(data_fix, name))
     return data
 
 
-def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells, row_height=dict()):
+def _get_workbook_for_custom_xls(excel_lines: List, need_proposal_legend: bool, font_rows: dict, row_height=dict()):
     workbook = Workbook()
     worksheet_title = clean_worksheet_title(_("List UE"))
     header, *content = [tuple(line) for line in excel_lines]
@@ -305,7 +308,7 @@ def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cell
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
         STYLED_CELLS: {},
-        COLORED_ROWS: colored_cells,
+        FONT_ROWS: font_rows,
         ROW_HEIGHT: row_height,
 
     }
@@ -326,7 +329,7 @@ def _build_legend_sheet():
     return {LEGEND_WB_STYLE: colored_cells, LEGEND_WB_CONTENT: content}
 
 
-def _add_optional_titles(custom_xls_form):
+def _add_optional_titles(custom_xls_form: CustomXlsForm):
     data = []
     if custom_xls_form.is_valid():
         for field in custom_xls_form.fields:
@@ -337,7 +340,7 @@ def _add_optional_titles(custom_xls_form):
     return data
 
 
-def _get_attribution_line(a_person_teacher):
+def _get_attribution_line(a_person_teacher: 'Teacher'):
     if a_person_teacher:
         return " ".join([
             (a_person_teacher.last_name or "").upper(),
@@ -347,215 +350,157 @@ def _get_attribution_line(a_person_teacher):
     return ""
 
 
-def _get_optional_data(data, luy, optional_data_needed, gey):
+def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_needed: Dict[str, bool], link: 'Link'):
     if optional_data_needed['has_required_entity']:
-        data.append(luy.learning_container_year.requirement_entity)
+        data.append(luy.entities.requirement_entity_acronym)
     if optional_data_needed['has_allocation_entity']:
-        data.append(luy.learning_container_year.allocation_entity)
+        data.append(luy.entities.allocation_entity_acronym)
     if optional_data_needed['has_credits']:
-        data.append(gey.relative_credits or '-')
+        data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
-        data.append(luy.get_periodicity_display())
+        data.append(PeriodicityEnum[luy.periodicity.name].value if luy.periodicity else '')
     if optional_data_needed['has_active']:
         data.append(str.strip(yesno(luy.status)))
     if optional_data_needed['has_quadrimester']:
-        data.append(luy.get_quadrimester_display() or '')
+        data.append(luy.quadrimester.value if luy.quadrimester else '')
     if optional_data_needed['has_session_derogation']:
-        data.append(luy.get_session_display() or '')
+        data.append(luy.session or '')
     if optional_data_needed['has_volume']:
-        luys = annotate_qs(LearningUnitYear.objects.filter(id=luy.id))
-        data.extend(volume_information(luys[0]))
+        data.extend(volumes_information(luy.lecturing_volume, luy.practical_volume))
     if optional_data_needed['has_teacher_list']:
-        attribution_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+        teachers = _get_distinct_teachers(
             luy
-        ).values()
+        )
         data.append(
             ";".join(
-                [_get_attribution_line(value.get('person'))
-                 for value in attribution_values
+                [_get_attribution_line(teacher)
+                 for teacher in teachers
                  ]
             )
         )
         data.append(
             ";".join(
-                [value.get('person').email
-                 for value in attribution_values
+                [teacher.email
+                 for teacher in teachers
                  ]
             )
         )
     if optional_data_needed['has_proposition']:
-        proposal = find_by_learning_unit_year(luy)
-        if proposal:
-            data.append(proposal.get_type_display())
-            data.append(proposal.get_state_display())
+        if luy.proposal:
+            data.append(ProposalType.get_value(luy.proposal.type) if luy.proposal.type else '')
+            data.append(ProposalState.get_value(luy.proposal.state) if luy.proposal.state else '')
         else:
             data.append('')
             data.append('')
     if optional_data_needed['has_english_title']:
-        data.append(luy.complete_title_english)
+        data.append(luy.full_title_en)
     if optional_data_needed['has_language']:
-        data.append(luy.language)
+        data.append(luy.main_language)
     if optional_data_needed['has_specifications']:
-        specifications_data = _build_specifications_cols(luy, gey)
+        specifications_data = _build_specifications_cols(luy)
         for k, v in zip(specifications_data._fields, specifications_data):
             data.append(v)
     if optional_data_needed['has_description_fiche'] or optional_data_needed['has_force_majeure']:
-        description_fiche = _build_description_fiche_cols(luy, gey)
+        description_fiche = _build_description_fiche_cols(luy.description_fiche, luy.teaching_materials)
         for k, v in zip(description_fiche._fields, description_fiche):
             data.append(v)
         if optional_data_needed['has_force_majeure']:
-            force_majeure = _build_force_majeure_cols(gey)
+            force_majeure = _build_force_majeure_cols(luy)
             for k, v in zip(force_majeure._fields, force_majeure):
                 data.append(v)
     return data
 
 
-def _annotate_with_description_fiche_specifications(
-        group_elt_yrs_param, description_fiche=False, specifications=False, force_majeure=False
-):
-    group_element_years = group_elt_yrs_param
-    sq = TranslatedText.objects.filter(
-        reference=OuterRef('child_leaf__pk'),
-        entity=LEARNING_UNIT_YEAR)
-    if description_fiche or force_majeure:
-        annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
-        group_element_years = group_element_years.annotate(**annotations)
-        group_element_years = group_element_years.annotate(
-            last_update_by=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='author'), ()),
-            last_update_date=RawSQL(LAST_UPDATE_FICHE_DESCRIPTIVE.format(field_to_select='last_update'), ())
-        )
-
-        if force_majeure:
-            annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE)
-            group_element_years = group_element_years.annotate(**annotations)
-            group_element_years = group_element_years.annotate(
-                last_update_by_force_majeure=RawSQL(LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='author'), ()),
-                last_update_date_force_majeure=RawSQL(
-                    LAST_UPDATE_FORCE_MAJEURE.format(field_to_select='last_update'), ()
-                )
-            )
-
-    if specifications:
-        annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
-        group_element_years = group_element_years.annotate(**annotations)
-
-    return group_element_years
-
-
-def _build_validate_html_list_to_string(value_param, method):
-    if method is None or method not in (hyperlinks_to_string, html2text):
-        return value_param.strip()
-
-    if value_param:
-        # string must never be longer than 32,767 characters
-        # truncate if necessary
-        value = value_param.strip()
-        value = value[:32767]
-        value = method(html.unescape(value)) if value else ""
-        if next(ILLEGAL_CHARACTERS_RE.finditer(value), None):
-            return "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING'))
-        return value
-
-    return ""
-
-
-def _build_specifications_cols(luy, gey):
-    achievements_fr = LearningAchievement.objects.filter(
-        learning_unit_year_id=luy.id,
-        language__code=settings.LANGUAGE_CODE_FR[:2].upper()).order_by('order')
-
-    achievements_en = LearningAchievement.objects.filter(
-        learning_unit_year_id=luy.id,
-        language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
-
-    return SpecificationsCols(
-        themes_discussed=_build_validate_html_list_to_string(gey.themes_discussed, html2text),
-        themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html2text),
-        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html2text),
-        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html2text),
-        achievements_fr=_build_achievements(achievements_fr),
-        achievements_en=_build_achievements(achievements_en),
-    )
-
-
-def _build_achievements(achievements):
-    achievements_str = ""
-    for achievement in achievements:
-        if achievement.text and achievement.text.strip() != "":
-            if achievement.code_name:
-                achievements_str += "{} -".format(achievement.code_name)
-            achievements_str += _build_validate_html_list_to_string(achievement.text, html2text).lstrip('\n')
-            achievements_str += '\n'
-    return achievements_str.rstrip('\n')
-
-
-def _build_description_fiche_cols(luy, gey):
-    teaching_materials = TeachingMaterial.objects.filter(learning_unit_year_id=luy.id).order_by('order')
-    return DescriptionFicheCols(
-        resume=_build_validate_html_list_to_string(gey.resume, html2text),
-        resume_en=_build_validate_html_list_to_string(gey.resume_en, html2text),
-        teaching_methods=_build_validate_html_list_to_string(gey.teaching_methods, html2text),
-        teaching_methods_en=_build_validate_html_list_to_string(gey.teaching_methods_en, html2text),
-        evaluation_methods=_build_validate_html_list_to_string(gey.evaluation_methods, html2text),
-        evaluation_methods_en=_build_validate_html_list_to_string(gey.evaluation_methods_en, html2text),
-        other_informations=_build_validate_html_list_to_string(gey.other_informations, html2text),
-        other_informations_en=_build_validate_html_list_to_string(gey.other_informations_en, html2text),
-        online_resources=_build_validate_html_list_to_string(gey.online_resources, hyperlinks_to_string),
-        online_resources_en=_build_validate_html_list_to_string(gey.online_resources_en, hyperlinks_to_string),
-        teaching_materials=_build_validate_html_list_to_string(
-            ''.join("<p>{} - {}</p>".format(_('Mandatory') if a.mandatory else _('Non-mandatory'), a.title)
-                    for a in teaching_materials),
-            html2text
-        ),
-        bibliography=_build_validate_html_list_to_string(gey.bibliography, html2text),
-        mobility=_build_validate_html_list_to_string(gey.mobility, html2text),
-        last_update_by=_build_validate_html_list_to_string(gey.last_update_by, html2text),
-        last_update_date=gey.last_update_date.strftime('%d/%m/%Y') if gey.last_update_date else None
-    )
-
-
-def _build_force_majeure_cols(gey):
+def _build_force_majeure_cols(luy: 'DddLearningUnitYear'):
+    force_majeure = luy.force_majeure
     return ForceMajeureCols(
         teaching_methods_force_majeure=_build_validate_html_list_to_string(
-            gey.teaching_methods_force_majeure, html2text
+            force_majeure.teaching_methods
         ),
         teaching_methods_force_majeure_en=_build_validate_html_list_to_string(
-            gey.teaching_methods_force_majeure_en, html2text
+            force_majeure.teaching_methods_en
         ),
         evaluation_methods_force_majeure=_build_validate_html_list_to_string(
-            gey.evaluation_methods_force_majeure, html2text
+            force_majeure.evaluation_methods
         ),
         evaluation_methods_force_majeure_en=_build_validate_html_list_to_string(
-            gey.evaluation_methods_force_majeure_en, html2text
+            force_majeure.evaluation_methods_en
         ),
         other_informations_force_majeure=_build_validate_html_list_to_string(
-            gey.other_informations_force_majeure, html2text
+            force_majeure.other_informations
         ),
         other_informations_force_majeure_en=_build_validate_html_list_to_string(
-            gey.other_informations_force_majeure_en, html2text
+            force_majeure.other_informations_en
         ),
-        last_update_by_force_majeure=_build_validate_html_list_to_string(
-            gey.last_update_by_force_majeure, html2text
-        ),
-        last_update_date_force_majeure=gey.last_update_date_force_majeure.strftime('%d/%m/%Y')
-        if gey.last_update_date_force_majeure else None,
+        last_update_by_force_majeure=_build_validate_html_list_to_string(force_majeure.author),
+        last_update_date_force_majeure=force_majeure.last_update.strftime('%d/%m/%Y')
+        if force_majeure.last_update else None,
     )
 
 
-def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
-    annotations = {
-        lbl: Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
-        for lbl in fr_labels
+def _build_validate_html_list_to_string(value_param):
+    return get_html_to_text(value_param)
+
+
+def _build_specifications_cols(luy: 'DddLearningUnitYear'):
+    specifications = luy.specifications
+    dict_achievement = _build_achievements(luy.achievements)
+    return SpecificationsCols(
+        themes_discussed=_build_validate_html_list_to_string(specifications.themes_discussed),
+        themes_discussed_en=_build_validate_html_list_to_string(specifications.themes_discussed_en),
+        prerequisite=_build_validate_html_list_to_string(specifications.prerequisite),
+        prerequisite_en=_build_validate_html_list_to_string(specifications.prerequisite_en),
+        achievements_fr=dict_achievement.get('achievements_fr', ''),
+        achievements_en=dict_achievement.get('achievements_en', ''),
+    )
+
+
+def _build_achievements(achievements: List['Achievement']) -> Dict[str, str]:
+    achievements_fr = ""
+    achievements_en = ""
+    if achievements:
+        for achievement in achievements:
+            if achievement.text_fr and achievement.text_fr.strip() != "":
+                if achievement.code_name:
+                    achievements_fr += "{} -".format(achievement.code_name)
+                achievements_fr += _build_validate_html_list_to_string(achievement.text_fr).lstrip('\n')
+                achievements_fr += '\n'
+
+            if achievement.text_en and achievement.text_en.strip() != "":
+                if achievement.code_name:
+                    achievements_en += "{} -".format(achievement.code_name)
+                achievements_en += _build_validate_html_list_to_string(achievement.text_en).lstrip('\n')
+                achievements_en += '\n'
+    return {
+        'achievements_fr': achievements_fr.rstrip('\n'),
+        'achievements_en': achievements_en.rstrip('\n')
     }
 
-    annotations.update({
-        "{}_en".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
-        for lbl in en_labels}
+
+def _build_description_fiche_cols(description_fiche: 'DescriptionFiche',
+                                  teaching_materials: List['TeachingMaterial']) -> DescriptionFicheCols:
+    return DescriptionFicheCols(
+        resume=_build_validate_html_list_to_string(description_fiche.resume),
+        resume_en=_build_validate_html_list_to_string(description_fiche.resume_en),
+        teaching_methods=_build_validate_html_list_to_string(description_fiche.teaching_methods),
+        teaching_methods_en=_build_validate_html_list_to_string(description_fiche.teaching_methods_en),
+        evaluation_methods=_build_validate_html_list_to_string(description_fiche.evaluation_methods),
+        evaluation_methods_en=_build_validate_html_list_to_string(description_fiche.evaluation_methods_en),
+        other_informations=_build_validate_html_list_to_string(description_fiche.other_informations),
+        other_informations_en=_build_validate_html_list_to_string(description_fiche.other_informations_en),
+        online_resources=_build_validate_html_list_to_string(description_fiche.online_resources),
+        online_resources_en=_build_validate_html_list_to_string(description_fiche.online_resources_en),
+        teaching_materials=_build_validate_html_list_to_string(
+            ''.join("<p>{} - {}</p>".format(_('Mandatory') if a.is_mandatory else _('Non-mandatory'), a.title)
+                    for a in teaching_materials)
+        ),
+        bibliography=_build_validate_html_list_to_string(description_fiche.bibliography),
+        mobility=_build_validate_html_list_to_string(description_fiche.mobility),
+        last_update_by=_build_validate_html_list_to_string(description_fiche.author),
+        last_update_date=description_fiche.last_update.strftime('%d/%m/%Y')
+        if description_fiche.last_update else None
     )
-    return annotations
 
 
 def _build_subquery_text_label(qs, cms_text_label, lang):
@@ -563,9 +508,86 @@ def _build_subquery_text_label(qs, cms_text_label, lang):
         'text')[:1]
 
 
-def _build_gathering_content(edg):
-    return "{} - {}".format(edg.partial_acronym, edg.title) if edg else ''
+def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str:
+    return "{} - {}".format(direct_gathering_node.code,
+                            direct_gathering_node.group_title_fr or '') if direct_gathering_node else ''
 
 
-def _build_main_gathering_content(edg):
-    return "{} - {}".format(edg.acronym, edg.partial_title if edg.is_finality else edg.title) if edg else ''
+def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['ProgramTreeVersion']) -> str:
+    if gathering_node:
+        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(gathering_node.year,
+                                                                             gathering_node.code,
+                                                                             tree_versions)
+        return "{}{} - {}".format(
+            gathering_node.title,
+            pgm_tree_version.version_label if pgm_tree_version else '',
+            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr)
+    return '-'
+
+
+def volumes_information(lecturing_volume, practical_volume):
+    return [get_significant_volume(lecturing_volume.total_annual or 0),
+            get_significant_volume(lecturing_volume.first_quadrimester or 0),
+            get_significant_volume(lecturing_volume.second_quadrimester or 0),
+            lecturing_volume.classes_count or 0,
+            get_significant_volume(practical_volume.total_annual or 0),
+            get_significant_volume(practical_volume.first_quadrimester or 0),
+            get_significant_volume(practical_volume.second_quadrimester or 0),
+            practical_volume.classes_count or 0]
+
+
+# FIXME :: to refactor because of cognitive complexity
+def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
+    main_parent = None
+    direct_parent = None
+    exclude_ue_from_list = False
+    if parents_of_ue:
+        option_list = False
+        for parent in parents_of_ue:
+            if not direct_parent:
+                direct_parent = parent
+
+            if option_list and parent.is_finality():
+                exclude_ue_from_list = True
+            else:
+                if main_parent is None \
+                        and (parent.is_training()
+                             or parent.is_mini_training()
+                             or parent.node_type in [GroupType.COMPLEMENTARY_MODULE]):
+                    main_parent = parent
+            if parent.node_type in [GroupType.OPTION_LIST_CHOICE]:
+                option_list = True
+            if option_list and parent.is_finality():
+                exclude_ue_from_list = True
+            if exclude_ue_from_list:
+                break
+
+    return {
+        MAIN_GATHERING_KEY: main_parent,
+        DIRECT_GATHERING_KEY: direct_parent,
+        EXCLUDE_UE_KEY: exclude_ue_from_list
+    }
+
+
+def _get_distinct_teachers(luy):
+    teachers = []
+    for attribution in luy.attributions:
+        if attribution.teacher not in teachers:
+            teachers.append(attribution.teacher)
+    return teachers
+
+
+def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree_versions: List['ProgramTreeVersion']):
+    program_tree_identity = ProgramTreeIdentity(code=code, year=year)
+    return next(
+        (tree_version for tree_version in tree_versions
+         if tree_version.program_tree_identity == program_tree_identity),
+        None
+    )
+
+
+def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
+    return "{}{}".format(
+        tree.root_node.title,
+        program_tree_version.version_label
+    ) if program_tree_version else tree.root_node.title

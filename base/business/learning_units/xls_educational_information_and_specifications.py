@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import html
 
-import bleach
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField, Q
 from django.db.models.expressions import F
 from django.db.models.functions import Concat, Upper
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Alignment, Style
+from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 from reversion.models import Version
 
@@ -44,6 +42,7 @@ from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
 from base.models.person import get_user_interface_language
 from base.models.teaching_material import TeachingMaterial
+from base.utils.excel import get_html_to_text
 from base.views.learning_unit import get_specifications_context
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.text_label import TextLabel
@@ -54,7 +53,7 @@ from osis_common.document import xls_build
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
 WORKSHEET_TITLE = _('Learning units list')
-WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
+WRAP_TEXT_ALIGN = Alignment(wrapText=True, vertical="top")
 CMS_ALLOWED_TAGS = []
 
 
@@ -72,8 +71,8 @@ def create_xls_educational_information_and_specifications(user, learning_units, 
                                          'start': 2,
                                          'stop': (len(learning_units)) + 1
                                          },
-                  xls_build.STYLED_CELLS: {
-                      WRAP_TEXT_STYLE: _get_wrapped_cells_educational_information_and_specifications(
+                  xls_build.ALIGN_CELLS: {
+                      WRAP_TEXT_ALIGN: _get_wrapped_cells_educational_information_and_specifications(
                           learning_units, len(titles)
                       )
                   }
@@ -110,12 +109,6 @@ def _add_cms_title_fr_en(cms_labels, with_en=True):
         if with_en:
             titles.append(_add_text_label(a_text_label, LANGUAGE_CODE_EN))
     return titles
-
-
-def get_html_to_text(text_to_convert):
-    text_to_convert = text_to_convert or ''
-    return bleach.clean(html.unescape(text_to_convert),
-                        strip=True, tags=CMS_ALLOWED_TAGS).lstrip()
 
 
 def prepare_xls_educational_information_and_specifications(learning_unit_years, request):

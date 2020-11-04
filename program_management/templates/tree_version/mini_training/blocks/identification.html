@@ -1,0 +1,106 @@
+{% load static bootstrap3 %}
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="identification">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                         <div class="col-md-6">
+                            {% bootstrap_label mini_training_version_form.version_name.label label_class="control-label" %}
+                            <div class="version_name-group">
+                                {% bootstrap_field mini_training_version_form.version_name form_group_class='form-group' show_label=False addon_before=mini_training_obj.acronym|add:" [" addon_after=']' %}
+                            </div>
+                        </div>
+                        {% bootstrap_field mini_training_version_form.code form_group_class="col-md-6" show_help=False %}
+                    </div>
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.category form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_version_form.type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.status form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_version_form.schedule_type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.credits form_group_class="col-md-6" %}
+                        {% bootstrap_field mini_training_version_form.constraint_type form_group_class="col-md-6" %}
+                    </div>
+                    <br>
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.min_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
+                        {% bootstrap_field mini_training_version_form.max_constraint form_group_class="col-md-6" label_class="text-first-letter-capitalize" %}
+                    </div>
+                    <br>
+                    {% bootstrap_field mini_training_version_form.offer_title_fr %}
+                    {% bootstrap_field mini_training_version_form.version_title_fr %}
+                    {% bootstrap_field mini_training_version_form.offer_title_en %}
+                    {% bootstrap_field mini_training_version_form.version_title_en %}
+                    {% bootstrap_field mini_training_version_form.keywords %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.management_entity  form_group_class="col-md-12" %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.academic_year form_group_class="col-md-12" %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% if mini_training_version_form.start_year %}
+                            {% bootstrap_field mini_training_version_form.start_year form_group_class="col-md-6" %}
+                            {% bootstrap_field mini_training_version_form.end_year form_group_class="col-md-6" %}
+                        {% else %}
+                            {% bootstrap_field mini_training_version_form.end_year form_group_class="col-md-12" %}
+                        {% endif %}
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        {% bootstrap_field mini_training_version_form.teaching_campus form_group_class="col-md-12" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% bootstrap_field mini_training_version_form.remark_fr label_class="d-block text-first-letter-capitalize" %}
+            {% bootstrap_field mini_training_version_form.remark_en label_class="d-block text-first-letter-capitalize" %}
+        </div>
+    </div>
+</div>

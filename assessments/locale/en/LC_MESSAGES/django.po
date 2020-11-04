@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 13:18+0200\n"
+"POT-Creation-Date: 2020-10-05 09:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,11 +57,9 @@ msgstr ""
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
 
+msgctxt "UE acronym"
 msgid "Acronym"
 msgstr ""
-
-msgid "Acronym enrollment header"
-msgstr "Program"
 
 msgid "Add"
 msgstr ""
@@ -107,9 +105,6 @@ msgid "Choose file"
 msgstr ""
 
 msgid "City"
-msgstr ""
-
-msgid "Code"
 msgstr ""
 
 msgid "Compare"
@@ -196,6 +191,7 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
+#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -273,6 +269,7 @@ msgstr ""
 msgid "M=Justified Absence"
 msgstr ""
 
+msgctxt "male"
 msgid "Main"
 msgstr ""
 
@@ -403,9 +400,6 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
-msgid "Registration number header"
-msgstr "Registration number"
-
 msgid "Remove"
 msgstr ""
 
@@ -492,9 +486,6 @@ msgstr ""
 
 msgid "Session"
 msgstr ""
-
-msgid "Session enrollment header"
-msgstr "Session number"
 
 msgid "Session number"
 msgstr ""
@@ -609,6 +600,9 @@ msgid "Warning : some registered scores have not been submitted yet!"
 msgstr ""
 
 msgid "Without attribution"
+msgstr ""
+
+msgid "Yes"
 msgstr ""
 
 msgid "You can't encode a 'score' and a 'justification' together"

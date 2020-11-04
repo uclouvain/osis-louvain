@@ -26,10 +26,13 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.i18n import JavaScriptCatalog
 
 from base.views import common
 
-packages = ('assessments', 'base')
+js_info_dict = {
+    'packages': ('assessments',)
+}
 
 urlpatterns = (
     url(r'^login/$', common.login, name='login'),
@@ -39,6 +42,8 @@ urlpatterns = (
     url(r'^' + settings.ADMIN_URL, admin.site.urls),
     url(r'', include('base.urls')),
     url(r'^hijack/', include('hijack.urls', namespace='hijack')),
+    url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
+
 )
 
 if 'assistant' in settings.INSTALLED_APPS:

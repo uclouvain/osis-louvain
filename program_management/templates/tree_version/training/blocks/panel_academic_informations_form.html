@@ -1,0 +1,104 @@
+{% load static %}
+{% load i18n bootstrap3 %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            {% bootstrap_field training_version_form.academic_type form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.duration form_group_class="col-md-2" %}
+            {% bootstrap_field training_version_form.duration_unit form_group_class="col-md-4" %}
+            {% bootstrap_field training_version_form.internship_presence form_group_class="col-md-6" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.is_enrollment_enabled form_group_class="col-md-6" %}
+            {% bootstrap_field training_version_form.has_partial_deliberation form_group_class="col-md-6" %}
+        </div>
+
+        <div class="row">
+            {% bootstrap_field training_version_form.has_online_re_registration form_group_class="col-md-6" %}
+            {% bootstrap_field training_version_form.has_dissertation form_group_class="col-md-6" %}
+        </div>
+
+        <div class="row">
+            {% bootstrap_field training_version_form.has_admission_exam form_group_class="col-md-12" %}
+        </div>
+
+        <div class="row">
+            {% bootstrap_field training_version_form.produce_university_certificate form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.decree_category form_group_class="col-md-12" %}
+        </div>
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.rate_code form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.main_language form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.english_activities form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.other_language_activities form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.main_domain form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.secondary_domains form_group_class="col-md-12" %}
+        </div>
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.isced_domain form_group_class="col-md-12" %}
+        </div>
+
+        <br>
+        <div class="row">
+            {% bootstrap_field training_version_form.internal_comment form_group_class="col-md-12" %}
+        </div>
+        <br>
+
+    </div>
+</div>

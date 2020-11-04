@@ -135,18 +135,6 @@ table.volumes thead {
     background-color: #d9534f;
 }
 
-.notification:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: red;
-    top: -3px;
-    right: -2px;
-    border-radius: 50%;
-}
-
 .no_label {
     font-weight: normal;
 }
@@ -288,4 +276,9 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 160px;
+}
+
+.trigger_modal{
+    cursor: pointer;
+    text-decoration: none;
 }

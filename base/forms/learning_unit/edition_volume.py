@@ -48,7 +48,7 @@ STYLE_MIN_WIDTH_VOLUME = 'min-width:55px;'
 
 class VolumeField(forms.DecimalField):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, max_digits=6, decimal_places=2, min_value=0, **kwargs)
+        super().__init__(*args, max_digits=6, decimal_places=2, **kwargs)
 
 
 class VolumeEditionForm(forms.Form):

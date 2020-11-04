@@ -60,7 +60,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -300,7 +300,7 @@ class TestConsolidateProposal(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        LanguageFactory(code='FR', name='FRENCH')
+        FrenchLanguageFactory()
 
     def test_when_proposal_is_not_accepted_nor_refused(self):
         states = (state for state, value in proposal_state.ProposalState.__members__.items()

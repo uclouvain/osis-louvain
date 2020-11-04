@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<script>mapboxgl.accessToken = '{{ MAPBOX_ACCESS_TOKEN }}';</script>
+<div class="row lat-lon--widget"{% include "django/forms/widgets/attrs.html" %}>
+  <div class="col-sm-6">
+    <div class="row">
+      {% for widget in widget.subwidgets %}
+        <div class="col-sm-6">
+          {% include widget.template_name %}
+        </div>
+      {% endfor %}
+    </div>
+    <button class="btn btn-default geocode" type="button">
+      <i class="glyphicon glyphicon-search"></i>
+      {% trans "Look up the address" %}
+    </button>
+    <div class="geocode-results"></div>
+  </div>
+  <div class="col-sm-6">
+    <div class="lat-lon--map"></div>
+    <em>{% trans "Click on the map to set the location" %}</em>
+  </div>
+</div>

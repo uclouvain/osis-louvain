@@ -30,14 +30,21 @@
 {% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id as url_attributions %}
 {% url 'learning_unit_specifications' learning_unit_year_id=learning_unit_year.id as url_specifications %}
 
+{% url 'learning_unit' acronym=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_identification_with_code_and_year %}
+{% url 'learning_unit_formations' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_formations_with_code_and_year %}
+{% url 'learning_unit_components' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_components_with_code_and_year %}
+{% url 'learning_unit_pedagogy' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_pedagogy_with_code_and_year %}
+{% url 'learning_unit_attributions' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_attributions_with_code_and_year %}
+{% url 'learning_unit_specifications' code=learning_unit_year.acronym year=learning_unit_year.academic_year.year as url_specifications_with_code_and_year %}
+
 {% if learning_unit_year.is_external_mobility %}
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
+        <li role="presentation" {% if request.path == url_identification or request.path == url_identification_with_code_and_year %} class="active" {% endif %}>
             <a href="{{ url_identification }}" role="tab">
                 {% trans 'Identification' %}
             </a>
         </li>
-        <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
+        <li role="presentation" {% if request.path == url_formations or request.path == url_formations_with_code_and_year %} class="active" {% endif %}>
             <a href="{{ url_formations }}" role="tab">
                 {% trans 'Trainings' %}
             </a>
@@ -45,31 +52,31 @@
     </ul>
 {% else %}
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
+        <li role="presentation" {% if request.path == url_identification or request.path == url_identification_with_code_and_year %} class="active" {% endif %}>
             <a href="{{ url_identification }}" role="tab">
                 {% trans 'Identification' %}
             </a>
         </li>
-        <li role="presentation" {% if request.path == url_components %} class="active" {% endif %}>
+        <li role="presentation" {% if request.path == url_components or request.path == url_components_with_code_and_year %} class="active" {% endif %}>
             <a href="{{ url_components }}" role="tab">
                 {% trans 'Components' %}
             </a>
         </li>
         {% if not learning_unit_year.is_external_with_co_graduation %}
-            <li role="presentation" id="description_link" {% if request.path == url_pedagogy %}
+            <li role="presentation" id="description_link" {% if request.path == url_pedagogy or request.path == url_pedagogy_with_code_and_year %}
                 class="active" {% endif %}>
                 <a href="{{ url_pedagogy }}" role="tab">
                     {% trans 'Description fiche' %}
                 </a>
             </li>
-            <li role="presentation" id="specification_link" {% if request.path == url_specifications %}
+            <li role="presentation" id="specification_link" {% if request.path == url_specifications or request.path == url_specifications_with_code_and_year%}
                 class="active" {% endif %}>
                 <a href="{{ url_specifications }}" role="tab">
                     {% trans 'Specifications' %}
                 </a>
             </li>
         {% endif %}
-        <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
+        <li role="presentation" {% if request.path == url_formations or request.path == url_formations_with_code_and_year %} class="active" {% endif %}>
             <a id="training_link"  href="{{ url_formations }}" role="tab">
                 {% trans 'Utilizations' %}
             </a>
@@ -77,7 +84,7 @@
 
         {% if "attribution" in installed_apps %}
         {% url 'select_attribution' learning_unit_year_id=learning_unit_year.id as url_select_attributions %}
-        <li role="presentation" {% if request.path == url_attributions or request.path == url_select_attributions %}
+        <li role="presentation" {% if request.path == url_attributions or request.path == url_select_attributions or request.path == url_attributions_with_code_and_year %}
             class="active" {% endif %}>
             <a id="attributions_link" href="{% url 'learning_unit_attributions' learning_unit_year.id %}" role="tab">
                 {% trans 'Tutors' %}

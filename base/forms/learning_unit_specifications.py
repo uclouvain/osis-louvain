@@ -48,11 +48,11 @@ class LearningUnitSpecificationsForm(forms.Form):
 
     def refresh_data(self):
         language_iso = self.language[0]
-        texts_list = translated_text.search(entity=entity_name.LEARNING_UNIT_YEAR,
-                                            reference=self.learning_unit_year.id,
-                                            language=language_iso) \
-            .exclude(text__isnull=True)
-
+        texts_list = translated_text.search(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=self.learning_unit_year.id,
+            language=language_iso
+        ).exclude(text__isnull=True)
         set_trans_txt(self, texts_list)
 
 
@@ -77,12 +77,13 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.fields['trans_text_{}'.format(code[:2])].initial = value.text
 
     def _get_or_create_translated_text(self, language):
-        return translated_text.get_or_create(
+        translated_text, _ = TranslatedText.objects.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.id,
-            language=language,
-            text_label=self.text_label
+            text_label=self.text_label,
+            language=language
         )
+        return translated_text
 
     def save(self):
         self._save_translated_text()

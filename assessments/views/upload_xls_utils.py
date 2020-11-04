@@ -40,6 +40,7 @@ from assessments.business.score_encoding_export import HEADER
 from assessments.forms.score_file import ScoreFileForm
 from attribution import models as mdl_attr
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
 col_academic_year = HEADER.index(_('Academic year'))
@@ -146,7 +147,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     worksheet = workbook.active
     new_scores_number = 0
     learning_unit_year = mdl.learning_unit_year.get_by_id(learning_unit_year_id)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = program_manager.is_program_manager(request.user)
 
     data_xls = _get_all_data(worksheet)
 

@@ -167,7 +167,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Acronym' context 'OF acronym' %}</th>
                             <th>{% trans 'Code' %}</th>
                             <th>{% trans 'Title' %}</th>
                         </tr>
@@ -178,7 +178,7 @@
 
                                     <tr>
                                         <td>
-                                            <a href="{% url 'education_group_read' root_id=egy.id education_group_year_id=egy.id %}"
+                                            <a href="{% url 'education_group_read_proxy' year=egy.academic_year.year acronym=egy.acronym %}"
                                                id="lnk_program_managed_{{ egy.id }}">
                                                 {{ egy.acronym }}
                                             </a>

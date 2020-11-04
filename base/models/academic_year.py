@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
 
 from django.db import models
 from django.utils import timezone
@@ -151,7 +152,7 @@ def current_academic_year():
     return current_academic_years().first()
 
 
-def starting_academic_year():
+def starting_academic_year() -> Optional['AcademicYear']:
     """ If we have two academic year [2015-2016] [2016-2017]. It will return [2016-2017] """
     return current_academic_years().last()
 

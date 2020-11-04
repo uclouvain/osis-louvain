@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,64 +23,104 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
+
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.ddd.domain.program_tree_version import STANDARD
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
+
+URL_ELEMENT_IDENTIFICATION = 'element_identification'
 
 
 class TestLearningUnitUtilization(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_component_year_1 = LearningComponentYearFactory(
-            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=10)
-        cls.learning_component_year_2 = LearningComponentYearFactory(
-            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=10)
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
-                                                           child_branch=cls.education_group_year_2)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,
-                                                           child_branch=None,
-                                                           child_leaf=cls.learning_unit_year_1)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year_1,
-                                                           child_branch=cls.education_group_year_3)
-        cls.group_element_year_4 = GroupElementYearFactory(parent=cls.education_group_year_3,
-                                                           child_branch=None,
-                                                           child_leaf=cls.learning_unit_year_2)
-        cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        """
+        training_root_element
+        |-- common code
+          |--- subgroup_element
+              |--- element_luy1
+          |-- element_luy2
+        |-- deepening_element
+          |--- element_luy3
+        """
+        cls.academic_year = AcademicYearFactory(current=True)
 
-        cls.url = reverse(
-            "learning_unit_utilization",
-            args=[
-                cls.education_group_year_1.id,
-                cls.learning_unit_year_1.id,
-            ]
+        cls.training_root_element = ElementGroupYearFactory(
+            group_year__education_group_type__name=TrainingType.BACHELOR.name,
+            group_year__academic_year=cls.academic_year
+        )
+        cls.common_core_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.COMMON_CORE.name
+        )
+        cls.subgroup_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        cls.deepening_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=MiniTrainingType.DEEPENING.name
+        )
+        cls.deepening_subgroup_element = ElementGroupYearFactory(
+            group_year__academic_year=cls.academic_year,
+            group_year__education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        cls.element_luy1 = ElementLearningUnitYearFactory(learning_unit_year__academic_year=cls.academic_year)
+        cls.element_luy2 = ElementLearningUnitYearFactory(learning_unit_year__academic_year=cls.academic_year)
+        cls.element_luy3 = ElementLearningUnitYearFactory(learning_unit_year__academic_year=cls.academic_year)
+
+        GroupElementYearFactory(parent_element=cls.training_root_element, child_element=cls.common_core_element)
+        GroupElementYearFactory(parent_element=cls.common_core_element, child_element=cls.subgroup_element)
+        GroupElementYearFactory(parent_element=cls.training_root_element, child_element=cls.deepening_element)
+        GroupElementYearChildLeafFactory(parent_element=cls.subgroup_element, child_element=cls.element_luy1)
+        GroupElementYearChildLeafFactory(parent_element=cls.common_core_element, child_element=cls.element_luy2)
+        GroupElementYearChildLeafFactory(parent_element=cls.deepening_element,
+                                         child_element=cls.deepening_subgroup_element)
+        GroupElementYearChildLeafFactory(parent_element=cls.deepening_subgroup_element, child_element=cls.element_luy3)
+
+        cls.education_group_version = EducationGroupVersionFactory(
+            offer__academic_year=cls.academic_year,
+            root_group=cls.training_root_element.group_year,
+            version_name=STANDARD,
         )
 
-    def test_education_group_using_template_use(self):
-        self.client.force_login(self.user)
+        cls.central_manager = CentralManagerFactory()
+        cls.url = reverse(
+            "learning_unit_utilization",
+            kwargs={
+                'root_element_id': cls.training_root_element.pk,
+                'child_element_id': cls.element_luy1.pk,
+            }
+        )
+
+    def setUp(self):
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_case_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_when_user_has_no_permission(self):
+        a_person_without_permission = PersonFactory()
+        self.client.force_login(a_person_without_permission.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_template_used(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'learning_unit/tab_utilization.html')
 
-    def test_education_group_using_check_parent_list_with_group(self):
-        self.client.force_login(self.user)
+    def test_assert_key_context(self):
         response = self.client.get(self.url)
-        self.assertEqual(list(response.context_data['group_element_years']),
-                         [self.group_element_year_2])
+        self.assertIn('utilization_rows', response.context)

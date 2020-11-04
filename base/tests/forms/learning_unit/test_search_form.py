@@ -41,14 +41,17 @@ from base.models.offer_year_entity import OfferYearEntity
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementLearningUnitYearFactory
 from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
@@ -184,121 +187,6 @@ class TestSearchForm(TestCase):
         learning_unit_filter = LearningUnitFilter(self.data)
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
-
-
-class TestFilterIsBorrowedLearningUnitYear(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-
-        cls.luys_not_in_education_group = [
-            LearningUnitYearFactory(academic_year=cls.academic_year,
-                                    learning_container_year__academic_year=cls.academic_year) for _ in range(3)
-        ]
-
-        cls.luys_with_same_entity_as_education_group = [
-            generate_learning_unit_year_with_associated_education_group(cls.academic_year)
-        ]
-
-        cls.luys_in_same_faculty_as_education_group = [
-            generate_learning_unit_year_with_associated_education_group(cls.academic_year, same_entity=False)
-            for _ in range(3)
-        ]
-
-        cls.luys_in_different_faculty_than_education_group = [
-            generate_learning_unit_year_with_associated_education_group(cls.academic_year, same_faculty=False)
-            for _ in range(3)
-        ]
-
-    def test_empty_queryset(self):
-        empty_qs = LearningUnitYear.objects.none()
-        result = list(filter_is_borrowed_learning_unit_year(empty_qs, self.academic_year.start_date))
-        self.assertFalse(result)
-
-    def test_with_learning_unit_years_not_used_in_any_education_group(self):
-        self.assert_filter_borrowed_luys_returns_empty_qs(self.luys_not_in_education_group)
-
-    def test_with_learning_unit_years_when_requirement_entity_same_as_education_group(self):
-        self.assert_filter_borrowed_luys_returns_empty_qs(self.luys_with_same_entity_as_education_group)
-
-    def test_with_learning_unit_years_when_entity_for_luy_and_education_group_in_same_faculty(self):
-        self.assert_filter_borrowed_luys_returns_empty_qs(self.luys_in_same_faculty_as_education_group)
-
-    def test_with_learning_unit_when_entity_for_luy_and_education_group_in_different_faculty(self):
-        qs = LearningUnitYear.objects.filter(
-            pk__in=[luy.pk for luy in self.luys_in_different_faculty_than_education_group]
-        )
-        result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date))
-        self.assertCountEqual(result,   [obj.id for obj in self.luys_in_different_faculty_than_education_group])
-
-    def test_with_faculty_borrowing_set(self):
-        qs = LearningUnitYear.objects.filter(
-            pk__in=[luy.pk for luy in self.luys_in_different_faculty_than_education_group]
-        )
-
-        group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
-        entity = OfferYearEntity.objects.get(education_group_year=group.parent).entity
-        result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
-                                                            faculty_borrowing=entity.id))
-        self.assertCountEqual(result, [obj.id for obj in self.luys_in_different_faculty_than_education_group[:1]])
-        acronyms = [entity.most_recent_acronym, entity.most_recent_acronym.lower()]
-        for acronym in acronyms:
-            with self.subTest(msg=acronym):
-                data = {
-                    "academic_year": self.academic_year.id,
-                    "faculty_borrowing_acronym": acronym
-                }
-
-                borrowed_filter = BorrowedLearningUnitSearch(data)
-
-                borrowed_filter.is_valid()
-                results = list(borrowed_filter.qs)
-
-                self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
-
-    def test_with_faculty_borrowing_set_and_no_entity_version(self):
-        group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
-        data = {
-            "academic_year": self.academic_year.id,
-            "faculty_borrowing_acronym": group.parent.acronym
-        }
-
-        borrowed_filter = BorrowedLearningUnitSearch(data)
-
-        borrowed_filter.is_valid()
-        result = list(borrowed_filter.qs)
-        self.assertEqual(result, [])
-
-    def assert_filter_borrowed_luys_returns_empty_qs(self, learning_unit_years):
-        qs = LearningUnitYear.objects.filter(pk__in=[luy.pk for luy in learning_unit_years])
-        result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date))
-        self.assertFalse(result)
-
-
-def generate_learning_unit_year_with_associated_education_group(academic_year, same_faculty=True, same_entity=True):
-    luy = LearningUnitYearFactory(
-        academic_year=academic_year,
-        learning_container_year__academic_year=academic_year,
-        learning_container_year__requirement_entity=EntityFactory()
-    )
-
-    entity_version = EntityVersionFactory(entity=luy.learning_container_year.requirement_entity,
-                                          entity_type=entity_type.SCHOOL)
-    parent_entity = EntityVersionFactory(entity=entity_version.parent, parent=None, entity_type=entity_type.FACULTY)
-
-    if not same_entity:
-        entity_version = parent_entity
-    if not same_faculty:
-        entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY)
-
-    offer_year_entity = OfferYearEntityFactory(entity=entity_version.entity,
-                                               education_group_year__academic_year=academic_year)
-
-    GroupElementYearFactory(child_branch=offer_year_entity.education_group_year, parent=None)
-    GroupElementYearFactory(child_branch=None, child_leaf=luy,
-                            parent=offer_year_entity.education_group_year)
-
-    return luy
 
 
 class TestFilterDescriptiveficheLearningUnitYear(TestCase):

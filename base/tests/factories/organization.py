@@ -35,6 +35,10 @@ class OrganizationFactory(factory.DjangoModelFactory):
 
     external_id = factory.Faker('text', max_nb_chars=100)
     changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
-    is_current_partner = True
 
     type = factory.Iterator(organization_type.ORGANIZATION_TYPE, getter=lambda c: c[0])
+    name = "Name"
+
+
+class MainOrganizationFactory(OrganizationFactory):
+    type = organization_type.MAIN

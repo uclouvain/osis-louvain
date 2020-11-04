@@ -28,38 +28,46 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li class="active">{% trans 'Formation catalogue' %}</li>
+    <li class="active">{% trans 'Formation catalogue' %}</li>
 {% endblock %}
-{% block content %}
-<div class="page-header">
-    <h2>{% trans 'Formation catalogue' %}</h2>
-</div>
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="row">
-            {%  if perms.base.can_access_education_group %}
-            <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading">
-                    {% flag "version_program" %}
-                        {% url 'version_program' as url_training %}
-                    {% else %}
-                        {% url 'education_groups' as url_training %}
-                    {% endflag %}
-                    <a href="{{url_training}}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
-                </h4>
-                <p>{% trans 'Management of formations' %}</p>
-            </div>
-            {% endif %}
-            {% if perms.base.can_access_learningunit %}
-                <div class="col-md-1"><i class="fa fa-file" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></h4>
-                    <p> {% trans 'Management of learning units.' %}</p>
-                </div>
-            {% endif %}
-        </div>
 
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'Formation catalogue' %}</h2>
     </div>
-</div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                {%  if perms.base.view_educationgroup %}
+                    <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            {% url 'version_program' as url_training %}
+                            <a href="{{url_training}}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
+                        </h4>
+                        <p>{% trans 'Management of formations' %}</p>
+                    </div>
+                {% endif %}
+                {% if perms.base.can_access_learningunit %}
+                    <div class="col-md-1"><i class="fa fa-file" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></h4>
+                        <p> {% trans 'Management of learning units.' %}</p>
+                    </div>
+                {% endif %}
+            </div>
+            <br>
+            <div class="row">
+                {% if perms.base.can_access_catalog_configuration %}
+                    <div class="col-md-1"><i class="fa fa-cog" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            <a href="{% url 'catalog_configuration' %}" id="lnk_catalog_configuration">{% trans 'Configuration' %}</a>
+                        </h4>
+                        <p> {% trans 'Management of catalog configuration' %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -41,13 +41,13 @@ class TestOsisRoleManager(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             self.manager.register(SimpleNamespace)
 
-    def test_register_case_subclass_of_role_model(self):
+    def test_register_case_subclass_of_role_model(self, ):
         subclass = mock.Mock(spec=models.RoleModel)
         type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
 
         self.manager.register(subclass.__class__)
         self.assertIsInstance(self.manager.roles, set)
-        self.assertEquals(len(self.manager.roles), 1)
+        self.assertTrue(subclass.__class__ in self.manager.roles)
 
     @mock.patch('osis_role.role.OsisRoleManager.roles', new_callable=mock.PropertyMock)
     def test_get_group_names_managed(self, mock_roles_set):
@@ -55,7 +55,7 @@ class TestOsisRoleManager(SimpleTestCase):
         type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
         mock_roles_set.return_value = {subclass.__class__}
 
-        self.assertEquals(
+        self.assertEqual(
             self.manager.group_names_managed(),
             {'role_model_subclass'}
         )

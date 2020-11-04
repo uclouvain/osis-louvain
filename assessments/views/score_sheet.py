@@ -35,7 +35,7 @@ from assessments.business import score_encoding_sheet
 from assessments.forms import score_sheet_address_entity
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.models import score_sheet_address as score_sheet_address_model
-from base import models as mdl
+from base.auth.roles import program_manager
 from base.models.offer_year import OfferYear
 from osis_common.utils.models import get_object_or_none
 from reference.models.country import Country
@@ -62,7 +62,7 @@ def _get_common_context(request, offer_year_id):
     return {
         'offer_year': offer_year,
         'countries': Country.objects.all(),
-        'is_program_manager': mdl.program_manager.is_program_manager(request.user, offer_year=offer_year),
+        'is_program_manager': program_manager.is_program_manager(request.user, offer_year=offer_year),
         'entity_versions': score_encoding_sheet.get_entity_version_choices(offer_year),
     }
 

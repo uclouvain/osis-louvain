@@ -72,17 +72,17 @@ def _check_tutoring_learning_unit_year(tutoring):
 
 
 def _check_group_element_year_deletion(group_element_year):
-    if not group_element_year.parent:
+    if not group_element_year.parent_element:
         return {}
 
     return {
         group_element_year: _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s') % {
-            'subtype': _str_partim_or_full(group_element_year.child_leaf),
-            'acronym': group_element_year.child_leaf.acronym,
-            'group': group_element_year.parent.partial_acronym,
-            'year': group_element_year.child_leaf.academic_year
+            'subtype': _str_partim_or_full(group_element_year.child_element.learning_unit_year),
+            'acronym': group_element_year.child_element.learning_unit_year.acronym,
+            'group': group_element_year.parent_element.group_year.partial_acronym,
+            'year': group_element_year.child_element.learning_unit_year.academic_year
         }
-        }
+    }
 
 
 def _check_attribution_deletion(learning_unit_year):
@@ -166,9 +166,6 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     if next_year:
         msg.extend(delete_from_given_learning_unit_year(next_year))
 
-    if learning_unit_year.learning_container_year and learning_unit_year.is_full():
-        msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
-
     for component in learning_unit_year.learningcomponentyear_set.all():
         msg.extend(_delete_learning_component_year(component))
 
@@ -176,7 +173,13 @@ def delete_from_given_learning_unit_year(learning_unit_year):
 
     _decrement_end_year_learning_unit(learning_unit_year)
 
+    is_full = learning_unit_year.is_full()
+    has_learning_container_year = learning_unit_year.learning_container_year
+
     learning_unit_year.delete()
+
+    if has_learning_container_year and is_full:
+        msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
     msg.append(create_learning_unit_year_deletion_message(learning_unit_year))
     return msg
@@ -192,13 +195,11 @@ def _decrement_end_year_learning_unit(learning_unit_year):
         learning_unit_to_edit.save()
 
 
-def _delete_learning_container_year(learning_unit_container):
+def _delete_learning_container_year(learning_container_year):
     msg = []
-
-    for partim in learning_unit_container.get_partims_related():
+    for partim in learning_container_year.get_partims_related():
         msg.extend(delete_from_given_learning_unit_year(partim))
-    learning_unit_container.delete()
-
+    learning_container_year.delete()
     return msg
 
 

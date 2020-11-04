@@ -21,55 +21,117 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import get_object_or_404
+from django.http import QueryDict
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
-from django.utils.translation import gettext_lazy as _
 
-from base.forms.education_group.search.quick_search import QuickEducationGroupYearFilter
 from base.forms.learning_unit.search.quick_search import QuickLearningUnitYearFilter
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
-from education_group.api.serializers.education_group import EducationGroupSerializer
+from education_group.views.serializers.group_year import GroupYearSerializer
+from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
-from program_management.business.group_element_years import attach
 
 CACHE_TIMEOUT = 60
 
 
-class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
-                                        FilterView):
-    model = EducationGroupYear
+class QuickGroupYearFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        to_field_name="year",
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("female plural", "All"),
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Acronym/Short title'),
+    )
+    partial_acronym = filters.CharFilter(
+        field_name="partial_acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    title = filters.CharFilter(
+        field_name="title_fr",
+        lookup_expr='icontains',
+        max_length=255,
+        required=False,
+        label=_('Title')
+    )
+
+    ordering = OrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('partial_acronym', 'code'),
+            ('title_fr', 'title'),
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = GroupYear
+        fields = [
+            'acronym',
+            'title',
+            'academic_year',
+            'partial_acronym'
+        ]
+
+    def __init__(self, *args, initial=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+        if initial:
+            self.form.fields["academic_year"].initial = initial["academic_year"]
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return GroupYear.objects.none()
+        return GroupYear.objects.all()
+
+
+class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
+                               FilterView):
+    model = GroupYear
     template_name = 'quick_search_egy_inner.html'
-    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
     timeout = CACHE_TIMEOUT
 
-    filterset_class = QuickEducationGroupYearFilter
+    filterset_class = QuickGroupYearFilter
     cache_exclude_params = ['page']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
 
-    serializer_class = EducationGroupSerializer
+    serializer_class = GroupYearSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
+        get_without_path = kwargs['data'].copy()  # type: QueryDict
+        del get_without_path["path"]
+        kwargs["data"] = get_without_path or None
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['education_group_year_id'] = self.kwargs['education_group_year_id']
-        context['display_quick_search_luy_link'] = attach.can_attach_learning_units(
-            EducationGroupYear.objects.get(id=self.kwargs['education_group_year_id'])
-        )
+        context['display_quick_search_luy_link'] = self.is_learning_unit_child_allowed()
+        context['node_path'] = self.request.GET["path"]
+        context['year'] = self.kwargs["year"]
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -80,12 +142,16 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
     def get_paginate_by(self, queryset):
         return self.paginate_by
 
+    def is_learning_unit_child_allowed(self):
+        element_id = int(self.request.GET["path"].split("|")[-1])
+        return GroupYear.objects.get(element__id=element_id).education_group_type.learning_unit_child_allowed
+
 
 class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
                                       FilterView):
     model = LearningUnitYear
     template_name = 'quick_search_luy_inner.html'
-    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickLearningUnitYearFilter
@@ -97,15 +163,17 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
+        get_without_path = kwargs['data'].copy()  # type: QueryDict
+        del get_without_path["path"]
+        kwargs["data"] = get_without_path or None
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['education_group_year_id'] = self.kwargs['education_group_year_id']
+        context['node_path'] = self.request.GET["path"]
+        context['year'] = self.kwargs["year"]
         return context
 
     def render_to_response(self, context, **response_kwargs):

@@ -24,7 +24,10 @@
 import time
 
 from behave import *
+from behave.runner import Context
 from selenium.webdriver.common.by import By
+
+import program_management.views.tree.move
 
 use_step_matcher("parse")
 
@@ -152,7 +155,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page.up.click()
+    program_management.views.tree.move.up.click()
     time.sleep(1)
 
 
@@ -189,12 +192,25 @@ def step_impl(context, proposal_type, acronym):
     context.test.assertIn(proposal_type, context.current_page.success_messages.text)
 
 
+@then("Vérifier que une proposition de {proposal_type} a été faite")
+def step_impl(context: Context, proposal_type):
+    """
+    :type context: behave.runner.Context
+    """
+    context.test.assertIn(proposal_type, context.current_page.success_messages.text)
+
+
 @step("Vérifier que l'année academique termine en {year}")
 def step_impl(context, year):
     """
     :type context: behave.runner.Context
     """
     context.test.assertIn(year, context.current_page.find_element(By.ID, "id_end_year").text)
+
+
+@step("Vérifier que l'année academique termine")
+def step_impl(context: Context):
+    context.test.assertIn(str(context.anac.year), context.current_page.find_element(By.ID, "id_end_year").text)
 
 
 @then("Vérifier que le dossier {acronym} est bien {state}")
@@ -204,7 +220,7 @@ def step_impl(context, acronym, state):
     """
     current_state = context.current_page.find_element(
         By.CSS_SELECTOR,
-        "#table_learning_units > tbody > tr:nth-child(1) > td.col-proposal_state"
+        "#table_learning_units > tbody > tr:nth-child(1) > td:nth-child(9)"
     ).text
     context.test.assertEqual(current_state.strip(), state.strip())
 

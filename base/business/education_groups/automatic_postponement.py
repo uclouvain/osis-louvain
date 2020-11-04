@@ -23,54 +23,14 @@
 # ############################################################################
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import transaction, Error
-from django.db.models import OuterRef, Exists
-from django.utils.translation import gettext as _
 
-from base.business.education_groups.create import create_initial_group_element_year_structure
-from base.business.education_groups.postponement import duplicate_education_group_year, ConsistencyError
+from base.business.education_groups.postponement import ConsistencyError
 from base.business.utils.model import update_related_object
-from base.business.utils.postponement import AutomaticPostponementToN6, AutomaticPostponement
-from base.models.education_group import EducationGroup
+from base.business.utils.postponement import AutomaticPostponement
+
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import MiniTrainingType
-from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_egy, \
-    send_mail_after_annual_procedure_of_automatic_postponement_of_egy
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-
-
-class EducationGroupAutomaticPostponementToN6(AutomaticPostponementToN6):
-    model = EducationGroup
-    annualized_set = "educationgroupyear"
-
-    send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_egy
-    send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_egy
-    extend_method = duplicate_education_group_year
-    msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
-
-    def get_queryset(self, queryset=None):
-        mini_training_to_postpone = EducationGroupYear.objects.filter(
-            education_group=OuterRef("pk"),
-            education_group_type__name__in=MiniTrainingType.to_postpone()
-        )
-        training_to_postpone = EducationGroupYear.objects.filter(
-            education_group=OuterRef("pk"),
-            education_group_type__category=TRAINING
-        ).exclude(
-            acronym__icontains="11BA"
-        )
-        education_group_years_to_postpone = mini_training_to_postpone | training_to_postpone
-        # We need to postpone only trainings and some mini trainings
-        return super().get_queryset(queryset).annotate(
-            to_postpone=Exists(education_group_years_to_postpone)
-        ).filter(
-            to_postpone=True
-        )
-
-    def post_extend(self, original_object, list_postponed_objects):
-        """ After the main postponement, we need to create the structure of the education_group_years """
-        create_initial_group_element_year_structure([original_object] + list_postponed_objects)
 
 
 class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):

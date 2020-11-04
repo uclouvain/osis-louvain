@@ -36,3 +36,4 @@ class EducationGroupDetailedAchievementFactory(factory.django.DjangoModelFactory
     french_text = factory.fuzzy.FuzzyText('label_', 20)
     english_text = factory.fuzzy.FuzzyText('label_', 20)
     education_group_achievement = factory.SubFactory(EducationGroupAchievementFactory)
+    order = factory.fuzzy.FuzzyInteger(1, 5)

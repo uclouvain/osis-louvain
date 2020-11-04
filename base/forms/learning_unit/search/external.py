@@ -44,7 +44,7 @@ class ExternalLearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
@@ -64,7 +64,7 @@ class ExternalLearningUnitFilter(FilterSet):
         required=False,
         label=_('Status'),
         field_name="status",
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     country = filters.ModelChoiceFilter(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),

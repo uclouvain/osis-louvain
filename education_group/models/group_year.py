@@ -26,10 +26,17 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Case, When, Q, Value, CharField
+from django.db.models.functions import Concat
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models import entity_version
+from base.models.campus import Campus
 from base.models.entity import Entity
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -41,15 +48,66 @@ class GroupYearManager(models.Manager):
         )
 
 
+class GroupYearVersionManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(educationgroupversion__isnull=False).select_related(
+            'group', 'educationgroupversion'
+        )
+
+
+class GroupYearQuerySet(models.QuerySet):
+    def annotate_full_titles(self):
+        return self.annotate(
+            full_title_fr=Case(
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories())
+                    & Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
+                    then=Concat(
+                        'educationgroupversion__offer__title',
+                        Value(' ['),
+                        'educationgroupversion__title_fr',
+                        Value(']')
+                    )
+                ),
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories()),
+                    then='educationgroupversion__offer__title'
+                ),
+                default='title_fr',
+                output_field=CharField(),
+            ),
+            full_title_en=Case(
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories())
+                    & Q(educationgroupversion__title_en__isnull=False) & ~Q(educationgroupversion__title_en=''),
+                    then=Concat(
+                        'educationgroupversion__offer__title_english',
+                        Value(' ['),
+                        'educationgroupversion__title_en',
+                        Value(']')
+                    )
+                ),
+                When(
+                    Q(education_group_type__category__in=Categories.training_categories()),
+                    then='educationgroupversion__offer__title_english'
+                ),
+                default='title_en',
+                output_field=CharField(),
+            )
+        )
+
+
 class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'academic_year',
                     'changed')
     list_filter = ('education_group_type', 'academic_year')
     search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
+    raw_id_fields = (
+        'education_group_type', 'academic_year', 'group', 'main_teaching_campus',
+    )
 
 
 class GroupYear(models.Model):
-
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -134,7 +192,23 @@ class GroupYear(models.Model):
         on_delete=models.PROTECT
     )
 
-    objects = GroupYearManager()
+    main_teaching_campus = models.ForeignKey(
+        Campus,
+        blank=True,
+        null=True,
+        related_name='teaching_campus',
+        verbose_name=_("Learning location"),
+        on_delete=models.PROTECT
+    )
+
+    objects = GroupYearManager.from_queryset(GroupYearQuerySet)()
+    objects_version = GroupYearVersionManager.from_queryset(GroupYearQuerySet)()
+
+    class Meta:
+        unique_together = ("partial_acronym", "academic_year")
+        index_together = [
+            ("partial_acronym", "academic_year"),
+        ]
 
     def __str__(self):
         return "{} ({})".format(self.acronym,
@@ -145,9 +219,42 @@ class GroupYear(models.Model):
             raise AttributeError(
                 _('Please enter an academic year greater or equal to group start year.')
             )
-        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
-            raise AttributeError(
-                _('Please enter an academic year less or equal to group end year.')
-            )
-
         super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        result = super().delete(using, keep_parents)
+
+        has_group_anymore_children = self.group.groupyear_set.all().exists()
+        if not has_group_anymore_children:
+            result = self.group.delete()
+        return result
+
+    def get_full_title_fr(self):
+        if self.education_group_type.category in Categories.training_categories():
+            full_title_fr = self.educationgroupversion.offer.title
+            if self.educationgroupversion.title_fr:
+                full_title_fr += "[ " + self.educationgroupversion.title_fr + " ]"
+            return full_title_fr
+        return self.title_fr
+
+    def get_full_title_en(self):
+        if self.education_group_type.category in Categories.training_categories():
+            full_title_en = self.educationgroupversion.offer.title_english
+            if self.educationgroupversion.title_en:
+                full_title_en += "[ " + self.educationgroupversion.title_en + " ]"
+            return full_title_en
+        return self.title_fr
+
+    @property
+    def is_minor_major_option_list_choice(self):
+        return self.education_group_type.name in GroupType.minor_major_option_list_choice()
+
+    @property
+    def is_mini_training(self):
+        return self.education_group_type.name in MiniTrainingType.get_names()
+
+    @cached_property
+    def management_entity_version(self):
+        return entity_version.find_entity_version_according_academic_year(
+            self.management_entity, self.academic_year
+        )

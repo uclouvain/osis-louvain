@@ -30,14 +30,14 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class TestLearningAchievementForm(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.language_fr = LanguageFactory(code="FR")
-        cls.language_en = LanguageFactory(code="EN")
+        cls.language_fr = FrenchLanguageFactory()
+        cls.language_en = EnglishLanguageFactory()
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )

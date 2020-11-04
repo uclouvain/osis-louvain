@@ -1,0 +1,96 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load i18n static bootstrap3 %}
+
+{% block title %}
+    <title>OSIS - {% trans 'Management common topics' %}</title>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'catalog_configuration' %}" id="lnk_catalog_configuration">{% trans 'Configuration' %}</a></li>
+    <li><a id="lnk_common_topics_configuration" class="active">{% trans 'Management common topics' %}</a></li>
+{% endblock %}
+
+
+{% block content %}
+     <div class="page-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="d-inline-block">{% trans 'Management common topics' %}</h2>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form id="search_form">
+                    <div class="row">
+                        <div class="col-md-2">
+                            {% bootstrap_field form.academic_year %}
+                        </div>
+                        <div class="col-md-offset-9 col-md-1">
+                            <br>
+                            <div class="btn-toolbar pull-right">
+                                <button type="submit" id="bt_submit_common_topics_search"
+                                        class="btn btn-primary" role="button">
+                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                </button>
+                                {% include 'blocks/button/button_filter_refresh.html' %}
+                            </div>
+                        </div>
+                    </div>
+                    {% bootstrap_field form.ordering %}
+                    {{ form.media }}
+                </form>
+
+                {% include 'learning_unit/blocks/form/search_form_reset.html' %}
+                <hr style="margin:10px -15px 10px -15px;">
+
+                 <div class="row">
+                    {% if object_list_count %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong style="margin-left:10px;color:grey;">
+                                    {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} common topics{% endblocktrans %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <table id="table_common_topics" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                                    <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="text-center">
+                            {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                        </div>
+                    {% endif %}
+                 </div>
+            </div>
+        </div>
+     </div>
+{% endblock content%}
+
+
+{% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            let columnDefs = [
+                {"name": "academic_year", "targets": 0, "data": "academic_year"},
+                {
+                    "name": "acronym",
+                    "targets": 1,
+                    "data": "acronym",
+                    "render": function ( data, type, row, meta ) {
+                        return outputAnchorOuterHtml(row["url"], data);
+                    }
+                }
+            ];
+            initializeDataTable("search_form", "table_common_topics", "commonTopicIds", {{ page_obj.number }},
+            {{items_per_page}}, "{% url 'common_topics_configuration' %}", columnDefs);
+        });
+    </script>
+{% endblock script %}

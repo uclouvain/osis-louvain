@@ -23,50 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import sys
+from typing import List
 
-from django.utils.translation import ngettext
-
-from base.ddd.utils.business_validator import BusinessValidator
+from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
+from base.utils.constants import INFINITE_VALUE
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.exception import CannotAttachFinalitiesWithGreaterEndDateThanProgram2M
 
 
-# Implemented from _check_end_year_constraints_on_2m
-class AttachFinalityEndDateValidator(BusinessValidator):
+class AttachFinalityEndDateValidator(business_validator.BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
     the end date of all 2M is greater or equals of all finalities.
     """
 
-    def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
+    def __init__(self, tree_version_2m: 'ProgramTreeVersion', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachFinalityEndDateValidator, self).__init__()
-        msg = "This validator need the children of the node to add. Please load the complete Tree from the Node to Add"
-        assert isinstance(tree_from_node_to_add, program_tree.ProgramTree), msg
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-            assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
+            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
         self.tree_from_node_to_add = tree_from_node_to_add
         self.node_to_add = tree_from_node_to_add.root_node
-        self.tree_2m = tree_2m
+        self.tree_version_2m = tree_version_2m
 
     def validate(self):
         if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
-            inconsistent_nodes = self._get_acronyms_where_end_date_gte_root_end_date()
-            if inconsistent_nodes:
-                self.add_error_message(
-                    ngettext(
-                        "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-                        "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
-                        len(inconsistent_nodes)
-                    ) % {
-                        "acronym": ', '.join(inconsistent_nodes),
-                        "root_acronym": self.tree_2m.root_node.acronym
-                    }
+            inconsistent_finalities = self._get_finalities_where_end_date_gt_root_end_date()
+            if inconsistent_finalities:
+                raise CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(
+                    self.tree_version_2m.tree.root_node,
+                    inconsistent_finalities
                 )
 
-    def _get_acronyms_where_end_date_gte_root_end_date(self):
+    def _get_finalities_where_end_date_gt_root_end_date(self) -> List['Node']:
+        root_end_year = self.tree_version_2m.tree.root_node.end_year or INFINITE_VALUE
         return [
-            finality.acronym for finality in self.tree_from_node_to_add.get_all_finalities()
-            if finality.end_date > self.tree_2m.root_node.end_date
+            finality for finality in self.tree_from_node_to_add.get_all_finalities()
+            if (finality.end_year or INFINITE_VALUE) > root_end_year
         ]

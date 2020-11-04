@@ -36,8 +36,8 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class EducationGroupTypeAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('name', 'category', )
-    list_filter = ('name', 'category', )
+    list_display = ('name', 'external_id', 'category', 'learning_unit_child_allowed', )
+    list_filter = ('category', 'learning_unit_child_allowed', 'name', )
     search_fields = ['name', 'category']
 
 

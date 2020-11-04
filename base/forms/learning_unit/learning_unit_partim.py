@@ -126,6 +126,14 @@ class PartimForm(LearningUnitBaseForm):
         super().__init__(instances_data, *args, **kwargs)
         self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
 
+    def _specific_title_post_clean(self):
+        if not self.learning_container_year_form.instance.common_title and \
+                not self.learning_unit_year_form.cleaned_data['specific_title']:
+            self.learning_unit_year_form.add_error(
+                "specific_title",
+                _("You must either set the common title or the specific title")
+            )
+
     @property
     def learning_unit_form(self):
         return self.forms[LearningUnitPartimModelForm]

@@ -25,26 +25,26 @@
 
 <div class="modal-content" id="form-modal-content">
 
-        <div id="form-modal-body" class="modal-body">
-            {# the action needs the get parameters to use the proxy manager -> get_full_path #}
-            {% include 'template_messages.html' %}
-            {% if confirmation_message %}
-                <br>
-                <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
-                    {% csrf_token %}
-                    {{ confirmation_message }}
-                </form>
+    <div id="form-modal-body" class="modal-body">
+        {# the action needs the get parameters to use the proxy manager -> get_full_path #}
+        {% include 'template_messages.html' %}
+        {% if confirmation_message %}
+            <br>
+            <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
+                {% csrf_token %}
+                {{ confirmation_message }}
+            </form>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-                    <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
-                           onclick="$('#form_detach_confirm').submit();"/>
-                </div>
-            {% else %}
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-                </div>
-            {% endif %}
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
+                       onclick="$('#form_detach_confirm').submit();"/>
+            </div>
+        {% else %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            </div>
+        {% endif %}
+    </div>
 
 </div>

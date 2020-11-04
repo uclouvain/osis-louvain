@@ -42,7 +42,7 @@ class TestCreateEducationGroupAchievement(TestCase):
         cls.education_group_year = EducationGroupYearFactory()
         cls.user = UserFactory()
         cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group',
+            'view_educationgroup',
             'add_educationgroupachievement',
             user=cls.user
         )
@@ -55,11 +55,11 @@ class TestCreateEducationGroupAchievement(TestCase):
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
-                "create_education_group_achievement",
+                "training_achievement_create",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
-                ]), data={"code_name": code}
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -70,12 +70,12 @@ class TestCreateEducationGroupAchievement(TestCase):
         achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
         response = self.client.post(
             reverse(
-                "create_education_group_detailed_achievement",
+                "training_detailed_achievement_create",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
                     achievement.pk,
-                ]), data={"code_name": code}
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -87,11 +87,11 @@ class TestCreateEducationGroupAchievement(TestCase):
 
         response = self.client.post(
             reverse(
-                "create_education_group_achievement",
+                "training_achievement_create",
                 args=[
-                    self.education_group_year.pk,
-                    self.education_group_year.pk,
-                ]), data={"code_name": code}
+                    self.education_group_year.academic_year.year,
+                    self.education_group_year.partial_acronym,
+                ]), data={"code_name": code, "path": 1111}
         )
 
         self.assertEqual(response.status_code, 403)

@@ -28,6 +28,21 @@ class VolumeEditionStrategy(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def is_valid(self):
         # TODO: reduce cognitive complexity (at 29 now)
+        if self.volume_q1 < 0:
+            self.obj.add_error(self.input_names['volume_q1'],
+                               _('Ensure this value is greater than or equal to %s.') % '0')
+        if self.volume_q2 < 0:
+            self.obj.add_error(self.input_names['volume_q2'],
+                               _('Ensure this value is greater than or equal to %s.') % '0')
+            if self.volume_requirement_entity < 0:
+                self.obj.add_error(self.input_names['volume_requirement_entity'],
+                                   _('Ensure this value is greater than or equal to %s.') % '0')
+            if self.volume_additional_requirement_entity_1 < 0:
+                self.obj.add_error(self.input_names['volume_additional_requirement_entity_1'],
+                                   _('Ensure this value is greater than or equal to %s.') % '0')
+            if self.volume_additional_requirement_entity_2 < 0:
+                self.obj.add_error(self.input_names['volume_additional_requirement_entity_2'],
+                                   _('Ensure this value is greater than or equal to %s.') % '0')
         if self.raw_volume_q1 is not None or self.raw_volume_q2 is not None:
             if self.volume_total != self.volume_q1 + self.volume_q2:
                 self.obj.add_error(self.input_names['volume_total'],

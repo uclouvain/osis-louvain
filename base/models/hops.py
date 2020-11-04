@@ -32,12 +32,12 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class HopsAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('ares_study', 'ares_graca', 'ares_ability', 'changed')
+    list_display = ('education_group_year', 'ares_study', 'ares_graca', 'ares_ability', 'changed')
     list_filter = ('ares_study', )
     raw_id_fields = (
         'education_group_year'
     )
-    search_fields = ['ares_study']
+    search_fields = ['ares_study', 'education_group_year__acronym', 'education_group_year__partial_acronym']
 
 
 class Hops(models.Model):

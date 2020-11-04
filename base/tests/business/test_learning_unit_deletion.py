@@ -54,16 +54,16 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import AdministrativeManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class LearningUnitYearDeletion(TestCase):
@@ -91,8 +91,11 @@ class LearningUnitYearDeletion(TestCase):
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
 
-        group_1 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
-        group_2 = GroupElementYearFactory(child_branch=None, child_leaf=l_unit_2)
+        elem_ue_1 = ElementFactory(learning_unit_year=l_unit_2)
+        elem_ue_2 = ElementFactory(learning_unit_year=l_unit_2)
+
+        group_1 = GroupElementYearFactory(child_element=elem_ue_1)
+        group_2 = GroupElementYearFactory(child_element=elem_ue_2)
 
         component = LearningComponentYearFactory(learning_unit_year=l_unit_2)
 
@@ -137,13 +140,13 @@ class LearningUnitYearDeletion(TestCase):
         self.assertIn(msg_delete_offer_type
                       % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
-                         'group': group_1.parent.partial_acronym,
+                         'group': group_1.parent_element.group_year.partial_acronym,
                          'year': l_unit_2.academic_year},
                       msg)
         self.assertIn(msg_delete_offer_type
                       % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
-                         'group': group_2.parent.partial_acronym,
+                         'group': group_2.parent_element.group_year.partial_acronym,
                          'year': l_unit_2.academic_year},
                       msg)
 
@@ -301,20 +304,18 @@ class LearningUnitYearDeletion(TestCase):
                                                                subtype=learning_unit_year_subtypes.FULL,
                                                                academic_year=learning_container_year.academic_year)
         # Create CMS data - TAB Specification
-        cms_specification_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                                   label=CMS_LABEL_SPECIFICATIONS[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_specification_label, text='Specification of learning unit year')
+        cms_specification_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_SPECIFICATIONS[0])
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_specification_label,
+                                              text='Specification of learning unit year')
         # Create CMS data - TAB Pedagogy
-        cms_pedagogy_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                              label=CMS_LABEL_PEDAGOGY[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_pedagogy_label, text='Pedagogy of learning unit year')
+        cms_pedagogy_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_PEDAGOGY[0])
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_pedagogy_label, text='Pedagogy of learning unit year')
         # Create CMS data - TAB Summary
-        cms_summary_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                             label=CMS_LABEL_SUMMARY[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_summary_label, text='Summary of learning unit year')
+        cms_summary_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_SUMMARY[0])
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_summary_label, text='Summary of learning unit year')
 
         # Before delete, we should have 3 data in CMS
         self.assertEqual(3, TranslatedText.objects.all().count())

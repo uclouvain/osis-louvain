@@ -53,17 +53,6 @@
                             {% endif %}
                         {% endflag %}
 
-                        {# This feature is used for managing tree in education group context #}
-                        {% flag "copy_education_group_to_cache" %}
-                            <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
-                                <a {% if "base.can_edit_learningunit" in perms %} href="#"
-                                                                                  onclick="javascript:select()" {% endif %}>
-                                    {% trans 'Copy' %}
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                        {% endflag %}
-
                         {% flag "learning_unit_update" %}
                             {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
                             {% li_edit_lu edit_learning_unit_url _('Modify') %}
@@ -126,18 +115,3 @@
                 </div>
     {% endif %}
 {% endif %}
-
-{% block script %}
-    <script>
-        function select() {
-            $.ajax({
-                url: "{% url 'copy_learning_unit_to_cache' learning_unit_year_id=learning_unit_year.id %}",
-                dataType: 'json',
-                type: 'POST',
-                success: function (jsonResponse) {
-                    displayInfoMessage(jsonResponse, 'message_info_container');
-                }
-            });
-        }
-    </script>
-{% endblock %}

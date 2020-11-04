@@ -54,14 +54,14 @@ class UserListViewTestCase(TestCase):
 
     def test_donot_return_teacher_only_in_tutor_group(self):
         a_tutor_person = PersonFactory()
-        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
+        a_tutor_person.user.groups.add(Group.objects.get_or_create(name=TUTOR)[0])
         a_tutor_person.save()
         self.assertCountEqual(UserListView().get_queryset(), [])
 
     def test_tutor_in_several_groups(self):
         a_tutor_person = PersonFactory()
-        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
-        a_tutor_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        a_tutor_person.user.groups.add(Group.objects.get_or_create(name=TUTOR)[0])
+        a_tutor_person.user.groups.add(Group.objects.get_or_create(name=CENTRAL_MANAGER_GROUP)[0])
         a_tutor_person.save()
 
         self.assertCountEqual(UserListView().get_queryset(), [a_tutor_person])
@@ -69,7 +69,7 @@ class UserListViewTestCase(TestCase):
     def test_donot_return_student_in_no_groups(self):
         StudentFactory()
         a_central_manager_person = PersonFactory()
-        a_central_manager_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        a_central_manager_person.user.groups.add(Group.objects.get_or_create(name=CENTRAL_MANAGER_GROUP)[0])
         a_central_manager_person.save()
 
         self.assertCountEqual(UserListView().get_queryset(), [a_central_manager_person])
