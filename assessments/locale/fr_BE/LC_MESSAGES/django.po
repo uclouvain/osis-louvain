@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-05 09:53+0200\n"
+"POT-Creation-Date: 2020-11-12 15:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -206,6 +206,8 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -531,6 +533,9 @@ msgstr "Status"
 
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
+
+msgid "Student path"
+msgstr "Parcours de l'étudiant"
 
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
