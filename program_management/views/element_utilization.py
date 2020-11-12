@@ -27,12 +27,13 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read.get_utilization_rows import get_utilizations
-from program_management.views.generic import LearningUnitGeneric
+from program_management.views.generic import LearningUnitGeneric, Tab
 
 
 class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_utilization.html"
 
+    active_tab = Tab.UTILIZATION
     permission_required = 'base.view_educationgroup'
     raise_exception = True
 

@@ -229,9 +229,11 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         self.assertTrue(mock_service_create_group.called)
 
     @mock.patch('education_group.views.group.create.GroupAttachForm', new_callable=mocks.MockFormValid)
+    @mock.patch('education_group.views.group.create.ElementIdSearch.get_from_group_identity', return_value="10")
     @mock.patch('education_group.views.group.create.create_group_and_attach_service.create_group_and_attach')
     def test_post_assert_redirection_with_path_queryparam(self,
                                                           mock_service_create_group,
+                                                          mock_get_element_id,
                                                           mock_form,
                                                           *args):
 
@@ -241,5 +243,5 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
 
         expected_redirect = \
             reverse('group_identification', kwargs={'code': 'LTRONC1000', 'year': 2018}) + \
-            "?path={}".format(str(self.parent_element.pk))
+            "?path={}|{}".format(str(self.parent_element.pk), "10")
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)

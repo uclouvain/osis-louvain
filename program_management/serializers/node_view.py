@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import namedtuple
 from typing import List, Dict
 
 from django.templatetags.static import static
@@ -39,37 +40,48 @@ from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
 
+NodeViewContext = namedtuple('NodeViewContext', 'view_path root_node current_path')
+
 
 def serialize_children(
         children: List['Link'],
-        path: str,
         tree: 'ProgramTree',
-        context=None,
+        context: NodeViewContext,
 ) -> List[dict]:
     serialized_children = []
     for link in children:
-        child_path = path + PATH_SEPARATOR + str(link.child.pk)
+        child_context = NodeViewContext(
+            view_path=context.view_path,
+            root_node=context.root_node,
+            current_path=context.current_path + PATH_SEPARATOR + str(link.child.pk)
+        )
         if link.child.is_learning_unit():
-            serialized_node = _leaf_view_serializer(link, child_path, tree, context=context)
+            serialized_node = _leaf_view_serializer(link, tree, child_context)
         else:
-            serialized_node = _get_node_view_serializer(link, child_path, tree, context)
+            serialized_node = _get_node_view_serializer(link, tree, child_context)
         serialized_children.append(serialized_node)
     return serialized_children
 
 
-def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'ProgramTree', context=None) -> dict:
+def _get_node_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewContext) -> dict:
+    querystring_params = {"path": context.current_path, "redirect_path": context.view_path}
+
     return {
-        'path': path,
-        'href': reverse_with_get('element_identification', args=[link.child.year, link.child.code], get={"path": path}),
-        'root': context['root'].pk,
+        'path': context.current_path,
+        'href': reverse_with_get(
+            'element_identification',
+            args=[link.child.year, link.child.code],
+            get={"path": context.current_path}
+        ),
+        'root': context.root_node.pk,
         'group_element_year': link.pk,
         'element_id': link.child.pk,
         'element_type': link.child.type.name,
         'element_code': link.child.code,
         'element_year': link.child.year,
         'title': link.child.code,
-        'paste_url': reverse_with_get('tree_paste_node', get={"path": path}),
-        'detach_url': reverse_with_get('tree_detach_node', get={"path": path}),
+        'paste_url': reverse_with_get('tree_paste_node', get=querystring_params),
+        'detach_url': reverse_with_get('tree_detach_node', get=querystring_params),
         'modify_url': reverse('tree_update_link', args=[
             link.parent.code,
             link.parent.year,
@@ -80,17 +92,21 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', tree: 'Progr
             'quick_search_learning_unit' if tree.allows_learning_unit_child(
                 link.child) else 'quick_search_education_group',
             args=[link.child.academic_year.year],
-            get={"path": path}
+            get=querystring_params
         ),
     }
 
 
-def _get_leaf_view_attribute_serializer(link: 'Link', path: str, tree: 'ProgramTree', context=None) -> dict:
-    attrs = _get_node_view_attribute_serializer(link, path, tree, context=context)
+def _get_leaf_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewContext) -> dict:
+    attrs = _get_node_view_attribute_serializer(link, tree, context)
     attrs.update({
-        'path': path,
+        'path': context.current_path,
         'icon': None,
-        'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
+        'href': reverse_with_get(
+            'learning_unit_utilization',
+            args=[context.root_node.pk, link.child.pk],
+            get={"path": context.current_path}
+        ),
         'paste_url': None,
         'search_url': None,
         'has_prerequisite': link.child.has_prerequisite,
@@ -123,23 +139,21 @@ def __get_title(obj: 'Link') -> str:
 
 def _get_node_view_serializer(
         link: 'Link',
-        path: str,
         tree: 'ProgramTree',
-        context=None,
+        context: NodeViewContext,
 ) -> dict:
 
     return {
-        'id': path,
-        'path': path,
+        'id': context.current_path,
+        'path': context.current_path,
         'icon': _get_group_node_icon(link),
         'text': _format_node_group_text(link.child),
         'children': serialize_children(
             children=link.child.children,
-            path=path,
             tree=tree,
             context=context,
         ),
-        'a_attr': _get_node_view_attribute_serializer(link, path, tree, context=context),
+        'a_attr': _get_node_view_attribute_serializer(link, tree, context),
     }
 
 
@@ -149,13 +163,13 @@ def _get_group_node_icon(obj: 'Link'):
     return None
 
 
-def _leaf_view_serializer(link: 'Link', path: str, tree: 'ProgramTree', context=None) -> dict:
+def _leaf_view_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewContext) -> dict:
     return {
-        'id': path,
-        'path': path,
+        'id': context.current_path,
+        'path': context.current_path,
         'icon': __get_learning_unit_node_icon(link),
-        'text': __get_learning_unit_node_text(link, context=context),
-        'a_attr': _get_leaf_view_attribute_serializer(link, path, tree, context=context),
+        'text': __get_learning_unit_node_text(link, context),
+        'a_attr': _get_leaf_view_attribute_serializer(link, tree, context),
     }
 
 
@@ -169,8 +183,8 @@ def __get_learning_unit_node_icon(link: 'Link') -> str:
     return "far fa-file"
 
 
-def __get_learning_unit_node_text(link: 'Link', context=None):
-    if context['root'].year != link.child.year:
+def __get_learning_unit_node_text(link: 'Link', context: NodeViewContext):
+    if context.root_node.year != link.child.year:
         return "|{}|{}".format(link.child.year, link.child.code)
     return link.child.code
 

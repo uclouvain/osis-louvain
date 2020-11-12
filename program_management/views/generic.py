@@ -23,8 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
+from enum import IntEnum
+from gettext import ngettext
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.translation import gettext_lazy as _
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -37,22 +42,18 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.utils.urls import reverse_with_get
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.enums.node_type import NodeType
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -82,7 +83,14 @@ class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, Succe
         return self.get_object().parent_element.group_year
 
 
+class Tab(IntEnum):
+    UTILIZATION = 1
+    PREREQUISITE = 2
+
+
 class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
+    active_tab = None
+
     def get_person(self):
         return get_object_or_404(Person, user=self.request.user)
 
@@ -123,6 +131,7 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
         context['tree_json_url'] = self.get_tree_json_url()
+        context["tab_urls"] = self.get_tab_urls()
         context['tree_root_id'] = self.get_root_id()
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
         context['selected_element_clipboard'] = self.get_selected_element_clipboard_message()
@@ -143,4 +152,34 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         return root_node.node_type not in NO_PREREQUISITES
 
     def get_tree_json_url(self) -> str:
-        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+        queryparams = {'path': self.request.GET.get('path')} if 'path' in self.request.GET else {}
+        return reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.get_root_id()},
+            get=queryparams
+        )
+
+    def get_tab_urls(self):
+        queryparams = {'path': self.request.GET.get('path')} if 'path' in self.request.GET else {}
+        return OrderedDict({
+            Tab.UTILIZATION: {
+                'text': _('Utilizations'),
+                'active': Tab.UTILIZATION == self.active_tab,
+                'display': True,
+                'url': reverse_with_get(
+                    'learning_unit_utilization',
+                    args=[self.get_root_id(), self.node.pk],
+                    get=queryparams
+                )
+            },
+            Tab.PREREQUISITE: {
+                'text': ngettext('Prerequisite', 'Prerequisites', 2),
+                'active': Tab.PREREQUISITE == self.active_tab,
+                'display': True,
+                'url': reverse_with_get(
+                    'learning_unit_prerequisite',
+                    args=[self.get_root_id(), self.node.pk],
+                    get=queryparams
+                )
+            },
+        })

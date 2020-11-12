@@ -97,3 +97,11 @@ class ElementIdSearch(interface.DomainService):
         ).values('pk')
         if values:
             return values[0]['pk']
+
+    def get_from_group_identity(self, group_identity: 'GroupIdentity') -> Optional[ElementId]:
+        values = Element.objects.filter(
+            group_year__partial_acronym=group_identity.code,
+            group_year__academic_year__year=group_identity.year
+        ).values('pk')
+        if values:
+            return values[0]['pk']

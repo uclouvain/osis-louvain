@@ -237,7 +237,11 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         )
 
     def get_tree_json_url(self) -> str:
-        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+        return reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.get_root_id()},
+            get={"path": self.get_path()}
+        )
 
     def get_update_permission_name(self) -> str:
         if self.current_version.is_standard_version:

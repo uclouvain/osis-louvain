@@ -38,6 +38,7 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
+from base.utils.urls import reverse_with_get
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service
@@ -172,7 +173,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
                "?path={}".format(self.get_path())
 
     def get_tree_json_url(self) -> str:
-        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+        return reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.get_root_id()},
+            get={"path": self.get_path()}
+        )
 
     def get_tab_urls(self):
         tab_urls = OrderedDict({

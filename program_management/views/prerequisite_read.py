@@ -33,7 +33,7 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
-from program_management.views.generic import LearningUnitGeneric
+from program_management.views.generic import LearningUnitGeneric, Tab
 
 
 class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
@@ -51,6 +51,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, LearningUnitGeneric):
 
 class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_prerequisite_training.html"
+    active_tab = Tab.PREREQUISITE
 
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -86,6 +87,7 @@ class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, L
 
 class LearningUnitPrerequisiteGroup(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_prerequisite_group.html"
+    active_tab = Tab.PREREQUISITE
 
     permission_required = 'base.view_educationgroup'
     raise_exception = True

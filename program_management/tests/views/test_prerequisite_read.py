@@ -39,6 +39,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
+from program_management.views.generic import Tab
 
 
 class TestLearningUnitPrerequisiteTraining(TestCase):
@@ -95,6 +96,12 @@ class TestLearningUnitPrerequisiteTraining(TestCase):
         response = self.client.get(self.url)
         self.assertIn("can_modify_prerequisite", response.context)
         self.assertIn("show_modify_prerequisite_button", response.context)
+
+    def test_assert_active_tabs_is_prerequisite_and_others_are_not_active(self):
+        response = self.client.get(self.url)
+
+        self.assertTrue(response.context['tab_urls'][Tab.PREREQUISITE]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
 
     @mock.patch('program_management.ddd.validators._authorized_root_type_for_prerequisite'
                 '.AuthorizedRootTypeForPrerequisite.validate')

@@ -26,6 +26,7 @@ from education_group.templatetags.academic_year_display import display_as_academ
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_group_and_attach_service
 
@@ -135,6 +136,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         url = reverse('group_identification', kwargs={'code': group_id.code, 'year': group_id.year})
         path = self.get_attach_path()
         if path:
+            path += '|' + str(ElementIdSearch().get_from_group_identity(group_id))
             url += "?path={}".format(path)
         return url
 

@@ -33,6 +33,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from base.utils.urls import reverse_with_get
 from education_group.ddd.domain.group import Group
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -117,7 +118,11 @@ class TestTrainingReadGeneralInformation(TestCase):
             'publish_general_information', args=[str(self.current_year), "LDROI200M"]
         ) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['publish_url'], expected_publish_url)
-        expected_tree_json_url = reverse('tree_json', kwargs={'root_id': self.training_version.root_group.element.pk})
+        expected_tree_json_url = reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.training_version.root_group.element.pk},
+            get={"path": str(self.training_version.root_group.element.pk)}
+        )
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['group'], Group)
         self.assertFalse(response.context['can_edit_information'])

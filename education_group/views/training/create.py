@@ -186,7 +186,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         path = self.get_attach_path()
         if path:
             path += '|' + str(ElementIdSearch().get_from_training_identity(training_id))
-            node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[0]))
+            node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
             url = reverse_with_get(
                 'element_identification',
                 args=[node_identity.year, node_identity.code],

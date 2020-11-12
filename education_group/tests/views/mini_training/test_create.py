@@ -86,6 +86,8 @@ class TestCreate(TestCase):
         )
 
     @mock.patch("education_group.views.mini_training.create.NodeIdentitySearch")
+    @mock.patch("education_group.views.mini_training.create.ElementIdSearch.get_from_mini_training_identity",
+                return_value="50")
     @mock.patch('education_group.views.mini_training.create.MiniTrainingCreateView.get_form')
     @mock.patch("program_management.ddd.service.write."
                 "create_and_attach_mini_training_service.create_mini_training_and_paste")
@@ -93,6 +95,7 @@ class TestCreate(TestCase):
             self,
             mock_service,
             mock_form,
+            mock_get_element_id,
             mock_node_identity_search):
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020)
         mock_node_identity_search.return_value.get_from_element_id.return_value = node.NodeIdentity(
@@ -115,7 +118,7 @@ class TestCreate(TestCase):
         expected_reverse = reverse_with_get(
             "element_identification",
             kwargs={"code": "COCODE", "year": 2020},
-            get={"path": "10|25"}
+            get={"path": "10|25|50"}
 
         )
         self.assertRedirects(response, expected_reverse, fetch_redirect_response=False)

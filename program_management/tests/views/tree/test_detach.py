@@ -36,6 +36,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from base.utils.urls import reverse_with_get
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain import link
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
@@ -117,9 +118,56 @@ class TestDetachNodeView(TestCase):
         )
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {'success': True})
+        expected_redirect = reverse_with_get(
+            'element_identification',
+            kwargs={
+                'code': self.group_element_year.parent_element.group_year.partial_acronym,
+                'year': self.group_element_year.parent_element.group_year.academic_year.year
+            },
+            get={'path': self.group_element_year.parent_element.pk}
+        )
+        self.assertJSONEqual(str(response.content, encoding='utf8'), {
+            'success': True,
+            'success_url': expected_redirect
+        })
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_service.called)
+
+    @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
+    def test_detach_case_assert_redirect_path_when_provided_in_querystring(self, mock_service):
+        another_child = GroupElementYearFactory(
+            parent_element=self.group_element_year.parent_element,
+            child_element__group_year__academic_year=self.academic_year
+        )
+
+        mock_service.return_value = link.LinkIdentity(
+            parent_code=self.group_element_year.parent_element.group_year.partial_acronym,
+            child_code=self.group_element_year.child_element.group_year.partial_acronym,
+            parent_year=self.group_element_year.parent_element.group_year.academic_year.year,
+            child_year=self.group_element_year.child_element.group_year.academic_year.year
+        )
+
+        redirect_path = "|".join([str(self.group_element_year.parent_element.pk), str(another_child.child_element.pk)])
+        url_with_redirect_path = self.url + "&redirect_path=" + redirect_path
+        response = self.client.post(
+            url_with_redirect_path,
+            follow=True,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            data={'path': self.path_to_detach}
+        )
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        expected_redirect = reverse_with_get(
+            'element_identification',
+            kwargs={
+                'code': another_child.child_element.group_year.partial_acronym,
+                'year': another_child.child_element.group_year.academic_year.year
+            },
+            get={'path': redirect_path}
+        )
+        self.assertJSONEqual(str(response.content, encoding='utf8'), {
+            'success': True,
+            'success_url': expected_redirect
+        })
 
     @mock.patch("program_management.ddd.service.write.detach_node_service.detach_node")
     def test_detach_when_element_is_in_clipboard(self, mock_service):

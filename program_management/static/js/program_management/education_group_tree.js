@@ -120,14 +120,11 @@ $("a[id^='quick-search']").click(function (event) {
 });
 
 
-$("#scrollableDiv").on("scroll", function() {
-    saveScrollPosition();
-});
-
 function getTreeRootId() {
     return $(PANEL_TREE_ID).attr('data-rootId');
 }
 
+$("#scrollableDiv").on("scroll", saveScrollPosition);
 function saveScrollPosition() {
     const rootId = getTreeRootId();
     const scrollPosition = $("#scrollableDiv")[0].scrollTop;
@@ -148,11 +145,7 @@ function scrollToPositionSaved() {
 }
 
 
-$(window).scroll(function() {
-    adaptTreeOnFooter();
-});
-
-
+$(window).scroll(adaptTreeOnFooter);
 function adaptTreeOnFooter() {
     if (checkVisible !== undefined && checkVisible($('.footer'))) {
         $('.side-container').css("height", "calc(100% - 100px)");
@@ -254,6 +247,20 @@ function restoreTreeDataFromCache() {
     $documentTree.jstree(true).refresh(skip_loading=true);
 }
 
+function getActiveNodeIdAccordingToQueryStringParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathQueryString = urlParams.get('path');
+
+    return pathQueryString ? pathQueryString : getTreeRootId();
+}
+
+function selectActiveNodeAccordingToQueryStringParams() {
+    const $documentTree = $(PANEL_TREE_ID);
+    const nodeId = getActiveNodeIdAccordingToQueryStringParams();
+    $documentTree.jstree(true).deselect_all();
+    $documentTree.jstree(true).select_node(nodeId);
+}
+
 
 function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_element_url) {
     $documentTree.bind("activate_node.jstree", function (event, data) {
@@ -268,6 +275,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
             $(this).jstree('close_all');
         }
     });
+    $documentTree.bind("refresh.jstree", selectActiveNodeAccordingToQueryStringParams);
 
     function generateTreeKey(){
         const treeRootId = getTreeRootId();
@@ -282,7 +290,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                 "data": function(obj, callback) {
                     const treeCachedData = getTreeCacheData();
                     callback(treeCachedData);
-                }
+                },
             },
             "plugins": [
                 "contextmenu",

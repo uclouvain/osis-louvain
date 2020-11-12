@@ -46,6 +46,7 @@ from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import node_identity_service
 from program_management.ddd.service.write import create_and_attach_mini_training_service, \
@@ -134,6 +135,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
     def _get_success_redirect_url(self, mini_training_identity: mini_training.MiniTrainingIdentity):
         path = self.get_attach_path()
         if path:
+            path += '|' + str(ElementIdSearch().get_from_mini_training_identity(mini_training_identity))
             node_identity = NodeIdentitySearch().get_from_element_id(int(path.split('|')[-1]))
             url = reverse_with_get(
                 'element_identification',

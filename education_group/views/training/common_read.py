@@ -34,7 +34,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
-from base.business.education_group import has_coorganization
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
@@ -60,7 +59,6 @@ from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
@@ -266,7 +264,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ) + "?path={}".format(self.get_path())
 
     def get_tree_json_url(self) -> str:
-        return reverse('tree_json', kwargs={'root_id': self.get_root_id()})
+        return reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.get_root_id()},
+            get={"path": self.get_path()}
+        )
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_training_version"

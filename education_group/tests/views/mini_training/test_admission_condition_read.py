@@ -33,6 +33,7 @@ from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from base.utils.urls import reverse_with_get
 from education_group.ddd.domain.group import Group
 from education_group.views.mini_training.common_read import Tab
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -114,9 +115,11 @@ class TestMiniTrainingReadAdmissionCondition(TestCase):
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.mini_training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.mini_training_version)
-        expected_tree_json_url = reverse('tree_json', kwargs={
-            'root_id': self.mini_training_version.root_group.element.pk
-        })
+        expected_tree_json_url = reverse_with_get(
+            'tree_json',
+            kwargs={'root_id': self.mini_training_version.root_group.element.pk},
+            get={"path": str(self.mini_training_version.root_group.element.pk)}
+        )
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIn("can_edit_information", response.context)
