@@ -206,8 +206,6 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, fuzzy, python-format
-#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
