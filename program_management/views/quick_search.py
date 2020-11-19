@@ -24,7 +24,6 @@
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
@@ -121,10 +120,11 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
-        get_without_path = kwargs['data'].copy()  # type: QueryDict
-        del get_without_path["path"]
-        kwargs["data"] = get_without_path or None
+        queryparams = kwargs['data'].copy()
+        del queryparams["path"]
+        if "academic_year" not in queryparams:
+            queryparams["academic_year"] = self.kwargs["year"]
+        kwargs["data"] = queryparams
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -173,10 +173,11 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        kwargs["initial"] = {'academic_year': self.kwargs["year"]}
-        get_without_path = kwargs['data'].copy()  # type: QueryDict
-        del get_without_path["path"]
-        kwargs["data"] = get_without_path or None
+        queryparams = kwargs['data'].copy()
+        del queryparams["path"]
+        if "academic_year" not in queryparams:
+            queryparams["academic_year"] = self.kwargs["year"]
+        kwargs["data"] = queryparams
         return kwargs
 
     def get_context_data(self, **kwargs):

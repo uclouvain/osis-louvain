@@ -35,6 +35,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments
@@ -537,7 +538,8 @@ class UploadXLSTest(TestCase):
 
     def test_header_not_changed(self):
         from assessments.business.score_encoding_export import HEADER
-        header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'),
+        header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'),
+                                pgettext_lazy('encoding', 'Program'),
                                 _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
                                 _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
                                 _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),

@@ -28,24 +28,29 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
+                <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}">
+                    <ins>{{ learning_unit_year.acronym }}</ins>
+                </a>
                 {% trans "has the following prerequisites" %}:
             </p>
             {% if formations %}
                 <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th>{% trans 'Trainings' %}</th>
-                            <th>{% blocktrans count counter=2 %}Prerequisite{% plural %}Prerequisites{% endblocktrans %}</th>
-                        </tr>
+                    <tr>
+                        <th>{% trans 'Trainings' %}</th>
+                        <th>{% blocktrans %}Prerequisites{% endblocktrans %}</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for education_group_year in formations %}
-                            <tr>
-                                <td><a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}">{{ education_group_year.acronym }}</a></td>
-                                <td>{{ education_group_year.prerequisites.0.prerequisite_string_as_href|safe|default:"-"}}</td>
-                            </tr>
-                        {% endfor %}
+                    {% for education_group_year in formations %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}">{{ education_group_year.acronym }}</a>
+                            </td>
+                            <td>
+                                {{ education_group_year.prerequisites.0.prerequisite_string_as_href|safe|default:"-"}}</td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             {% endif %}

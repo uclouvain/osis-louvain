@@ -25,6 +25,7 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
+from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree_version, exception
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -32,7 +33,9 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 
 class TestProgramTreeVersionBuilderCopyToNextYear(SimpleTestCase):
     def setUp(self):
-        self.copy_from_program_tree_version = ProgramTreeVersionFactory()
+        self.copy_from_program_tree_version = ProgramTreeVersionFactory(
+            tree__root_node__node_type=TrainingType.BACHELOR
+        )
         self.mock_repository = mock.create_autospec(ProgramTreeVersionRepository)
 
     @mock.patch("program_management.ddd.validators.validators_by_business_action.CopyProgramTreeVersionValidatorList")
@@ -54,7 +57,9 @@ class TestProgramTreeVersionBuilderCopyToNextYear(SimpleTestCase):
     @mock.patch("program_management.ddd.validators.validators_by_business_action.CopyProgramTreeVersionValidatorList")
     def test_should_return_existing_tree_version_when_already_exists_for_next_year(self, mock_validator):
         mock_validator.return_value.validate.return_value = None
-        next_year_program_tree_version = ProgramTreeVersionFactory()
+        next_year_program_tree_version = ProgramTreeVersionFactory(
+            tree__root_node__node_type=TrainingType.BACHELOR
+        )
         self.mock_repository.get.return_value = next_year_program_tree_version
 
         result_tree_version = program_tree_version.ProgramTreeVersionBuilder().copy_to_next_year(

@@ -115,7 +115,7 @@ class CannotDeleteStandardDueToVersionEndDate(BusinessException):
     def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
         message = _(
             "You can't delete the standard program tree '{code}' "
-            "in {year} as specific versions exists during this year."
+            "in {year} as specific versions exists during this year and/or in the future."
         ).format(
             code=tree.program_tree_identity.code,
             year=tree.entity_id.year,
@@ -153,23 +153,23 @@ class ProgramTreeVersionMismatch(BusinessException):
         return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
 
 
-class Program2MEndDateShouldBeGreaterOrEqualThanItsFinalities(BusinessException):
-    def __init__(self, finality: 'Node', **kwargs):
-        message = _("The end date must be higher or equal to finality %(acronym)s") % {
-            "acronym": str(finality)
+class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
+    def __init__(self, node_2m: 'Node', **kwargs):
+        message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
+            "acronym": node_2m.title
         }
         super().__init__(message, **kwargs)
 
 
-class CannotAttachFinalitiesWithGreaterEndDateThanProgram2M(BusinessException):
+class FinalitiesEndDateGreaterThanTheirMasters2MException(BusinessException):
     def __init__(self, root_node: 'Node', finalities: List['Node']):
         message = ngettext(
             "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
             "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
             len(finalities)
         ) % {
-            "acronym": ', '.join([str(node) for node in finalities]),
-            "root_acronym": root_node
+            "acronym": ', '.join([node.title for node in finalities]),
+            "root_acronym": root_node.title
         }
         super().__init__(message)
 

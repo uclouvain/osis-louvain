@@ -105,7 +105,7 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     form.add_error('academic_year', e.message)
                     form.add_error('end_year', '')
                 else:
-                    form.add_error('', e.message)
+                    form.add_error(None, e.message)
 
         return self.form_invalid(form)
 

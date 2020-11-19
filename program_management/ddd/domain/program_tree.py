@@ -105,7 +105,7 @@ class ProgramTreeBuilder:
                 override_end_year_to=override_end_year_to,
                 override_start_year_to=override_start_year_to
             )
-            copied_link = link_factory.duplicate(copy_from_link, new_parent, new_child)
+            copied_link = link_factory.create_link(new_parent, new_child)
             new_parent.children.append(copied_link)
         return new_parent
 

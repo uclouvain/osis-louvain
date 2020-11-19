@@ -44,13 +44,14 @@ def update_program_tree_version(
         version_name=command.version_name,
         is_transition=command.is_transition,
     )
-    program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
+    repository = ProgramTreeVersionRepository()
+    program_tree_version = repository.get(entity_id=identity)
 
     __call_delete_service(program_tree_version, command.end_year)
 
     program_tree_version.update(__convert_command_to_update_data(command))
 
-    identity = ProgramTreeVersionRepository().update(
+    identity = repository.update(
         program_tree_version,
     )
 

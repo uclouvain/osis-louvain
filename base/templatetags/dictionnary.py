@@ -31,3 +31,15 @@ register = template.Library()
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter
+def get_first_item(dictionary):
+    return next(iter(dictionary.items()))
+
+
+@register.filter
+def remove_first(dictionary: dict):
+    key, value = get_first_item(dictionary)
+    del dictionary[key]
+    return dictionary

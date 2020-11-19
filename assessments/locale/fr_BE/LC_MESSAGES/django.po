@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-12 15:05+0100\n"
+"POT-Creation-Date: 2020-11-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "\n"
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
-"l'adresse affichée sur les pages d'encodage de notes pour le programme "
+"l'adresse affichée sur les pages d'encodage de notes pour la formation "
 "%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
 "dessous vous aidera à pré-remplir le formulaire."
 
@@ -122,6 +122,9 @@ msgstr "Choisir un fichier"
 msgid "City"
 msgstr "Ville"
 
+msgid "Code"
+msgstr "Code"
+
 msgid "Compare"
 msgstr "Comparer"
 
@@ -160,6 +163,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Display all deadlines for this learning unit"
+msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"
@@ -401,8 +407,9 @@ msgstr "Imprimer tous les cours"
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
+msgctxt "encoding"
 msgid "Program"
-msgstr "Programme"
+msgstr "Formation"
 
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
@@ -425,6 +432,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Remaining scores to submit for this deadline"
+msgstr "Nombre de notes encore à soumettre pour cette date"
+
 msgid "Remove"
 msgstr "Retirer"
 
@@ -444,7 +454,7 @@ msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
 "address for the papersheet."
 msgstr ""
-"Ré-utilisez l'adresse d'une entité liée au programme ou informez l'adresse "
+"Ré-utilisez l'adresse d'une entité liée à la formation ou informez l'adresse "
 "postale pour la feuille papier."
 
 msgid "Row"
@@ -500,7 +510,7 @@ msgid "Search"
 msgstr "Chercher"
 
 msgid "Search of annual programs"
-msgstr "Chercher les programmes annuels"
+msgstr "Chercher les formations annuelles"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
@@ -566,8 +576,8 @@ msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr "Le fichier doit être un fichier excel valide"
 
-msgid "The manager will keep the following programs : "
-msgstr "Le gestionnaire devra conserver les programmes suivant : "
+msgid "The manager will keep the following trainings : "
+msgstr "Le gestionnaire devra conserver les formations suivantes : "
 
 #, python-format
 msgid ""
@@ -605,6 +615,9 @@ msgstr "Formation"
 
 msgid "Tutor"
 msgstr "Tuteur"
+
+msgid "Tutor deadlines"
+msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
 msgstr "Tuteurs du cours"
@@ -695,7 +708,7 @@ msgid "of"
 msgstr "sur"
 
 msgid "program(s)"
-msgstr "programme(s)"
+msgstr "formation(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"

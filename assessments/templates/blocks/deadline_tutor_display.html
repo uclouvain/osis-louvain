@@ -1,5 +1,4 @@
-{% extends "education_group_app/group/layout_read.html" %}
-{% load i18n bootstrap3 format static education_group %}
+{% load i18n date %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -24,16 +23,16 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-{% block details %}
-    <div class="row">
-        <div class="col-md-12">
-            {% url 'group_identification' group.year group.code as url_identification %}
-             <a href="{{url_identification}}"
-               id="lnk_identification">{{ group.code }} - {{ group.abbreviated_title }}</a>
-            {% trans 'is using in' %} :
-            <br><br>
-            {% include "blocks/table_element_utilizations.html" %}
-        </div>
-    </div>
-{% endblock details %}
+{% if deadline|is_past %}
+    <strong class="col-md-4 {% if scores_not_yet_submitted == 0 %}success{% else %}error{% endif %}">
+        {{ deadline|date:"d/m/Y" }}
+    </strong>
+{% else %}
+    <span class="col-md-4">{{ deadline|date:"d/m/Y" }}</span>
+{% endif %}
+<span class="col-md-3">
+    <span title="{% trans 'Remaining scores to submit for this deadline' %}"
+          class="badge badge-default {% if scores_not_yet_submitted == 0 %}background-success{% else %}background-error{% endif %}">
+    {{ scores_not_yet_submitted }}
+    </span>
+</span>

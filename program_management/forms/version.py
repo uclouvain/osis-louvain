@@ -284,7 +284,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
-        return '.'.join(["GroupForm", self.training_type.name, field_name])
+        return '.'.join(["TrainingVersionForm", self.training_type.name, field_name])
 
     # PermissionFieldMixin
     def get_context(self) -> str:
@@ -360,7 +360,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
 
     # ValidationRuleMixin
     def field_reference(self, field_name: str) -> str:
-        return '.'.join(["GroupForm", self.mini_training_type.name, field_name])
+        return '.'.join(["MiniTrainingVersionForm", self.mini_training_type.name, field_name])
 
     # PermissionFieldMixin
     def get_context(self) -> str:

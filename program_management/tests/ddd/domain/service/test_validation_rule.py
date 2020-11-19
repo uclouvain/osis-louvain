@@ -47,3 +47,7 @@ class TestGetValidationRuleForField(TestCase):
         result = FieldValidationRule.get(self.education_group_type, "field")
 
         self.assertEqual(self.rule, result)
+
+    def test_get_prefix_should_return_version_form_if_is_version(self):
+        prefix = FieldValidationRule._get_prefix(self.education_group_type, is_version=True)
+        self.assertEqual(prefix, "TrainingVersionForm")

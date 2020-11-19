@@ -145,7 +145,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     elif isinstance(e, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_authorization', e.message)
                     else:
-                        training_form.add_error('', e.message)
+                        training_form.add_error(None, e.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))

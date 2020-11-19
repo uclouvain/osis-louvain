@@ -168,7 +168,7 @@ msgstr "Gestionnaire centraux"
 msgid "Certificate aim can only be edited by program manager"
 msgstr ""
 "Attendus du diplôme peuvent seulement être modifiés par un gestionnaire de "
-"programme"
+"parcours étudiant"
 
 #, python-format
 msgid ""

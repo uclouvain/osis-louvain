@@ -32,15 +32,24 @@ from osis_common.ddd import interface
 class FieldValidationRule(interface.DomainService):
 
     @classmethod
-    def get(cls, node_type: EducationGroupTypesEnum, field_name: str) -> ValidationRule:
-        prefix = 'GroupForm'
-        if isinstance(node_type, TrainingType):
-            prefix = 'TrainingForm'
-        elif isinstance(node_type, MiniTrainingType):
-            prefix = 'MiniTrainingForm'
+    def get(cls, node_type: EducationGroupTypesEnum, field_name: str, is_version: bool = False) -> ValidationRule:
+        prefix = cls._get_prefix(node_type, is_version)
+
         field_reference_value = '{prefix}.{type}.{field_name}'.format(
             prefix=prefix,
             type=node_type.name,
             field_name=field_name,
         )
         return ValidationRule.objects.get(field_reference=field_reference_value)
+
+    @classmethod
+    def _get_prefix(cls, node_type: EducationGroupTypesEnum, is_version: bool = False) -> str:
+        prefix = 'Group'
+        if isinstance(node_type, TrainingType):
+            prefix = 'Training'
+        elif isinstance(node_type, MiniTrainingType):
+            prefix = 'MiniTraining'
+        if is_version:
+            prefix += 'Version'
+        prefix += 'Form'
+        return prefix

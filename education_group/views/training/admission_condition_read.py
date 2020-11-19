@@ -48,7 +48,7 @@ class TrainingReadAdmissionCondition(TrainingRead):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        training = self.get_training()
+        training = self.training
         context = {
             **super().get_context_data(**kwargs),
             "can_edit_information":
@@ -82,21 +82,21 @@ class TrainingReadAdmissionCondition(TrainingRead):
         ]
 
     def get_common_admission_condition(self):
-        training = self.get_training()
+        training = self.training
         return admission_condition.get_common_admission_condition(
             training.type.name,
             training.year
         )
 
     def get_admission_condition(self):
-        training = self.get_training()
+        training = self.training
         return admission_condition.get_admission_condition(
             training.acronym,
             training.year
         )
 
     def get_admission_condition_lines(self, language: str):
-        training = self.get_training()
+        training = self.training
         return admission_condition.get_admission_condition_lines(
             training.acronym,
             training.year,

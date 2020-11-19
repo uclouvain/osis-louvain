@@ -78,6 +78,8 @@ class NodeGroupYearFactory(NodeFactory):
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
+    version_title_fr = None
+    version_title_en = None
     end_year = factory.SelfAttribute('.end_date')
     children = factory.LazyFunction(list)
     teaching_campus = factory.SubFactory(CampusFactory)

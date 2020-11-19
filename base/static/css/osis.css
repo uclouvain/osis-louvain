@@ -681,3 +681,20 @@ input::-webkit-inner-spin-button {
 .without_arrow input[type=number] {
     -moz-appearance: textfield;
 }
+
+.background-grey {
+    background-color: lightgrey;
+}
+
+.background-success {
+    background-color: #5cb85c;
+}
+
+.background-error {
+    background-color: #d9534f;
+}
+
+
+.row-score-encoding {
+    line-height: 2em;
+}

@@ -26,6 +26,7 @@
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 from openpyxl import Workbook
 from openpyxl.styles import Color, PatternFill, Font, colors
 from openpyxl.writer.excel import save_virtual_workbook
@@ -41,10 +42,11 @@ from base.models.student_specific_profile import StudentSpecificProfile
 from osis_common.decorators.download import set_download_cookie
 from assessments.models import score_sheet_address
 
-HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
-          _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-          _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
-          _('Specific room of examination'), _('Other educational facilities'), _('Educational tutor'),
+HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
+          _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
+          _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
+          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
+          _('Educational tutor'),
           ]
 
 JUSTIFICATION_ALIASES = {

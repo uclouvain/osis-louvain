@@ -123,7 +123,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     self.mini_training_form.add_error("min_constraint", e.message)
                     self.mini_training_form.add_error("max_constraint", "")
                 else:
-                    self.mini_training_form.add_error('', e.message)
+                    self.mini_training_form.add_error(None, e.message)
         except exception.MiniTrainingCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [
@@ -133,7 +133,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return []
 
     def delete_mini_training(self) -> List['MiniTrainingIdentity']:
-        end_year = self.mini_training_form.cleaned_data["end_year"]
+        end_year = self.mini_training_form.cleaned_data["end_year"].year
         if not end_year:
             return []
         try:
@@ -199,7 +199,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             mini_trainings_identities: List['MiniTrainingIdentity']) -> List[str]:
         last_identity = mini_trainings_identities[-1]
         is_new_end_year_lower_than_initial_one = operator.is_year_lower(
-            self.mini_training_form.cleaned_data["end_year"],
+            self.mini_training_form.cleaned_data["end_year"].year,
             self.mini_training_form.initial['end_year']
         )
         if is_new_end_year_lower_than_initial_one:
@@ -207,7 +207,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
             ) % {
                 "acronym": last_identity.acronym,
-                "academic_year": display_as_academic_year(self.mini_training_form.cleaned_data["end_year"] + 1)
+                "academic_year": display_as_academic_year(self.mini_training_form.cleaned_data["end_year"].year + 1)
             }
             return [delete_message]
         return []
@@ -273,7 +273,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             title_en=cleaned_data['title_en'],
             keywords=cleaned_data['keywords'],
             management_entity_acronym=cleaned_data['management_entity'],
-            end_year=cleaned_data['end_year'],
+            end_year=cleaned_data['end_year'].year,
             teaching_campus_name=cleaned_data['teaching_campus']['name'],
             teaching_campus_organization_name=cleaned_data['teaching_campus']['organization_name'],
             constraint_type=cleaned_data['constraint_type'],
@@ -295,5 +295,5 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             offer_acronym=cleaned_data["abbreviated_title"],
             version_name='',
             is_transition=False,
-            from_year=cleaned_data["end_year"]+1
+            from_year=cleaned_data["end_year"].year+1
         )

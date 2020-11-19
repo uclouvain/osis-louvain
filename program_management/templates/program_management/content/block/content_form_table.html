@@ -25,10 +25,12 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-    {{ content_formset.management_form }}
-    {{ content_formset.media }}
     {% for form in content_formset.forms %}
+        {% if forloop.first %}
+            {{ content_formset.management_form }}
+            {{ content_formset.media }}
+        {% endif %}
+
         {% bootstrap_form_errors form %}
     {% endfor %}
     <table class="table">

@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
 from base.utils.urls import reverse_with_get
@@ -25,7 +26,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
-from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain import program_tree_version, exception as program_exception
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
@@ -65,9 +66,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.training_version_form.is_valid():
             version_identities = self.update_training_version()
-            self.display_success_messages(version_identities)
-            self.display_delete_messages(version_identities)
             if not self.training_version_form.errors:
+                self.display_success_messages(version_identities)
+                self.display_delete_messages(version_identities)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -136,6 +137,13 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.training_version_form.add_error("min_constraint", e.message)
             self.training_version_form.add_error("max_constraint", "")
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, program_exception.FinalitiesEndDateGreaterThanTheirMasters2MException) or \
+                        isinstance(e, program_exception.Program2MEndDateLowerThanItsFinalitiesException):
+                    self.training_version_form.add_error('end_year', e.message)
+                else:
+                    self.training_version_form.add_error(None, e.message)
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [

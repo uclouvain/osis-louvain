@@ -41,6 +41,10 @@ def create_exam_enrollment(session_exam, learning_unit_enrollment):
     an_exam_enrollment = exam_enrollment.ExamEnrollment(session_exam=session_exam,
                                                         learning_unit_enrollment=learning_unit_enrollment)
     an_exam_enrollment.save()
+    SessionExamDeadlineFactory(
+        offer_enrollment=an_exam_enrollment.learning_unit_enrollment.offer_enrollment,
+        number_session=session_exam.number_session
+    )
     return an_exam_enrollment
 
 

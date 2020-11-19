@@ -45,7 +45,7 @@ class TrainingReadContent(TrainingRead):
         return reverse_with_get(
             'content_update',
             kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
-            get={"path_to": self.get_path(), "tab": self.active_tab.name}
+            get={"path_to": self.path, "tab": self.active_tab.name}
         )
 
     def get_update_permission_name(self) -> str:
@@ -56,5 +56,5 @@ class TrainingReadContent(TrainingRead):
         return load_tree.load(self.get_root_id())
 
     def get_children(self) -> List['Node']:
-        parent_node = self.get_tree().get_node(self.get_path())
+        parent_node = self.get_tree().get_node(self.path)
         return parent_node.children

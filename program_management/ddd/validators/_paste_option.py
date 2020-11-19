@@ -35,7 +35,7 @@ from program_management.ddd.domain.exception import CannotAttachOptionIfNotPrese
 from program_management.ddd.domain.service import identity_search
 
 
-class AttachOptionsValidator(BusinessValidator):
+class PasteOptionsValidator(BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
@@ -43,46 +43,46 @@ class AttachOptionsValidator(BusinessValidator):
 
     def __init__(
             self,
-            tree_version_2m: 'ProgramTreeVersion',
-            tree_from_node_to_add: 'ProgramTree',
-            node_to_paste_to: 'Node',
-            *args
+            program_tree_repository: 'ProgramTreeRepository',
+            tree_from_node_to_paste: 'ProgramTree',
+            node_to_paste_to: 'NodeGroupYear',
+            trees_2m: List['ProgramTree']
     ):
-        super(AttachOptionsValidator, self).__init__()
-        if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-            assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree_version_2m.tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
-        self.tree_from_node_to_add = tree_from_node_to_add
-        self.node_to_add = tree_from_node_to_add.root_node
+        super(PasteOptionsValidator, self).__init__()
+        assert_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+        for tree_2m in trees_2m:
+            assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_msg
+        self.program_tree_repository = program_tree_repository
+        self.tree_from_node_to_paste = tree_from_node_to_paste
+        self.node_to_paste = self.tree_from_node_to_paste.root_node
         self.node_to_paste_to = node_to_paste_to
-        self.tree_version_2m = tree_version_2m
+        self.trees_2m = trees_2m
 
-    def get_options_to_attach(self):
-        options = self.tree_from_node_to_add.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
-        if self.node_to_add.is_option():
-            options.add(self.tree_from_node_to_add.root_node)
+    def get_options_to_paste(self):
+        options = self.tree_from_node_to_paste.root_node.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
+        if self.node_to_paste.is_option():
+            options.add(self.node_to_paste)
         return options
 
     def validate(self):
-        if not(self._is_node_to_paste_to_inside_a_finality() or self._is_tree_to_add_a_finality()):
-            return
-
-        options_to_attach = self.get_options_to_attach()
+        options_to_attach = self.get_options_to_paste()
         if options_to_attach:
-            options_from_2m_option_list = self.tree_version_2m.tree.get_2m_option_list()
-            options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
-            if options_to_attach_not_present_in_2m_option_list:
-                raise CannotAttachOptionIfNotPresentIn2MOptionListException(
-                    self.tree_version_2m.tree.root_node,
-                    options_to_attach_not_present_in_2m_option_list
-                )
+            for tree_2m in self.trees_2m:
+                if self._is_node_to_paste_a_finality() or self._is_node_to_paste_to_inside_a_finality(tree_2m):
+                    options_from_2m_option_list = tree_2m.get_2m_option_list()
+                    options_to_attach_not_present_in_2m_option_list = options_to_attach - options_from_2m_option_list
+                    if options_to_attach_not_present_in_2m_option_list:
+                        raise CannotAttachOptionIfNotPresentIn2MOptionListException(
+                            tree_2m.root_node,
+                            options_to_attach_not_present_in_2m_option_list
+                        )
 
-    def _is_node_to_paste_to_inside_a_finality(self) -> bool:
-        finalities = self.tree_version_2m.get_tree().root_node.get_finality_list()
+    def _is_node_to_paste_to_inside_a_finality(self, tree_2m: 'ProgramTree') -> bool:
+        finalities = tree_2m.root_node.get_finality_list()
         nodes_inside_finalities = finalities.copy()
         for finality in finalities:
             nodes_inside_finalities |= set(finality.children_as_nodes)
         return self.node_to_paste_to in nodes_inside_finalities
 
-    def _is_tree_to_add_a_finality(self):
-        return self.tree_from_node_to_add.root_node.is_finality()
+    def _is_node_to_paste_a_finality(self):
+        return self.node_to_paste.is_finality()

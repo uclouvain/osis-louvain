@@ -51,7 +51,7 @@ class Link(interface.Entity):
     relative_credits = attr.ib(type=int, default=None)
     min_credits = attr.ib(type=int, default=None)
     max_credits = attr.ib(type=int, default=None)
-    is_mandatory = attr.ib(type=bool, default=False)
+    is_mandatory = attr.ib(type=bool, default=True)
     block = attr.ib(type=str, default=None)
     access_condition = attr.ib(type=bool, default=False)
     comment = attr.ib(type=str, default=None)
@@ -126,9 +126,9 @@ class Link(interface.Entity):
         self._has_changed = True
 
 
+@attr.s(slots=True, str=False, hash=False, eq=False)
 class LinkWithChildLeaf(Link):
-    def __init__(self, *args, **kwargs):
-        super(LinkWithChildLeaf, self).__init__(*args, **kwargs)
+    relative_credits = attr.ib(type=int, default=attr.Factory(lambda self: self.child.credits, takes_self=True))
 
 
 class LinkWithChildBranch(Link):
@@ -153,10 +153,10 @@ class LinkFactory:
         else:
             return LinkWithChildBranch(parent, child, **kwargs)
 
-    def duplicate(self, duplicate_from: 'Link', new_parent: 'Node', new_child: 'Node') -> 'Link':
-        copied_link = attr.evolve(duplicate_from, child=new_child, parent=new_parent)
-        copied_link._has_changed = True
-        return copied_link
+    def create_link(self, *args, **kwargs) -> Link:
+        link_created = self.get_link(*args, **kwargs)
+        link_created._has_changed = True
+        return link_created
 
     def deepcopy_link_without_copy_children_recursively(self, original_link: 'Link'):
         original_child = original_link.child

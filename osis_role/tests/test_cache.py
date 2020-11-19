@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from rules import predicate
 
 from base.tests.factories.user import UserFactory
@@ -38,6 +38,7 @@ class TestSetCachePredicateResult(SimpleTestCase):
         )
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestPredicateCacheDecorator(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()

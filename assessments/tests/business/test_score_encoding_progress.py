@@ -98,6 +98,7 @@ class ScoreEncodingProgressTest(TestCase):
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
+        progress_list = score_encoding_progress.group_by_learning_unit_year(progress_list)
         self.assertEqual(len(progress_list), 1)
         self.assertEqual(progress_list[0].learning_unit_year_acronym, self.learning_unit_year.acronym)
         self.assertEqual(progress_list[0].total_exam_enrollments, 8)
@@ -114,6 +115,7 @@ class ScoreEncodingProgressTest(TestCase):
             academic_year=self.academic_year
         )
         progress_list = score_encoding_progress.append_related_tutors_and_score_responsibles(progress_list)
+        progress_list = score_encoding_progress.group_by_learning_unit_year(progress_list)
         self.assertEqual(len(progress_list), 1)
         self.assertEqual(len(progress_list[0].tutors), 3)
         self.assertEqual(len(progress_list[0].score_responsibles), 1)

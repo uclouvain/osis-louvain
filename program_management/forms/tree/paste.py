@@ -75,7 +75,8 @@ class PasteNodeForm(LinkForm):
                     isinstance(e, exception.ReferenceLinkNotAllowedWithLearningUnitException) or\
                     isinstance(e, exception.ChildTypeNotAuthorizedException) or \
                     isinstance(e, exception.MaximumChildTypesReachedException):
-                self.add_error("link_type", e.message)
+                field_to_link_error_to = "link_type" if "link_type" in self.fields else None
+                self.add_error(field_to_link_error_to, e.message)
             elif isinstance(e, exception.InvalidBlockException):
                 self.add_error("block", e.message)
             elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \

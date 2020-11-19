@@ -116,7 +116,8 @@ class ValidationRuleMixin(WarningFormMixin):
                 else:
                     field.initial = rule.initial_value if rule.initial_value not in ['False', 'True'] else bool(
                         strtobool(
-                            rule.initial_value))
+                            rule.initial_value)
+                    )
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)

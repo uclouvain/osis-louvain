@@ -24,9 +24,7 @@
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.test import TestCase
-from django.urls import reverse
 
-from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.urls import reverse_with_get
@@ -67,7 +65,11 @@ class TestQuickSearchLearningUnitYearView(TestCase):
         self.assertEqual(response.context['quick_search_education_group_url'], expected_url)
 
     def test_learning_unit_search_filter(self):
-        response = self.client.get(self.url, data={'title': 'dead', 'path': self.path})
+        response = self.client.get(self.url, data={
+            'title': 'dead',
+            'path': self.path,
+            'academic_year': self.luy_to_find.academic_year.year
+        })
         self.assertTemplateUsed(response, 'quick_search_luy_inner.html')
         self.assertIn(self.luy_to_find, response.context['page_obj'])
 
@@ -94,13 +96,7 @@ class TestQuickSearchGroupYearView(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
-
         self.addCleanup(cache.clear)
-
-    def test_show_no_data_when_no_criteria_set(self):
-        response = self.client.get(self.url, data={'path': self.path})
-        self.assertTemplateUsed(response, 'quick_search_egy_inner.html')
-        self.assertFalse(list(response.context['page_obj']))
 
     def test_assert_context_keys(self):
         response = self.client.get(self.url, data={'path': self.path})
@@ -113,7 +109,11 @@ class TestQuickSearchGroupYearView(TestCase):
         self.assertEqual(response.context['quick_search_learning_unit_url'], expected_url)
 
     def test_education_group_search_filter(self):
-        response = self.client.get(self.url, data={'title': 'Rav', 'path': self.path})
+        response = self.client.get(self.url, data={
+            'title': 'Rav',
+            'path': self.path,
+            'academic_year': self.group_to_find.academic_year.year
+        })
         self.assertTemplateUsed(response, 'quick_search_egy_inner.html')
         self.assertIn(self.group_to_find, response.context['page_obj'])
 

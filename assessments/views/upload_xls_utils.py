@@ -32,6 +32,7 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
 from openpyxl import load_workbook
 
@@ -46,7 +47,7 @@ from base.models.enums import exam_enrollment_justification_type as justificatio
 col_academic_year = HEADER.index(_('Academic year'))
 col_session = HEADER.index(_('Session'))
 col_learning_unit = HEADER.index(_('Learning unit'))
-col_offer = HEADER.index(_('Program'))
+col_offer = HEADER.index(pgettext_lazy('encoding', 'Program'))
 col_registration_id = HEADER.index(_('Registration number'))
 col_email = HEADER.index(_('Email'))
 col_score = HEADER.index(_('Numbered scores'))

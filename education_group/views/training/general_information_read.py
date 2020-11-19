@@ -52,7 +52,7 @@ class TrainingReadGeneralInformation(TrainingRead):
                 self.node_identity.year,
                 self.node_identity.code
             ]) +
-            "?path={}".format(self.get_path()),
+            "?path={}".format(self.path),
             "can_edit_information":
                 self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer),
             "show_contacts": self.can_have_contacts(),
@@ -65,14 +65,14 @@ class TrainingReadGeneralInformation(TrainingRead):
 
     def get_update_label_url(self):
         offer_id = self.education_group_version.offer_id
-        return reverse('education_group_pedagogy_edit', args=[offer_id]) + "?path={}".format(self.get_path())
+        return reverse('education_group_pedagogy_edit', args=[offer_id]) + "?path={}".format(self.path)
 
     def get_sections(self):
-        return serializers.general_information.get_sections(self.get_group(), self.request.LANGUAGE_CODE)
+        return serializers.general_information.get_sections(self.group, self.request.LANGUAGE_CODE)
 
     def can_have_contacts(self):
         return general_information_sections.CONTACTS in \
-            general_information_sections.SECTIONS_PER_OFFER_TYPE[self.get_group().type.name]['specific']
+            general_information_sections.SECTIONS_PER_OFFER_TYPE[self.group.type.name]['specific']
 
     def get_entity_contact(self):
         return getattr(
@@ -95,4 +95,4 @@ class TrainingReadGeneralInformation(TrainingRead):
 
     @functools.lru_cache()
     def _get_contacts(self):
-        return serializers.general_information.get_contacts(self.get_group())
+        return serializers.general_information.get_contacts(self.group)

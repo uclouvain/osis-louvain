@@ -25,16 +25,15 @@
 ##############################################################################
 from collections import OrderedDict
 from enum import IntEnum
-from gettext import ngettext
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.utils.translation import gettext_lazy as _
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
@@ -48,12 +47,12 @@ from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.repositories import load_tree
-from program_management.models.enums.node_type import NodeType
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.models.enums.node_type import NodeType
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -173,7 +172,7 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
                 )
             },
             Tab.PREREQUISITE: {
-                'text': ngettext('Prerequisite', 'Prerequisites', 2),
+                'text': _('Prerequisites'),
                 'active': Tab.PREREQUISITE == self.active_tab,
                 'display': True,
                 'url': reverse_with_get(

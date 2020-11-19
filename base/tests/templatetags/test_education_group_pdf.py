@@ -30,6 +30,7 @@ from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.templatetags import education_group_pdf
+from base.templatetags.education_group_pdf import format_complete_title_label
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 
@@ -63,3 +64,52 @@ class TestGetVerboseLink(SimpleTestCase):
 
         expected_result = "LDROI1001 Title learning unit [15 + 20] (6 {})".format(_('credits'))
         self.assertEqual(expected_result, education_group_pdf.get_verbose_link(link))
+
+
+class TestFormatTitleLabel(SimpleTestCase):
+    def test_format_complete_title_label_with_standard_version(self):
+        node = NodeGroupYearFactory(
+            offer_title_fr="Offer title fr",
+            offer_title_en="Offer title en",
+            group_title_fr="Group title fr",
+            group_title_en="Group title en",
+            offer_partial_title_fr="Offer partial title fr",
+            offer_partial_title_en="Offer partial title en",
+            version_title_fr=None,
+            version_title_en=None
+        )
+        expected_result = "Group title fr "
+        complete_title_label = format_complete_title_label(node, node.group_title_en, node.group_title_fr)
+        self.assertEqual(complete_title_label, expected_result)
+
+    def test_format_complete_title_label_with_specific_version_and_title(self):
+        node = NodeGroupYearFactory(
+            offer_title_fr="Offer title fr",
+            offer_title_en="Offer title en",
+            group_title_fr="Group title fr",
+            group_title_en="Group title en",
+            offer_partial_title_fr="Offer partial title fr",
+            offer_partial_title_en="Offer partial title en",
+            version_title_fr="Version title fr",
+            version_title_en="Version title en",
+            version_name="VERSION"
+        )
+        expected_result = "Group title fr - Version title fr [VERSION]"
+        complete_title_label = format_complete_title_label(node, node.group_title_en, node.group_title_fr)
+        self.assertEqual(complete_title_label, expected_result)
+
+    def test_format_complete_title_label_with_specific_version_and_title(self):
+        node = NodeGroupYearFactory(
+            offer_title_fr="Offer title fr",
+            offer_title_en="Offer title en",
+            group_title_fr="Group title fr",
+            group_title_en="Group title en",
+            offer_partial_title_fr="Offer partial title fr",
+            offer_partial_title_en="Offer partial title en",
+            version_title_fr=None,
+            version_title_en=None,
+            version_name="VERSION"
+        )
+        expected_result = "Group title fr [VERSION]"
+        complete_title_label = format_complete_title_label(node, node.group_title_en, node.group_title_fr)
+        self.assertEqual(complete_title_label, expected_result)

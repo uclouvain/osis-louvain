@@ -29,6 +29,7 @@ from django.db import transaction
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder, ProgramTreeIdentity
+from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
@@ -36,7 +37,6 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 def duplicate_program_tree(
         cmd: command.DuplicateProgramTree
 ) -> 'ProgramTreeIdentity':
-
     # GIVEN
     program_tree_identity = ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
     existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
@@ -47,7 +47,10 @@ def duplicate_program_tree(
         override_end_year_to=cmd.override_end_year_to,
         override_start_year_to=cmd.override_start_year_to
     )
-
+    validation_rule = FieldValidationRule.get(
+        program_tree.root_node.node_type, 'credits', is_version=True
+    )
+    program_tree.root_node.credits = validation_rule.initial_value
     # THEN
     program_tree_identity = ProgramTreeRepository().create(
         program_tree=program_tree,

@@ -254,7 +254,7 @@
                                 {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
                                     {% url 'organization_read' organization_id=organization.id as url_organization %}
                                     {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
-                                    {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus %}
+                                    {% dl_tooltip campus 'campus' label_text=_('Learning location') value=campus.name  %}
                                 {% endwith %}
                             {% endif %}
 

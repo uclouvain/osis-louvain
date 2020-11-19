@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-12 15:05+0100\n"
+"POT-Creation-Date: 2020-11-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,6 +107,9 @@ msgstr ""
 msgid "City"
 msgstr ""
 
+msgid "Code"
+msgstr ""
+
 msgid "Compare"
 msgstr ""
 
@@ -144,6 +147,9 @@ msgid "Decimals authorized for this learning unit"
 msgstr ""
 
 msgid "Definitive submission (Submit to faculty)"
+msgstr ""
+
+msgid "Display all deadlines for this learning unit"
 msgstr ""
 
 msgid "Display all tutors for this learning unit"
@@ -376,6 +382,7 @@ msgstr ""
 msgid "Print the scores"
 msgstr ""
 
+msgctxt "encoding"
 msgid "Program"
 msgstr ""
 
@@ -398,6 +405,9 @@ msgid "Registration ID does not match email"
 msgstr ""
 
 msgid "Registration number"
+msgstr ""
+
+msgid "Remaining scores to submit for this deadline"
 msgstr ""
 
 msgid "Remove"
@@ -534,7 +544,7 @@ msgstr ""
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
 
-msgid "The manager will keep the following programs : "
+msgid "The manager will keep the following trainings : "
 msgstr ""
 
 #, python-format
@@ -567,6 +577,9 @@ msgid "Training"
 msgstr ""
 
 msgid "Tutor"
+msgstr ""
+
+msgid "Tutor deadlines"
 msgstr ""
 
 msgid "Tutors of the course"

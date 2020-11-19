@@ -44,10 +44,12 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
+from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
+from base.models.person import Person
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
@@ -150,6 +152,8 @@ def scores_encoding(request):
         score_encoding_progress_list = score_encoding_progress. \
             append_related_tutors_and_score_responsibles(score_encoding_progress_list)
 
+        score_encoding_progress_list = score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
+
         if incomplete_encodings_only:
             score_encoding_progress_list = score_encoding_progress.filter_only_incomplete(score_encoding_progress_list)
 
@@ -181,18 +185,20 @@ def scores_encoding(request):
             academic_year=academic_yr
         )
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
+        if offer_year_id:
+            score_encoding_progress_list = [
+                score_encoding for score_encoding in score_encoding_progress_list
+                if score_encoding.offer_year_id == offer_year_id
+            ]
+
+        score_encoding_progress_list = score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
                         'offer_year_list': all_offers,
                         'offer_year_id': offer_year_id})
-    if score_encoding_progress_list:
-        filtered_list = [score_encoding for score_encoding in score_encoding_progress_list
-                         if score_encoding.offer_year_id == offer_year_id]
-    else:
-        filtered_list = []
+
     context.update({
-        'notes_list': score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
-        if not offer_year_id else filtered_list
+        'notes_list': score_encoding_progress_list
     })
 
     return render(request, template_name, context)
@@ -443,12 +449,21 @@ def __send_messages_for_each_offer_year(
     """
     sent_error_messages = []
     offer_years = get_offer_years_from_enrollments(updated_enrollments)
+    score_sheet_addresses = score_sheet_address_mdl.search_from_offer_years(offer_years)
     for offer_year in offer_years:
+        score_sheet_address = next(
+            (
+                score_sheet_address for score_sheet_address in score_sheet_addresses
+                if score_sheet_address.offer_year_id == offer_year.pk
+            ),
+            None
+        )
         sent_error_message = __send_message_for_offer_year(
             all_enrollments,
             learning_unit_year,
             offer_year,
-            pgm_manager=pgm_manager
+            pgm_manager=pgm_manager,
+            score_sheet_address=score_sheet_address
         )
         if sent_error_message:
             sent_error_messages.append(sent_error_message)
@@ -464,7 +479,8 @@ def __send_message_for_offer_year(
         all_enrollments,
         learning_unit_year,
         offer_year,
-        pgm_manager: mdl.person.Person
+        pgm_manager: mdl.person.Person,
+        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None
 ):
     enrollments = filter_enrollments_by_offer_year(all_enrollments, offer_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
@@ -472,12 +488,16 @@ def __send_message_for_offer_year(
     sent_error_message = None
     if progress == 100:
         receivers = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
+        cc_list = [pgm_manager]
+        if score_sheet_address and score_sheet_address.email:
+            # Todo: Refactor CC list must not be a person but a list of email...
+            cc_list.append(Person(email=score_sheet_address.email))
         sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
             receivers,
             enrollments,
             learning_unit_year.acronym,
             offer_acronym,
-            cc=[pgm_manager]
+            cc=cc_list
         )
     return sent_error_message
 

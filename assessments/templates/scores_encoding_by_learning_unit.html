@@ -1,7 +1,7 @@
 {% extends "scores_encoding_mgr_layout.html" %}
 {% load i18n %}
 {% load static %}
-{% load dictionnary %}
+{% load dictionnary tutor_deadline %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -143,15 +143,16 @@
             <div class="tab-content" id="pnl_learning_units">
                 <div role="tabpanel" class="tab-pane fade in active" id="tab_online">
                     <br>
-                    <table class="table table-hover">
+                    <table class="table table-hover table-responsive">
                         <thead>
                         <tr>
-                            <th id="complete">{% trans 'Complete' %}</th>
-                            <th id="code">{% trans 'Acronym' context 'UE acronym' %}</th>
-                            <th id="title">{% trans 'Learning unit' %}</th>
-                            <th id="responsible">{% trans 'Scores responsible' %}</th>
-                            <th id="progress">{% trans 'Progress' %}</th>
-                            <th id="encode"></th>
+                            <th id="complete" class="col-md-1">{% trans 'Complete' %}</th>
+                            <th id="code" class="col-md-1">{% trans 'Acronym' context 'UE acronym' %}</th>
+                            <th id="title" class="col-md-4">{% trans 'Learning unit' %}</th>
+                            <th id="responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
+                            <th id="tutor_deadlines" class="col-md-2">{% trans 'Tutor deadlines' %}</th>
+                            <th id="progress" class="col-md-1">{% trans 'Progress' %}</th>
+                            <th id="encode" class="col-md-1"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -180,6 +181,35 @@
                             -
                         {% endif %}
                     </td>
+                    <td headers="tutor_deadlines">
+                        {% with note_detail.remaining_scores_by_deadline|ordered_deadlines_to_display as deadlines %}
+                            {% if deadlines %}
+                                {% with first_item=deadlines|get_first_item %}
+                                    {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
+                                        <div class="row row-score-encoding">
+                                            {% include "blocks/deadline_tutor_display.html" %}
+                                            {% if deadlines|length > 1 %}
+                                                <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                   aria-expanded="false"
+                                                   aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                   title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                {% endwith %}
+                                <div class="collapse {% if tutor %}in{% endif %}"
+                                     id="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}">
+                                    {% with deadlines_without_first=deadlines|remove_first %}
+                                        {% for deadline, scores_not_yet_submitted in deadlines_without_first.items %}
+                                            <div class="row row-score-encoding">{% include "blocks/deadline_tutor_display.html" %}</div>
+                                        {% endfor %}
+                                    {% endwith %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
                     <td headers="progress">
                         <div class="progress">
                             <div class="progress-bar {% if note_detail.progress_int == 100 %}
@@ -192,8 +222,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                         <b>
                                             {{ note_detail.exam_enrollments_encoded }}
@@ -263,8 +293,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                          <b>
                                             {{ note_detail.exam_enrollments_encoded }}
@@ -350,8 +380,8 @@
                                  style="width: {{ note_detail.progress }}%;"
                                  title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
-                                        {% if note_detail.scores_not_yet_submitted %}
-                                            ({{ note_detail.scores_not_yet_submitted }})
+                                        {% if note_detail.draft_scores %}
+                                            ({{ note_detail.draft_scores }})
                                         {% endif %}
                                         <b>
                                             {{ note_detail.exam_enrollments_encoded }}

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% load i18n %}
 {% load static %}
-{% load dictionnary %}
+{% load dictionnary tutor_deadline%}
 {% load format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -100,6 +100,7 @@
                             <tr>
                                 <th>{% trans 'Acronym' context 'UE acronym' %}</th>
                                 <th>{% trans 'Learning unit' %}</th>
+                                <th id="tutor_deadlines">{% trans 'Tutor deadlines' %}</th>
                                 <th>{% trans 'Progress' %}</th>
                                 <th></th>
                             </tr>
@@ -110,6 +111,35 @@
                                 <td>{{ note_detail.learning_unit_year_acronym }}</td>
                                 <td><a href="{% url 'online_encoding' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
                                            id="lnk_{{ note_detail.learning_unit_year_acronym }}">{{ note_detail.learning_unit_year_title }}</a>
+                                </td>
+                                <td headers="tutor_deadlines">
+                                    {% with note_detail.remaining_scores_by_deadline|ordered_deadlines_to_display as deadlines %}
+                                        {% if deadlines %}
+                                            {% with first_item=deadlines|get_first_item %}
+                                                {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
+                                                    <div class="row row-score-encoding">
+                                                        {% include "blocks/deadline_tutor_display.html" %}
+                                                        {% if deadlines|length > 1 %}
+                                                            <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                               aria-expanded="false"
+                                                               aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
+                                                               title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endwith %}
+                                            {% endwith %}
+                                            <div class="collapse {% if tutor %}in{% endif %}"
+                                                 id="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}">
+                                                {% with deadlines_without_first=deadlines|remove_first %}
+                                                    {% for deadline, scores_not_yet_submitted in deadlines_without_first.items %}
+                                                        <div class="row row-score-encoding">{% include "blocks/deadline_tutor_display.html" %}</div>
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 <td id="txt_progress_{{ note_detail.learning_unit_year_acronym }}" >
                                     <div class="progress">

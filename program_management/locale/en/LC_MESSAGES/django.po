@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 10:49+0100\n"
+"POT-Creation-Date: 2020-11-17 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -168,6 +168,7 @@ msgstr ""
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
 
+#, python-format
 msgid ""
 "Cannot detach because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
@@ -175,12 +176,13 @@ msgstr ""
 "Cannot remove because the following learning units are prerequisite in "
 "%(formation)s: %(learning_units)s"
 
+#, python-format
 msgid ""
-"Cannot detach education group year %(acronym)s as the following learning "
-"units are prerequisite in %(formation)s: %(learning_units)s"
+"Cannot detach because the following learning units have prerequisite in "
+"%(formation)s: %(learning_units)s"
 msgstr ""
-"Cannot remove education group year %(acronym)s as the following learning "
-"units are prerequisite in %(formation)s: %(learning_units)s"
+"Cannot detach because the following learning units have prerequisite in "
+"%(formation)s: %(learning_units)s"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -583,9 +585,10 @@ msgid "Pre-condition"
 msgstr ""
 
 msgid "Prerequisite"
-msgid_plural "Prerequisites"
-msgstr[0] ""
-msgstr[1] ""
+msgstr "Prerequisite"
+
+msgid "Prerequisites"
+msgstr "Prerequisites"
 
 msgid "Prerequisites are invalid"
 msgstr ""
@@ -715,7 +718,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The end date must be higher or equal to finality %(acronym)s"
+msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 
 #, python-format
@@ -888,7 +891,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
-"versions exists during this year."
+"versions exists during this year and/or in the future."
 msgstr ""
 
 #, python-format

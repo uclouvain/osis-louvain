@@ -50,7 +50,7 @@ FIELDS_TO_NOT_POSTPONE = {
     'attribution_procedure': 'attribution_procedure'
 }
 FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
-                   'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
+                   'credits', 'session', 'quadrimester', 'status', 'internship_subtype', 'professional_integration',
                    'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
                    'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
                    'additional_entity_2']

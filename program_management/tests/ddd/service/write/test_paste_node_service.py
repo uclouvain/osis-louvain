@@ -236,7 +236,6 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             ]
         }
         self.tree = tree_builder(tree_data)
-        self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
 
         tree_to_paste_data = {
             "node_type": MiniTrainingType.OPTION,
@@ -246,12 +245,22 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         self.node_to_paste = self.tree_to_paste.root_node
 
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree, self.tree_to_paste])
+        self.tree_version = StandardProgramTreeVersionFactory(
+            tree=self.tree,
+            program_tree_repository=self.fake_program_tree_repository
+        )
+        self.tree_version_to_paste = StandardProgramTreeVersionFactory(
+            tree=self.tree_to_paste,
+            program_tree_repository=self.fake_program_tree_repository
+        )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
             self.fake_program_tree_repository
         )
 
-        self.fake_tree_version_repository = get_fake_program_tree_version_repository([self.tree_version])
+        self.fake_tree_version_repository = get_fake_program_tree_version_repository(
+            [self.tree_version, self.tree_version_to_paste]
+        )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
             self.fake_tree_version_repository
@@ -278,6 +287,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         tree_to_attach = ProgramTreeFactory(root_node=node_attached_to_root)
         self.fake_node_repository.root_entities.append(node_attached_to_root)
         self.fake_program_tree_repository.root_entities.append(tree_to_attach)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_attach,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         invalid_where_to_paste_path_command = PasteElementCommandFactory(
             node_to_paste_code=node_attached_to_root.code,
@@ -335,6 +350,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         }
         tree_with_parent_as_reference_link = tree_builder(tree_data)
         self.fake_program_tree_repository.root_entities.append(tree_with_parent_as_reference_link)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_with_parent_as_reference_link,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
@@ -353,6 +374,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         self.node_to_paste.entity_id = attr.evolve(self.node_to_paste.entity_id, year=2021)
         tree_to_paste = ProgramTreeFactory(root_node=self.node_to_paste)
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=self.node_to_paste.code,
@@ -379,6 +406,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         )
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
         self.fake_node_repository.root_entities.append(tree_to_paste.root_node)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
@@ -406,6 +439,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         )
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
         self.fake_node_repository.root_entities.append(tree_to_paste.root_node)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         valid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
@@ -429,6 +468,12 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         node_to_paste = tree_to_paste.root_node
 
         self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
 
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=node_to_paste.code,

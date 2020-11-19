@@ -162,7 +162,7 @@ class TestTrainingVersionUpdateGetView(TestCase):
 class TestTrainingVersionUpdatePostView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.training_version_obj = SpecificProgramTreeVersionFactory()
+        cls.training_version_obj = SpecificProgramTreeVersionFactory(tree__root_node__year=2020)
         cls.group_obj = GroupFactory(
             entity_identity=GroupIdentity(
                 code=cls.training_version_obj.tree.root_node.code,

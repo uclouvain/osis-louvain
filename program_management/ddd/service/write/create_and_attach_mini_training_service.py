@@ -23,6 +23,8 @@
 # ############################################################################
 from typing import List
 
+from django.db import transaction
+
 from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from program_management.ddd import command as command_program_management
@@ -30,6 +32,7 @@ from program_management.ddd.service.read import get_default_link_type_service
 from program_management.ddd.service.write import paste_element_service, create_mini_training_with_program_tree
 
 
+@transaction.atomic
 def create_mini_training_and_paste(
         cmd: command_program_management.CreateMiniTrainingAndPasteCommand) -> List['MiniTrainingIdentity']:
     cmd_create = _get_create_orphan_mini_training_command_from_create_mini_training_and_attach_command(cmd)

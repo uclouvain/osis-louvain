@@ -63,7 +63,7 @@ DEFAULT_LEGEND_FILLS = {
 BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
-HEADER_PROGRAMS = _('Programs')
+HEADER_PROGRAMS = _('Trainings')
 PROPOSAL_LINE_STYLES = {
     ProposalType.CREATION.name: Font(color=CREATION_COLOR),
     ProposalType.MODIFICATION.name: Font(color=MODIFICATION_COLOR),

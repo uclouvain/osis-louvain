@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import Dict
 
 import factory.fuzzy
@@ -98,10 +99,10 @@ def _tree_builder(data: Dict) -> 'Node':
 
     node = _node_builder(_data)
 
-    for child_data in children:
+    for child_data, order in zip(children, itertools.count()):
         link_data = child_data.pop("link_data", {})
         child_node = _tree_builder(child_data)
-        LinkFactory(parent=node, child=child_node, **link_data)
+        LinkFactory(parent=node, child=child_node, **link_data, order=order)
 
     return node
 

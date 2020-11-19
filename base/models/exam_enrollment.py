@@ -25,9 +25,10 @@
 ##############################################################################
 from decimal import *
 
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import When, Case, Q, Sum, Count, IntegerField, F
+from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery, ManyToManyField
 from django.utils.translation import gettext as _
 
 from attribution.models import attribution
@@ -275,31 +276,66 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                                         with_session_exam_deadline=False,
                                         only_enrolled=only_enrolled)
 
-    return queryset.values('session_exam', 'learning_unit_enrollment__learning_unit_year',
-                           'learning_unit_enrollment__offer_enrollment__offer_year') \
-        .annotate(
+    queryset = queryset.annotate(
         total_exam_enrollments=Count('id'),
-        learning_unit_enrollment__learning_unit_year__acronym=
-        F('learning_unit_enrollment__learning_unit_year__acronym'),
-        learning_unit_enrollment__learning_unit_year__specific_title=
-        F('learning_unit_enrollment__learning_unit_year__specific_title'),
-        learning_unit_enrollment__learning_unit_year__learning_container_year__common_title=
-        F('learning_unit_enrollment__learning_unit_year__learning_container_year__common_title'),
-        exam_enrollments_encoded=Sum(Case(
-            When(Q(score_final__isnull=False) | Q(justification_final__isnull=False), then=1),
-            default=0,
-            output_field=IntegerField())
+        learning_unit_year_id=F('learning_unit_enrollment__learning_unit_year_id'),
+        offer_year_id=F('learning_unit_enrollment__offer_enrollment__offer_year_id'),
+        learning_unit_year_acronym=F('learning_unit_enrollment__learning_unit_year__acronym'),
+        learning_unit_year_specific_title=F('learning_unit_enrollment__learning_unit_year__specific_title'),
+        learning_container_year_common_title=F(
+            'learning_unit_enrollment__learning_unit_year__learning_container_year__common_title'
         ),
-        scores_not_yet_submitted=Sum(Case(
-            When((Q(score_draft__isnull=False) &
-                  Q(score_final__isnull=True) &
-                  Q(justification_final__isnull=True)) | (Q(justification_draft__isnull=False) &
-                                                          Q(score_final__isnull=True) &
-                                                          Q(justification_final__isnull=True))
-                 , then=1),
-            default=0,
-            output_field=IntegerField()))
+        exam_enrollments_encoded=Sum(
+            Case(
+                When(
+                    Q(score_final__isnull=False) | Q(justification_final__isnull=False),
+                    then=1
+                ),
+                default=0,
+                output_field=IntegerField()
+            )
+        ),
+        draft_scores=Sum(
+            Case(
+                When(
+                    (
+                        Q(score_draft__isnull=False)
+                        & Q(score_final__isnull=True)
+                        & Q(justification_final__isnull=True)
+                    ) | (
+                        Q(justification_draft__isnull=False)
+                        & Q(score_final__isnull=True)
+                        & Q(justification_final__isnull=True)
+                    ),
+                    then=1
+                ),
+                default=0,
+                output_field=IntegerField())
+        ),
+        scores_not_yet_submitted=Sum(
+            Case(
+                When(
+                    Q(score_final__isnull=True) & Q(justification_final__isnull=True),
+                    then=1
+                ),
+                default=0,
+                output_field=IntegerField()
+            )
+        ),
+        deadline=Subquery(
+            session_exam_deadline.SessionExamDeadline.objects.filter(
+                offer_enrollment_id=OuterRef('learning_unit_enrollment__offer_enrollment_id'),
+                number_session=session_exam_number,
+            ).distinct().values('deadline')[:1]
+        ),
+        deadline_tutor=Subquery(
+            session_exam_deadline.SessionExamDeadline.objects.filter(
+                offer_enrollment_id=OuterRef('learning_unit_enrollment__offer_enrollment_id'),
+                number_session=session_exam_number,
+            ).distinct().values('deadline_tutor')[:1]
+        )
     )
+    return queryset
 
 
 def find_for_score_encodings(session_exam_number,

@@ -414,7 +414,8 @@ class Node(interface.Entity):
         return link_to_update
 
     def add_child(self, node: 'Node', **link_attrs) -> 'Link':
-        child = link_factory.get_link(parent=self, child=node, order=len(self.children), **link_attrs)
+        max_order = max((child.order for child in self.children), default=-1)
+        child = link_factory.get_link(parent=self, child=node, order=max_order + 1, **link_attrs)
         self._children.append(child)
         child._has_changed = True
         return child

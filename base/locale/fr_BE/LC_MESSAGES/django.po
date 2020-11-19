@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-06 18:22+0100\n"
+"POT-Creation-Date: 2020-11-16 14:58+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -884,7 +884,7 @@ msgstr "Entités"
 msgid "Entities for DAFs + designation of note holders and program managers"
 msgstr ""
 "Entités pour DAFs + désignation responsables de notes et gestionnaires de "
-"programme"
+"parcours étudiant"
 
 msgid "Entity"
 msgstr "Entité"
@@ -1072,6 +1072,10 @@ msgstr "Matricule FGS"
 
 msgid "Go"
 msgstr "Continuer"
+
+msgctxt "carousel"
+msgid "Go"
+msgstr "Accéder"
 
 msgid "Group"
 msgstr "Groupe"
@@ -1415,8 +1419,8 @@ msgstr "Masculin"
 msgid "Manage volumes"
 msgstr "Gérer les volumes"
 
-msgid "Managed programs"
-msgstr "Programmes gérés"
+msgid "Managed trainings"
+msgstr "Formations gérées"
 
 msgid "Management entity"
 msgstr "Entité de gestion"
@@ -2020,12 +2024,6 @@ msgstr "Master en 180-240 crédits (programme)"
 msgid "Program organized with other institutes"
 msgstr "Programme co-organisés avec d'autres institutions"
 
-msgid "Programs"
-msgstr "Programmes"
-
-msgid "Programs/gathering"
-msgstr "Programmes/regroupements"
-
 msgid "Prohibition to delete a learning unit before 2015."
 msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
 
@@ -2535,8 +2533,10 @@ msgstr "L'unité d'enseignement %(acronym)s n'est incluse dans aucun groupement"
 msgid ""
 "The learning unit %(code)s doesn't have any Title - Common part in %(ac)s, "
 "it is then neccessary to specify a Title - Specific complement on the partim."
-msgstr "L'unité d'enseignement %(code)s ne possède pas d'intitulé - partie commune en %(ac)s, "
-"il est donc nécessaire de spécifier un intitulé - complément spécifique au partim"
+msgstr ""
+"L'unité d'enseignement %(code)s ne possède pas d'intitulé - partie commune "
+"en %(ac)s, il est donc nécessaire de spécifier un intitulé - complément "
+"spécifique au partim"
 
 #, python-format
 msgid ""
@@ -2596,6 +2596,9 @@ msgstr ""
 
 msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
+
+msgid "The objects are been deleted successfully"
+msgstr "Les compétences acquises ont bien été supprimées."
 
 #, python-format
 msgid ""
@@ -2787,6 +2790,9 @@ msgstr "Formations"
 
 msgid "Trainings and learning units"
 msgstr "Formations et unités d&apos;enseignement"
+
+msgid "Trainings/gathering"
+msgstr "Formations/regroupements"
 
 msgid "Transformation"
 msgstr "Transformation"

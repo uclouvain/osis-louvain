@@ -105,7 +105,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     group_form.add_error('min_constraint', e.message)
                     group_form.add_error('max_constraint', '')
                 else:
-                    group_form.add_error('', e.message)
+                    group_form.add_error(None, e.message)
 
     @functools.lru_cache()
     def get_group_obj(self) -> 'Group':

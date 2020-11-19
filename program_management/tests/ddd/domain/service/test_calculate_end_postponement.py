@@ -54,6 +54,7 @@ class TestCalculateEndPostponementYear(MockPatcherMixin, TestCase):
         self.program_tree = ProgramTreeFactory(
             entity_id__year=self.current_year,
             entity_id__code=self.root_node_code,
+            root_node__end_year=None,
         )
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.program_tree])
 
