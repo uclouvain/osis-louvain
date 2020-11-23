@@ -596,7 +596,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
         'score_responsibles': list(score_responsibles),
         'tutors': list(tutors),
         'is_coordinator': is_coordinator,
-        'draft_scores_not_submitted': len(scores_list.enrollment_draft_not_submitted),
+        'draft_scores_not_submitted': len(scores_list.enrollments_available_for_submission),
         'exam_enrollments_encoded': len(scores_list.enrollment_encoded),
         'total_exam_enrollments': _get_count_still_enrolled(scores_list.enrollments),
         'progress': scores_list.progress,

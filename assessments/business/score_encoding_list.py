@@ -271,6 +271,10 @@ class ScoresEncodingList:
 
     @property
     def enrollment_draft_not_submitted(self):
+        return [enrollment for enrollment in self.enrollments if enrollment.is_draft and not enrollment.is_final]
+
+    @property
+    def enrollments_available_for_submission(self):
         return [
             enrollment for enrollment in self.enrollments
             if enrollment.is_draft and not enrollment.is_final and not enrollment.deadline_reached and not (
