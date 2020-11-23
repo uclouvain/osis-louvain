@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -86,7 +86,8 @@ def get_scores_encoding_list(user, **kwargs):
         'academic_year': current_academic_year,
         'number_session': current_number_session,
         'learning_unit_year': learning_unit_year.get_by_id(learning_unit_year_id) if learning_unit_year_id else None,
-        'enrollments': enrollments
+        'enrollments': enrollments,
+        'is_program_manager': is_program_manager
     })
 
 
@@ -245,7 +246,7 @@ def set_score_and_justification(enrollment, is_program_manager):
         enrollment.score_final = enrollment.score_encoded
         enrollment.justification_final = enrollment.justification_encoded
 
-    #Validation
+    #  Validation
     enrollment.full_clean()
     enrollment.save()
 
@@ -258,6 +259,7 @@ class ScoresEncodingList:
         self.number_session = kwargs.get('number_session')
         self.learning_unit_year = kwargs.get('learning_unit_year')
         self.enrollments = kwargs.get('enrollments')
+        self.is_program_manager = kwargs.get('is_program_manager')
 
     @property
     def progress_int(self):
@@ -269,7 +271,11 @@ class ScoresEncodingList:
 
     @property
     def enrollment_draft_not_submitted(self):
-        return [enrollment for enrollment in self.enrollments if enrollment.is_draft and not enrollment.is_final]
+        return [
+            enrollment for enrollment in self.enrollments
+            if enrollment.is_draft and not enrollment.is_final and not enrollment.deadline_reached and not (
+                        enrollment.deadline_tutor_reached and not self.is_program_manager)
+        ]
 
     @property
     def enrollment_encoded(self):
