@@ -59,7 +59,7 @@
 {% endblock header_content %}
 
 {% block content %}
-    <form id="UpdateContentForm" class="education_group_form" method="POST">
+    <form id="UpdateContentForm" class="osis-form" method="POST">
         {% csrf_token %}
         {% bootstrap_formset_errors content_formset %}
         <div class="panel panel-default">
@@ -76,5 +76,4 @@
         {% include "blocks/modal/confirmation_modal.html" %}
     </form>
 
-    <script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>
 {% endblock content %}

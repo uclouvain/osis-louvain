@@ -48,26 +48,14 @@ class GroupForm(ValidationRuleMixin, forms.Form):
     abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
-    credits = forms.IntegerField(
-        label=_("Credits"),
-        required=False,
-        widget=forms.TextInput
-    )
+    credits = fields.CreditField()
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),
         required=False,
     )
-    min_constraint = forms.IntegerField(
-        label=_("minimum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
-    max_constraint = forms.IntegerField(
-        label=_("maximum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
+    min_constraint = forms.IntegerField(label=_("minimum constraint"), required=False)
+    max_constraint = forms.IntegerField(label=_("maximum constraint"), required=False)
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
     teaching_campus = fields.MainCampusChoiceField(
         queryset=None,

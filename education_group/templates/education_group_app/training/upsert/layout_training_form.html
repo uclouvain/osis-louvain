@@ -25,7 +25,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form id="UpsertTrainingForm" class="education_group_form" method="POST" novalidate>
+<form id="UpsertTrainingForm" class="osis-form" method="POST">
     {% csrf_token %}
     {% bootstrap_form_errors training_form %}
     <div class="panel panel-default">
@@ -43,4 +43,3 @@
 </form>
 
 {{ training_form.media }}
-<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>

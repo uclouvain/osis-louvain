@@ -99,12 +99,10 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     min_constraint = forms.IntegerField(
         label=_("minimum constraint").capitalize(),
         required=False,
-        widget=forms.TextInput
     )
     max_constraint = forms.IntegerField(
         label=_("maximum constraint").capitalize(),
         required=False,
-        widget=forms.TextInput
     )
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
@@ -121,8 +119,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     duration = forms.IntegerField(
         initial=1,
         label=_("Duration"),
-        validators=[MinValueValidator(1)],
-        widget=forms.TextInput(),
+        min_value=1,
     )
     duration_unit = forms.ChoiceField(
         initial=DurationUnitsEnum.QUADRIMESTER.name,
@@ -261,18 +258,26 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
-    ares_code = forms.IntegerField(label=_('ARES study code'), widget=forms.TextInput(), required=False,
-                                   max_value=9999)
-    ares_graca = forms.IntegerField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False,
-                                    max_value=9999)
-    ares_authorization = forms.IntegerField(label=_('ARES ability'), widget=forms.TextInput(), required=False,
-                                            max_value=9999)
+    ares_code = forms.IntegerField(
+        label=_('ARES study code'),
+        required=False,
+        max_value=9999
+    )
+    ares_graca = forms.IntegerField(
+        label=_('ARES-GRACA'),
+        required=False,
+        max_value=9999
+    )
+    ares_authorization = forms.IntegerField(
+        label=_('ARES ability'),
+        required=False,
+        max_value=9999
+    )
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
         max_digits=7,
         decimal_places=4,
         label=_('Co-graduation total coefficient'),
-        widget=forms.TextInput(),
         required=False,
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )

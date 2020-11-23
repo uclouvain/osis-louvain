@@ -230,6 +230,12 @@
 
 <script src="{% static 'js/osis.js' %}"></script>
 <script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
+<script type="text/javascript" src="{% static "js/parsley/parsley.min.js" %}"></script>
+{# Find a better way to load static depending on language #}
+{% if LANGUAGE_CODE == 'fr-be' %}
+<script type="text/javascript" src="{% static "js/parsley/fr.js" %}"></script>
+{% endif %}
+<script type="text/javascript" src="{% static "js/osis-form.js" %}"></script>
 
 {% block script %}{% endblock %}
 

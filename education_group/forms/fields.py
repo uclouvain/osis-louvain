@@ -54,13 +54,7 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
 
 class CreditField(forms.IntegerField):
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            min_value=0,
-            max_value=999,
-            label=_("Credits"),
-            widget=forms.TextInput,
-            **kwargs
-        )
+        super().__init__(min_value=0, max_value=999, label=_("Credits"), **kwargs)
 
 
 class SecondaryDomainsField(AutoCompleteSelectMultipleField):

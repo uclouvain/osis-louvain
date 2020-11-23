@@ -50,7 +50,7 @@
 {% endblock header_content %}
 
 {% block content %}
-    <form id="UpsertMiniTrainingVersionForm" class="mini_training_version_form" method="POST" novalidate>
+    <form id="UpsertMiniTrainingVersionForm" class="mini_training_version_form osis-form" method="POST" novalidate>
         {% csrf_token %}
         {% bootstrap_form_errors mini_training_version_form %}
         <div class="panel panel-default">

@@ -51,7 +51,7 @@
 {% endblock header_content %}
 
 {% block content %}
-    <form id="UpsertTrainingVersionForm" class="training_version_form" method="POST" novalidate>
+    <form id="UpsertTrainingVersionForm" class="training_version_form osis-form" method="POST" novalidate>
         {% csrf_token %}
         {% bootstrap_form_errors training_version_form %}
         <div class="panel panel-default">

@@ -88,16 +88,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
         label=_("Type of constraint"),
         required=False,
     )
-    min_constraint = forms.IntegerField(
-        label=_("minimum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
-    max_constraint = forms.IntegerField(
-        label=_("maximum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
+    min_constraint = forms.IntegerField(label=_("minimum constraint"), required=False)
+    max_constraint = forms.IntegerField(label=_("maximum constraint"), required=False)
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
     teaching_campus = fields.MainCampusChoiceField(
         queryset=None,

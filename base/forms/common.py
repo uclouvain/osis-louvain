@@ -119,9 +119,9 @@ class ValidationRuleMixin(WarningFormMixin):
                             rule.initial_value)
                     )
 
-                field.validators.append(
-                    RegexValidator(rule.regex_rule, rule.regex_error_message or None)
-                )
+                if rule.regex_rule:
+                    field.validators.append(RegexValidator(rule.regex_rule, rule.regex_error_message or None))
+                    field.widget.attrs.update({"pattern": rule.regex_rule})
 
     @staticmethod
     def change_status(field, rule):

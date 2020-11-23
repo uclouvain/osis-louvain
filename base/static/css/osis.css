@@ -669,19 +669,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     width: 1300px;
 }
 
-/* Css to remove arrows from input of type number */
-/* Chrome, Safari, Edge, Opera */
-.without_arrow input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Firefox */
-.without_arrow input[type=number] {
-    -moz-appearance: textfield;
-}
-
 .background-grey {
     background-color: lightgrey;
 }

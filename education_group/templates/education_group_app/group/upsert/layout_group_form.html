@@ -25,7 +25,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form id="UpsertGroupForm" class="education_group_form" method="POST">
+<form id="UpsertGroupForm" class="osis-form" method="POST">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -39,5 +39,3 @@
         </div>
     </div>
 </form>
-
-<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>
