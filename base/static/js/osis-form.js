@@ -3,28 +3,64 @@ const DEFAULT_CONFIGURATION = {
     successClass: "has-success",
     trigger: "focusin focusout",
     classHandler: function (inputField){
-        return inputField.$element.closest("div");
-
+        return $(inputField.element.closest(".form-group") || inputField.element.closest("div"));
+    },
+    errorsContainer: function(inputField){
+        return inputField.$element.closest(".form-group")
     },
     errorsWrapper: '<div class="help-block"></div>',
     errorTemplate: '<p></p>',
 }
 
 $(document).ready(function () {
+    window.Parsley.addAsyncValidator('osis', remoteFieldValidation);
+
     $(".osis-form").parsley(DEFAULT_CONFIGURATION);
 
-    // In case of invalid input for type integer, the value accessible from js is "",
-    // therefore you would never got an error.
+    // In case of invalid input for type integer, the value accessible from js is "", therefore you would never got an error.
     $(".osis-form").each(function(){
         addValidationOnNumberInput($(this));
+    })
+
+
+    window.Parsley.on('field:success', function (){
+        const inputField = this;
+        if(inputField.warning !== undefined && inputField.warning !== null){
+            displayWarning(inputField);
+        }
+        else{
+            hideWarning(inputField)
+        }
     })
 
     window.Parsley.on('form:error', function (){
         highlightFormTabsWithError()
     })
-
     highlightFormTabsWithError()
 })
+
+function displayWarning(inputField){
+    inputField._ui.$errorClassHandler.removeClass("has-success");
+    inputField._ui.$errorClassHandler.addClass("has-warning");
+    inputField._ui.$errorsWrapper.text(inputField.warning);
+}
+
+function hideWarning(inputField){
+    inputField._ui.$errorClassHandler.removeClass("has-warning");
+    inputField._ui.$errorsWrapper.text("");
+}
+
+function remoteFieldValidation(xhr) {
+    const inputField = this;
+    return xhr.then(function(jsonResponse) {
+        if (!jsonResponse["valid"]) {
+            return $.Deferred().reject(jsonResponse["msg"]);
+        }
+        inputField.warning = jsonResponse["msg"];
+        return true;
+    })
+}
+
 
 function addValidationOnNumberInput($form){
     $form.find("input[type=number]").each(function(){

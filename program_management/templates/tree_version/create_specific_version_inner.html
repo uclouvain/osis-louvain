@@ -25,7 +25,7 @@
 {% endcomment %}
 
 <div class="modal-content">
-    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' training_identity.year training_identity.acronym %}"
+    <form class="form osis-form" method="POST" id="SpecificVersionForm"
     action="{{ request.path }}">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
@@ -35,10 +35,16 @@
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% bootstrap_label form.version_name.label label_class="control-label" %}
-                    <div class="version_name-group">
-                        {% bootstrap_field form.version_name form_group_class='form-group' show_label=False addon_before=training_identity.acronym|add:"[" addon_after=']' %}
-                        <span id="version_name_error_id"></span>
+
+                    <div class="form-group required_field">
+                        {% bootstrap_label form.version_name.label label_class="control-label" %}
+                        <div class="input-group">
+                            <span class="input-group-addon">{{ training_identity.acronym }}[</span>
+                            <input id="{{ form.version_name.id_for_label }}" class="form-control" type="text" name="{{ form.version_name.name }}" style="text-transform: uppercase;"
+                                   maxlength="15" required data-parsley-remote="{% url 'check_version_name' training_identity.year training_identity.acronym %}"
+                                   data-parsley-remote-validator="osis">
+                            <span class="input-group-addon">]</span>
+                        </div>
                     </div>
                     {% bootstrap_field form.version_title_fr %}
                     {% bootstrap_field form.version_title_en %}
@@ -58,7 +64,7 @@
 </div>
 
 {% block script %}
-    <script type="text/javascript" src="{% static 'js/program_management/creation_education_group_version.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/osis-form.js' %}"></script>
     <script>
         function changeValue(new_value){
             document.getElementById('save_type').value=new_value;

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Dict
+from typing import List
 
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -214,12 +214,6 @@ class MiniTrainingHaveLinkWithEPC(BusinessException):
             abbreviated_title=abbreviated_title,
             academic_year=display_as_academic_year(year)
         )
-        super().__init__(message, **kwargs)
-
-
-class VersionNameAlreadyExist(BusinessException):
-    def __init__(self, version_name: str, *args, **kwargs):
-        message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)
 
 

@@ -33,6 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
+import program_management.ddd.domain.exception
 from base.models.enums import education_group_categories
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
@@ -43,14 +44,15 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand, \
+    GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import get_last_existing_version_service
 from program_management.ddd.service.write import create_and_postpone_tree_version_service, \
     prolong_existing_tree_version_service
 from program_management.forms.version import SpecificVersionForm
-from program_management.views.tree_version.check_version_name import get_last_existing_version
 
 
 class CreateProgramTreeVersionType(ChoiceEnum):
@@ -108,7 +110,8 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 command = _convert_form_to_create_command(form)
                 try:
                     identities = create_and_postpone_tree_version_service.create_and_postpone(command=command)
-                except (exception.VersionNameAlreadyExist, exception.MultipleEntitiesFoundException) as e:
+                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                        exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
                 identities = prolong_existing_tree_version_service.prolong_existing_tree_version(
@@ -188,4 +191,14 @@ def _convert_form_to_prolong_command(
         is_transition=False,
         title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
         title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
+    )
+
+
+def get_last_existing_version(version_name: str, offer_acronym: str) -> 'ProgramTreeVersionIdentity':
+    return get_last_existing_version_service.get_last_existing_version_identity(
+        GetLastExistingVersionNameCommand(
+            version_name=version_name.upper(),
+            offer_acronym=offer_acronym.upper(),
+            is_transition=False,
+        )
     )

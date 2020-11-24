@@ -55,7 +55,9 @@ from program_management.ddd.validators._prerequisite_expression_syntax import Pr
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
+from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
+from program_management.ddd.validators._version_name_pattern import VersionNamePatternValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -258,5 +260,15 @@ class CreateProgramTreeVersionValidatorList(BusinessListValidator):
     def __init__(self, year: int, offer_acronym: str, version_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name),
+        ]
+        super().__init__()
+
+
+class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, year: int, offer_acronym: str, version_name: str):
+        self.validators = [
+            VersionNamePatternValidator(version_name),
+            VersionNameExistsValidator(year, offer_acronym, version_name),
+            VersionNameExistedValidator(year, offer_acronym, version_name),
         ]
         super().__init__()

@@ -24,13 +24,13 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import VersionNameAlreadyExist
+from program_management.ddd.domain.exception import VersionNameExistedException
 
 
-class VersionNameExistsValidator(BusinessValidator):
+class VersionNameExistedValidator(BusinessValidator):
 
     def __init__(self, working_year: int, offer_acronym: str, version_name: str):
-        super(VersionNameExistsValidator, self).__init__()
+        super().__init__()
         self.working_year = working_year
         self.version_name = version_name
         self.offer_acronym = offer_acronym
@@ -41,5 +41,5 @@ class VersionNameExistsValidator(BusinessValidator):
             self.version_name,
             self.offer_acronym,
         )
-        if last_version_identity and last_version_identity.year >= self.working_year:
-            raise VersionNameAlreadyExist(last_version_identity.version_name)
+        if last_version_identity and last_version_identity.year < self.working_year:
+            raise VersionNameExistedException(last_version_identity.version_name)

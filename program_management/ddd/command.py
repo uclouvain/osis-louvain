@@ -687,3 +687,10 @@ class PostponeGroupVersionCommand(interface.CommandRequest):
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_is_transition = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class CheckVersionNameCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)

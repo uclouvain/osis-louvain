@@ -23,23 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import VersionNameAlreadyExist
+from program_management.ddd.domain.exception import InvalidVersionNameException
+
+VERSION_NAME_REGEX = "^[A-Z]{0,15}$"
 
 
-class VersionNameExistsValidator(BusinessValidator):
+class VersionNamePatternValidator(BusinessValidator):
 
-    def __init__(self, working_year: int, offer_acronym: str, version_name: str):
-        super(VersionNameExistsValidator, self).__init__()
-        self.working_year = working_year
+    def __init__(self, version_name: str):
+        super().__init__()
         self.version_name = version_name
-        self.offer_acronym = offer_acronym
 
     def validate(self, *args, **kwargs):
-        from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
-        last_version_identity = GetLastExistingVersion().get_last_existing_version_identity(
-            self.version_name,
-            self.offer_acronym,
-        )
-        if last_version_identity and last_version_identity.year >= self.working_year:
-            raise VersionNameAlreadyExist(last_version_identity.version_name)
+        if not bool(re.match(VERSION_NAME_REGEX, self.version_name.upper())):
+            raise InvalidVersionNameException()
