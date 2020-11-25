@@ -25,11 +25,11 @@
 ##############################################################################
 from unittest import mock
 
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, SimpleTestCase
 from django.views.generic import TemplateView
 
 from base.tests.factories.user import UserFactory
-from base.utils.cache import cache, RequestCache, CacheFilterMixin
+from base.utils.cache import cache, RequestCache, CacheFilterMixin, cached_result
 
 
 class TestRequestCache(TestCase):
@@ -113,3 +113,27 @@ class TestCacheFilterMixin(TestCase):
         obj = DummyClass(request=self.request)
         obj.get(self.request)
         self.assertFalse(mock_save_get_parameters.called)
+
+
+class TestCachedResult(SimpleTestCase):
+    @cached_result
+    def _function_cached_for_test(self, number_to_increment: int):
+        return number_to_increment + 1
+
+    def test_function_cached(self):
+        incremented_number = 0
+        incremented_number = self._function_cached_for_test(incremented_number)  # Increment 1
+        incremented_number = self._function_cached_for_test(incremented_number)  # Increment 2
+        incremented_number = self._function_cached_for_test(incremented_number)  # Increment 3
+        expected_result = 1
+        self.assertTrue(hasattr(self, '__cached__function_cached_for_test'))
+        self.assertEqual(
+            incremented_number,
+            expected_result,
+            "Function called 3 times, but should have been executed only the first time"
+        )
+        self.assertNotEqual(
+            incremented_number,
+            3,
+            "Function called 3 times, but should have been executed only the first time"
+        )

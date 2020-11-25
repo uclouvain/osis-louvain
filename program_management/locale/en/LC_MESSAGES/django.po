@@ -288,9 +288,6 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
-msgid "Formations"
-msgstr ""
-
 msgid "Full title of the english version"
 msgstr ""
 
@@ -634,6 +631,9 @@ msgid "Registration ID"
 msgstr ""
 
 msgid "Registration form for the content of"
+msgstr ""
+
+msgid "Relative / Absolute <br>credits"
 msgstr ""
 
 msgid "Relative credits"
@@ -1017,7 +1017,4 @@ msgid "training"
 msgstr ""
 
 msgid "yes"
-msgstr ""
-
-msgid "yes,no"
 msgstr ""

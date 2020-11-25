@@ -26,7 +26,9 @@
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.service.read.get_utilization_rows import get_utilizations
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from program_management.views.generic import LearningUnitGeneric, Tab
 
 
@@ -39,8 +41,11 @@ class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['utilization_rows'] = get_utilizations(NodeIdentity(code=self.node.code, year=self.node.year),
-                                                       context.get('language'))
+        context['direct_parents'] = utilizations_serializer(
+            NodeIdentity(code=self.node.code, year=self.node.year),
+            search_program_trees_using_node,
+            NodeRepository()
+        )
         return context
 
     def get_permission_object(self):

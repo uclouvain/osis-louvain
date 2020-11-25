@@ -160,6 +160,9 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 .results_on_deck .ui-icon.ui-icon-trash:before {
     color: black;
     content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+
 }
 
 .table_header {

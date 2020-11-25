@@ -92,7 +92,7 @@ class TestTrainingReadContent(TestCase):
         self.assertIsInstance(response.context['form_xls_custom'], CustomXlsForm)
         self.assertIsInstance(response.context['tree_json_url'], str)
         self.assertIsInstance(response.context['group'], Group)
-        self.assertIsInstance(response.context['utilization_rows'], List)
+        self.assertIsInstance(response.context['direct_parents'], List)
 
         self.assertIn('current_version', response.context)
         self.assertIn('academic_year_choices', response.context)

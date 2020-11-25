@@ -97,7 +97,7 @@ class TestMiniTrainingReadUtilization(TestCase):
         )
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
         self.assertIsInstance(response.context['group'], Group)
-        self.assertIsInstance(response.context['utilization_rows'], List)
+        self.assertIsInstance(response.context['direct_parents'], List)
 
     def test_assert_active_tabs_is_utilization_and_others_are_not_active(self):
         response = self.client.get(self.url)

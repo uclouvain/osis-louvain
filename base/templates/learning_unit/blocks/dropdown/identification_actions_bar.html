@@ -43,9 +43,12 @@
 
                         {% flag "learning_unit_create" %}
                             {% if "base.can_create_learningunit" in perms and can_create_partim %}
-                                <li {% if not is_person_linked_to_entity %}class="disabled"{% endif %}>
-                                    <a id="new_partim" {% if is_person_linked_to_entity %}
-                                       href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
+                                <li {% if not is_person_linked_to_entity or proposal.type == 'CREATION' %}class="disabled"{% endif %}>
+                                    <a id="new_partim" {% if is_person_linked_to_entity or proposal.type == 'CREATION' %}
+                                       href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}
+                                        data-toggle="tooltip"
+                                        {% if proposal.type == 'CREATION' %} disabled
+                                        title="{% trans 'You cannot create a partim for a learning unit in proposition of creation' %}"{% endif %}>
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>

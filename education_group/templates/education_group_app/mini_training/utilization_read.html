@@ -32,7 +32,7 @@
                id="lnk_identification">{{ group.code }} - {{ group.abbreviated_title }}{% if not current_version.is_standard %}[{{ current_version.version_name }}]{% endif %}</a>
             {% trans 'is using in' %} :
             <br><br>
-            {% include "blocks/table_element_utilizations.html" %}
+            {% include 'blocks/node_trees_utilizations_table.html' %}
         </div>
     </div>
 {% endblock details %}

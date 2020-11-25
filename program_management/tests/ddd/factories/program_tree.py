@@ -92,6 +92,14 @@ class ProgramTreeFactory(factory.Factory):
 
         return tree_standard
 
+    @staticmethod
+    def produce_standard_2M_program_tree_with_one_finality(current_year: int, end_year: int) -> 'ProgramTree':
+        program_tree = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
+        finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
+        finality_list_node = next(n for n in program_tree.get_all_nodes() if n.is_finality_list_choice())
+        finality_list_node.add_child(finality)
+        return program_tree
+
 
 def _tree_builder(data: Dict) -> 'Node':
     _data = data.copy()

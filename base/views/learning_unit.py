@@ -65,6 +65,10 @@ from base.views.common import display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
@@ -79,18 +83,9 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
                                                     code, year)
     learn_unit_year = context["learning_unit_year"]
 
-    if hasattr(learn_unit_year, 'element'):
-        group_elements_years = learn_unit_year.element.children_elements.select_related(
-            "parent_element", "child_element", "parent_element__group_year__education_group_type"
-        ).order_by('parent_element__group_year__partial_acronym')
-        education_groups_years = [group_element_year.child_element for group_element_year in group_elements_years]
-        formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
-            education_groups_years,
-            as_instances=True,
-            with_parents_of_parents=True
-        )
-        context['formations_by_educ_group_year'] = formations_by_educ_group_year
-        context['group_elements_years'] = group_elements_years
+    node_identity = NodeIdentity(code=learn_unit_year.acronym, year=learn_unit_year.academic_year.year)
+    utilizations = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+    context['direct_parents'] = utilizations
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['total_formation_enrollments'] = 0

@@ -202,22 +202,6 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
     return ''
 
 
-def get_program_tree_version_dict(tree_versions: List['ProgramTreeVersion'],
-                                  language: str) -> Dict:
-
-    version_info = {}
-    if tree_versions:
-        program_tree_version = tree_versions[0]
-        version_info['version_label'] = program_tree_version.version_label
-        if language == LANGUAGE_CODE_EN and program_tree_version.title_en:
-            version_info['title'] = "[{}]".format(program_tree_version.title_en)
-        else:
-            version_info['title'] = \
-                "[{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else ''
-
-    return version_info
-
-
 def _format_node_group_text(node: 'NodeGroupYear') -> str:
     if node.version_name:
         return "{node.code} - {node.title}[{node.version_name}]".format(node=node)

@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 import copy
 from collections import Counter
-from typing import List, Set, Optional, Dict, Hashable
+from typing import List, Set, Optional, Dict
 
 import attr
 
@@ -33,6 +34,7 @@ from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.utils.cache import cached_result
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
@@ -238,11 +240,11 @@ class ProgramTree(interface.RootEntity):
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    def get_links_using_node(self, child_node: 'Node') -> List['Link']:
-        return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
+    def search_links_using_node(self, child_node: 'Node') -> List['Link']:
+        return [link_obj for link_obj in self.get_all_links() if link_obj.child == child_node]
 
     def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
-        links = self.get_links_using_node(child_node)
+        links = self.search_links_using_node(child_node)
         if links:
             return links[0]
 
@@ -500,7 +502,7 @@ class ProgramTree(interface.RootEntity):
         distinct_credits_repr = []
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
 
-        for link_obj in self.get_links_using_node(node):
+        for link_obj in self.search_links_using_node(node):
             if link_obj.relative_credits_repr not in distinct_credits_repr:
                 distinct_credits_repr.append(link_obj.relative_credits_repr)
         return " ; ".join(
@@ -510,7 +512,7 @@ class ProgramTree(interface.RootEntity):
     def get_blocks_values(self, child_node: 'NodeIdentity'):
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
         return " ; ".join(
-            [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
+            [str(grp.block) for grp in self.search_links_using_node(node) if grp.block]
         )
 
     def is_empty(self):
@@ -573,6 +575,29 @@ class ProgramTree(interface.RootEntity):
         ).validate()
         return link_updated
 
+    @cached_result
+    def _paths_by_node(self) -> Dict['Node', List['Path']]:
+        paths_by_node = collections.defaultdict(list)
+        for path, child_node in self.root_node.descendents:
+            paths_by_node[child_node].append(path)
+        return paths_by_node
+
+    def get_paths_from_node(self, node: 'Node') -> List['Path']:
+        return self._paths_by_node().get(node) or []
+
+    def search_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
+        paths = self.get_paths_from_node(node)
+        indirect_parents = []
+        for path in paths:
+            for parent in self.get_parents(path):
+                if parent.is_indirect_parent() and node != parent:
+                    indirect_parents.append(parent)
+                    break
+        return indirect_parents
+
+    def contains(self, node: Node) -> bool:
+        return node in self.get_all_nodes()
+
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
     nodes = [root]
@@ -608,26 +633,5 @@ def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = Non
     return new_node
 
 
-def get_nearest_parents(parents: List['Node']) -> Optional[Dict[str, 'Node']]:
-    parent_direct_node = None
-    root_node = None
-    option_node = None
-    for node in parents:
-        if (node.is_minor_or_deepening()) or (node.is_training() and node.is_finality()):
-            parent_direct_node = node
-
-    for node in parents:
-        if node.is_option():
-            option_node = node
-        if option_node:
-            if node.is_training():
-                root_node = node
-        else:
-            if node.is_training() or node.is_mini_training():
-                root_node = node
-    if (parent_direct_node is None and root_node is None) or (option_node and root_node is None):
-        return None
-    return {
-        'parent_direct_node': parent_direct_node,
-        'root_node': root_node
-    }
+def _path_contains(path: 'Path', node: 'Node') -> bool:
+    return PATH_SEPARATOR + str(node.pk) in path

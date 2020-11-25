@@ -123,4 +123,4 @@ class TestLearningUnitUtilization(TestCase):
 
     def test_assert_key_context(self):
         response = self.client.get(self.url)
-        self.assertIn('utilization_rows', response.context)
+        self.assertIn('direct_parents', response.context)

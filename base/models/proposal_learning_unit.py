@@ -34,6 +34,7 @@ from base.models import entity_version
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
+from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from osis_common.utils.models import get_object_or_none
 
@@ -116,7 +117,7 @@ def filter_proposal_fields(queryset, **kwargs):
     return queryset
 
 
-def is_learning_unit_year_in_proposal(luy):
+def is_learning_unit_year_in_proposal(luy: LearningUnitYear):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
@@ -124,7 +125,14 @@ def is_learning_unit_in_proposal(lu: LearningUnit):
     return ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=lu).exists()
 
 
-def is_in_proposal_of_transformation(luy):
+def is_in_creation_proposal(luy: LearningUnitYear):
+    return ProposalLearningUnit.objects.filter(
+        learning_unit_year=luy,
+        type=ProposalType.CREATION.name
+    ).exists()
+
+
+def is_in_proposal_of_transformation(luy: LearningUnitYear):
     return ProposalLearningUnit.objects.filter(
         learning_unit_year=luy,
         type__in=[ProposalType.TRANSFORMATION.name, ProposalType.TRANSFORMATION_AND_MODIFICATION.name]

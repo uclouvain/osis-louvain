@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 14:58+0100\n"
+"POT-Creation-Date: 2020-11-23 14:08+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -545,6 +545,9 @@ msgstr "Partie commune"
 
 msgid "Common title"
 msgstr "Intitulé commun"
+
+msgid "Comparison of LUs"
+msgstr "Comparaison entre UEs"
 
 msgid "Comparison of learning units"
 msgstr "Liste comparative d'unités d'enseignement"
@@ -3059,6 +3062,11 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement en proposition de création"
+
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
@@ -3265,6 +3273,9 @@ msgstr "éléments par page"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisée"
+
+msgid "learning_units_comparison"
+msgstr "comparaison_entre_UEs"
 
 msgid "list of required teaching materials"
 msgstr "liste des supports de cours obligatoires"

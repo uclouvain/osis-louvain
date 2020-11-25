@@ -71,12 +71,12 @@ class TestSearchCases(TestCase):
             academic_year=cls.an_academic_year,
             requirement_entity=cls.entity_1,
         )
-        a_learning_unit_year = LearningUnitYearFactory(acronym="LBIO1212",
-                                                       academic_year=cls.an_academic_year,
-                                                       learning_container_year=cls.learning_container_yr)
-        cls.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,
-                                                                   type=proposal_type.ProposalType.CREATION,
-                                                                   state=proposal_state.ProposalState.CENTRAL,
+        cls.a_learning_unit_year = LearningUnitYearFactory(acronym="LBIO1212",
+                                                           academic_year=cls.an_academic_year,
+                                                           learning_container_year=cls.learning_container_yr)
+        cls.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=cls.a_learning_unit_year,
+                                                                   type=proposal_type.ProposalType.CREATION.name,
+                                                                   state=proposal_state.ProposalState.CENTRAL.name,
                                                                    entity=cls.entity_1)
 
     def test_search_by_proposal_type(self):
@@ -104,6 +104,9 @@ class TestSearchCases(TestCase):
 
     def check_search_result(self, results):
         self.assertCountEqual(results, [self.a_proposal_learning_unit.learning_unit_year])
+
+    def test_is_in_creation_proposal(self):
+        self.assertTrue(proposal_learning_unit.is_in_creation_proposal(self.a_learning_unit_year))
 
 
 class TestEnsureFolderIdValidator(TestCase):

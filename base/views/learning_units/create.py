@@ -30,6 +30,7 @@ from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
+from base.models import proposal_learning_unit
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear, find_latest_by_learning_unit
 from base.models.person import Person
@@ -70,6 +71,11 @@ def create_learning_unit(request, academic_year_id):
 def create_partim_form(request, learning_unit_year_id):
     person = get_object_or_404(Person, user=request.user)
     learning_unit_year_full = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
+
+    if proposal_learning_unit.is_in_creation_proposal(learning_unit_year_full):
+        display_error_messages(request, _('You cannot create a partim for a learning unit in proposition of creation'))
+        return redirect('learning_unit', learning_unit_year_id=learning_unit_year_id)
+
     end_postponement = find_latest_by_learning_unit(learning_unit_year_full.learning_unit)
 
     postponement_form = LearningUnitPostponementForm(

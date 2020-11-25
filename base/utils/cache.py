@@ -179,3 +179,20 @@ class ElementCache(OsisCache):
             'action': action.value
         }
         self.set_cached_data(data_to_cache)
+
+
+def cached_result(func):
+    """
+    Decorator used to cache the result returned by any function/property.
+    Only works on functions/properties of an instance objects.
+    """
+    def f_cached(*args, **kwargs):
+        self = args[0]
+        cached_property_name = '__cached_' + func.__name__
+        if hasattr(self, cached_property_name):
+            result = getattr(self, cached_property_name, None)
+        else:
+            result = func(*args, **kwargs)
+            setattr(self, cached_property_name, result)
+        return result
+    return f_cached

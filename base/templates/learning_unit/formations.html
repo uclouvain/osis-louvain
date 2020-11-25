@@ -1,7 +1,6 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load static %}
 {% load i18n %}
-{% load dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -29,7 +28,7 @@
 {% block content_tab %}
     <div class="panel-body" id="tabs">
         <br>
-        {% if group_elements_years %}
+        {% if direct_parents %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
@@ -37,64 +36,7 @@
                 <div class="panel-body">
                     <div class="tab-content" id="tab_content">
                         <div role="tabpanel" class="tab-pane active" id="trainings">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>{% trans 'Code' %}</th>
-                                    <th>{% trans 'Title' %}</th>
-                                    <th>{% trans "Training type" %}</th>
-                                    <th>{% trans 'Block' %}</th>
-                                    <th>{% trans 'Trainings' %}</th>
-                                    <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for group_element_year in group_elements_years %}
-                                    {% url 'group_identification' group_element_year.parent_element.group_year.academic_year.year group_element_year.parent_element.group_year.partial_acronym as url_education_group_year %}
-                                    <tr>
-                                        <td>
-                                            <a href="{{ url_education_group_year }}">
-                                                {{ group_element_year.parent_element.group_year.partial_acronym | default_if_none:'-' }}
-                                            </a>
-                                        </td>
-                                        <td>{{ group_element_year.parent_element.group_year.title_fr | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.parent_element.group_year.education_group_type | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-                                        <td>
-                                            <ul>
-                                                {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_element_id %}
-                                                    {% with training.group_year.educationgroupversion.offer as offer %}
-                                                    {% url 'training_identification' offer.academic_year.year offer.partial_acronym as url_education_group_yr %}
-                                                    <li>
-                                                        <a href="{{ url_education_group_yr }}">{{ offer.acronym }}
-                                                            - {{ offer.title }}</a>
-                                                        {% if formations_by_educ_group_year|get_item:training.id %}
-                                                            <ul>
-                                                                <li>
-                                                                    {% trans 'Included in' %} :
-                                                                    {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
-                                                                        {% with parent_training.group_year.educationgroupversion.offer as parent_offer %}
-                                                                        {% url 'training_identification' parent_training.group_year.academic_year.year parent_training.group_year.partial_acronym as url_parent_training %}
-                                                                        <a href="{{ url_parent_training }}">{{ parent_offer.acronym }}</a>
-                                                                        {% if not forloop.last %} - {% endif %}
-                                                                        {% endwith %}
-                                                                    {% endfor %}
-                                                                </li>
-                                                            </ul>
-                                                        {% endif %}
-                                                    </li>
-                                                    {% endwith %}
-                                                {% endfor %}
-                                            </ul>
-                                        </td>
-                                        <td class="text-center">
-                                            {{ group_element_year.relative_credits | default_if_none:'-' }}
-                                            / {{ group_element_year.child_element.learning_unit_year.credits.normalize | default_if_none:'-' }}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                            {% include 'blocks/node_trees_utilizations_table.html' %}
                         </div>
                     </div>
                 </div>

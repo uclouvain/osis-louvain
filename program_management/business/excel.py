@@ -124,7 +124,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
 
         for group_number, group in enumerate(node.prerequisite.prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
-                prerequisite_item_links = tree.get_links_using_node(
+                prerequisite_item_links = tree.search_links_using_node(
                     tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
                 )
                 prerequisite_line = _prerequisite_item_line(tree,

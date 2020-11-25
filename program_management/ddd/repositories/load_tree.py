@@ -27,6 +27,8 @@ import copy
 from typing import List, Dict, Any
 
 from base.models import group_element_year
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.node import factory as node_factory
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
@@ -62,19 +64,17 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
-        # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
-        #  with different attributes values like prerequisites
-        copy_links = {key: copy.copy(value) for key, value in links.items()}
-        copy_nodes = {key: copy.copy(value) for key, value in nodes.items()}
+        # TODO : check this changes with Eddy
         root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
-        copy_nodes[root_node.pk] = root_node
+        nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
             'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
         }
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
-        tree = __build_tree(root_node, structure_for_current_root_node, copy_nodes, copy_links, tree_prerequisites)
+        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
         trees.append(tree)
+        del nodes[root_node.pk]
     return trees
 
 
@@ -182,12 +182,23 @@ def __build_children(
             links,
             prerequisites
         )
+        # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
+        #  with different attributes values like prerequisites (cf. OSIS-5281)
+        #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
+        if any(child.is_learning_unit() for child in child_node.children_as_nodes):
+            child_node = copy.copy(child_node)
+
+        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
 
         if child_node.is_learning_unit():
+            # FIXME Copy links and nodes because it's possible there is a node a present in different trees but
+            #  with different attributes values like prerequisites (cf. OSIS-5281)
+            #  It's because prerequisites should be an attribute of the ProgramTree, not of the Node.
+            child_node = copy.copy(child_node)
+            link_node = copy.copy(link_node)
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
         link_node.entity_id = LinkIdentity(

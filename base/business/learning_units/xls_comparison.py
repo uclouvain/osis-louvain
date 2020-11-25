@@ -58,8 +58,8 @@ EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
 DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
 DESC = "desc"
-WORKSHEET_TITLE = 'learning_units_comparison'
-XLS_FILENAME = 'learning_units_comparison'
+WORKSHEET_TITLE = _('Comparison of LUs')
+XLS_FILENAME = _('learning_units_comparison')
 XLS_DESCRIPTION = _("Comparison of learning units")
 
 ACRONYM_COL_NUMBER = 0

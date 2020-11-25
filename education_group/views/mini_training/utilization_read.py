@@ -24,7 +24,9 @@
 #
 ##############################################################################
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
-from program_management.ddd.service.read.get_utilization_rows import get_utilizations
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 
 
 class MiniTrainingReadUtilization(MiniTrainingRead):
@@ -35,5 +37,9 @@ class MiniTrainingReadUtilization(MiniTrainingRead):
         context = super().get_context_data(**kwargs)
         return {
             **context,
-            'utilization_rows': get_utilizations(self.node_identity, context.get('language'))
+            'direct_parents': utilizations_serializer(
+                self.node_identity,
+                search_program_trees_using_node,
+                NodeRepository()
+            )
         }

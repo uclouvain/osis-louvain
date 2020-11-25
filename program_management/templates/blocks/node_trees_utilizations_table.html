@@ -1,0 +1,113 @@
+{% load static %}
+{% load i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>{% trans 'Code' %}</th>
+        <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+        <th>{% trans 'Title' %}</th>
+        <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+        <th>{% trans 'Mandatory' %}</th>
+        <th>{% trans 'Block' %}</th>
+        <th>{% trans 'Trainings' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for direct_link in direct_parents %}
+        <tr>
+            <td> {% if row.link.is_reference %}  <img src="{% static 'img/reference.jpg' %}"> {% endif %} </td>
+            <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
+                <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
+            </td>
+            <td>{{ direct_link.link.parent.full_acronym }}</td>
+            <td>
+                {% if direct_link.link.parent.is_training or direct_link.link.parent.is_mini_training %}
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
+                        {{ direct_link.link.parent.offer_title_en | default_if_none:'' }}
+                    {% else %}
+                        {{ direct_link.link.parent.offer_title_fr | default_if_none:'' }}
+                    {% endif %}
+                {% else %}
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.group_title_en %}
+                        {{ direct_link.link.parent.group_title_en | default_if_none:'' }}
+                    {% else %}
+                        {{ direct_link.link.parent.group_title_fr | default_if_none:'' }}
+                    {% endif %}
+                {% endif %}
+                {% if LANGUAGE_CODE == 'en' and direct_link.link.parent.version_title_en %}
+                    [{{ direct_link.link.parent.version_title_en | default_if_none:'' }}]
+                {% else %}
+                    {% if direct_link.link.parent.version_title_fr %}
+                        [{{ direct_link.link.parent.version_title_fr | default_if_none:'' }}]
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td class="text-nowrap text-center">
+                {{ direct_link.link.relative_credits | default_if_none:'-' }} / {{ direct_link.link.child.credits.normalize | default_if_none:'-' }}
+            </td>
+            <td class="text-nowrap text-center">{{ direct_link.link.is_mandatory | yesno | title }}</td>
+            <td class="text-nowrap text-center">{{ direct_link.link.block | default_if_none:'-' }}</td>
+            <td>
+                {% for indirect_parent in direct_link.indirect_parents %}
+                    {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
+                <li>
+                    {% url 'element_identification' indirect_parent.node.year indirect_parent.node.code as url_indirect_parent_identification %}
+                    <a href="{{ url_indirect_parent_identification }}">
+                        {{ indirect_parent.node.full_acronym }}
+                    </a>
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
+                        - {{ indirect_parent.node.offer_title_en }}
+                    {% else %}
+                        - {{ indirect_parent.node.offer_title_fr }}
+                    {% endif %}
+                    {% if LANGUAGE_CODE == 'en' and indirect_parent.node.version_title_en %}
+                        [{{ indirect_parent.node.version_title_en }}]
+                    {% else %}
+                        {% if indirect_parent.node.version_title_fr %}
+                            [{{ indirect_parent.node.version_title_fr }}]
+                        {% endif %}
+                    {% endif %}
+                    <ul>
+                        {% for indirect_parent_of_indirect_parent in indirect_parent.indirect_parents %}
+                            {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
+                        {% url 'element_identification' indirect_parent_of_indirect_parent.node.year indirect_parent_of_indirect_parent.node.code as url_indirect_parent_node_identification %}
+                        <a href="{{ url_indirect_parent_node_identification }}">
+                            {{ indirect_parent_of_indirect_parent.node.full_acronym }}
+                        </a>
+                        {% if forloop.last %}</li>{% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% if forloop.last %}</ul>{% endif %}
+                {% endfor %}
+
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-16 14:58+0100\n"
+"POT-Creation-Date: 2020-11-23 14:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -530,6 +530,9 @@ msgstr ""
 msgid "Common title"
 msgstr ""
 
+msgid "Comparison of LUs"
+msgstr ""
+
 msgid "Comparison of learning units"
 msgstr ""
 
@@ -1044,6 +1047,10 @@ msgstr ""
 msgid "Global ID"
 msgstr ""
 
+msgid "Go"
+msgstr ""
+
+msgctxt "carousel"
 msgid "Go"
 msgstr ""
 
@@ -2910,6 +2917,10 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
+msgid ""
+"You cannot create a partim for a learning unit in proposition of creation"
+msgstr ""
+
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
@@ -3098,6 +3109,9 @@ msgid "items per page"
 msgstr ""
 
 msgid "learning unit year"
+msgstr ""
+
+msgid "learning_units_comparison"
 msgstr ""
 
 msgid "list of required teaching materials"

@@ -63,6 +63,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.proposal_type import ProposalType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -333,6 +334,23 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         mock_partim_form_save.return_value = a_partim_learning_unit_year
         response = self.client.post(self.url, data={})
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_partim_learning_unit_year.id})
+        self.assertRedirects(response, url_to_redirect)
+
+    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
+                side_effect=lambda *args: True)
+    def test_create_partim_for_learning_unit_in_creation_proposal(self, mock_is_pers_linked_to_entity_charge):
+        ProposalLearningUnitFactory(
+            learning_unit_year=self.learning_unit_year_full,
+            type=ProposalType.CREATION.name
+        )
+        response = self.client.get(self.url)
+
+        msg = get_messages_from_response(response)
+        expected_message = _('You cannot create a partim for a learning unit in proposition of creation')
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.ERROR)
+
+        url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
         self.assertRedirects(response, url_to_redirect)
 
 
@@ -664,12 +682,12 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element3, group_element1]
-        self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
+        self.assertIn('direct_parents', context)
+        self.assertTrue(len(context['direct_parents']) == 3)
         self.assertIn('root_formations', context)
-
-    def _assert_group_elements_ordered_by_partial_acronym(self, context, expected_order):
-        self.assertListEqual(list(context['group_elements_years']), expected_order)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
 
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,

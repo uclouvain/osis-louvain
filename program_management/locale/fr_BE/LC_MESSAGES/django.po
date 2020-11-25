@@ -314,9 +314,6 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
-msgid "Formations"
-msgstr "Formations"
-
 msgid "Full title of the english version"
 msgstr "Intitulé de la version en anglais"
 
@@ -677,6 +674,9 @@ msgstr "NOMA"
 
 msgid "Registration form for the content of"
 msgstr "Formulaire d'inscription au contenu de"
+
+msgid "Relative / Absolute <br>credits"
+msgstr "Crédits <br>relatifs / absolus"
 
 msgid "Relative credits"
 msgstr "Crédits relatifs"
@@ -1096,6 +1096,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-msgid "yes,no"
-msgstr "oui,non"

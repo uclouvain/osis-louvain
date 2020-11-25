@@ -223,6 +223,9 @@ class Node(interface.Entity):
     def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
 
+    def is_finality_list_choice(self) -> bool:
+        return self.node_type in {GroupType.FINALITY_120_LIST_CHOICE, GroupType.FINALITY_180_LIST_CHOICE}
+
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
@@ -261,6 +264,12 @@ class Node(interface.Entity):
 
     def is_major(self) -> bool:
         return self.node_type == MiniTrainingType.FSA_SPECIALITY
+
+    def is_common_core(self) -> bool:
+        return self.node_type == GroupType.COMMON_CORE
+
+    def is_indirect_parent(self) -> bool:
+        return self.is_training() or self.is_minor_or_deepening()
 
     def get_direct_child_as_node(self, node_id: 'NodeIdentity') -> 'Node':
         return next(node for node in self.get_direct_children_as_nodes() if node.entity_id == node_id)
