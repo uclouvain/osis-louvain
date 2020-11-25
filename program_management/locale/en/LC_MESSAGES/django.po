@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-17 14:07+0100\n"
+"POT-Creation-Date: 2020-11-25 09:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,12 +137,8 @@ msgstr ""
 msgid "Annual"
 msgstr ""
 
-msgid "Are you sure you want to delete %(object)s ?"
-msgstr ""
-
 #, python-format
-msgid ""
-"Are you sure you want to delete %(offer_acronym)s %(version_name)s%(title)s ?"
+msgid "Are you sure you want to delete %(object)s ?"
 msgstr ""
 
 #, python-format
@@ -332,6 +328,9 @@ msgid "Included in"
 msgstr ""
 
 msgid "Internship"
+msgstr ""
+
+msgid "Invalid name version"
 msgstr ""
 
 msgid "Invalid tree path"
@@ -853,6 +852,12 @@ msgid "Version"
 msgstr ""
 
 msgid "Version name"
+msgstr ""
+
+msgid "Version name {} already exists"
+msgstr ""
+
+msgid "Version name {} existed"
 msgstr ""
 
 msgid "Volume"
