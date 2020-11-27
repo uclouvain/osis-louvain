@@ -1,11 +1,11 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=6616c6e25065bb63a246ac0540dbc30acb39d4d2a792adb02110283b4194b6fe
-    - PGPORT=5433
 
 arch: arm64-graviton2
 virt: lxd
 os: linux
+dist: focal
 group: edge
 
 language: python
