@@ -25,7 +25,6 @@
 ##############################################################################
 from enum import Enum
 
-from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
@@ -34,10 +33,15 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from education_group.views.general_information.update_common_condition import UpdateCommonCondition
 from osis_role.contrib.views import PermissionRequiredMixin
+from base.models.admission_condition import AdmissionCondition
+from collections import namedtuple
 
 
 class Tab(Enum):
     ADMISSION_CONDITION = 0
+
+
+CommonObject = namedtuple('CommonObject', ['education_group_year', 'admission_condition'])
 
 
 class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
@@ -47,14 +51,17 @@ class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
     template_name = "education_group_app/general_information/common_bachelor.html"
 
     def get_context_data(self, **kwargs):
-        object = self.get_object()
+        objects = get_objects(self.kwargs['year'])
+        object = objects.education_group_year
+        object_admission_condition = objects.admission_condition
+
         return {
             **super().get_context_data(**kwargs),
             "object": object,
-            "admission_condition": object.admissioncondition,
+            "admission_condition": object_admission_condition,
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
-                "base.change_commonadmissioncondition", self.get_object()
+                "base.change_commonadmissioncondition", object
             ),
             "update_text_url": self.get_update_text_url(),
             "publish_url": self.get_publish_url()
@@ -70,16 +77,6 @@ class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
             }
         }
 
-    def get_object(self) -> EducationGroupYear:
-        try:
-            return EducationGroupYear.objects.look_for_common(
-                academic_year__year=self.kwargs['year'],
-                education_group_type__name=TrainingType.BACHELOR.name,
-                admissioncondition__isnull=False
-            ).select_related('admissioncondition').get()
-        except EducationGroupYear.DoesNotExist:
-            raise Http404
-
     def get_publish_url(self):
         return reverse('publish_common_bachelor_admission_condition', kwargs={'year': self.kwargs['year']})
 
@@ -94,12 +91,28 @@ class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
 
 class UpdateCommonBachelorAdmissionCondition(UpdateCommonCondition):
     def get_admission_condition(self):
-        common = EducationGroupYear.objects.look_for_common(
-            academic_year__year=self.kwargs['year'],
-            education_group_type__name=TrainingType.BACHELOR.name,
-            admissioncondition__isnull=False
-        ).select_related('admissioncondition').get()
-        return common.admissioncondition
+        objects = get_objects(self.kwargs['year'])
+        return objects.admission_condition
 
     def get_success_url(self) -> str:
         return reverse('common_bachelor_admission_condition', kwargs={'year': self.kwargs['year']})
+
+
+def get_objects(year: int) -> CommonObject:
+
+    try:
+        egy_object = EducationGroupYear.objects.look_for_common(
+            academic_year__year=year,
+            education_group_type__name=TrainingType.BACHELOR.name,
+            admissioncondition__isnull=False
+        ).select_related('admissioncondition').get()
+        admission_condition_object = egy_object.admissioncondition
+    except EducationGroupYear.DoesNotExist:
+        egy_object = EducationGroupYear.objects.look_for_common(
+            academic_year__year=year,
+            education_group_type__name=TrainingType.BACHELOR.name,
+            admissioncondition__isnull=True
+        ).get()
+        admission_condition_object = AdmissionCondition(education_group_year=egy_object)
+    return CommonObject(education_group_year=egy_object,
+                        admission_condition=admission_condition_object)
