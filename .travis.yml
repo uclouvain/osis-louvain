@@ -3,7 +3,7 @@ env:
     - CC_TEST_REPORTER_ID=6616c6e25065bb63a246ac0540dbc30acb39d4d2a792adb02110283b4194b6fe
 
 dist: xenial
-virt: lx
+virt: lxd
 arch: arm64-graviton2
 group: edge
 language: python
@@ -14,6 +14,7 @@ install:
   - "pip install -r requirements.txt"
 
 before_script:
+  - "sudo systemctl start postgresql"
   - "psql -d template1 -c 'create extension unaccent;' -U postgres"
   - "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
   - "chmod +x ./cc-test-reporter"
