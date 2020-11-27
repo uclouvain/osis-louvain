@@ -30,7 +30,7 @@ services:
   - rabbitmq
   - postgresql
 addons:
-  postgresql: "10"
+  postgresql: "9.5.23"
   apt:
     packages:
       - postgis
