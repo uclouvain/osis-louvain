@@ -276,7 +276,7 @@ class EntityVersionQuerySet(CTEQuerySet):
                 function='ARRAY_TO_STRING',
                 separator=' / ',
             ),
-        ).filter(parent__isnull=True).order_by('-start_date')
+        ).only_roots().order_by('-start_date')
 
     def descendants(self, entity, date=None):
         """ Return the children entities """
@@ -291,18 +291,18 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
 
+    def only_roots(self):
+        return self.filter(parent__isnull=True)
+
     @property
     def of_main_organization(self):
         return self.filter(entity__organization__type=MAIN)
 
     @property
-    def of_active_academic_partner(self):
+    def of_academic_partner(self):
         return self.filter(
             entity__organization__type=ACADEMIC_PARTNER,
-            # The two following check for active root entity
-            parent__isnull=True,
-            end_date__isnull=True,
-        )
+        ).only_roots()
 
 
 class EntityVersionManager(CTEManager.from_queryset(EntityVersionQuerySet)):

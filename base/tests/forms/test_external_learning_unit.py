@@ -43,18 +43,18 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
-NAMEN = 'Namur'
+NAMUR = 'Namur'
 
 
 def get_valid_external_learning_unit_form_data(academic_year, person, learning_unit_year=None):
@@ -244,7 +244,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
 
     def test_init(self):
         campus = CampusFactory()
-        address = OrganizationAddressFactory(is_main=True, organization=campus.organization)
+        address = MainRootEntityVersionAddressFactory(entity_version__entity__organization=campus.organization)
 
         luy = LearningUnitYearFullFactory(campus=campus)
 
@@ -274,20 +274,30 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
 
-        cls.be_organization_adr_city1 = OrganizationAddressFactory(country__iso_code="BE", city=NAMEN)
+        cls.organization_1 = OrganizationFactory()
+        cls.be_organization_adr_city1 = MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=cls.organization_1,
+            country__iso_code="BE",
+            city=NAMUR
+        )
         cls.external_lu_1 = ExternalLearningUnitYearFactory(
             co_graduation=True,
             learning_unit_year__academic_year=cls.academic_year,
             learning_unit_year__acronym='EDROI1001',
-            learning_unit_year__campus__organization=cls.be_organization_adr_city1.organization,
+            learning_unit_year__campus__organization=cls.organization_1,
         )
 
-        cls.be_organization_adr_city2 = OrganizationAddressFactory(country__iso_code="BE", city='Bruxelles')
+        cls.organization_2 = OrganizationFactory()
+        cls.be_organization_adr_city2 = MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=cls.organization_2,
+            country__iso_code="BE",
+            city='Bruxelles'
+        )
         cls.external_lu_2 = ExternalLearningUnitYearFactory(
             co_graduation=True,
             learning_unit_year__academic_year=cls.academic_year,
             learning_unit_year__acronym='EDROI1002',
-            learning_unit_year__campus__organization=cls.be_organization_adr_city2.organization,
+            learning_unit_year__campus__organization=cls.organization_2,
         )
 
     def test_search_learning_units_on_acronym(self):
@@ -324,7 +334,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_search_learning_units_by_city(self):
         form_data = {
             "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
-            "city": NAMEN,
+            "city": NAMUR,
         }
 
         external_filter = ExternalLearningUnitFilter(form_data)
@@ -334,7 +344,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_search_learning_units_by_campus(self):
         form_data = {
             "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
-            "city": NAMEN,
+            "city": NAMUR,
             "campus": self.external_lu_1.learning_unit_year.campus.id,
         }
 

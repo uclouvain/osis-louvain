@@ -29,29 +29,18 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch, filter_is_borrowed_learning_unit_year
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter, MOBILITY
 from base.forms.search.search_form import get_research_criteria
-from base.models.enums import entity_type, learning_container_year_types
-from base.models.group_element_year import GroupElementYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.offer_year_entity import OfferYearEntity
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.models.enums import learning_container_year_types
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group_year import TrainingFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementLearningUnitYearFactory
 from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
@@ -150,11 +139,21 @@ class TestSearchForm(TestCase):
         organization_2 = OrganizationFactory(name="organization 2")
         organization_3 = OrganizationFactory(name="organization 3")
 
-        OrganizationAddressFactory(organization=organization_1, country=country, city=NAMUR)
-        OrganizationAddressFactory(organization=organization_2, country=country, city=NAMUR)
-
-        OrganizationAddressFactory(organization=organization_3, country=country, city=CINEY)
-
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_1,
+            country=country,
+            city=NAMUR
+        )
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_2,
+            country=country,
+            city=NAMUR
+        )
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=organization_3,
+            country=country,
+            city=CINEY
+        )
         CampusFactory(organization=organization_1)
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)

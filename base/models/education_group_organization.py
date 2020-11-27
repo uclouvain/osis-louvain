@@ -28,7 +28,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -55,7 +54,3 @@ class EducationGroupOrganization(models.Model):
 
     class Meta:
         unique_together = ('education_group_year', 'organization', )
-
-    @cached_property
-    def address(self):
-        return organization_address.find_by_organization(self.organization).first()

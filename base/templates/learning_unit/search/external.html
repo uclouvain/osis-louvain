@@ -73,8 +73,8 @@
     let city_node = $("select#id_city");
     let campus_node = $("select#id_campus");
 
-    country_node.filterCityByCountry(city_node, campus_node, "{% url "filter_cities_by_country" %}");
-    city_node.filterCampusByCity(campus_node, "{% url "filter_campus_by_city" %}");
+    country_node.filterCityByCountry(city_node, campus_node, "{% url "get_cities_related_to_country" %}");
+    city_node.filterCampusByCity(campus_node, "{% url "get_campuses_related_to_city" %}");
 
     $(document).ready(function()
     {

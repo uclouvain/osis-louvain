@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 14:08+0100\n"
+"POT-Creation-Date: 2020-11-24 10:38+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2151,6 +2151,9 @@ msgstr "Référence"
 msgid "Reference institution"
 msgstr "Institution de référence"
 
+msgid "Refresh and visualize publication"
+msgstr "Actualiser et visualiser la publication"
+
 msgid "Refused"
 msgstr "Refusé"
 
@@ -3097,6 +3100,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
 "première année d'organisation de l'UE."
+
+msgid ""
+"You do not have the permission to refresh the publication for this learning "
+"unit"
+msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette unité d'enseignement"
+
+msgid "You do not have the permission to refresh the publication for this year"
+msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"

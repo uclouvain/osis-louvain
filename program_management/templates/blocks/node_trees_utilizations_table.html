@@ -42,7 +42,7 @@
         <tr>
             <td> {% if row.link.is_reference %}  <img src="{% static 'img/reference.jpg' %}"> {% endif %} </td>
             <td>{% url 'element_identification' direct_link.link.parent.year direct_link.link.parent.code as url_parent_identification %}
-                <a href="{{ url_parent_identification }}">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
+                <a href="{{ url_parent_identification }}?keep-tab=no">{{ direct_link.link.parent.code | default_if_none:'' }}</a>
             </td>
             <td>{{ direct_link.link.parent.full_acronym }}</td>
             <td>
@@ -77,7 +77,7 @@
                     {% if forloop.first %}<ul style="padding-left: 15px;">{% endif %}
                 <li>
                     {% url 'element_identification' indirect_parent.node.year indirect_parent.node.code as url_indirect_parent_identification %}
-                    <a href="{{ url_indirect_parent_identification }}">
+                    <a href="{{ url_indirect_parent_identification }}?keep-tab=no">
                         {{ indirect_parent.node.full_acronym }}
                     </a>
                     {% if LANGUAGE_CODE == 'en' and indirect_parent.node.offer_title_en %}
@@ -96,7 +96,7 @@
                         {% for indirect_parent_of_indirect_parent in indirect_parent.indirect_parents %}
                             {% if forloop.first %}<li>{% trans 'Included in' %} : {% else %} - {% endif %}
                         {% url 'element_identification' indirect_parent_of_indirect_parent.node.year indirect_parent_of_indirect_parent.node.code as url_indirect_parent_node_identification %}
-                        <a href="{{ url_indirect_parent_node_identification }}">
+                        <a href="{{ url_indirect_parent_node_identification }}?keep-tab=no">
                             {{ indirect_parent_of_indirect_parent.node.full_acronym }}
                         </a>
                         {% if forloop.last %}</li>{% endif %}

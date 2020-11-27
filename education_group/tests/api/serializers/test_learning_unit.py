@@ -28,7 +28,6 @@ from django.db.models import Value, IntegerField
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
-from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory

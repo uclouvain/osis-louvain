@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import transaction
 
+from program_management import publisher
 from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
@@ -46,5 +47,6 @@ def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
 
     if commit:
         persist_tree.persist(working_tree)
+        publisher.element_detached.send(None, path_detached=path_to_detach)
 
     return deleted_link.entity_id

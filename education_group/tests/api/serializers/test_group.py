@@ -57,6 +57,7 @@ class GroupDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'acronym',
             'code',
@@ -71,6 +72,7 @@ class GroupDetailSerializerTestCase(TestCase):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

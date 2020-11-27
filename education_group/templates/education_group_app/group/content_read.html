@@ -59,7 +59,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'element_identification' link.child.year link.child.code %}"
+                                <a href="{% url 'element_identification' link.child.year link.child.code %}?keep-tab=no"
                                    id="lnk_education_group_{{ link.child.pk }}">{{ link.child.code }}</a>
                             </td>
                             <td>

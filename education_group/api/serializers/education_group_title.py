@@ -38,10 +38,27 @@ class EducationGroupTitleSerializer(serializers.ModelSerializer):
             'title',
         )
 
-    def get_title(self, version):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        field_name = 'title' + field_suffix
-        title = getattr(version.root_group, 'title' + field_suffix)
-        version_title = getattr(version, field_name)
-        title_suffix = ' [{}]'.format(version_title) if version_title else ''
-        return title + title_suffix if title else None
+    @staticmethod
+    def get_title(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_FR)
+
+
+class EducationGroupTitleAllLanguagesSerializer(EducationGroupTitleSerializer):
+    title_en = serializers.SerializerMethodField()
+
+    class Meta(EducationGroupTitleSerializer.Meta):
+        fields = EducationGroupTitleSerializer.Meta.fields + (
+            'title_en',
+        )
+
+    @staticmethod
+    def get_title_en(version):
+        return _get_offer_title_from_lang(version, settings.LANGUAGE_CODE_EN)
+
+
+def _get_offer_title_from_lang(version, lang: str):
+    version_field_name = 'title' + ('_en' if lang == settings.LANGUAGE_CODE_EN else '_fr')
+    title = getattr(version.offer, 'title' + ('_english' if lang == settings.LANGUAGE_CODE_EN else ''))
+    version_title = getattr(version, version_field_name)
+    title_suffix = ' [{}]'.format(version_title) if version_title else ''
+    return title + title_suffix if title else None

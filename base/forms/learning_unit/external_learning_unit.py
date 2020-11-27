@@ -73,7 +73,14 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         queryset=Country.objects.all(),
         required=False,
         label=_("Country"),
-        widget=autocomplete.ModelSelect2(url='country-autocomplete')
+        widget=autocomplete.ModelSelect2(
+            url='country-autocomplete',
+            attrs={
+                'onchange': (
+                    'clearAutocomplete("id_campus");'
+                )
+            }
+        )
     )
 
     def __init__(self, *args, instance=None, initial=None, **kwargs):
@@ -104,7 +111,10 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country_external_institution"]
+                forward=["country_external_institution"],
+                attrs={
+                    'id': 'id_campus'
+                }
             ),
             'credits': forms.TextInput(),
         }

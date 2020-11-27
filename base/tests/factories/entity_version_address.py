@@ -45,3 +45,18 @@ class EntityVersionAddressFactory(factory.DjangoModelFactory):
     entity_version = factory.SubFactory(EntityVersionFactory)
     location = None
     is_main = FuzzyBoolean()
+
+
+class MainRootEntityVersionAddressFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = 'base.EntityVersionAddress'
+
+    city = factory.Faker('city')
+    street = factory.Faker('street_name')
+    street_number = random.randint(1, 1000)
+    postal_code = factory.Faker('postcode')
+    state = factory.Faker('text', max_nb_chars=255)
+    country = factory.SubFactory(CountryFactory)
+    entity_version = factory.SubFactory(EntityVersionFactory, parent=None)
+    location = None
+    is_main = True

@@ -24,8 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
+from base.models.enums import organization_type
 from base.models.enums.organization_type import MAIN
+from base.models.organization import Organization
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -46,7 +50,7 @@ class Campus(SerializableModel):
     is_administration = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.organization)
+        return "{} - {}".format(self.name, self.organization) if self.name else self.organization.name
 
     class Meta:
         verbose_name_plural = 'campuses'
@@ -68,3 +72,13 @@ def find_by_name_and_organization_name(name, organization_name):
         return Campus.objects.get(name=name, organization__name=organization_name)
     except Campus.DoesNotExist:
         return None
+
+
+@receiver(post_save, sender=Organization)
+def _create_default_campus(sender, instance, **kwargs):
+    """
+    For purpose of external learning unit year module, we need to create a default campus for each organization
+    for field "Institution" dropdown
+    """
+    if instance.type != organization_type.MAIN:
+        Campus.objects.get_or_create(name='', organization=instance)

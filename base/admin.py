@@ -152,9 +152,6 @@ admin.site.register(offer_year_entity.OfferYearEntity,
 admin.site.register(organization.Organization,
                     organization.OrganizationAdmin)
 
-admin.site.register(organization_address.OrganizationAddress,
-                    organization_address.OrganizationAddressAdmin)
-
 admin.site.register(person.Person,
                     person.PersonAdmin)
 

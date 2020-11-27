@@ -33,7 +33,8 @@ from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
+    EducationGroupVersionFactory
 
 
 class MiniTrainingListSerializerTestCase(TestCase):
@@ -61,6 +62,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -117,6 +119,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -137,7 +140,9 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -152,3 +157,29 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.mini_training.education_group_type.name
         )
+
+
+class MiniTrainingVersionDetailSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN
+        )
+        cls.mini_training = MiniTrainingFactory(
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_version.entity,
+        )
+        cls.version = EducationGroupVersionFactory(offer=cls.mini_training, version_name='TEST')
+        url = reverse('education_group_api_v1:mini_training_read', kwargs={
+            'acronym': cls.mini_training.acronym,
+            'year': cls.academic_year.year,
+            'version_name': cls.version.version_name
+        })
+        cls.serializer = MiniTrainingDetailSerializer(cls.version, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_not_field_versions(self):
+        self.assertNotIn('versions', list(self.serializer.data.keys()))

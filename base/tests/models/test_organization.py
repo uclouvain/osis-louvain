@@ -26,6 +26,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from base.models.organization import Organization
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -82,10 +83,10 @@ class OrganizationOrderingTest(TestCase):
         result = organizations.values_list('name', flat=True)
         self.assertEqual(list(result), ['A', 'B', 'C', 'D'])
 
-        self.assertTrue(organizations[0].is_current_partner)
-        self.assertTrue(organizations[1].is_current_partner)
-        self.assertFalse(organizations[2].is_current_partner)
-        self.assertFalse(organizations[3].is_current_partner)
+        self.assertTrue(organizations[0].is_active)
+        self.assertTrue(organizations[1].is_active)
+        self.assertFalse(organizations[2].is_active)
+        self.assertFalse(organizations[3].is_active)
 
     def test_organization_properties(self):
         organizations = Organization.objects.all()
@@ -102,3 +103,47 @@ class OrganizationOrderingTest(TestCase):
         # Verify D properties
         self.assertEqual(organizations[3].start_date, datetime.date(2013, 1, 1))
         self.assertEqual(organizations[3].end_date, datetime.date(2015, 1, 1))
+
+
+class OrganizationIsActiveTest(TestCase):
+    def test_is_active_case_end_date_lower_than_today(self):
+        root_inactive = EntityVersionFactory(
+            entity__organization__name='A',
+            start_date=datetime.date(2015, 1, 1),
+            end_date=timezone.now() - datetime.timedelta(days=5),
+            parent=None,
+        )
+        self.assertFalse(
+            Organization.objects.all().filter(
+                name="A",
+                is_active=True
+            ).exists()
+        )
+
+    def test_is_active_case_end_date_greater_than_today(self):
+        root_active = EntityVersionFactory(
+            entity__organization__name='A',
+            start_date=datetime.date(2015, 1, 1),
+            end_date=timezone.now() + datetime.timedelta(days=5),
+            parent=None,
+        )
+        self.assertTrue(
+            Organization.objects.all().filter(
+                name="A",
+                is_active=True
+            ).exists()
+        )
+
+    def test_is_active_case_end_date_is_none(self):
+        root_active = EntityVersionFactory(
+            entity__organization__name='A',
+            start_date=datetime.date(2015, 1, 1),
+            end_date=None,
+            parent=None,
+        )
+        self.assertTrue(
+            Organization.objects.all().filter(
+                name="A",
+                is_active=True
+            ).exists()
+        )

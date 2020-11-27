@@ -3,7 +3,7 @@ base.validationrule,TrainingForm.AGGREGATION.acronym,REQUIRED,2A,"^([A-Za-z]{2,4
 <ul>
 <li>2-4 letters + <b>2A</b></li>
 </ul>
-Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Aggégation est composé de:
+Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Agrégation est composé de:
 <ul>
 <li>2-4 lettres + <b>2A</b></li>
 </ul>
@@ -249,7 +249,7 @@ base.validationrule,TrainingForm.AGGREGATION.code,REQUIRED,200E,"^([LWMBlwmb])([
 <li>numerical part: 3 numbers</li>
 <li><b>E</b></li>
 </ul>
-Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Aggrégation est composée de:
+Examples: <i>LHIST200E, LEDPH200E, LPSP200E</i>","Code d’une Agrégation est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -264,7 +264,7 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.code,REQUIRED,100Q
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b> or <b>W</b></li>
 </ul>
-Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation de participation est composée de:
+Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation de participation est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -279,7 +279,7 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.code,REQUIRED,100W,"^([L
 <li>numerical part: 3 numbers</li>
 <li><b>W</b></li>
 </ul>
-Examples: <i>LFITN100W</i>","Code d’une Attestation de réussite est composée de:
+Examples: <i>LFITN100W</i>","Code d’une Attestation de réussite est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -294,7 +294,7 @@ base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.code,REQUIRED,10
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b> or <b>W</b></li>
 </ul>
-Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’obtention de crédits est composée de:
+Examples: <i>LPCDI100W, LFRTB100Q, WAPHE100Q</i>","Code d’une Attestation d’obtention de crédits est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -459,7 +459,7 @@ base.validationrule,TrainingForm.FORMATION_PHD.code,REQUIRED,330D,"^([LWMBlwmb])
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>","Code d’une Formation doctorale est composée de:
+Examples: <i>LBAUR330D, LCRIM330D, WBIFA330D</i>","Code d’une Formation doctorale est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1225,7 +1225,7 @@ base.validationrule,GroupForm.COMMON_CORE.code,REQUIRED,100T,"^([LWMBlwmb])([A-Z
 <li>numerical part: 3-6 numbers</li>
 <li><b>T</b></li>
 </ul>
-Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (Tronc commun) est composée de:
+Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (Tronc commun) est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1265,7 +1265,7 @@ base.validationrule,GroupForm.MINOR_LIST_CHOICE.code,REQUIRED,120G,"^([LWMBlwmb]
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix mineures est composée de:
+Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix mineures est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1285,7 +1285,7 @@ base.validationrule,GroupForm.MAJOR_LIST_CHOICE.code,REQUIRED,200G,"^([LWMBlwmb]
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composée de:
+Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1305,7 +1305,7 @@ base.validationrule,GroupForm.OPTION_LIST_CHOICE.code,REQUIRED,300G,"^([LWMBlwmb
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix Option est composée de:
+Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix Option est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1325,7 +1325,7 @@ base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.code,REQUIRED,400G,"^([LW
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix de finalités (120) est composée de:
+Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix de finalités (120) est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1345,7 +1345,7 @@ base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.code,REQUIRED,400G,"^([LW
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de finalités (180) est composée de:
+Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de finalités (180) est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1365,7 +1365,7 @@ base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.code,REQUIRED,500
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité est composée de:
+Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1420,7 +1420,7 @@ base.validationrule,MiniTrainingForm.SOCIETY_MINOR.code,REQUIRED,100I,"^([LWMBlw
 <li>numerical part: 3 numbers</li>
 <li><b>I</b></li>
 </ul>
-Examples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>","Code d’une Mineure de société est composée de:
+Examples: <i>LCUCR100I, LDVLD100I, LGENR100I</i>","Code d’une Mineure de société est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1435,7 +1435,7 @@ base.validationrule,MiniTrainingForm.ACCESS_MINOR.code,REQUIRED,100I,"^([LWMBlwm
 <li>numerical part: 3 numbers</li>
 <li><b>I</b></li>
 </ul>
-Examples: <i>LECON100I, LISP100I, LLING100I</i>","Code d’une Mineure d’accès est composée de:
+Examples: <i>LECON100I, LISP100I, LLING100I</i>","Code d’une Mineure d’accès est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1450,7 +1450,7 @@ base.validationrule,MiniTrainingForm.OPEN_MINOR.code,REQUIRED,100I,"^([LWMBlwmb]
 <li>numerical part: 3 numbers</li>
 <li><b>I</b></li>
 </ul>
-Examples: <i>LANTI100I, WSBIM100I, LMPME100I</i>","Code d’une Mineure d’ouverture est composée de:
+Examples: <i>LANTI100I, WSBIM100I, LMPME100I</i>","Code d’une Mineure d’ouverture est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1465,7 +1465,7 @@ base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.code,REQUIRED
 <li>numerical part: 3 numbers</li>
 <li><b>I</b></li>
 </ul>
-Examples: <i>LALLE100I, LCHIM100I, LITA100I</i>","Code d’une Mineure complément disciplinaire est composée de:
+Examples: <i>LALLE100I, LCHIM100I, LITA100I</i>","Code d’une Mineure complément disciplinaire est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1480,7 +1480,7 @@ base.validationrule,MiniTrainingForm.FSA_SPECIALITY.code,REQUIRED,100J,"^([LWMBl
 <li>numerical part: 3 numbers</li>
 <li><b>J</b></li>
 </ul>
-Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (majeure) est composée de:
+Examples: <i>LMAJ103J, LMAJ102J, LPSP100J</i>","Code d’une Spécialité FSA (majeure) est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
@@ -1495,7 +1495,7 @@ base.validationrule,MiniTrainingForm.OPTION.code,REQUIRED,100O,"^([LWMBlwmb])([A
 <li>numerical part: 3 numbers</li>
 <li><b>O</b></li>
 </ul>
-Examples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>","Code d’une Option est composée de:
+Examples: <i>LFYAP132O, MCOMM110O, LENVI103O</i>","Code d’une Option est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>

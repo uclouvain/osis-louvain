@@ -79,33 +79,6 @@
                             <dd>{{ object.end_date | default_if_none:'-' }}</dd>
                         </dl>
                     </div>
-                    <br>
-                    {% with object.organizationaddress_set.all as addresses %}
-                        {% if addresses %}
-                            <label>{% trans 'Address(es)' %}</label>
-                            <br>
-                            <div class="row">
-                                {% for address in addresses %}
-                                    <div class="col-md-3">
-                                        <div class="list-group">
-                                            <a href="{% url 'organization_address_read' address.id %}" class="list-group-item">
-                                                <h4 class="list-group-item-heading">{{ address.label | default_if_none:'' }}</h4>
-                                                <p class="list-group-item-text">
-                                                <address>
-                                                    {{ address.location | default_if_none:'' }}<br>
-                                                    {{ address.postal_code | default_if_none:'' }} {{ address.city | default_if_none:'' }} <br>
-                                                    {{ address.country | default_if_none:'' }}
-                                                </address>
-                                            </a>
-                                        </div>
-                                    </div>
-                                {%endfor%}
-                            </div>
-                        {%else%}
-                            <br>
-                        {%endif%}
-                    {% endwith %}
-
                 </div>
 
                 <div id="tab_campus_list" class="tab-pane fade">
@@ -125,6 +98,24 @@
                     </table>
                 </div>
             </div>
+            {% if addresses %}
+                <label>{% trans 'Address(es)' %}</label>
+                <div class="row">
+                    {% for address in addresses %}
+                        <div class="col-md-3">
+                            <div class="list-group">
+                                <a class="list-group-item">
+                                    <address>
+                                        {{ address.street_number | default_if_none:'' }} {{ address.street | default_if_none:'' }}<br>
+                                        {{ address.postal_code | default_if_none:'' }} {{ address.city | default_if_none:'' }} <br>
+                                        {{ address.country | default_if_none:'' }}
+                                    </address>
+                                </a>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+            {%endif%}
         </div>
     </div>
 {% endblock %}

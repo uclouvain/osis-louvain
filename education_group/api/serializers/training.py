@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -32,12 +31,13 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
+from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
 
 
-class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
+class TrainingBaseListSerializer(EducationGroupTitleAllLanguagesSerializer, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
     acronym = serializers.CharField(source='offer.acronym')
     code = serializers.CharField(source='root_group.partial_acronym')
@@ -55,13 +55,16 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
     administration_faculty = serializers.SerializerMethodField()
     management_entity = serializers.CharField(source='offer.management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
+    ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
+    ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
+    ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display',
                                                       read_only=True)
 
-    class Meta(EducationGroupTitleSerializer.Meta):
-        fields = EducationGroupTitleSerializer.Meta.fields + (
+    class Meta(EducationGroupTitleAllLanguagesSerializer.Meta):
+        fields = EducationGroupTitleAllLanguagesSerializer.Meta.fields + (
             'url',
             'version_name',
             'acronym',
@@ -73,6 +76,9 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
         )
 
     @staticmethod
@@ -85,24 +91,20 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
 
 
 class TrainingListSerializer(TrainingBaseListSerializer):
-    partial_title = serializers.SerializerMethodField()
+    partial_title = serializers.CharField(source='offer.partial_title')
+    partial_title_en = serializers.CharField(source='offer.partial_title_english')
 
     class Meta(TrainingBaseListSerializer.Meta):
         fields = TrainingBaseListSerializer.Meta.fields + (
             'partial_title',
-        )
-
-    def get_partial_title(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.offer,
-            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            'partial_title_en'
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
             data.pop('partial_title')
+            data.pop('partial_title_en')
         return data
 
 
@@ -179,12 +181,11 @@ class TrainingDetailSerializer(TrainingListSerializer):
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     rate_code_text = serializers.CharField(source='offer.get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
-    remark = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='root_group.remark_fr', read_only=True)
+    remark_en = serializers.CharField(source='root_group.remark_en', read_only=True)
     domain_name = serializers.CharField(read_only=True)
     domain_code = serializers.CharField(read_only=True)
-    ares_study = serializers.IntegerField(source='offer.hops.ares_study', read_only=True)
-    ares_graca = serializers.IntegerField(source='offer.hops.ares_graca', read_only=True)
-    ares_ability = serializers.IntegerField(source='offer.hops.ares_ability', read_only=True)
+    versions = serializers.SerializerMethodField()
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -226,6 +227,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -246,14 +248,15 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'main_teaching_campus',
             'domain_code',
             'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'versions'
         )
 
-    def get_remark(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.root_group,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
-        )
+    def get_versions(self, version):
+        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        return TrainingVersionListSerializer(versions, many=True, context=self.context).data
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if obj.version_name != '':
+            data.pop('versions')
+        return data

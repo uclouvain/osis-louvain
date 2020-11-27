@@ -25,7 +25,28 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
+{% block action_top %}
+    <div class="pull-right">
+        <a id="visualize_refreshed_publication_btn"
+           class="btn btn-default"
+           data-code="{{ learning_unit_year.acronym }}"
+           role="button"
+           {% if enable_publish_button %}
+               href="{% url "publish_and_access_learning_unit_pedagogy" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
+               target="_blank"
+           {% else %}
+               disabled
+           {% endif %}
+           data-toggle="tooltip"
+           {% if not can_edit_information and not can_edit_force_majeur_section %}
+                title="{% trans 'You do not have the permission to refresh the publication for this learning unit' %}"
+           {% elif not luy_in_current_or_future_anac %}
+                title="{% trans 'You do not have the permission to refresh the publication for this year' %}"
+           {% endif %}>
+           {% trans 'Refresh and visualize publication' %}
+        </a>
+    </div>
+{% endblock %}
 
 {% block content_tab %}
     <div class="panel-body" id="tabs" >

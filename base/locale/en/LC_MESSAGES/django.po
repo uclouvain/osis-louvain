@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-23 14:08+0100\n"
+"POT-Creation-Date: 2020-11-24 10:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -528,9 +528,6 @@ msgid "Common part"
 msgstr ""
 
 msgid "Common title"
-msgstr ""
-
-msgid "Comparison of LUs"
 msgstr ""
 
 msgid "Comparison of learning units"
@@ -2085,6 +2082,9 @@ msgstr ""
 msgid "Reference institution"
 msgstr ""
 
+msgid "Refresh and visualize publication"
+msgstr ""
+
 msgid "Refused"
 msgstr ""
 
@@ -2941,6 +2941,14 @@ msgstr ""
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
+msgstr ""
+
+msgid ""
+"You do not have the permission to refresh the publication for this learning "
+"unit"
+msgstr ""
+
+msgid "You do not have the permission to refresh the publication for this year"
 msgstr ""
 
 msgid "You don't have the rights to consolidate"

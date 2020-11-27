@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from django.core.cache import cache
 
+from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import ElementCache
 from education_group import publisher
 from education_group.models.group_year import GroupYear
-from osis_common.utils.models import get_object_or_none
 from program_management.models.element import Element
+from program_management import publisher as publisher_pgrm_management
 
 
 @receiver(publisher.group_created)
@@ -43,13 +45,21 @@ def create_element_of_group(sender, group_identity, **kwargs):
 
 
 @receiver(publisher.learning_unit_year_created)
-def create_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
-    Element.objects.get_or_create(learning_unit_year_id=learning_unit_year_id)
+def create_element_of_learning_unit_year(sender, learning_unit_identity, **kwargs):
+    Element.objects.get_or_create(
+        learning_unit_year_id=LearningUnitYear.objects.get(
+            acronym=learning_unit_identity.code,
+            academic_year__year=learning_unit_identity.year
+        ).pk
+    )
 
 
 @receiver(publisher.learning_unit_year_deleted)
-def delete_element_of_learning_unit_year(sender, learning_unit_year_id, **kwargs):
-    Element.objects.filter(learning_unit_year_id=learning_unit_year_id).delete()
+def delete_element_of_learning_unit_year(sender, learning_unit_identity, **kwargs):
+    Element.objects.filter(
+        learning_unit_year__acronym=learning_unit_identity.code,
+        learning_unit_year__academic_year__year=learning_unit_identity.year
+    ).delete()
 
 
 @receiver(publisher.group_deleted)
@@ -58,3 +68,30 @@ def delete_element_of_group(sender, group_identity, **kwargs):
         group_year__partial_acronym=group_identity.code,
         group_year__academic_year__year=group_identity.year
     ).delete()
+
+
+@receiver(publisher_pgrm_management.element_detached)
+def delete_element_in_cache_from_path_detached(sender, path_detached: str, **kwargs):
+    if not hasattr(cache, 'keys'):
+        # Standard Django's cache wrapper doesn't provide a keys function with wildcard operator.
+        # Only django-redis allow that that's why we check if keys exists
+        return
+    cache_key = ElementCache.PREFIX_KEY.format(user="*")
+    cached_items = cache.get_many(cache.keys(cache_key))
+    [cache.delete(key) for key, cached in cached_items.items() if cached.get('path_to_detach') == path_detached]
+
+
+@receiver(publisher.group_deleted)
+@receiver(publisher.learning_unit_year_deleted)
+def delete_element_in_cache_from_element_deleted(sender, **kwargs):
+    if not hasattr(cache, 'keys'):
+        # Standard Django's cache wrapper doesn't provide a keys function with wildcard operator.
+        # Only django-redis allow that that's why we check if keys exists
+        return
+    identity = kwargs.get('learning_unit_identity') or kwargs.get('group_identity')
+    cache_key = ElementCache.PREFIX_KEY.format(user="*")
+    cached_items = cache.get_many(cache.keys(cache_key))
+    [
+        cache.delete(key) for key, cached in cached_items.items()
+        if cached.get('element_code') == identity.code and cached.get('element_year') == identity.year
+    ]

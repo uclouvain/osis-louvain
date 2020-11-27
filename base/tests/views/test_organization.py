@@ -23,20 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models import organization_address
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.user import SuperUserFactory
-from base.views.organization import organization_address_delete
+from base.tests.factories.user import SuperUserFactory, UserFactory
 
 
-class OrganizationViewTestCase(TestCase):
+class OrganizationSearchViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.organization = OrganizationFactory()
@@ -47,22 +45,6 @@ class OrganizationViewTestCase(TestCase):
     def setUp(self):
         self.client.force_login(self.a_superuser)
 
-    def test_organization_address_delete(self):
-        address = OrganizationAddressFactory(organization=self.organization)
-
-        response = self.client.post(reverse(organization_address_delete, args=[address.id]))
-        self.assertRedirects(response, reverse("organization_read", args=[self.organization.pk]))
-        with self.assertRaises(ObjectDoesNotExist):
-            organization_address.OrganizationAddress.objects.get(id=address.id)
-
-    def test_organization_address_edit(self):
-        from base.views.organization import organization_address_edit
-        address = OrganizationAddressFactory(organization=self.organization)
-        response = self.client.get(reverse(organization_address_edit, args=[address.id]))
-
-        self.assertTemplateUsed(response, "organization/organization_address_form.html")
-        self.assertEqual(response.context.get("organization_address"), address)
-
     def test_organizations_search(self):
         response = self.client.get(reverse('organizations_search'), data={
             'acronym': self.organization.acronym[:2]
@@ -70,3 +52,37 @@ class OrganizationViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, "organization/organizations.html")
         self.assertEqual(response.context["object_list"][0], self.organization)
+
+
+class OrganizationDetailViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.root_entity_version = MainEntityVersionFactory(
+            entity__organization=cls.organization,
+            parent=None
+        )
+        MainRootEntityVersionAddressFactory(entity_version=cls.root_entity_version)
+        cls.a_superuser = SuperUserFactory()
+
+        cls.url = reverse('organization_read', kwargs={'organization_id': cls.organization.pk})
+
+    def setUp(self) -> None:
+        self.client.force_login(self.a_superuser)
+
+    def test_case_user_has_not_permission_assert_permission_denied(self):
+        self.client.force_login(UserFactory())
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_template_used(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "organization/organization.html")
+
+    def test_assert_context_keys(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIn('addresses', response.context)

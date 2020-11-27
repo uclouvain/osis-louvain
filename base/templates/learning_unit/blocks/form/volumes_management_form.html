@@ -36,8 +36,8 @@
                         <b>{{ learning_unit.acronym }}</b>
                         <br>
                         {% if learning_unit.quadrimester %}
-                        <abbr title="{% trans 'Quadrimester' %} : {% trans learning_unit.quadrimester|default:"" %}">
-                            ({% trans learning_unit.quadrimester %})
+                        <abbr title="{% trans 'Quadrimester' %} : {% trans learning_unit.get_quadrimester_display|default:"" %}">
+                            ({% trans learning_unit.get_quadrimester_display %})
                         </abbr>
                         {% endif %}
                     </th>

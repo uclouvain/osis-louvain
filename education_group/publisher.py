@@ -28,5 +28,5 @@ from django.dispatch import Signal
 group_created = Signal(providing_args=['group_identity'])
 group_deleted = Signal(providing_args=['group_identity'])
 
-learning_unit_year_created = Signal(providing_args=['learning_unit_year_id'])
-learning_unit_year_deleted = Signal(providing_args=['learning_unit_year_id'])
+learning_unit_year_created = Signal(providing_args=['learning_unit_identity'])
+learning_unit_year_deleted = Signal(providing_args=['learning_unit_identity'])

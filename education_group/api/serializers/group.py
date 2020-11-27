@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -37,19 +36,14 @@ from education_group.models.group_year import GroupYear
 
 
 class GroupTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
+    title = serializers.CharField(source='title_fr', read_only=True)
+    title_en = serializers.CharField(read_only=True)
 
     class Meta:
         model = GroupYear
         fields = (
             'title',
-        )
-
-    def get_title(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'title_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
+            'title_en'
         )
 
 
@@ -63,7 +57,8 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
-    remark = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='remark_fr', read_only=True)
+    remark_en = serializers.CharField(read_only=True)
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value
@@ -86,14 +81,8 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
-        )
-
-    def get_remark(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
 
     @staticmethod

@@ -32,21 +32,26 @@ from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
+from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class EducationGroupRootHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def get_url(self, obj: EducationGroupVersion, _, request, format):
+        view_name = 'education_group_api_v1:'
         if obj.offer.is_training():
-            view_name = 'education_group_api_v1:' + TrainingDetail.name
+            view_name += TrainingDetail.name
         else:
-            view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
+            view_name += MiniTrainingDetail.name
 
         url_kwargs = {
             'acronym': obj.offer.acronym,
             'year': obj.offer.academic_year.year,
-            'version_name': obj.version_name
         }
+        if obj.version_name != STANDARD:
+            url_kwargs.update({
+                'version_name': obj.version_name
+            })
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 

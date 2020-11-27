@@ -24,12 +24,14 @@
 #
 ##############################################################################
 from datetime import datetime
+from typing import Optional
 
 from django.db import models
-from django.db.models import F, Func, OuterRef, Q, Subquery
+from django.db.models import F, Func, OuterRef, Subquery, Prefetch, BooleanField
 from django.utils.safestring import mark_safe
 
 from base.models.entity_version import EntityVersion
+from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import organization_type
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -43,15 +45,15 @@ class OrganizationAdmin(SerializableModelAdmin):
 class OrganizationManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().annotate(
-            is_current_partner=Func(
+            is_active=Func(
                 Subquery(
                     EntityVersion.objects.filter(
                         entity__organization=OuterRef('pk'),
-                        parent__isnull=True,
-                    ).order_by('-start_date').values('end_date')[:1]
+                    ).only_roots().order_by('-start_date').values('end_date')[:1]
                 ),
                 function='IS NULL',
-                template='%(expressions)s %(function)s',
+                template='(%(expressions)s %(function)s OR %(expressions)s >= NOW())',
+                output_field=BooleanField()
             ),
         )
 
@@ -59,15 +61,10 @@ class OrganizationManager(models.Manager):
 class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=50, blank=True)
     acronym = models.CharField(max_length=20, blank=True)
-
-    type = models.CharField(max_length=30, blank=True,
-                            choices=organization_type.ORGANIZATION_TYPE,
-                            default='')
-
+    type = models.CharField(max_length=30, blank=True, choices=organization_type.ORGANIZATION_TYPE, default='')
     prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
 
@@ -84,27 +81,21 @@ class Organization(SerializableModel):
     logo_tag.short_description = 'Logo'
 
     class Meta:
-        ordering = (F("is_current_partner").desc(), "name")
+        ordering = (F("is_active").desc(), "name")
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
 
     @property
     def country(self):
-        # FIXME : Workaround, the address must be directly selectable
-        qs = self.organizationaddress_set
-        if qs.exists():
-            return qs.first().country
-        return None
+        return getattr(self.main_address, 'country', None)
 
     @property
     def start_date(self):
         # Get the earliest root entity version
-        root_entity_version = EntityVersion.objects.filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('start_date').first()
-
+        root_entity_version = EntityVersion.objects.filter(entity__organization=self.pk).only_roots().order_by(
+            'start_date'
+        ).first()
         if root_entity_version:
             return root_entity_version.start_date
         return None
@@ -112,23 +103,35 @@ class Organization(SerializableModel):
     @property
     def end_date(self):
         # Get the latest root entity version
-        root_entity_version = EntityVersion.objects.filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('-start_date').first()
+        root_entity_version = EntityVersion.objects.filter(entity__organization=self.pk).only_roots().order_by(
+            '-start_date'
+        ).first()
         if root_entity_version:
             return root_entity_version.end_date
         return None
 
     @property
-    def website(self):
-        # Get the current root entity version
-        now = datetime.now()
-        root_entity_version = EntityVersion.objects.current(now).filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('-start_date').first()
+    def main_address(self) -> 'EntityVersionAddress':
+        root_entity_version = self.__get_current_root_entity_version()
+        if root_entity_version:
+            return next(
+                (address for address in root_entity_version.entityversionaddress_set.all() if address.is_main),
+                None
+            )
+        return None
 
+    @property
+    def website(self) -> Optional[str]:
+        root_entity_version = self.__get_current_root_entity_version()
         if root_entity_version:
             return root_entity_version.entity.website
         return None
+
+    def __get_current_root_entity_version(self) -> EntityVersion:
+        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots()\
+            .prefetch_related(
+                Prefetch(
+                    'entityversionaddress_set',
+                    queryset=EntityVersionAddress.objects.all().select_related('country')
+                )
+            ).order_by('-start_date').first()

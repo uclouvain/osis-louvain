@@ -107,6 +107,7 @@ from program_management.tests.factories.education_group_version import StandardE
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 
 
 @override_flag('learning_unit_create', active=True)
@@ -694,13 +695,14 @@ class LearningUnitViewTestCase(TestCase):
                                                              acronym='LBIOL')
 
         learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOL', quadrimester='Q1&2',
+                                                     acronym='LBIOL',
+                                                     quadrimester=LearningUnitYearQuadrimester.Q1and2.name,
                                                      learning_container_year=learning_container_yr)
 
         learning_component_yr = LearningComponentYearFactory(learning_unit_year=learning_unit_yr_1)
 
         result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
-        self.assertEqual(result, 'LBIOL (Q1&2)')
+        self.assertEqual(result, 'LBIOL ({})'.format(LearningUnitYearQuadrimester.Q1and2.value))
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
@@ -871,6 +873,25 @@ class LearningUnitViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
+
+    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_pedagogy_publish_button_enabled(self, mock_perm_pedagogy):
+        mock_perm_pedagogy.return_value = True
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
+
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
+        self.assertTrue(response.context['enable_publish_button'])
+
+    @mock.patch(
+        "base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_pedagogy_publish_button_disabled(self, mock_perm_pedagogy, mock_perm_force_majeure):
+        mock_perm_pedagogy.return_value = False
+        mock_perm_force_majeure.return_value = False
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
+
+        self.assertTrue(response.context['luy_in_current_or_future_anac'])
+        self.assertFalse(response.context['enable_publish_button'])
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()

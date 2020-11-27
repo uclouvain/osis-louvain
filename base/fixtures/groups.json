@@ -965,21 +965,6 @@
                     "organization"
                 ],
                 [
-                    "add_organizationaddress",
-                    "base",
-                    "organizationaddress"
-                ],
-                [
-                    "change_organizationaddress",
-                    "base",
-                    "organizationaddress"
-                ],
-                [
-                    "delete_organizationaddress",
-                    "base",
-                    "organizationaddress"
-                ],
-                [
                     "add_person",
                     "base",
                     "person"

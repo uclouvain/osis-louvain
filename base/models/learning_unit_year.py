@@ -53,6 +53,7 @@ from base.models.prerequisite_item import PrerequisiteItem
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from education_group import publisher
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -267,10 +268,16 @@ class LearningUnitYear(SerializableModel):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        publisher.learning_unit_year_created.send(None, learning_unit_year_id=self.id)
+        publisher.learning_unit_year_created.send(
+            None,
+            learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
+        )
 
     def delete(self, *args, **kwargs):
-        publisher.learning_unit_year_deleted.send(None, learning_unit_year_id=self.id)
+        publisher.learning_unit_year_deleted.send(
+            None,
+            learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
+        )
         super(LearningUnitYear, self).delete(*args, **kwargs)
 
     @property

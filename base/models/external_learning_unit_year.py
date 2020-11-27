@@ -26,7 +26,6 @@
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -99,27 +98,3 @@ class ExternalLearningUnitYear(models.Model):
 
     def __str__(self):
         return u"%s" % self.external_acronym
-
-
-def search(academic_year_id=None, acronym=None, title=None, country=None, city=None, campus=None):
-    queryset = ExternalLearningUnitYear.objects
-
-    if academic_year_id:
-        queryset = queryset.filter(learning_unit_year__academic_year=academic_year_id)
-
-    if acronym:
-        queryset = queryset.filter(learning_unit_year__acronym__icontains=acronym)
-
-    if title:
-        queryset = queryset. \
-            filter(Q(learning_unit_year__specific_title__icontains=title) |
-                   Q(learning_unit_year__learning_container_year__common_title__icontains=title))
-
-    if campus:
-        queryset = queryset.filter(learning_unit_year__campus=campus)
-    elif city:
-        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__city=city)
-    elif country:
-        queryset = queryset.filter(learning_unit_year__campus__organization__organizationaddress__country=country)
-
-    return queryset

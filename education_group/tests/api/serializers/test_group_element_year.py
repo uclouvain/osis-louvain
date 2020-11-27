@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-import mock
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
 from rest_framework.reverse import reverse
@@ -100,12 +99,14 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'node_type',
             'subtype',
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -117,10 +118,12 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'is_mandatory',
             'access_condition',
             'comment',
+            'comment_en',
             'link_type',
             'link_type_text',
             'block',
@@ -130,6 +133,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -142,9 +146,11 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'is_mandatory',
             'access_condition',
             'comment',
+            'comment_en',
             'link_type',
             'link_type_text',
             'block',
@@ -169,7 +175,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
 
     def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
         luy = self.serializer.data['children'][0]['children'][0]
-        self.assertEqual(luy['title'], 'COMMON')
+        self.assertEqual(luy['title_en'], 'COMMON')
 
     def test_learning_unit_children_status_field_is_false_boolean(self):
         luy = self.serializer.data['children'][0]['children'][0]
@@ -343,14 +349,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         })
         self.assertIn(expected_learning_unit_url, self.serializer.data['children'][0]['children'][0]['url'])
 
-    def test_ensure_title_is_related_to_instance_and_language_of_serializer(self):
-        self.assertIn(self.serializer.data['title'], self.training.offer_title_en)
-        self.assertEqual(self.serializer.data['children'][0]['title'], self.common_core.group_title_en)
-        self.assertEqual(
-            self.serializer.data['children'][0]['children'][0]['title'],
-            self.learning_unit_year.common_title_en + (self.learning_unit_year.specific_title_en or ''),
-        )
-
     def expected_credits(self, absolute_credits, relative_credits):
         luy = NodeLearningUnitYearFactory(
             year=self.year,
@@ -414,13 +412,16 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'node_type',
             'subtype',
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'partial_title',
+            'partial_title_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -432,10 +433,12 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'is_mandatory',
             'access_condition',
             'comment',
+            'comment_en',
             'link_type',
             'link_type_text',
             'block',
@@ -445,6 +448,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(SimpleTestCas
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type'
@@ -498,12 +502,14 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'node_type',
             'subtype',
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -515,10 +521,12 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
         expected_fields = [
             'url',
             'title',
+            'title_en',
             'children',
             'is_mandatory',
             'access_condition',
             'comment',
+            'comment_en',
             'link_type',
             'link_type_text',
             'block',
@@ -528,7 +536,9 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(SimpleTestCa
             'acronym',
             'code',
             'remark',
+            'remark_en',
             'partial_title',
+            'partial_title_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',

@@ -57,13 +57,8 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
     }
 }
 
-function clearAdditionalEntity(id){
-    if (id === 'id_additional_requirement_entity_1') {
-            $('#select2-id_additional_requirement_entity_1-container').empty();
-    }
-    if (id === 'id_additional_requirement_entity_2') {
-            $('#select2-id_additional_requirement_entity_2-container').empty();
-    }
+function clearAutocomplete(id){
+    $('#' + id).empty();
 }
 
 function validate_acronym() {
@@ -157,7 +152,7 @@ $(document).ready(function() {
         });
         if(isDisabledField('allocation_entity')){
             document.getElementById('id_allocation_entity-country').disabled = true;
-        };
+        }
     });
     $.extend($.validator.messages, {
         required: trans_field_required,

@@ -33,6 +33,7 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -114,6 +115,8 @@ def __convert_string_to_enum(node_data: dict) -> dict:
         node_data['constraint_type'] = ConstraintTypes[node_data['constraint_type']]
     if node_data.get('offer_status'):
         node_data['offer_status'] = ActiveStatusEnum[node_data['offer_status']]
+    if node_data.get('quadrimester'):
+        node_data['quadrimester'] = DerogationQuadrimester[node_data['quadrimester']]
     node_data['type'] = NodeType[node_data['type']]
     return node_data
 

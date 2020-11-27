@@ -20,7 +20,6 @@ class Command(BaseCommand):
             'person',
             'person_address',
             'organization',
-            'organization_address',
             'campus',
             'education_group',
             'offer_type',

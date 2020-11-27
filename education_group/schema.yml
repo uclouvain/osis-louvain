@@ -177,42 +177,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
-  /trainings/{year}/{acronym}/versions:
-    get:
-      description: Return the versions list of the training
-      operationId: versions_list
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: query
-          name: is_transition
-          schema:
-            description: Is a transition version (default is standard version -> false)
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedVersion'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      tags:
-        - trainings
   /trainings/{year}/{acronym}/versions/{version_name}:
     get:
       description: Return the detail of the training version
@@ -779,42 +743,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{acronym}/versions:
-    get:
-      description: Return the versions list of the mini training
-      operationId: minitrainings_versions_list
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: query
-          name: is_transition
-          schema:
-            description: Is a transition version (default is standard version -> false)
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedVersion'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      tags:
-        - mini_trainings
   /mini_trainings/{year}/{acronym}/versions/{version_name}:
     get:
       description: Return the detail of the mini training version
@@ -1014,15 +942,10 @@ components:
           type: array
           items:
             type: integer
-    PaginatedVersion:
-      allOf:
-        - $ref: '#/components/schemas/Pagination'
-        - type: object
-          properties:
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/Version'
+    ArrayOfVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Version'
     Version:
       type: object
       properties:
@@ -1065,6 +988,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         academic_year:
           type: number
         administration_entity:
@@ -1075,7 +1000,15 @@ components:
           type: string
         management_faculty:
           type: string
+        ares_ability:
+          type: integer
+        ares_graca:
+          type: integer
+        ares_study:
+          type: integer
         partial_title:
+          type: string
+        partial_title_en:
           type: string
       required:
         - url
@@ -1087,6 +1020,9 @@ components:
         - academic_year
         - administration_entity
         - management_entity
+        - ares_ability
+        - ares_graca
+        - ares_study
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
@@ -1178,6 +1114,8 @@ components:
               minimum: 1
             remark:
               type: string
+            remark_en:
+              type: string
             min_constraint:
               type: integer
               minimum: 1
@@ -1216,12 +1154,8 @@ components:
               type: string
             is_transition:
               type: boolean
-            ares_ability:
-              type: integer
-            ares_graca:
-              type: integer
-            ares_study:
-              type: integer
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     GroupDetailed:
       type: object
       properties:
@@ -1244,6 +1178,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         credits:
           type: integer
           minimum: 1
@@ -1258,6 +1194,8 @@ components:
         constraint_type_text:
           type: string
         remark:
+          type: string
+        remark_en:
           type: string
         campus:
           $ref: '#/components/schemas/Campus'
@@ -1292,6 +1230,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
     MiniTrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/MiniTraining'
@@ -1314,6 +1254,8 @@ components:
               type: string
             remark:
               type: string
+            remark_en:
+              type: string
             campus:
               $ref: '#/components/schemas/Campus'
             keywords:
@@ -1326,6 +1268,8 @@ components:
               $ref: '#/components/schemas/ScheduleTypeEnum'
             schedule_type_text:
               type: string
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     Tree:
       type: object
       properties:
@@ -1336,11 +1280,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
           type: string
         min_constraint:
           type: integer
@@ -1351,6 +1299,8 @@ components:
         constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         remark:
+          type: string
+        remark_en:
           type: string
         version_name:
           type: string
@@ -1385,11 +1335,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
           type: string
         credits:
           type: number
@@ -1415,7 +1369,11 @@ components:
           type: boolean
         comment:
           type: string
+        comment_en:
+          type: string
         remark:
+          type: string
+        remark_en:
           type: string
         link_type:
           $ref: '#/components/schemas/NodeLinkTypeEnum'

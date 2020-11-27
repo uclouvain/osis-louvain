@@ -27,13 +27,14 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from education_group.api.serializers.utils import get_title_from_lang
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from program_management import formatter
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import STANDARD
 
 
 class RecursiveField(serializers.Serializer):
@@ -57,9 +58,12 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
             )
             url_kwargs = {
                 'acronym': obj.child.title,
-                'year': obj.child.year,
-                'version_name': obj.child.version_name
+                'year': obj.child.year
             }
+            if obj.child.version_name != STANDARD:
+                url_kwargs.update({
+                    'version_name': obj.child.version_name
+                })
         else:
             view_name = 'education_group_api_v1:' + GroupDetail.name
             url_kwargs = {
@@ -73,6 +77,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
 class BaseCommonNodeTreeSerializer(serializers.Serializer):
     url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
     title = serializers.SerializerMethodField()
+    title_en = serializers.SerializerMethodField()
     children = RecursiveField(
         source='child.get_children_and_only_reference_children_except_within_minor_list',
         many=True,
@@ -82,7 +87,8 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     is_mandatory = serializers.BooleanField(read_only=True)
     access_condition = serializers.BooleanField(read_only=True)
-    comment = serializers.SerializerMethodField()
+    comment = serializers.CharField(read_only=True)
+    comment_en = serializers.CharField(source='comment_english', read_only=True)
     link_type = serializers.CharField(source='link_type.name', allow_null=True, read_only=True)
     link_type_text = serializers.CharField(source='link_type.value', allow_null=True, read_only=True)
     block = serializers.SerializerMethodField()
@@ -97,18 +103,16 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_block(obj: 'Link'):
         return sorted([int(block) for block in str(obj.block or '')])
 
-    def get_comment(self, obj: 'Link'):
-        field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
-        return getattr(obj, 'comment' + field_suffix)
-
 
 class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
     node_type = serializers.SerializerMethodField(read_only=True)
     subtype = serializers.CharField(source='child.node_type.name', read_only=True)
     acronym = serializers.CharField(source='child.title', read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
-    remark = serializers.SerializerMethodField()
-    partial_title = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='child.remark_fr', read_only=True)
+    remark_en = serializers.CharField(source='child.remark_en', read_only=True)
+    partial_title = serializers.CharField(source='child.offer_partial_title_fr', read_only=True)
+    partial_title_en = serializers.CharField(source='child.offer_partial_title_en', read_only=True)
     min_constraint = serializers.IntegerField(source='child.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
@@ -122,29 +126,21 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
             return NodeType.MINI_TRAINING.name
         return NodeType.GROUP.name
 
-    def get_remark(self, obj):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        return getattr(obj.child, 'remark' + field_suffix)
-
     def get_title(self, obj):
-        version_title = formatter.format_version_title(obj.child, self.context.get('language'))
-        field_suffix = 'en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else 'fr'
-        field_prefix = 'offer' if obj.child.is_training() else 'group'
-        attr_name = '{}_title_{}'.format(field_prefix, field_suffix)
-        return getattr(obj.child, attr_name) + (' {}'.format(version_title) if version_title else '')
+        return get_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
+
+    def get_title_en(self, obj):
+        return get_title_from_lang(obj, settings.LANGUAGE_CODE_EN)
 
     @staticmethod
     def get_version_name(obj):
         return obj.child.version_name
 
-    def get_partial_title(self, obj):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        return getattr(obj.child, 'offer_partial_title' + field_suffix)
-
     def to_representation(self, obj):
         data = super().to_representation(obj)
         if not obj.child.is_training() or not self.instance.child.is_finality():
             data.pop('partial_title')
+            data.pop('partial_title_en')
         if obj.child.is_group():
             data.pop('version_name')
         return data
@@ -156,13 +152,6 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer, Educati
     def get_acronym(self, obj):
         version_name = self.context.get('version_name')
         return obj.child.title + ('[{}]'.format(version_name) if version_name else '')
-
-    def get_title(self, obj):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        version_title = self.context.get('version_title' + field_suffix)
-        title_suffix = ' [{}]'.format(version_title) if version_title else ''
-        title = getattr(obj.child, 'offer_title' + field_suffix)
-        return title + title_suffix if title else None
 
 
 class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupCommonNodeTreeSerializer):
@@ -193,13 +182,19 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     proposal_type = serializers.CharField(source='child.proposal_type.name', allow_null=True, read_only=True)
 
     def get_title(self, obj: 'Link'):
-        if self.context.get('language') == settings.LANGUAGE_CODE_EN:
+        return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_FR)
+
+    def get_title_en(self, obj: 'Link'):
+        return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_EN)
+
+    @staticmethod
+    def _get_ue_title_from_lang(obj, lang: str):
+        if lang == settings.LANGUAGE_CODE_EN:
             specific_title = obj.child.specific_title_en
             common_title = obj.child.common_title_en
         else:
             specific_title = obj.child.specific_title_fr
             common_title = obj.child.common_title_fr
-
         complete_title = specific_title
         if common_title:
             complete_title = common_title + (' - ' + specific_title if specific_title else "")

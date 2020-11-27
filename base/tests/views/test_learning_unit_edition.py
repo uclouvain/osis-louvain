@@ -48,6 +48,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -571,6 +572,9 @@ class TestEntityAutocomplete(TestCase):
             entity__organization__type=ACADEMIC_PARTNER,
             parent=None,
         )
+        cls.main_address = MainRootEntityVersionAddressFactory(
+            entity_version=cls.external_entity_version
+        )
 
     def setUp(self):
         self.client.force_login(user=self.super_user)
@@ -578,13 +582,13 @@ class TestEntityAutocomplete(TestCase):
     def test_when_param_is_digit_assert_searching_on_code(self):
         # When searching on "code"
         response = self.client.get(
-            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
+            self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.main_address.country_id}
         )
         self._assert_result_is_correct(response)
 
     def test_with_filter_by_section(self):
         response = self.client.get(
-            self.url, data={'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
+            self.url, data={'forward': '{"country": "%s"}' % self.main_address.country_id}
         )
         self._assert_result_is_correct(response)
 
@@ -602,15 +606,15 @@ class TestEntityAutocomplete(TestCase):
         country = CountryFactory()
 
         for letter in ['C', 'A', 'B']:
-            EntityVersionFactory(
+            entity_version = EntityVersionFactory(
                 entity_type=entity_type.SCHOOL,
                 start_date=datetime.date.today().replace(year=1900),
                 end_date=None,
                 title="{} title".format(letter),
                 entity__organization__type=ACADEMIC_PARTNER,
-                entity__country=country,
                 parent=None,
             )
+            MainRootEntityVersionAddressFactory(entity_version=entity_version, country=country)
         response = self.client.get(
             self.url, data={'forward': '{"country": "%s"}' % country.id}
         )

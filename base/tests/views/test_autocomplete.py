@@ -30,8 +30,8 @@ from django.urls import reverse
 
 from base.models.enums.organization_type import ACADEMIC_PARTNER, EMBASSY
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.autocomplete import EmployeeAutocomplete
@@ -44,20 +44,16 @@ class TestOrganizationAutocomplete(TestCase):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("organization_autocomplete")
 
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
+        cls.partner_academic_organization = OrganizationFactory(type=ACADEMIC_PARTNER, name="Université de Louvain")
+        cls.main_address = MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=cls.partner_academic_organization,
             country__iso_code='BE',
-            is_main=True
         )
-        OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
+
+        embassy_organization = OrganizationFactory(type=EMBASSY, name="Université de Nantes")
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=embassy_organization,
             country__iso_code='FR',
-            is_main=True
         )
 
     def setUp(self):
@@ -66,9 +62,9 @@ class TestOrganizationAutocomplete(TestCase):
     def test_when_filter_without_country_data_forwarded_result_found(self):
         response = self.client.get(self.url, data={'q': 'univ'})
 
-        expected_results = [{'text': self.organization.name,
-                             'selected_text': self.organization.name,
-                             'id': str(self.organization.pk)}]
+        expected_results = [{'text': self.partner_academic_organization.name,
+                             'selected_text': self.partner_academic_organization.name,
+                             'id': str(self.partner_academic_organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -84,11 +80,13 @@ class TestOrganizationAutocomplete(TestCase):
     def test_when_filter_with_country_data_forwarded_result_found(self):
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
+            data={'forward': '{"country": "%s"}' % self.main_address.country.pk}
         )
-        expected_results = [{'text': self.organization.name,
-                             'selected_text': self.organization.name,
-                             'id': str(self.organization.pk)}]
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.pk)
+        }]
 
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -105,17 +103,22 @@ class TestOrganizationAutocomplete(TestCase):
         results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, [])
 
-    def test_when_filter_with_country_data_forwarded_no_result_found_case_not_main(self):
-        self.organization_address.is_main = False
-        self.organization_address.save()
+    def test_when_filter_with_country_data_forwarded_result_found_case_not_main(self):
+        self.main_address.is_main = False
+        self.main_address.save()
         response = self.client.get(
             self.url,
-            data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
+            data={'forward': '{"country": "%s"}' % self.main_address.country.pk}
         )
 
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.pk)
+        }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, [])
+        self.assertListEqual(results, expected_results)
 
 
 class TestCountryAutocomplete(TestCase):
@@ -124,7 +127,6 @@ class TestCountryAutocomplete(TestCase):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("country-autocomplete")
         cls.country = CountryFactory(name="Narnia")
-        OrganizationAddressFactory(country=cls.country)
 
     def test_when_filter(self):
         self.client.force_login(user=self.super_user)
@@ -144,22 +146,17 @@ class TestCampusAutocomplete(TestCase):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("campus-autocomplete")
 
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
+        cls.partner_academic_organization = OrganizationFactory(type=ACADEMIC_PARTNER, name="Université de Louvain")
+        cls.main_address = MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=cls.partner_academic_organization,
             country__iso_code='BE',
-            is_main=True
         )
-        cls.campus = CampusFactory(organization=cls.organization)
-        CampusFactory(organization=OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
+
+        embassy_organization = OrganizationFactory(type=EMBASSY, name="Université de Nantes")
+        MainRootEntityVersionAddressFactory(
+            entity_version__entity__organization=embassy_organization,
             country__iso_code='FR',
-            is_main=True
-        ).organization)
+        )
 
     def setUp(self):
         self.client.force_login(user=self.super_user)
@@ -167,10 +164,11 @@ class TestCampusAutocomplete(TestCase):
     def test_when_filter_without_country_data_forwarded_result_found(self):
         response = self.client.get(self.url, data={'q': 'univ'})
 
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
-
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.campus_set.first().pk)
+        }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, expected_results)
@@ -185,11 +183,13 @@ class TestCampusAutocomplete(TestCase):
     def test_when_filter_with_country_data_forwarded_result_found(self):
         response = self.client.get(
             self.url,
-            data={'forward': '{"country_external_institution": "%s"}' % self.organization_address.country.pk}
+            data={'forward': '{"country_external_institution": "%s"}' % self.main_address.country.pk}
         )
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
+        expected_results = [{
+            'text': self.partner_academic_organization.name,
+            'selected_text': self.partner_academic_organization.name,
+            'id': str(self.partner_academic_organization.campus_set.first().pk)
+        }]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, expected_results)

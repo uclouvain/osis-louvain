@@ -206,7 +206,7 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         volume_format(learning_unit_yr.credits) or BLANK_VALUE,
         learning_unit_yr.language.name or BLANK_VALUE,
         learning_unit_yr.get_periodicity_display() if learning_unit_yr.periodicity else BLANK_VALUE,
-        get_translation(learning_unit_yr.quadrimester),
+        learning_unit_yr.get_quadrimester_display() if learning_unit_yr.quadrimester else BLANK_VALUE,
         get_translation(learning_unit_yr.session),
         get_representing_string(learning_unit_yr.learning_container_year.common_title),
         get_representing_string(learning_unit_yr.specific_title),

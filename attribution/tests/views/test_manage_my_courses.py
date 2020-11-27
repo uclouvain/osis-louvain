@@ -228,6 +228,7 @@ class TestViewEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
+        AcademicYearFactory.produce()
         cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
         cls.url = reverse(view_educational_information, args=[cls.attribution.learning_unit_year.id])
         cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))

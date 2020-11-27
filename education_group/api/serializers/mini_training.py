@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -33,10 +32,12 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
+from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 
-class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
+class MiniTrainingListSerializer(EducationGroupTitleAllLanguagesSerializer, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
     acronym = serializers.CharField(source='offer.acronym')
     code = serializers.CharField(source='root_group.partial_acronym')
@@ -59,8 +60,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
         read_only=True
     )
 
-    class Meta(EducationGroupTitleSerializer.Meta):
-        fields = EducationGroupTitleSerializer.Meta.fields + (
+    class Meta(EducationGroupTitleAllLanguagesSerializer.Meta):
+        fields = EducationGroupTitleAllLanguagesSerializer.Meta.fields + (
             'url',
             'version_name',
             'acronym',
@@ -78,7 +79,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
 
 
 class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
-    remark = serializers.SerializerMethodField()
+    remark = serializers.CharField(source='root_group.remark_fr', read_only=True)
+    remark_en = serializers.CharField(source='root_group.remark_en', read_only=True)
     campus = CampusDetailSerializer(source='root_group.main_teaching_campus', read_only=True)
     active = serializers.CharField(source='offer.active', read_only=True)
     schedule_type = serializers.CharField(source='offer.schedule_type', read_only=True)
@@ -93,6 +95,8 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
     schedule_type_text = serializers.CharField(source='offer.get_schedule_type_display', read_only=True)
 
+    versions = serializers.SerializerMethodField()
+
     class Meta(MiniTrainingListSerializer.Meta):
         fields = MiniTrainingListSerializer.Meta.fields + (
             'active',
@@ -106,12 +110,17 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
             'constraint_type',
             'constraint_type_text',
             'remark',
+            'remark_en',
             'campus',
+            'versions'
         )
 
-    def get_remark(self, education_group_version):
-        language = self.context.get('language')
-        return getattr(
-            education_group_version.root_group,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
-        )
+    def get_versions(self, version):
+        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        return MiniTrainingVersionListSerializer(versions, many=True, context=self.context).data
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if obj.version_name != '':
+            data.pop('versions')
+        return data

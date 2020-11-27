@@ -34,7 +34,8 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from reference.tests.factories.domain import DomainFactory
 
 
@@ -62,6 +63,7 @@ class TrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -73,6 +75,9 @@ class TrainingListSerializerTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
         ]
         self.assertListEqual(list(self.serializer.data), expected_fields)
 
@@ -114,6 +119,7 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -125,7 +131,11 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
-            'partial_title'
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
+            'partial_title',
+            'partial_title_en',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -157,7 +167,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         annotated_version = EducationGroupVersion.objects.annotate(
             domain_code=F('offer__main_domain__code'),
             domain_name=F('offer__main_domain__parent__name'),
@@ -174,6 +184,7 @@ class TrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -185,6 +196,9 @@ class TrainingDetailSerializerTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -223,6 +237,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -243,9 +258,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             'main_teaching_campus',
             'domain_code',
             'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -278,7 +291,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         annotated_version = EducationGroupVersion.objects.annotate(
             domain_code=F('offer__main_domain__code'),
             domain_name=F('offer__main_domain__parent__name'),
@@ -295,6 +308,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'version_name',
             'acronym',
@@ -306,7 +320,11 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'administration_faculty',
             'management_entity',
             'management_faculty',
+            'ares_study',
+            'ares_graca',
+            'ares_ability',
             'partial_title',
+            'partial_title_en',
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -345,6 +363,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
+            'remark_en',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -365,9 +384,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'main_teaching_campus',
             'domain_code',
             'domain_name',
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'versions'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -382,3 +399,33 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
         )
+
+
+class TrainingVersionDetailSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
+        cls.training = TrainingFactory(
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            main_domain=DomainFactory(parent=DomainFactory())
+        )
+        cls.version = EducationGroupVersionFactory(offer=cls.training, version_name='TEST')
+        annotated_version = EducationGroupVersion.objects.annotate(
+            domain_code=F('offer__main_domain__code'),
+            domain_name=F('offer__main_domain__parent__name'),
+        ).get(id=cls.version.id)
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year,
+            'version_name': cls.version.version_name
+        })
+        cls.serializer = TrainingDetailSerializer(annotated_version, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_not_field_versions(self):
+        self.assertNotIn('versions', list(self.serializer.data.keys()))
