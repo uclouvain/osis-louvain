@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from typing import Optional
+
 from django.db.models import Window
 from django.db.models.functions import Lag, Lead
 from django.template.defaulttags import register
@@ -41,7 +43,6 @@ from base.views.learning_units.search.common import SearchTypes
 from education_group.models.group_year import GroupYear
 from program_management.ddd.business_types import *
 from program_management.forms.education_groups import GroupFilter
-from typing import Optional
 
 
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
@@ -130,21 +131,22 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             named=True
         ).order_by(*order_by)
 
-
     current_row = _get_current_row(qs, obj)
 
     if current_row:
         context.update({
-            "next_element_title": _get_title(current_row.next_title,
-                                             current_row.next_version_label if not is_ue else None
-                                             ),
-            "next_url": reverse_url_function(current_row.next_code, current_row.next_year, url_name)
-            if current_row.next_id else None,
-            "previous_element_title": _get_title(current_row.previous_title,
-                                                 current_row.previous_version_label if not is_ue else None
-                                                 ),
-            "previous_url": reverse_url_function(current_row.previous_code, current_row.previous_year, url_name)
-            if current_row.previous_id else None
+            "next_element_title": _get_title(
+                current_row.next_title, current_row.next_version_label if not is_ue else None
+            ),
+            "next_url": reverse_url_function(
+                current_row.next_code, current_row.next_year, url_name
+            ) + '?path={}'.format(obj.element.id) if current_row.next_id else None,
+            "previous_element_title": _get_title(
+                current_row.previous_title, current_row.previous_version_label if not is_ue else None
+            ),
+            "previous_url": reverse_url_function(
+                current_row.previous_code, current_row.previous_year, url_name
+            ) + '?path={}'.format(obj.element.id) if current_row.previous_id else None
         })
     return context
 

@@ -41,6 +41,7 @@ from base.views.learning_units.search.common import SearchTypes
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class TestNavigationMixin:
@@ -165,7 +166,10 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[first_element_index],
             "next_element_title": self.elements_sorted_by_acronym[first_element_index + 1].acronym,
-            "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
+            "next_url": self._get_element_url(
+                self.query_parameters,
+                first_element_index + 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[first_element_index].element.id),
             "previous_element_title": None,
             "previous_url": None,
         }
@@ -178,7 +182,10 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
             "next_element_title": None,
             "next_url": None,
             "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].acronym,
-            "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
+            "previous_url": self._get_element_url(
+                self.query_parameters,
+                last_element_index - 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[last_element_index].element.id),
         }
         self.assertNavigationContextEquals(expected_context, last_element_index)
 
@@ -187,9 +194,15 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[inner_element_index],
             "next_element_title": self.elements_sorted_by_acronym[inner_element_index + 1].acronym,
-            "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
+            "next_url": self._get_element_url(
+                self.query_parameters,
+                inner_element_index + 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
             "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
-            "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
+            "previous_url": self._get_element_url(
+                self.query_parameters,
+                inner_element_index - 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
 
@@ -201,6 +214,8 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
     @classmethod
     def generate_elements(cls):
         group_years = GroupYearFactory.create_batch(5, academic_year=cls.academic_year)
+        for group_year in group_years:
+            ElementFactory(group_year=group_year)
         [EducationGroupVersionFactory(root_group=group) for group in group_years]
         return group_years
 
@@ -238,7 +253,10 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
                     self.elements_sorted_by_acronym[first_element_index + 1].educationgroupversion.version_name)
                 if self.elements_sorted_by_acronym[first_element_index + 1].educationgroupversion.version_name else ''
             ),
-            "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
+            "next_url": self._get_element_url(
+                self.query_parameters,
+                first_element_index + 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[first_element_index].element.id),
             "previous_element_title": None,
             "previous_url": None,
         }
@@ -256,7 +274,10 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
                     self.elements_sorted_by_acronym[last_element_index - 1].educationgroupversion.version_name) if
                 self.elements_sorted_by_acronym[last_element_index - 1].educationgroupversion.version_name else ''
             ),
-            "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
+            "previous_url": self._get_element_url(
+                self.query_parameters,
+                last_element_index - 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[last_element_index].element.id),
             "current_version": None
         }
         self.assertNavigationContextEquals(expected_context, last_element_index, True)
@@ -273,13 +294,19 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
                                                 self.elements_sorted_by_acronym[
                                                     inner_element_index + 1].educationgroupversion.version_name else ''
                                                 ),
-            "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
+            "next_url": self._get_element_url(
+                self.query_parameters,
+                inner_element_index + 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
             "previous_element_title": "{}{}".format(
                 self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
                 "[{}]".format(
                     self.elements_sorted_by_acronym[inner_element_index - 1].educationgroupversion.version_name) if
                 self.elements_sorted_by_acronym[inner_element_index - 1].educationgroupversion.version_name else ''),
-            "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
+            "previous_url": self._get_element_url(
+                self.query_parameters,
+                inner_element_index - 1
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index, True)
 
