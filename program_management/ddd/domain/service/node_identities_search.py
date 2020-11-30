@@ -40,6 +40,7 @@ class NodeIdentitiesSearch(interface.DomainService):
             year=F('academic_year__year'),
         ).values_list(
             'year',
-            flat=True
-        ).distinct()
-        return [NodeIdentity(code=group_code, year=year) for year in sorted(years)]
+            'partial_acronym'
+        ).distinct().order_by('year')
+
+        return [NodeIdentity(code=year[1], year=year[0]) for year in years]
