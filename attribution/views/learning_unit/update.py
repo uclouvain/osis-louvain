@@ -25,17 +25,16 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from attribution.views.learning_unit.common import AttributionBaseViewMixin
-from base.business.learning_units import perms
 from attribution.forms.attributions import AttributionForm, LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm
+from attribution.views.learning_unit.common import AttributionBaseViewMixin
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
 from base.views.mixins import AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView
 
 
 class UpdateAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
-    rules = [perms.is_eligible_to_manage_attributions]
+    permission_required = 'base.can_change_attribution'
     template_name = "attribution/learning_unit/attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionForm,

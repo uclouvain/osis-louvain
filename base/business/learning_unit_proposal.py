@@ -29,7 +29,6 @@ from typing import List, Dict, Callable, Any, Tuple
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
-from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +37,6 @@ from base import models as mdl_base
 from base.business import learning_unit_year_with_context
 from base.business.learning_unit import compose_components_dict
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
-from base.business.learning_units import perms
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
@@ -53,6 +51,7 @@ from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
+from osis_role.errors import get_permission_error
 from reference.models import language
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
@@ -216,8 +215,13 @@ def force_state_of_proposals(proposals, author, new_state):
         _("cannot be changed state"),
         None,
         None,
-        perms.is_eligible_to_edit_proposal
+        can_edit_proposal
     )
+
+
+def can_edit_proposal(proposal, author, raise_exception):
+    perm = 'base.can_edit_learning_unit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
 def modify_proposal_state(new_state, proposal):
@@ -235,8 +239,13 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
         _("cannot be canceled"),
         send_mail_util.send_mail_cancellation_learning_unit_proposals,
         research_criteria,
-        perms.is_eligible_for_cancel_of_proposal
+        can_cancel_proposal
     )
+
+
+def can_cancel_proposal(proposal, author, raise_exception):
+    perm = 'base.can_cancel_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
 def consolidate_proposals_and_send_report(
@@ -251,8 +260,13 @@ def consolidate_proposals_and_send_report(
         _('cannot be consolidated'),
         send_mail_util.send_mail_consolidation_learning_unit_proposal,
         research_criteria,
-        perms.is_eligible_to_consolidate_proposal
+        can_consolidate_learningunit_proposal
     )
+
+
+def can_consolidate_learningunit_proposal(proposal, author, raise_exception):
+    perm = 'base.can_consolidate_learningunit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
 def _apply_action_on_proposals_and_send_report(
@@ -297,14 +311,13 @@ def _apply_action_on_proposals(
 ) -> List[Tuple[proposal_learning_unit.ProposalLearningUnit, Dict]]:
     proposals_with_results = []
     for proposal in proposals:
-        try:
-            permission_check(proposal, author, True)
+        perm, perm_result = permission_check(proposal, author, True)
+        if perm_result:
             proposal_with_result = (proposal, action_method(proposal))
-        except PermissionDenied as perm_denied:
-            proposal_with_result = (proposal, {ERROR: _(str(perm_denied))})
-
+        else:
+            perm_denied_msg = get_permission_error(author.user, perm)
+            proposal_with_result = (proposal, {ERROR: _(str(perm_denied_msg))})
         proposals_with_results.append(proposal_with_result)
-
     return proposals_with_results
 
 

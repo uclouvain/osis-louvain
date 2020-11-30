@@ -28,17 +28,16 @@ from copy import deepcopy
 from unittest.mock import patch
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from reference.tests.factories.language import EnglishLanguageFactory
 
 
@@ -48,8 +47,7 @@ class LearningUnitPedagogyContextMixin(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.language = EnglishLanguageFactory()
-        cls.person = PersonFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
+        cls.person = CentralManagerFactory().person
         cls.current_ac = AcademicYearFactory(current=True)
         cls.past_ac_years = AcademicYearFactory.produce_in_past(cls.current_ac.year - 1, 5)
         cls.future_ac_years = AcademicYearFactory.produce_in_future(cls.current_ac.year + 1, 5)

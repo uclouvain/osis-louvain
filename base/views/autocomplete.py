@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
+
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Subquery, OuterRef, BooleanField, Q, Value
@@ -35,6 +37,9 @@ from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
 from base.models.person import Person
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.forms.fields import EntityRoleChoiceFieldMixin
 from reference.models.country import Country
 
 
@@ -133,10 +138,18 @@ class AdditionnalEntity2Autocomplete(EntityAutocomplete):
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
-class EntityRequirementAutocomplete(EntityAutocomplete):
+class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMixin, autocomplete.Select2QuerySetView):
+    def get_person(self) -> Person:
+        return self.request.user.person
+
+    def get_group_names(self) -> Set[str]:
+        return {FacultyManager.group_name, CentralManager.group_name}
+
     def get_queryset(self):
-        return super(EntityRequirementAutocomplete, self).get_queryset()\
-            .filter(entity__in=self.request.user.person.linked_entities)
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.q:
+            qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
+        return qs
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)

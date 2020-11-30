@@ -27,7 +27,6 @@ import itertools
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Permission
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
@@ -58,8 +57,10 @@ from base.tests.factories.user import UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
 from base.views.learning_achievement import management, create, create_first
 from cms.tests.factories.text_label import TextLabelFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.models.language import FR_CODE_LANGUAGE
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
 @override_flag('learning_achievement_update', active=True)
@@ -103,8 +104,9 @@ class TestLearningAchievementView(TestCase):
         setattr(request, 'session', 'session')
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
+
         with self.assertRaises(PermissionDenied):
-            management(request, self.achievement_fr.learning_unit_year.id)
+            management(request, learning_unit_year_id=self.achievement_fr.learning_unit_year.id)
 
     def test_delete_redirection(self):
         request = self.request_factory.post(
@@ -114,55 +116,56 @@ class TestLearningAchievementView(TestCase):
         setattr(request, 'session', 'session')
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        request.user = self.user
-        response = management(request, self.achievement_fr.learning_unit_year.id)
+        luy = self.achievement_fr.learning_unit_year
+        manager = CentralManagerFactory(entity=luy.learning_container_year.requirement_entity)
+        request.user = manager.person.user
+        response = management(request, learning_unit_year_id=self.achievement_fr.learning_unit_year.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url,
                          "/learning_units/{}/specifications/".format(self.achievement_fr.learning_unit_year.id))
 
     def test_delete_permission_denied(self):
         self.person_entity.delete()
-        request = self.request_factory.post(reverse('achievement_management',
-                                               args=[self.achievement_fr.learning_unit_year.id]),
-                                       data={'achievement_id': self.achievement_fr.id,
-                                             'action': DELETE})
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
+        request = self.request_factory.post(
+            reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]), data={
+                'achievement_id': self.achievement_fr.id,
+                'action': DELETE
+            }
+        )
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-            management(request, self.achievement_fr.learning_unit_year.id)
+            management(request, learning_unit_year_id=self.achievement_fr.learning_unit_year.id)
 
     def test_create_not_allowed(self):
         request = self.request_factory.get(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-            create(request, self.learning_unit_year.id, self.achievement_fr.id)
+            create(request, self.achievement_fr.id, learning_unit_year_id=self.learning_unit_year.id)
 
         request = self.request_factory.post(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-            create(request, self.learning_unit_year.id, self.achievement_fr.id)
+            create(request, self.achievement_fr.id, learning_unit_year_id=self.learning_unit_year.id)
 
     def test_create_first_not_allowed(self):
         request = self.request_factory.get(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-            create_first(request, self.learning_unit_year.id)
+            create_first(request, learning_unit_year_id=self.learning_unit_year.id)
 
         request = self.request_factory.post(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
-            create_first(request, self.learning_unit_year.id)
+            create_first(request, learning_unit_year_id=self.learning_unit_year.id)
 
     def test_check_achievement_code(self):
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        manager = FacultyManagerFactory(entity=self.learning_unit_year.learning_container_year.requirement_entity)
+        self.client.force_login(user=manager.person.user)
         url = reverse('achievement_check_code', args=[self.learning_unit_year.id])
         response = self.client.get(url, data={'code': self.achievement_fr.code_name})
         self.assertEqual(type(response), JsonResponse)
@@ -371,12 +374,11 @@ class TestLearningAchievementPostponement(TestCase):
     def setUpTestData(cls):
         cls.language_fr = FrenchLanguageFactory()
         cls.language_en = EnglishLanguageFactory()
-        cls.user = UserFactory()
+        cls.central_manager = CentralManagerFactory()
+        EntityVersionFactory(entity=cls.central_manager.entity)
+        cls.user = cls.central_manager.person.user
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
         flag.users.add(cls.user)
-        cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
-        cls.person_entity = PersonEntityFactory(person=cls.person)
-        EntityVersionFactory(entity=cls.person_entity.entity)
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.max_la_number = 2*len(cls.academic_years)
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_years[0], end_year=cls.academic_years[-1])
@@ -387,7 +389,7 @@ class TestLearningAchievementPostponement(TestCase):
             learning_container_year=LearningContainerYearFactory(
                 academic_year=academic_year,
                 learning_container=cls.learning_container,
-                requirement_entity=cls.person_entity.entity
+                requirement_entity=cls.central_manager.entity
             ),
             learning_unit=cls.learning_unit,
             acronym="TEST0000"
@@ -397,7 +399,7 @@ class TestLearningAchievementPostponement(TestCase):
         ) for luy in cls.learning_unit_years]
 
     def setUp(self):
-        self.client.force_login(self.person.user)
+        self.client.force_login(self.central_manager.person.user)
 
     def test_learning_achievement_create_with_postponement(self):
         create_response = self._create_achievements(code_name=1)

@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-25 00:17+0100\n"
+"POT-Creation-Date: 2020-11-27 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,5 +16,149 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Central manager"
+msgstr "Gestionnaire central"
+
+msgid "Central managers"
+msgstr "Gestionnaires centraux"
+
+msgid "Faculty manager"
+msgstr "Gestionnaire facultaire"
+
+msgid "Faculty managers"
+msgstr "Gestionnaires facultaires"
+
+msgid "Learning unit is not full"
+msgstr "L'unité d'enseignement n'est pas un cours complet"
+
+msgid "Learning unit type is not allowed for attributions"
+msgstr "L'unité d'enseignement ne peut pas être attribuée"
+
+#, python-format
+msgid ""
+"Learning unit type is not deletable because it is either a full course or it "
+"has the following type: %(types)s"
+msgstr ""
+"L'unité d'enseignement ne peut pas être supprimée car il s'agit soit d'un "
+"cours complet, soit d'un des types suivants: %(types)s"
+
 msgid "Only letters are allowed."
 msgstr "Seulement des lettres sont acceptées."
+
+msgid "Person not in accordance with proposal state"
+msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
+
+msgid "Proposal is of modification type"
+msgstr "La proposition est une proposition de modification"
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+#, python-format
+msgid ""
+"The learning unit date is not eligible for modification because of its type "
+"which is not among those types: %(types)s"
+msgstr ""
+"La date de cette unité d'enseignement n'est pas modifiable en raison de son "
+"type qui n'est pas parmi les types suivants: %(types)s"
+
+msgid "The learning unit has proposal"
+msgstr ""
+"L'unité d'enseignement est en proposition pour cette année ou une année "
+"antérieure"
+
+msgid "The learning unit is a partim"
+msgstr "L'unité d'enseignement est un partim"
+
+msgid "The learning unit is not a partim"
+msgstr "L'unité d'enseignement n'est pas un partim"
+
+msgid "The learning unit is not in proposal state"
+msgstr "L'unité d'enseignement n'est pas en proposition"
+
+#, python-format
+msgid "The learning unit start year is set before %(year)d."
+msgstr "L'année de début de l'unité d'enseignement est définie avant %(year)d."
+
+msgid "The proposal is not on this academic year"
+msgstr "La proposition n'est pas sur cette année académique"
+
+msgid "This learning unit has application"
+msgstr "L'unité d'enseignement a au moins une application"
+
+msgid "This learning unit has application this year"
+msgstr "L'unité d'enseignement a au moins une application cette année"
+
+msgid "This learning unit is not editable this period."
+msgstr "L'unité d'enseignement n'est pas modifiable durant cette période."
+
+msgid "This learning unit is not of type creation"
+msgstr "L'unité d'enseignement n'est pas une proposition de création"
+
+msgid "This learning unit is not of type modification"
+msgstr "L'unité d'enseignement n'est pas une proposition de création"
+
+msgid "This learning unit is not of type suppression"
+msgstr "L'unité d'enseignement n'est pas une proposition de suppression"
+
+msgid "This learning unit is of type creation"
+msgstr "L'unité d'enseignement est une proposition de création"
+
+#, python-format
+msgid ""
+"This learning unit isn't eligible for modification because of its type which "
+"is not among those types: %(types)s"
+msgstr ""
+"Cette unité d'enseignement n'est pas éligible en raison de son type qui "
+"n'est pas parmi les types suivants: %(types)s"
+
+msgid "You are not allowed to create proposal during this academic year"
+msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
+
+msgid ""
+"You are not allowed to put in proposal for ending date during this academic "
+"year"
+msgstr ""
+"La mise en proposition de fin d'enseignement n'est pas permise durant cette "
+"année académique"
+
+msgid ""
+"You are not allowed to put in proposal for modification during this academic "
+"year"
+msgstr ""
+"La mise en proposition de modification n'est pas permise durant cette année "
+"académique"
+
+msgid "You can only edit co-graduation external learning units"
+msgstr ""
+"Vous pouvez seulement modifier les unités d'enseignement externes de type co-"
+"diplomation"
+
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+"Vous pouvez seulement modifier une unité d'enseignement pour laquelle vous "
+"êtes lié à l'entité responsable"
+
+#, python-format
+msgid ""
+"You can't modify learning unit under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
+msgstr ""
+"Vous ne pouvez pas modifier une unité d'enseignement avant %(year)d. Les "
+"modifications doivent être faites dans EPC avant l'année %(year)d"
+
+msgid ""
+"You cannot delete a learning unit which is prerequisite or has "
+"prerequisite(s)"
+msgstr ""
+"Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
+"qui est prérequis."
+
+msgid "You cannot edit this type of learning unit"
+msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
+
+msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+"Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"

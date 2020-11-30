@@ -34,6 +34,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestSimplifiedVolumeManagementForm(TestCase):
@@ -56,7 +57,7 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         generator = GenerateContainer(current_academic_year, current_academic_year)
         cls.learning_unit_year = generator[0].learning_unit_year_full
         cls.entity_container_years = generator[0].list_repartition_volume_entities
-        cls.person = PersonFactory()
+        cls.person = CentralManagerFactory().person
 
     def test_save(self):
         formset = SimplifiedVolumeManagementForm(self.data, self.person, queryset=LearningComponentYear.objects.none())
@@ -103,13 +104,15 @@ class TestSimplifiedVolumeForm(TestCase):
             hourly_volume_partial_q1=5,
             hourly_volume_partial_q2=5
         )
+        cls.person = PersonFactory()
 
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0
         form = SimplifiedVolumeForm(
             data={"hourly_volume_partial_q1": 5}, is_faculty_manager=True, instance=self.instance,
             index=0,
-            component_type=COMPONENT_TYPES[0]
+            component_type=COMPONENT_TYPES[0],
+            user=self.person.user,
         )
         form.is_valid()
         self.assertTrue(
@@ -121,7 +124,8 @@ class TestSimplifiedVolumeForm(TestCase):
         form = SimplifiedVolumeForm(
             data={"hourly_volume_partial_q1": 0}, is_faculty_manager=True, instance=self.instance,
             component_type=COMPONENT_TYPES[0],
-            index=0
+            index=0,
+            user=self.person.user,
         )
         form.is_valid()
         self.assertTrue(gettext("The volume can not be set to 0.") in form.errors["hourly_volume_partial_q1"])
@@ -132,7 +136,8 @@ class TestSimplifiedVolumeForm(TestCase):
         form = SimplifiedVolumeForm(
             data={"hourly_volume_partial_q2": 0}, is_faculty_manager=True, instance=self.instance,
             component_type=COMPONENT_TYPES[0],
-            index=0
+            index=0,
+            user=self.person.user,
         )
         form.is_valid()
         self.assertTrue(gettext("The volume can not be set to 0.") in form.errors["hourly_volume_partial_q2"])
@@ -143,7 +148,8 @@ class TestSimplifiedVolumeForm(TestCase):
             data={"hourly_volume_partial_q1": 5, "hourly_volume_partial_q2": 7,
                   'hourly_volume_total_annual': 10}, is_faculty_manager=True, instance=self.instance,
             index=0,
-            component_type=COMPONENT_TYPES[0]
+            component_type=COMPONENT_TYPES[0],
+            user=self.person.user,
         )
         form.is_valid()
         self.assertEqual(form.errors["hourly_volume_partial_q1"][0], gettext(""))

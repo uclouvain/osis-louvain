@@ -30,20 +30,15 @@ from django.utils.functional import cached_property
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
-from base.business.learning_units import perms
 from base.models.enums import learning_component_year_type
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import Person
-from base.views.mixins import RulesRequiredMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class AttributionBaseViewMixin(RulesRequiredMixin):
+class AttributionBaseViewMixin(PermissionRequiredMixin):
     """ Generic Mixin for the update/create of Attribution """
 
-    rules = [perms.is_eligible_to_manage_charge_repartition]
-
-    def _call_rule(self, rule):
-        return rule(self.luy, get_object_or_404(Person, user=self.request.user))
+    permission_required = 'base.can_add_charge_repartition'
 
     @cached_property
     def luy(self):
@@ -92,3 +87,6 @@ class AttributionBaseViewMixin(RulesRequiredMixin):
         kwargs = super().get_form_kwargs(form_name)
         kwargs["learning_unit_year"] = self.luy
         return kwargs
+
+    def get_permission_object(self):
+        return self.luy

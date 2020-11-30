@@ -33,7 +33,6 @@ from django.views.decorators.http import require_POST
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_proposal as business_proposal
-from base.business.learning_units import perms
 from base.models.enums import proposal_type, proposal_state
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -47,7 +46,7 @@ def consolidate_proposal(request: http.HttpRequest, learning_unit_year_id: int):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
     user_person = get_object_or_404(Person, user=request.user)
 
-    if not perms.is_eligible_to_consolidate_proposal(proposal, user_person):
+    if not user_person.user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year):
         raise PermissionDenied("Proposal cannot be consolidated")
 
     messages_by_level = {}

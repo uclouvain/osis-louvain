@@ -23,22 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
+from base.models.enums.learning_container_year_types import MASTER_THESIS
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.views.mixins import RulesRequiredMixin
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestChargeRepartitionMixin:
     @classmethod
     def setUpTestData(cls):
-        cls.learning_unit_year = LearningUnitYearPartimFactory()
+        cls.entity = EntityWithVersionFactory()
+        cls.learning_unit_year = LearningUnitYearPartimFactory(
+            learning_container_year__container_type=MASTER_THESIS,
+            learning_container_year__requirement_entity=cls.entity
+        )
         cls.lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
         cls.practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
 
@@ -52,7 +56,7 @@ class TestChargeRepartitionMixin:
         cls.practical_component_full = PracticalLearningComponentYearFactory(
             learning_unit_year=cls.full_learning_unit_year
         )
-        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+        cls.person = CentralManagerFactory(entity=cls.entity).person
 
     def setUp(self):
         self.attribution = AttributionNewFactory(
@@ -82,10 +86,6 @@ class TestChargeRepartitionMixin:
 
         self.attribution = AttributionNew.objects.get(id=attribution_id)
         self.client.force_login(self.person.user)
-
-        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
-        self.mocked_permission_function = self.patcher.start()
-        self.addCleanup(self.patcher.stop)
 
     def clean_partim_charges(self):
         self.charge_practical.delete()

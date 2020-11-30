@@ -158,10 +158,11 @@ class EventPermLearningUnitCentralManagerEdition(EventPerm):
     error_msg = _("This learning unit is not editable by central managers during this period.")
 
 
+# TODO : gather EventPerm disregarding role
 def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
+    if person.is_central_manager_for_ue:
         return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
-    elif person.is_faculty_manager:
+    elif person.is_faculty_manager_for_ue:
         return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)

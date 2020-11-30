@@ -3,7 +3,8 @@
 {% load format %}
 {% load waffle_tags %}
 {% load feature_flag %}
-{% load learning_unit learning_unit_li %}
+{% load learning_unit %}
+{% load osis_role %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -57,12 +58,15 @@
                         {% endflag %}
 
                         {% flag "learning_unit_update" %}
-                            {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
-                            {% li_edit_lu edit_learning_unit_url _('Modify') %}
+                            <li>
+                                {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
+                                {% a_tag_has_perm edit_learning_unit_url _('Modify') 'base.can_edit_learningunit' user learning_unit_year %}
+                            </li>
+                            <li>
+                                {% url "learning_unit_edition_end_date" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_end_date_url %}
+                                {% a_tag_has_perm learning_unit_edition_end_date_url _('Modify end date') 'base.can_edit_learningunit_date' user learning_unit_year %}
+                            </li>
 
-
-                            {% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
-                            {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
                             <li class="divider"></li>
                         {% endflag %}
                         {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
@@ -90,29 +94,42 @@
                         <li class="divider"></li>
                         {% flag "learning_unit_proposal_create" %}
 
-                            {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
-                            {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal in modification') 'link_proposal_modification' %}
+                            <li>
+                                {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
+                                {% a_tag_has_perm learning_unit_modification_proposal_url _('Put in proposal in modification') 'base.can_propose_learningunit' user learning_unit_year %}
+                            </li>
 
-                            {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url %}
-                            {% li_suppression_proposal learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'link_proposal_suppression' %}
+                            <li>
+                                {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url %}
+                                {% a_tag_has_perm learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'base.can_propose_learningunit_end_date' user learning_unit_year %}
+                            </li>
 
                             <li class="divider"></li>
 
                         {% endflag %}
 
                         {% flag "learning_unit_proposal_update" %}
-                            {% li_edit_proposal url_edit_proposal _('Edit the proposal') 'link_proposal_edit' %}
+                            <li>
+                                {% a_tag_has_perm url_edit_proposal _('Edit the proposal') 'base.can_edit_learning_unit_proposal' user learning_unit_year %}
+                            </li>
                         {% endflag %}
 
                         {% flag "learning_unit_proposal_delete" %}
-                            {% li_cancel_proposal '#' _('Cancel the proposal') '#modalConfirmToCancel' 'link_cancel_proposal' %}
-                            {% li_consolidate_proposal '#' _('Consolidate the proposal') '#modalConsolidateLuy' 'link_consolidate_proposal' %}
+                            <li>
+                                {% a_tag_modal_target_has_perm "#modalConfirmToCancel" _('Cancel the proposal') 'base.can_cancel_proposal' user learning_unit_year %}
+                            </li>
+                            <li>
+                                {% a_tag_modal_target_has_perm "#modalConsolidateLuy" _('Consolidate the proposal') 'base.can_consolidate_learningunit_proposal' user learning_unit_year %}
+                            </li>
+
                             <li class="divider"></li>
                         {% endflag %}
 
 
                         {% flag "learning_unit_delete" %}
-                            {% li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus' %}
+                            <li>
+                                {% a_tag_modal_target_has_perm "#modalDeleteLuy" _('Delete learning unit year definitively') 'base.can_delete_learningunit' user learning_unit_year %}
+                            </li>
                         {% endflag %}
                     </ul>
                 </div>

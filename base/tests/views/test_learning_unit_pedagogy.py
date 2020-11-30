@@ -58,6 +58,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
 class LearningUnitPedagogyTestCase(TestCase):
@@ -93,11 +94,10 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
-        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
-        self.client.force_login(self.faculty_person.user)
+        self.client.force_login(self.faculty_manager.person.user)
 
     def test_user_not_logged(self):
         self.client.logout()
@@ -165,8 +165,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         )
         self.assertEqual(response.context['learning_units_count'], 2)
 
-    @patch('base.business.learning_units.perms.can_edit_summary_locked_field')
-    def test_tab_active_url(self, mock_can_edit_summary_locked):
+    def test_tab_active_url(self):
         url = reverse("learning_unit_pedagogy", args=[self.learning_unit_year.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -477,7 +476,7 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit')
+        cls.faculty_manager = FacultyManagerFactory()
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
@@ -487,7 +486,7 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
                           kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
 
     def setUp(self):
-        self.client.force_login(self.faculty_person.user)
+        self.client.force_login(self.faculty_manager.person.user)
 
     def test_toggle_summary_locked_case_user_not_logged(self):
         self.client.logout()
@@ -498,20 +497,19 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @patch('base.business.learning_units.perms.can_edit_summary_locked_field')
-    def test_toggle_summary_locked_case_cannot_edit_summary_locked(self, mock_can_edit_summary_locked):
-        mock_can_edit_summary_locked.return_value = False
+    def test_toggle_summary_locked_case_cannot_edit_summary_locked(self):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @patch('base.views.learning_units.pedagogy.update.display_success_messages')
-    @patch('base.business.learning_units.perms.can_edit_summary_locked_field')
-    def test_toggle_summary_locked_case_success(self, mock_can_edit_summary_locked, mock_diplay_success_message):
-        mock_can_edit_summary_locked.return_value = True
+    def test_toggle_summary_locked_case_success(self, mock_diplay_success_message):
         self.learning_unit_year.summary_locked = True
         self.learning_unit_year.save()
-
+        requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
+        faculty_manager = FacultyManagerFactory(entity=requirement_entity)
+        self.client.force_login(faculty_manager.person.user)
         response = self.client.post(self.url, follow=False)
+
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         self.assertTrue(mock_diplay_success_message.called)
         expected_redirection = reverse("learning_unit_pedagogy",

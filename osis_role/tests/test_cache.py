@@ -1,3 +1,5 @@
+from types import new_class
+
 from django.test import SimpleTestCase, override_settings
 from rules import predicate
 
@@ -6,6 +8,7 @@ from osis_role import cache
 from osis_role.cache import CachePredicateResultNotFound, predicate_cache
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestGetCachePredicateResult(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
@@ -24,6 +27,7 @@ class TestGetCachePredicateResult(SimpleTestCase):
         )
 
 
+@override_settings(PERMISSION_CACHE_ENABLED=True)
 class TestSetCachePredicateResult(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
@@ -43,13 +47,20 @@ class TestPredicateCacheDecorator(SimpleTestCase):
     def setUp(self):
         self.user = UserFactory.build()
 
-    def test_user_has_perm_assert_no_error_message(self):
-        @predicate(bind=True)
-        @predicate_cache(cache_key_fn=lambda *args, **kwargs: 'predicate_cache_key')
-        def predicate_name(self, user_obj, obj=None):
-            return True
+    @predicate(bind=True)
+    @predicate_cache(cache_key_fn=lambda *args, **kwargs: 'predicate_cache_key')
+    def predicate_name(self, user_obj, obj=None):
+        return True
 
-        self.assertTrue(predicate_name(user_obj=self.user))
+    def test_user_has_perm_assert_no_error_message(self):
+        self.assertTrue(self.predicate_name(self.user))
         self.assertTrue(
             cache.get_cache_predicate_result(self.user, 'predicate_name_predicate_cache_key')
+        )
+
+    def test_user_has_perm_assert_no_error_message_with_obj(self):
+        dummy_obj = new_class('dummy_type')()
+        self.assertTrue(self.predicate_name(self.user, dummy_obj))
+        self.assertTrue(
+            cache.get_cache_predicate_result(self.user, 'predicate_name_dummy_type_predicate_cache_key')
         )

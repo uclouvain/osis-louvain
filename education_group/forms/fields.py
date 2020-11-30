@@ -1,16 +1,14 @@
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
-from django.forms import ModelChoiceField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
-from osis_role.contrib.forms.fields import EntityRoleChoiceField
-
 from base.models.entity_version import EntityVersion, find_pedagogical_entities_version
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.forms.fields import EntityRoleModelChoiceField
 from reference.models import domain
 
 
@@ -20,7 +18,7 @@ class MainCampusChoiceField(forms.ModelChoiceField):
         super().__init__(queryset,  *args, **kwargs)
 
 
-class ManagementEntitiesChoiceField(EntityRoleChoiceField):
+class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
     def __init__(self, person, initial, **kwargs):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial

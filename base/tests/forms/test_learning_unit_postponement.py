@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from decimal import Decimal
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -39,16 +38,16 @@ from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
+from base.models.enums.learning_container_year_types import MASTER_THESIS
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
-from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -64,12 +63,15 @@ class LearningUnitPostponementFormContextMixin(TestCase):
         start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
-        FacultyManagerGroupFactory()
+
+        end_year_6 = AcademicYearFactory(year=cls.current_academic_year.year + 6)
+        # Creation of a LearingContainerYear and all related models - FOR 6 years
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, end_year_6)
+        cls.person = PersonFactory()
+        for entity in cls.learn_unit_structure.entities:
+            FacultyManagerFactory(person=cls.person, entity=entity)
 
     def setUp(self):
-        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
-        # Creation of a LearingContainerYear and all related models - FOR 6 years
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
         self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
 
@@ -89,10 +91,6 @@ class LearningUnitPostponementFormContextMixin(TestCase):
             learning_unit=self.learn_unit_structure.learning_unit_partim,
             academic_year=self.current_academic_year
         )
-
-        self.person = PersonFactory()
-        for entity in self.learn_unit_structure.entities:
-            PersonEntityFactory(person=self.person, entity=entity)
 
 
 class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMixin):
@@ -589,6 +587,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 
 def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
     container_year = learning_unit_year_instance.learning_container_year
+    container_year.container_type = MASTER_THESIS
     learning_unit_instance = learning_unit_year_instance.learning_unit
 
     if learning_unit_year_instance.subtype == learning_unit_year_subtypes.FULL:

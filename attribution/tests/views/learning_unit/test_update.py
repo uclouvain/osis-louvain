@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from django.http import HttpResponse
 from django.test import TestCase
@@ -38,16 +37,14 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.views.mixins import RulesRequiredMixin
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
-class TestEditAttribution(TestCase):
+class TestEditAttributionGet(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
         cls.learning_container_year = LearningContainerYearFactory(
-            container_type=LearningContainerYearType.COURSE.name
+            container_type=LearningContainerYearType.MASTER_THESIS.name
         )
         cls.learning_unit_year = LearningUnitYearFullFactory(
             learning_container_year=cls.learning_container_year
@@ -57,7 +54,7 @@ class TestEditAttribution(TestCase):
         cls.practical_component = PracticalLearningComponentYearFactory(
             learning_unit_year=cls.learning_unit_year)
         cls.attribution = AttributionNewFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year
+            learning_container_year=cls.learning_container_year,
         )
         cls.charge_lecturing = AttributionChargeNewFactory(
             attribution=cls.attribution,
@@ -67,16 +64,11 @@ class TestEditAttribution(TestCase):
             attribution=cls.attribution,
             learning_component_year=cls.practical_component
         )
+        cls.person = FacultyManagerFactory(entity=cls.learning_container_year.requirement_entity).person
 
     def setUp(self):
         self.client.force_login(self.person.user)
         self.url = reverse("update_attribution", args=[self.learning_unit_year.id, self.attribution.id])
-
-        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
-        self.mocked_permission_function = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
 
     def test_login_required(self):
         self.client.logout()
@@ -87,15 +79,43 @@ class TestEditAttribution(TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "attribution/learning_unit/attribution_inner.html")
+
+
+class TestEditAttributionPost(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_container_year = LearningContainerYearFactory(
+            container_type=LearningContainerYearType.MASTER_THESIS.name
+        )
+        cls.learning_unit_year = LearningUnitYearFullFactory(
+            learning_container_year=cls.learning_container_year
+        )
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year)
+        cls.practical_component = PracticalLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year)
+        cls.attribution = AttributionNewFactory(
+            learning_container_year=cls.learning_container_year,
+        )
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.lecturing_component
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.practical_component
+        )
+        cls.person = FacultyManagerFactory(entity=cls.learning_container_year.requirement_entity).person
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        self.url = reverse("update_attribution", args=[self.learning_unit_year.id, self.attribution.id])
 
     def test_post(self):
         data = {
             'attribution_form-function': COORDINATOR,
-            'attribution_form-start_year': 2018,
-            'attribution_form-duration': 3,
             'lecturing_form-allocation_charge': 50,
             'practical_form-allocation_charge': 10
         }
@@ -105,8 +125,6 @@ class TestEditAttribution(TestCase):
         self.charge_lecturing.refresh_from_db()
         self.charge_practical.refresh_from_db()
         self.assertEqual(self.attribution.function, COORDINATOR)
-        self.assertEqual(self.attribution.start_year, 2018)
-        self.assertEqual(self.attribution.end_year, 2020)
         self.assertEqual(self.charge_lecturing.allocation_charge, 50)
         self.assertEqual(self.charge_practical.allocation_charge, 10)
 

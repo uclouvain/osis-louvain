@@ -77,6 +77,46 @@ class TestATagModalHasPerm(SimpleTestCase):
         )
 
 
+class TestATagModalTargetHasPerm(SimpleTestCase):
+    def setUp(self):
+        self.target = "#target"
+        self.text = "Open target"
+        self.user = UserFactory.build()
+
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
+    def test_user_has_perm_tag(self, mock_has_perm):
+        expected_context = {
+            "url": "#",
+            "target": self.target,
+            "text": self.text,
+            "load_modal": True,
+        }
+
+        self.assertDictEqual(
+            osis_role.a_tag_modal_target_has_perm(self.target, self.text, "dummy-perm", self.user),
+            expected_context
+        )
+
+    @mock.patch("osis_role.errors.get_permission_error")
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_doesnt_have_perm_tag(self, mock_has_perm, mock_get_permission_error):
+        permission_error = "You don't have access to this link"
+        mock_get_permission_error.return_value = permission_error
+
+        expected_context = {
+            "url": "#",
+            "target": self.target,
+            "text": self.text,
+            "class_a": "disabled",
+            "error_msg": permission_error,
+            "load_modal": True,
+        }
+        self.assertDictEqual(
+            osis_role.a_tag_modal_target_has_perm(self.target, self.text, "dummy-perm", self.user),
+            expected_context
+        )
+
+
 class TestSubmitBtnHasPerm(SimpleTestCase):
     def setUp(self):
         self.inner_html = "Redirect to dummy"

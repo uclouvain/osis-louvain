@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-24 10:38+0100\n"
+"POT-Creation-Date: 2020-11-26 14:57+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -404,9 +404,6 @@ msgstr "Attributions"
 msgid "Bachelor"
 msgstr "Bachelier"
 
-msgid "Back"
-msgstr "Retour"
-
 msgid "Back to messages"
 msgstr "Retourner à la liste des messages"
 
@@ -451,10 +448,6 @@ msgstr "CAPAES"
 
 msgid "Campus"
 msgstr "Campus"
-
-msgid "Can delete according to the type of the learning unit"
-msgstr ""
-"Vous ne pouvez pas supprimer cette unité d'enseignement en raison de son type"
 
 msgid "Cancel"
 msgstr "Annuler"
@@ -1141,9 +1134,6 @@ msgstr "Inactif"
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
 
-msgid "Included in"
-msgstr "Inclus dans"
-
 msgid "Initial data"
 msgstr "Valeur initiale"
 
@@ -1181,9 +1171,6 @@ msgstr "Code non valide"
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
 
-msgid "Isn't a proposal"
-msgstr "Ce n'est pas une proposition"
-
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
@@ -1217,9 +1204,6 @@ msgstr "Mots clés"
 
 msgid "LU"
 msgstr "UE"
-
-msgid "Label"
-msgstr "Label"
 
 msgid "Language"
 msgstr "Langue"
@@ -1375,9 +1359,6 @@ msgstr "Liste des propositions"
 
 msgid "Local credits"
 msgstr "Crédits locaux"
-
-msgid "Location"
-msgstr "Localité"
 
 msgid "Lock"
 msgstr "Bloquer"
@@ -1684,9 +1665,6 @@ msgstr "Non concerné"
 msgid "Not defined"
 msgstr "Non défini"
 
-msgid "Not eligible to delete learning units"
-msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
-
 msgid "Not enrolled"
 msgstr "Pas inscrit"
 
@@ -1697,11 +1675,6 @@ msgid "Not in period to edit force majeure section."
 msgstr ""
 "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
-
-msgid "Not in range of years which can be edited by you"
-msgstr ""
-"L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez "
-"modifier"
 
 msgid "Not modified"
 msgstr "Non modifié"
@@ -1757,9 +1730,6 @@ msgstr "Ou"
 
 msgid "Organization"
 msgstr "Organisation"
-
-msgid "Organization address"
-msgstr "Adresse de l'organisation"
 
 msgid "Organizational chart"
 msgstr "Organigramme"
@@ -1857,9 +1827,6 @@ msgstr "Périodicité"
 msgid "Person entities"
 msgstr "Entités attachées"
 
-msgid "Person not in accordance with proposal state"
-msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
-
 msgid "Person with reduced mobility"
 msgstr "PMR"
 
@@ -1902,9 +1869,6 @@ msgstr ""
 
 msgid "Pole"
 msgstr "Pôle"
-
-msgid "Postal code"
-msgstr "Code postal"
 
 msgid ""
 "Postponement will not be possible as the chosen code already exists for "
@@ -2053,9 +2017,6 @@ msgstr "Proposition de modification"
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
 
-msgid "Proposal isn't on current learning unit year"
-msgstr "La proposition n'est pas sur l'année en cours"
-
 #, python-format
 msgid ""
 "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
@@ -2066,9 +2027,6 @@ msgstr ""
 
 msgid "Proposal management"
 msgstr "Gestion de la proposition"
-
-msgid "Proposal not in eligible state for consolidation"
-msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 
 msgid "Proposal of creation"
 msgstr "Proposition de création"
@@ -2163,9 +2121,6 @@ msgstr "Noma"
 msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
-
-msgid "Relative / Absolute <br>credits"
-msgstr "Crédits<br>relatifs / absolus"
 
 msgid "Release"
 msgstr "Release"
@@ -2733,8 +2688,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application."
-msgstr "L'unité d'enseignement dispose d'au moins une candidature"
+msgid "This learning unit has application this year"
+msgstr "L'unité d'enseignement dispose d'au moins une candidature cette année"
 
 msgid ""
 "This learning unit is not editable by central managers during this period."
@@ -2747,9 +2702,6 @@ msgid ""
 msgstr ""
 "Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
 "facultaires durant cette période."
-
-msgid "This learning unit isn't eligible for modification because of it's type"
-msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
 #, python-format
 msgid ""
@@ -2787,9 +2739,6 @@ msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"
-
-msgid "Training type"
-msgstr "Type d'OF"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -2980,53 +2929,8 @@ msgstr "Oui"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
-msgid ""
-"You are faculty manager and the proposal state is not 'Faculty', so you "
-"can't edit"
-msgstr ""
-"Vous êtes gestionnaire facultaire et la proposition n'est pas en état "
-"'Faculté', donc vous ne pouvez pas la modifier"
-
-msgid "You are not allowed to change the end year for this academic year"
-msgstr ""
-"Vous n’êtes pas autorisé·e à changer l’année de fin de cette année académique"
-
-msgid "You are not allowed to put in proposal for this academic year"
-msgstr ""
-"Vous n'êtes pas autorisé·e à mettre en proposition pour cette année "
-"académique"
-
-msgid ""
-"You are not attached to initial or current requirement entity, so you can't "
-"edit proposal"
-msgstr ""
-"Vous n'êtes pas rattaché·e à l'entité de charge (initiale ou courante), donc "
-"vous ne pouvez pas modifier la proposition"
-
 msgid "You are not attributed to this learning unit."
 msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
-
-msgid "You are not eligible to cancel proposal"
-msgstr "Vous ne pouvez pas annuler les propositions"
-
-msgid "You are not eligible to create/modify proposal"
-msgstr "Vous ne pouvez pas créer/modifier les propositions"
-
-msgid "You are not eligible to edit proposal"
-msgstr "Vous ne pouvez pas modifier les propositions"
-
-msgid "You are not eligible to manage learning units"
-msgstr "Vous ne pouvez pas agir sur les unités d'enseignements"
-
-msgid ""
-"You are not eligible to modify the end date of this learning unit. You "
-"should be central manager or the learning unit has to be a partim or the "
-"learning unit as to be a course/dissertation/internship"
-msgstr ""
-"Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. "
-"Vous devriez être gestionnaire central ou l'unité d'enseignement devrait "
-"être un partim ou encore l'unité d'enseignement devrait être un autre "
-"collectif/autre individuel/thèse"
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
@@ -3036,58 +2940,22 @@ msgstr ""
 "Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
 "protégées"
 
-msgid "You can only edit co-graduation external learning units"
-msgstr ""
-"Vous pouvez seulement modifier les unités d'enseignement externes de type co-"
-"diplomation"
-
-msgid ""
-"You can only modify a learning unit when your are linked to its requirement "
-"entity"
-msgstr ""
-"Vous ne pouvez modifier une unité d'enseignement que si vous êtes attaché·e "
-"à son entité responsable du cahier des charges"
-
-msgid "You can't edit because the learning unit has proposal"
-msgstr ""
-"Vous ne pouvez pas modifier l'unité d'enseignement car elle est en "
-"proposition pour cette année ou une année antérieure"
-
-msgid "You can't modify learning unit of a previous year"
-msgstr "Vous ne pouvez pas modifier la date de fin pour une année précédente"
-
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 "Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
 "inférieure à %(year)d"
 
-msgid "You can't modify proposal which is on an other year"
-msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
-
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
 msgstr ""
-"Vous ne pouvez pas créer de partim pour une unité d'enseignement en proposition de création"
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement en "
+"proposition de création"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
 "Vous ne pouvez pas créer/modifier une formation datant d'avant %(limit_year)s"
-
-#, python-format
-msgid ""
-"You cannot delete a learning unit which is existing before %(limit_year)s"
-msgstr ""
-"Vous ne pouvez pas supprimer une unité d'enseignement existant avant "
-"%(limit_year)s"
-
-msgid ""
-"You cannot delete a learning unit which is prerequisite or has "
-"prerequisite(s)"
-msgstr ""
-"Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
-"qui est prérequis."
 
 msgid "You cannot have a specific summary course submission event."
 msgstr ""
@@ -3104,13 +2972,13 @@ msgstr ""
 msgid ""
 "You do not have the permission to refresh the publication for this learning "
 "unit"
-msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette unité d'enseignement"
+msgstr ""
+"Vous n'avez pas la permission d'actualiser la publication pour cette unité "
+"d'enseignement"
 
 msgid "You do not have the permission to refresh the publication for this year"
-msgstr "Vous n'avez pas la permission d'actualiser la publication pour cette année"
-
-msgid "You don't have the rights to consolidate"
-msgstr "Vous n'avez pas le droit de consolider"
+msgstr ""
+"Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"

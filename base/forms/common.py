@@ -26,6 +26,7 @@
 from distutils.util import strtobool
 
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -95,11 +96,7 @@ class ValidationRuleMixin(WarningFormMixin):
         return result
 
     def field_reference(self, name):
-        return self._field_reference(self._meta.model, name)
-
-    @staticmethod
-    def _field_reference(model, name, *args):
-        return '.'.join([model._meta.db_table, name, *args])
+        raise ImproperlyConfigured('You must define a field reference in order to check for existing validation rules')
 
     def _set_rules_on_fields(self):
         for name, field in self.fields.items():

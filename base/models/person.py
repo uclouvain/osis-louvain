@@ -32,16 +32,11 @@ from django.db import models
 from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
-from base.models.entity_version import find_pedagogical_entities_version, \
-    build_current_entity_version_structure_in_memory, find_all_current_entities_version, \
-    find_parent_of_type_into_entity_structure
 from base.models.enums import person_source_type
-from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
@@ -177,8 +172,8 @@ class Person(SerializableModel):
             ("is_administrator", "Is administrator"),
             ("is_institution_administrator", "Is institution administrator "),
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
-            ("can_manage_charge_repartition", "Can manage charge repartition"),
-            ("can_manage_attribution", "Can manage attribution"),
+            ("can_add_charge_repartition", "Can add charge repartition"),
+            ("can_change_attribution", "Can change attribution"),
             ('can_read_persons_roles', 'Can read persons roles'),
         )
 
@@ -195,26 +190,6 @@ class Person(SerializableModel):
         if not isinstance(entity, Entity):
             raise ImproperlyConfigured("entity must be an instance of Entity.")
         return entity.id in self.linked_entities
-
-    @cached_property
-    def find_main_entities_version(self):
-        return find_pedagogical_entities_version().filter(entity__in=self.linked_entities)
-
-    def find_attached_faculty_entities_version(self, acronym_exceptions=None):
-        entity_structure = build_current_entity_version_structure_in_memory(timezone.now().date())
-        faculties = set()
-        for entity in self.directly_linked_entities:
-            faculties = faculties.union({
-                e.entity for e in entity_structure[entity.id]['all_children']
-                if e.entity_type == FACULTY or (acronym_exceptions and e.acronym in acronym_exceptions)
-            })
-
-            entity_version = entity_structure[entity.id]['entity_version']
-            if acronym_exceptions and entity_version.acronym in acronym_exceptions:
-                faculties.add(entity)
-            else:
-                faculties.add(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
-        return find_all_current_entities_version().filter(entity__in=faculties)
 
 
 def find_by_id(person_id):

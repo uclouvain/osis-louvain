@@ -44,9 +44,10 @@ from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACUL
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
     generate_learning_unit_edition_calendars
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
-from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -59,7 +60,8 @@ from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
-    update_learning_unit, _get_learning_units_for_context
+    update_learning_unit
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from reference.tests.factories.country import CountryFactory
 
 
@@ -68,10 +70,6 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = CentralManagerForUEFactory(user=cls.user)
-        cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
-        cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
         cls.learning_unit = cls.setup_learning_unit(cls.starting_academic_year)
         cls.learning_container_year = cls.setup_learning_container_year(
@@ -85,31 +83,27 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
             learning_unit_year_subtypes.FULL,
             learning_unit_year_periodicity.ANNUAL
         )
-
-        cls.a_superuser = SuperUserFactory()
-        cls.a_superperson = PersonFactory(user=cls.a_superuser)
+        cls.person = CentralManagerFactory(entity=cls.learning_container_year.requirement_entity).person
         generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.person.user)
 
     def test_view_learning_unit_edition_permission_denied(self):
+        self.client.force_login(PersonFactory().user)
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertEqual(response.status_code, 403)
 
-    @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
-    def test_view_learning_unit_edition_get(self, mock_perms):
-        mock_perms.return_value = True
+    def test_view_learning_unit_edition_get(self):
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-    @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
-    def test_view_learning_unit_edition_post(self, mock_perms):
-        mock_perms.return_value = True
-
+    @mock.patch('base.business.event_perms.EventPerm.get_academic_years_ids')
+    def test_view_learning_unit_edition_post(self, mock_get_academic_years_ids):
+        mock_get_academic_years_ids.return_value = [self.starting_academic_year.pk]
         form_data = {"academic_year": self.starting_academic_year.pk}
         response = self.client.post(
-            reverse('learning_unit_edition', args=[self.learning_unit_year.id]),
+            reverse("learning_unit_edition_end_date", args=[self.learning_unit_year.id]),
             data=form_data
         )
         msg = [m.message for m in get_messages(response.wsgi_request)]
@@ -117,10 +111,8 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         self.assertEqual(len(msg), 7)
         self.assertIn(messages.SUCCESS, msg_level)
 
-    @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')
-    def test_view_learning_unit_edition_template(self, mock_perms):
-        mock_perms.return_value = True
-        url = reverse("learning_unit_edition", args=[self.learning_unit_year.id])
+    def test_view_learning_unit_edition_template(self):
+        url = reverse("learning_unit_edition_end_date", args=[self.learning_unit_year.id])
         response = self.client.get(url)
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
@@ -133,15 +125,19 @@ class TestEditLearningUnit(TestCase):
         cls.an_academic_year = create_current_academic_year()
         generate_learning_unit_edition_calendars([cls.an_academic_year])
 
+        cls.parent_entity = EntityWithVersionFactory()
+
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             entity__organization__type=organization_type.MAIN,
+            parent=cls.parent_entity
         )
         cls.allocation_entity = EntityVersionFactory(
             start_date=today.replace(year=1900),
             entity__organization__type=organization_type.MAIN,
-            entity_type=entity_type.FACULTY
+            entity_type=entity_type.FACULTY,
+            parent=cls.parent_entity
         )
         cls.additional_entity_1 = EntityVersionFactory(
             start_date=today.replace(year=1900),
@@ -182,14 +178,8 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        person = CentralManagerForUEFactory()
-        PersonEntityFactory(
-            entity=cls.requirement_entity.entity,
-            person=person
-        )
-        cls.user = person.user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"),
-                                      Permission.objects.get(codename="can_access_learningunit"))
+        central_manager = CentralManagerFactory(entity=cls.parent_entity, with_child=True)
+        cls.user = central_manager.person.user
         cls.url = reverse(update_learning_unit, args=[cls.learning_unit_year.id])
 
     def setUp(self):
@@ -232,10 +222,14 @@ class TestEditLearningUnit(TestCase):
     def test_cannot_modify_past_learning_unit(self):
         past_year = datetime.date.today().year - 2
         past_academic_year = AcademicYearFactory(year=past_year)
-        past_learning_container_year = LearningContainerYearFactory(academic_year=past_academic_year,
-                                                                    container_type=learning_container_year_types.COURSE)
-        past_learning_unit_year = LearningUnitYearFactory(learning_container_year=past_learning_container_year,
-                                                          subtype=learning_unit_year_subtypes.FULL)
+        past_learning_container_year = LearningContainerYearFactory(
+            academic_year=past_academic_year,
+            container_type=learning_container_year_types.COURSE
+        )
+        past_learning_unit_year = LearningUnitYearFactory(
+            learning_container_year=past_learning_container_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
 
         url = reverse("edit_learning_unit", args=[past_learning_unit_year.id])
         response = self.client.get(url)
@@ -479,13 +473,6 @@ class TestLearningUnitVolumesManagement(TestCase):
         response = self.client.post(self.url)
 
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: False)
-    def test_should_call_is_eligible_for_modification_permission_when_accessing_view(self, mock_permission):
-        response = self.client.post(self.url)
-
-        self.assertTrue(mock_permission.called)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_should_display_volumes_management_for_whole_family_when_form_type_is_full(self):
         response = self.client.get(self.url)

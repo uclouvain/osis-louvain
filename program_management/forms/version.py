@@ -276,7 +276,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
-        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
@@ -352,7 +352,7 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
-        self.fields['management_entity'] = fields.ManagementEntitiesChoiceField(
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,

@@ -109,7 +109,7 @@ class LearningUnitDelete(TestCase):
         request = request_factory.get(reverse(delete_all_learning_units_year, args=[learning_unit_years[1].id]))
         request.user = self.user
 
-        response = delete_all_learning_units_year(request, learning_unit_years[1].id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=learning_unit_years[1].id)
         self.assertEqual(response.status_code, 405)  # Method not allowed
 
     def test_delete_all_learning_units_year_case_success(self):
@@ -122,7 +122,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, learning_unit_years[1].id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=learning_unit_years[1].id)
 
         msg_level = [m.level for m in get_messages(request)]
         msg = [m.message for m in get_messages(request)]
@@ -147,7 +147,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, learning_unit_years[1].id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=learning_unit_years[1].id)
 
         msg_level = [m.level for m in get_messages(request)]
         msg = [m.message for m in get_messages(request)]
@@ -174,7 +174,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, ly1.id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
 
         # Get message from context
         msg = [m.message for m in get_messages(request)]
@@ -211,7 +211,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, ly1.id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
 
         # Get message from context
         msg = [m.message for m in get_messages(request)]
@@ -246,7 +246,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, ly1.id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
 
         msg_level = [m.level for m in get_messages(request)]
         msg = [m.message for m in get_messages(request)]
@@ -275,7 +275,7 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, ly1.id)
+        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
 
         # Get message from context
         msg = [m.message for m in get_messages(request)]

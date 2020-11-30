@@ -32,7 +32,7 @@ from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
-from osis_role.contrib.forms.fields import EntityRoleChoiceField
+from osis_role.contrib.forms.fields import EntityRoleModelChoiceField
 
 
 class TestEntityRoleChoiceField(TestCase):
@@ -44,7 +44,7 @@ class TestEntityRoleChoiceField(TestCase):
 
     def setUp(self):
         self.person = PersonFactory()
-        self.field_instance = EntityRoleChoiceField(person=self.person, group_names=(
+        self.field_instance = EntityRoleModelChoiceField(person=self.person, group_names=(
             CentralManager.group_name,
             FacultyManager.group_name,
         ))

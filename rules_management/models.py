@@ -44,9 +44,22 @@ class FieldReferenceAdmin(OsisModelAdmin):
     form = AdminForm
 
 
+class FieldReferenceManager(models.Manager):
+    def get_by_natural_key(self, content_type, context, field_name):
+        return self.get(content_type=content_type, context=context, field_name=field_name)
+
+
 class FieldReference(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=50)
     context = models.CharField(max_length=50,  choices=enums.CONTEXT_CHOICES, blank=True)
     permissions = models.ManyToManyField(Permission, blank=True)
     groups = models.ManyToManyField(Group, blank=True)
+
+    objects = FieldReferenceManager()
+
+    class Meta:
+        unique_together = [['content_type', 'context', 'field_name']]
+
+    def natural_key(self):
+        return (self.content_type, self.context, self.field_name)

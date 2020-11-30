@@ -29,12 +29,11 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.views.learning_unit.common import AttributionBaseViewMixin
 from attribution.views.learning_unit.update import UpdateAttributionView
-from base.business.learning_units import perms
-from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
 
 
@@ -74,7 +73,7 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
 
 
 class AddChargeRepartition(UpdateAttributionView):
-    rules = [perms.is_eligible_to_manage_charge_repartition]
+    permission_required = 'base.can_add_charge_repartition'
     template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,

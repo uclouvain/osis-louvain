@@ -24,6 +24,7 @@
 #
 ############################################################################
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator
 from django.test import TestCase
 
@@ -34,6 +35,15 @@ from reference.models.country import Country
 
 
 class TestForm(ValidationRuleMixin, forms.ModelForm):
+    class Meta:
+        model = Country
+        fields = "__all__"
+
+    def field_reference(self, name):
+        return '.'.join(['reference_country', name])
+
+
+class TestFormWithoutFieldReference(ValidationRuleMixin, forms.ModelForm):
     class Meta:
         model = Country
         fields = "__all__"
@@ -64,6 +74,10 @@ class TestValidationRuleMixin(TestCase):
             regex_rule="^(LA|LB)$",
             placeholder=""
         )
+
+    def test_should_raise_improperly_configured_exception(self):
+        with self.assertRaises(ImproperlyConfigured):
+            TestFormWithoutFieldReference()
 
     def test_init(self):
         form = TestForm()

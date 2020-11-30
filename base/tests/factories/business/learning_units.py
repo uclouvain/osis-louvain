@@ -40,6 +40,7 @@ from base.models.enums import quadrimesters
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
@@ -112,7 +113,7 @@ class LearningUnitsMixin:
             result = LearningContainerYearFactory(
                 academic_year=academic_year,
                 container_type=container_type,
-                requirement_entity=None,
+                requirement_entity=EntityWithVersionFactory(),
                 allocation_entity=None
             )
         return result
@@ -224,7 +225,8 @@ def generate_academic_years(range=2):
 
 
 class GenerateContainer:
-    def __init__(self, start_year, end_year):
+    def __init__(self, start_year, end_year, parent_entity=None):
+        self.parent_entity = parent_entity
         self.start_year = start_year
         self.end_year = end_year
         self.learning_container = LearningContainerFactory()
@@ -257,7 +259,8 @@ class GenerateContainer:
                 start_date=datetime.datetime(1900, 1, 1),
                 end_date=None,
                 entity_type=entity_type.FACULTY,
-                entity__organization__type=organization_type.MAIN
+                entity__organization__type=organization_type.MAIN,
+                parent=self.parent_entity
             ).entity for _ in range(4)
         ]
         for entity in self.entities:

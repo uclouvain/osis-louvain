@@ -44,7 +44,8 @@ from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -53,7 +54,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
-from osis_common.utils.perms import BasePerm
 from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
@@ -231,13 +231,13 @@ class TestViewEducationalInformation(TestCase):
         AcademicYearFactory.produce()
         cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
         cls.url = reverse(view_educational_information, args=[cls.attribution.learning_unit_year.id])
-        cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
 
         self.patcher_perm_can_view_educational_information = mock.patch(
-            'attribution.views.perms.can_tutor_view_educational_information')
+            'attribution.views.perms.can_tutor_view_educational_information'
+        )
         self.mock_perm_view = self.patcher_perm_can_view_educational_information.start()
         self.mock_perm_view.return_value = True
 
@@ -297,23 +297,17 @@ class TestManageEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(year=get_current_year())
         cls.attribution = AttributionFactory(
             tutor=cls.tutor,
             summary_responsible=True,
-            learning_unit_year__academic_year=AcademicYearFactory(year=2019)
+            learning_unit_year__academic_year=cls.academic_year,
+            learning_unit_year__learning_container_year__requirement_entity=EntityWithVersionFactory()
         )
         cls.url = reverse("tutor_edit_educational_information", args=[cls.attribution.learning_unit_year.id])
-        cls.tutor.person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_pedagogy'))
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
-
-        self.patcher_perm_can_edit_educational_information = mock.patch.object(BasePerm, "is_valid")
-        self.mock_perm_view = self.patcher_perm_can_edit_educational_information.start()
-        self.mock_perm_view.return_value = True
-
-    def tearDown(self):
-        self.patcher_perm_can_edit_educational_information.stop()
 
     def test_user_not_logged(self):
         self.client.logout()
@@ -321,28 +315,37 @@ class TestManageEducationalInformation(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_check_if_user_can_view_educational_information(self):
-        self.mock_perm_view.return_value = False
-
+        self.client.force_login(PersonFactory().user)
         response = self.client.get(self.url)
-
-        self.assertTrue(self.mock_perm_view.called)
         self.assertTemplateUsed(response, "access_denied.html")
 
     @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
+    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
+    def test_use_edit_learning_unit_pedagogy_method(
+            self,
+            mock_interval_dates,
+            mock_edit_learning_unit_pedagogy
+    ):
+        mock_interval_dates.return_value = {
+            'start_date': self.academic_year.start_date,
+            'end_date': self.academic_year.end_date
+        }
         self.client.get(self.url)
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
 
     @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    def test_use_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
-        self.client.get(self.url)
-        self.assertTrue(mock_edit_learning_unit_pedagogy.called)
-
-    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
+    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(self, mock_edit_learning_unit_pedagogy):
-        self.attribution.learning_unit_year.academic_year = AcademicYearFactory(year=2015)
+    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(
+            self,
+            mock_interval_dates,
+            mock_edit_learning_unit_pedagogy
+    ):
+        academic_year = AcademicYearFactory(year=2015)
+        mock_interval_dates.return_value = {'start_date': academic_year.start_date, 'end_date': academic_year.end_date}
+        self.attribution.learning_unit_year.academic_year = academic_year
         self.attribution.learning_unit_year.save()
+
         self.client.get(self.url)
         self.assertFalse(mock_edit_learning_unit_pedagogy.called)
 

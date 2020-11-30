@@ -32,12 +32,14 @@ from django.utils.functional import lazy, cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import update_partim_acronym
+from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
-    EntitiesVersionChoiceField
+    PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
+from base.models import entity_version
 from base.models.campus import find_main_campuses
-from base.models.entity_version import find_pedagogical_entities_version, get_last_version
+from base.models.entity_version import get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL, \
@@ -90,11 +92,12 @@ class LearningContainerModelForm(forms.ModelForm):
         fields = ()
 
 
-class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
+class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms.ModelForm):
 
     def __init__(self, data, person, subtype, *args, external=False, **kwargs):
         self.person = person
         self.user = self.person.user
+        self.proposal = kwargs.pop('proposal', False)
         super().__init__(data, *args, **kwargs)
 
         self.external = external
@@ -194,6 +197,24 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
 
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        context = []
+        if self.instance.pk:
+            if self.instance.learning_container_year:
+                context.append(self.instance.learning_container_year.container_type)
+            context.append(self.instance.subtype)
+        elif self.initial:
+            context.append("NEW")
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.instance.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '_'.join(context)
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        return '.'.join(["LearningUnitYearModelForm", self.get_context(), field_name])
+
 
 class CountryEntityField(forms.ChoiceField):
     def __init__(self, *args, widget_attrs=None, **kwargs):
@@ -214,74 +235,14 @@ class CountryEntityField(forms.ChoiceField):
         )
 
 
-class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
-    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
-    requirement_entity = EntitiesVersionChoiceField(
-        widget=autocomplete.ModelSelect2(
-            url='entity_requirement_autocomplete',
-            attrs={
-                'id': 'id_requirement_entity',
-                'data-html': True,
-                'onchange': (
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_1_country", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", true);'
-                ),
-            },
-            forward=['country_requirement_entity']
-        ),
-        queryset=find_pedagogical_entities_version(),
-        label=_('Requirement entity')
-    )
-
+class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms.ModelForm):
+    requirement_entity = forms.CharField()
     country_requirement_entity = CountryEntityField()
 
-    allocation_entity = EntitiesVersionChoiceField(
-        widget=autocomplete.ModelSelect2(
-            url='allocation_entity_autocomplete',
-            attrs={
-                'id': 'allocation_entity',
-                'data-html': True,
-            },
-            forward=['country_allocation_entity']
-        ),
-        queryset=find_pedagogical_entities_version(),
-        label=_('Allocation entity')
-    )
-
+    allocation_entity = forms.CharField()
     country_allocation_entity = CountryEntityField()
 
-    additional_entity_1 = EntitiesVersionChoiceField(
-        required=False,
-        widget=autocomplete.ModelSelect2(
-            url='additional_entity_1_autocomplete',
-            attrs={
-                'id': 'id_additional_requirement_entity_1',
-                'data-html': True,
-                'onchange': (
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
-                    'updateAdditionalEntityEditability(this.value, '
-                    '"id_component-0-repartition_volume_additional_entity_1",'
-                    ' false);'
-                    'updateAdditionalEntityEditability(this.value, '
-                    '"id_component-1-repartition_volume_additional_entity_1",'
-                    ' false);'
-                    'updateAdditionalEntityEditability(this.value,'
-                    ' "id_component-0-repartition_volume_additional_entity_2",'
-                    ' true);'
-                    'updateAdditionalEntityEditability(this.value,'
-                    ' "id_component-1-repartition_volume_additional_entity_2",'
-                    ' true);'
-                ),
-            },
-            forward=['country_additional_entity_1']
-        ),
-        queryset=find_additional_requirement_entities_choices(),
-        label=_('Additional requirement entity 1')
-    )
-
+    additional_entity_1 = forms.CharField()
     country_additional_entity_1 = CountryEntityField(
         widget_attrs={
             'id': 'id_additional_entity_1_country',
@@ -291,26 +252,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         }
     )
 
-    additional_entity_2 = EntitiesVersionChoiceField(
-        required=False,
-        widget=autocomplete.ModelSelect2(
-            url='additional_entity_2_autocomplete',
-            attrs={
-                'id': 'id_additional_requirement_entity_2',
-                'data-html': True,
-                'onchange': (
-                    'updateAdditionalEntityEditability(this.value,'
-                    ' "id_component-0-repartition_volume_additional_entity_2", false);'
-                    'updateAdditionalEntityEditability(this.value,'
-                    ' "id_component-1-repartition_volume_additional_entity_2", false);'
-                ),
-            },
-            forward=['country_additional_entity_2']
-        ),
-        queryset=find_additional_requirement_entities_choices(),
-        label=_('Additional requirement entity 2')
-    )
-
+    additional_entity_2 = forms.CharField()
     country_additional_entity_2 = CountryEntityField(
         widget_attrs={
             'id': 'id_additional_entity_2_country',
@@ -325,11 +267,16 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         self.user = self.person.user
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
+        self.subtype = kwargs.pop('subtype')
         super().__init__(*args, **kwargs)
-        self.fields['requirement_entity'].queryset = self.person.find_main_entities_version
         self.prepare_fields()
         self.fields['common_title'].label = _('Common part')
         self.fields['common_title_english'].label = _('Common part')
+
+        self.__init_requirement_entity_field()
+        self.__init_allocation_entity_field()
+        self.__init_additional_entity_1_field()
+        self.__init_additional_entity_2_field()
 
         if self.instance.requirement_entity:
             self.initial['requirement_entity'] = get_last_version(self.instance.requirement_entity).pk
@@ -371,6 +318,104 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
                     learning_unit_year__learning_container_year=self.instance)
                 qs.update(**{attr_name: None})
 
+    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
+    def __init_requirement_entity_field(self):
+        self.fields['requirement_entity'] = PedagogicalEntitiesRoleModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('requirement_entity'),
+            widget=autocomplete.ModelSelect2(
+                url='entity_requirement_autocomplete',
+                attrs={
+                    'id': 'id_requirement_entity',
+                    'data-html': True,
+                    'onchange': (
+                        'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
+                        'updateAdditionalEntityEditability(this.value, "id_additional_entity_1_country", false);'
+                        'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
+                        'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", true);'
+                    ),
+                },
+                forward=['country_requirement_entity'],
+            ),
+            label=_('Requirement entity'),
+            disabled=self.fields['requirement_entity'].disabled
+        )
+
+    def __init_allocation_entity_field(self):
+        self.fields['allocation_entity'] = PedagogicalEntitiesRoleModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('allocation_entity'),
+            widget=autocomplete.ModelSelect2(
+                url='allocation_entity_autocomplete',
+                attrs={
+                    'id': 'allocation_entity',
+                    'data-html': True,
+                },
+                forward=['country_allocation_entity']
+            ),
+            label=_('Allocation entity'),
+            disabled=self.fields['requirement_entity'].disabled,
+            queryset=entity_version.find_pedagogical_entities_version(),
+        )
+
+    def __init_additional_entity_1_field(self):
+        self.fields['additional_entity_1'] = PedagogicalEntitiesRoleModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('additional_entity_1'),
+            required=False,
+            widget=autocomplete.ModelSelect2(
+                url='additional_entity_1_autocomplete',
+                attrs={
+                    'id': 'id_additional_requirement_entity_1',
+                    'data-html': True,
+                    'onchange': (
+                        'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
+                        'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
+                        'updateAdditionalEntityEditability(this.value, '
+                        '"id_component-0-repartition_volume_additional_entity_1",'
+                        ' false);'
+                        'updateAdditionalEntityEditability(this.value, '
+                        '"id_component-1-repartition_volume_additional_entity_1",'
+                        ' false);'
+                        'updateAdditionalEntityEditability(this.value,'
+                        ' "id_component-0-repartition_volume_additional_entity_2",'
+                        ' true);'
+                        'updateAdditionalEntityEditability(this.value,'
+                        ' "id_component-1-repartition_volume_additional_entity_2",'
+                        ' true);'
+                    ),
+                },
+                forward=['country_additional_entity_1']
+            ),
+            queryset=find_additional_requirement_entities_choices(),
+            label=_('Additional requirement entity 1'),
+            disabled=self.fields['requirement_entity'].disabled
+        )
+
+    def __init_additional_entity_2_field(self):
+        self.fields['additional_entity_2'] = PedagogicalEntitiesRoleModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('additional_entity_2'),
+            required=False,
+            widget=autocomplete.ModelSelect2(
+                url='additional_entity_2_autocomplete',
+                attrs={
+                    'id': 'id_additional_requirement_entity_2',
+                    'data-html': True,
+                    'onchange': (
+                        'updateAdditionalEntityEditability(this.value,'
+                        ' "id_component-0-repartition_volume_additional_entity_2", false);'
+                        'updateAdditionalEntityEditability(this.value,'
+                        ' "id_component-1-repartition_volume_additional_entity_2", false);'
+                    ),
+                },
+                forward=['country_additional_entity_2']
+            ),
+            queryset=find_additional_requirement_entities_choices(),
+            label=_('Additional requirement entity 2'),
+            disabled=self.fields['requirement_entity'].disabled
+        )
+
     class Meta:
         model = LearningContainerYear
         fields = (
@@ -399,3 +444,29 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
     @cached_property
     def additionnal_entity_version_2(self):
         return self.fields["additional_entity_2"].entity_version
+
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        context = []
+        if self.instance.pk:
+            if self.instance.container_type:
+                context.append(self.instance.container_type)
+            if self.subtype:
+                context.append(self.subtype)
+        elif self.initial:
+            context.append("NEW")
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else self.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '_'.join(context)
+
+    # ValidationRuleMixin
+    def field_reference(self, field_name: str) -> str:
+        context = []
+        if self.instance.container_type:
+            context.append(self.instance.container_type)
+        if self.subtype:
+            context.append(self.subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '.'.join(["LearningContainerYearModelForm", self.get_context(), field_name])

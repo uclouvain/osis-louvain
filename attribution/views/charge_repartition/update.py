@@ -25,13 +25,12 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from attribution.views.learning_unit.update import UpdateAttributionView
-from base.business.learning_units import perms
 from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
+from attribution.views.learning_unit.update import UpdateAttributionView
 
 
 class EditChargeRepartition(UpdateAttributionView):
-    rules = [perms.is_eligible_to_manage_charge_repartition]
+    permission_required = 'base.can_add_charge_repartition'
     template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,

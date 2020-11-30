@@ -38,7 +38,6 @@ from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
-from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models.person import Person
@@ -109,7 +108,9 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
     context['teaching_materials'] = teaching_materials
     context['can_edit_information'] = perm_to_edit
     context['can_edit_force_majeur_section'] = perm_to_edit_force_majeure
-    context['can_edit_summary_locked_field'] = perms.can_edit_summary_locked_field(learning_unit_year, person)
+    context['can_edit_summary_locked_field'] = person.user.has_perm(
+        'base.can_edit_summary_locked_field', learning_unit_year
+    )
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['attributions'] = attributions
     context["version"] = _get_modification_history(cms_pedagogy_last_modification_qs)
@@ -174,3 +175,15 @@ def _get_modification_history(filter_qs):
     ).order_by(
         "-revision__date_created"
     ).first()
+
+    context['cms_labels_translated'] = translated_labels_with_text
+    context['teaching_materials'] = teaching_materials
+    context['can_edit_information'] = perm_to_edit
+    context['can_edit_summary_locked_field'] = person.user.has_perm(
+        'base.can_edit_summary_locked_field', learning_unit_year
+    )
+    context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
+    context['attributions'] = attributions
+    context["version"] = reversion
+    context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
+    return render(request, template, context)

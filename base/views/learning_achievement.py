@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -36,8 +36,9 @@ from base.models.learning_achievement import LearningAchievement, find_learning_
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications, build_success_message
-from base.views.learning_units import perms
+from learning_unit.views.utils import learning_unit_year_getter
 from osis_common.utils.models import get_object_or_none
+from osis_role.contrib.views import permission_required
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
@@ -130,9 +131,8 @@ def _has_same_order_in_future(achievement, current_order, next_luy_achievement):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST'])
-@perms.can_update_learning_achievement
 def management(request, learning_unit_year_id):
     return operation(request, request.POST.get('achievement_id'), get_action(request))
 
@@ -145,9 +145,8 @@ def get_action(request):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(["GET", "POST"])
-@perms.can_update_learning_achievement
 def update(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
@@ -170,9 +169,8 @@ def update(request, learning_unit_year_id, learning_achievement_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST', 'GET'])
-@perms.can_update_learning_achievement
 def create(request, learning_unit_year_id, learning_achievement_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     a_language_code = request.GET.get('language_code', None)
@@ -217,9 +215,8 @@ def _save_and_redirect(request, form, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['POST', 'GET'])
-@perms.can_update_learning_achievement
 def create_first(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     form = LearningAchievementEditForm(
@@ -240,9 +237,8 @@ def create_first(request, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_update_learning_achievement', fn=learning_unit_year_getter, raise_exception=True)
 @require_http_methods(['GET'])
-@perms.can_update_learning_achievement
 def check_code(request, learning_unit_year_id):
     code = request.GET['code']
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)

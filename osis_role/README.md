@@ -219,7 +219,7 @@ Template tags
         {% load osis_role %}
         .......
         <div>
-             {% a_tag_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+             {% a_tag_has_perm create_obj_url _('New Object') 'base.add_obj' user obj %}                    
         </div>
 
 - <b>a_tag_modal_has_perm</b>: same as a_tag_has_perm but load url into a modal
@@ -227,7 +227,16 @@ Template tags
        {% load osis_role %}
         .......
         <div>
-             {% a_tag_modal_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+             {% a_tag_modal_has_perm create_obj_url _('New Object') 'base.add_obj' user obj %}                    
+        </div>
+         
+         
+- <b>a_tag_modal_target_has_perm</b>: tag with permission check opening a modal without loading url e.g. confirm modal
+
+       {% load osis_role %}
+        .......
+        <div>
+             {% a_tag_modal_target_has_perm "#confirmationModal" _('Confirm ?') 'base.add_obj' user obj %}                    
         </div>
 
 - <b>has_perm</b>: Evaluate permission according to user and ressource

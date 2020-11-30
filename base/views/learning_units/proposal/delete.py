@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from waffle.decorators import waffle_flag
 
@@ -32,12 +32,13 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_messages_by_level
-from base.views.learning_units import perms
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @waffle_flag('learning_unit_proposal_delete')
 @login_required
-@perms.can_perform_cancel_proposal
+@permission_required('base.can_cancel_proposal', raise_exception=True, fn=learning_unit_year_getter)
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def cancel_proposal_of_learning_unit(request, learning_unit_year_id):
     user_person = get_object_or_404(Person, user=request.user)

@@ -31,6 +31,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from base.business.learning_units.perms import find_last_requirement_entity_version
+from base.forms.learning_unit.entity_form import find_attached_faculty_entities_version
 from base.models import entity_version
 from base.models.entity_version import (
     build_current_entity_version_structure_in_memory,
@@ -40,14 +41,13 @@ from base.models.entity_version import (
     EntityVersion,
 )
 from base.models.enums import organization_type
-from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE
+from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE, SECTOR
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from osis_common.utils.datetime import get_tzinfo
 from reference.tests.factories.country import CountryFactory
 
@@ -391,45 +391,34 @@ class EntityVersionTest(TestCase):
             "ROOT / SECTOR / FACULTY / SCHOOL",
         )
 
-    def test_find_main_entities_version_filtered_by_person(self):
-        person = PersonFactory()
-        entity_version_attached = EntityVersionFactory(
-            entity__organization=self.organization,
-            entity_type="SECTOR",
-            parent=None,
-            end_date=None,
-            start_date=datetime.date.today() - datetime.timedelta(days=5)
-        )
-        entity_not_attached = EntityFactory(organization=self.organization)
-        EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR", parent=None, end_date=None)
-        PersonEntityFactory(person=person, entity=entity_version_attached.entity)
-        entity_list = list(person.find_main_entities_version)
-        self.assertTrue(entity_list)
-        self.assertEqual(len(entity_list), 1)
-        self.assertEqual(entity_list[0], entity_version_attached)
-
     def test_find_attached_faculty_entities_version_filtered_by_person(self):
-        person = PersonFactory()
-        entity_version_attached = EntityVersionFactory(
-            entity__organization=self.organization,
-            entity_type="FACULTY"
-        )
-
-        EntityWithVersionFactory(organization=self.organization, version__entity_type="SECTOR")
-
-        entity_version_ilv = EntityVersionFactory(
-            entity__organization=self.organization, acronym="ILV"
-        )
         entity_version_parent = EntityVersionFactory(
             entity__organization=self.organization,
-            entity_type='FACULTY')
+            entity_type=FACULTY
+        )
         EntityVersionFactory(parent=entity_version_parent.entity, entity_type='OTHER')
 
-        PersonEntityFactory(person=person, entity=entity_version_attached.entity)
-        PersonEntityFactory(person=person, entity=entity_version_ilv.entity)
-        PersonEntityFactory(person=person, entity=entity_version_parent.entity)
+        person = CentralManagerFactory(entity=entity_version_parent.entity, with_child=True).person
 
-        entity_list = list(person.find_attached_faculty_entities_version(acronym_exceptions=['ILV']))
+        entity_version_attached = EntityVersionFactory(
+            entity__organization=self.organization,
+            entity_type=FACULTY,
+            parent=entity_version_parent.entity
+        )
+
+        EntityWithVersionFactory(
+            organization=self.organization,
+            version__entity_type=SECTOR,
+            version__parent=entity_version_parent.entity
+        )
+
+        entity_version_ilv = EntityVersionFactory(
+            entity__organization=self.organization,
+            acronym="ILV",
+            parent=entity_version_parent.entity
+        )
+
+        entity_list = list(find_attached_faculty_entities_version(person=person, acronym_exceptions=['ILV']))
         self.assertTrue(entity_list)
         self.assertEqual(len(entity_list), 3)
         self.assertIn(entity_version_attached, entity_list)
@@ -437,8 +426,6 @@ class EntityVersionTest(TestCase):
         self.assertIn(entity_version_parent, entity_list)
 
     def test_find_attached_faculty_entities_version_filtered_by_person_but_faculty_below_attached_entities(self):
-        person = PersonFactory()
-
         entity_version_attached = EntityVersionFactory(entity__organization=self.organization, entity_type="SECTOR")
         entity_version_fac = EntityVersionFactory(
             entity__organization=self.organization,
@@ -447,9 +434,9 @@ class EntityVersionTest(TestCase):
             parent=entity_version_attached.entity
         )
 
-        PersonEntityFactory(person=person, entity=entity_version_attached.entity)
+        person = CentralManagerFactory(entity=entity_version_attached.entity, with_child=True).person
 
-        entity_list = list(person.find_attached_faculty_entities_version())
+        entity_list = list(find_attached_faculty_entities_version(person=person))
         self.assertTrue(entity_list)
         self.assertEqual(len(entity_list), 1)
         self.assertIn(entity_version_fac, entity_list)

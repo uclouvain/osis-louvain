@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-25 00:17+0100\n"
+"POT-Creation-Date: 2020-11-27 09:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,5 +17,128 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Central manager"
+msgstr ""
+
+msgid "Central managers"
+msgstr ""
+
+msgid "Faculty manager"
+msgstr ""
+
+msgid "Faculty managers"
+msgstr ""
+
+msgid "Learning unit is not full"
+msgstr ""
+
+msgid "Learning unit type is not allowed for attributions"
+msgstr ""
+
+#, python-format
+msgid ""
+"Learning unit type is not deletable because it is either a full course or it "
+"has the following type: %(types)s"
+msgstr ""
+
 msgid "Only letters are allowed."
+msgstr ""
+
+msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Proposal is of modification type"
+msgstr ""
+
+msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit date is not eligible for modification because of its type "
+"which is not among those types: %(types)s"
+msgstr ""
+
+msgid "The learning unit has proposal"
+msgstr ""
+
+msgid "The learning unit is a partim"
+msgstr ""
+
+msgid "The learning unit is not a partim"
+msgstr ""
+
+msgid "The learning unit is not in proposal state"
+msgstr ""
+
+#, python-format
+msgid "The learning unit start year is set before %(year)d."
+msgstr ""
+
+msgid "The proposal is not on this academic year"
+msgstr ""
+
+msgid "This learning unit has application"
+msgstr ""
+
+msgid "This learning unit has application this year"
+msgstr ""
+
+msgid "This learning unit is not editable this period."
+msgstr ""
+
+msgid "This learning unit is not of type creation"
+msgstr ""
+
+msgid "This learning unit is not of type modification"
+msgstr ""
+
+msgid "This learning unit is not of type suppression"
+msgstr ""
+
+msgid "This learning unit is of type creation"
+msgstr ""
+
+#, python-format
+msgid ""
+"This learning unit isn't eligible for modification because of its type which "
+"is not among those types: %(types)s"
+msgstr ""
+
+msgid "You are not allowed to create proposal during this academic year"
+msgstr ""
+
+msgid ""
+"You are not allowed to put in proposal for ending date during this academic "
+"year"
+msgstr ""
+
+msgid ""
+"You are not allowed to put in proposal for modification during this academic "
+"year"
+msgstr ""
+
+msgid "You can only edit co-graduation external learning units"
+msgstr ""
+
+msgid ""
+"You can only modify a learning unit when your are linked to its requirement "
+"entity"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can't modify learning unit under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
+msgstr ""
+
+msgid ""
+"You cannot delete a learning unit which is prerequisite or has "
+"prerequisite(s)"
+msgstr ""
+
+msgid "You cannot edit this type of learning unit"
+msgstr ""
+
+msgid "You cannot modify a learning unit of a previous year"
 msgstr ""

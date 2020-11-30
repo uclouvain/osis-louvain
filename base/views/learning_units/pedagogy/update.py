@@ -43,16 +43,17 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views import learning_unit
 from base.views.common import display_success_messages
-from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from base.views.learning_units.perms import PermissionDecorator
 from cms.models.text_label import TextLabel
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 from reference.models.language import find_language_in_settings
 
 
 @login_required
 @require_http_methods(["POST"])
-@perms.can_edit_summary_locked_field
+@permission_required('base.can_edit_summary_locked_field', fn=learning_unit_year_getter, raise_exception=True)
 def toggle_summary_locked(request, learning_unit_year_id):
     luy = learning_unit_year.toggle_summary_locked(learning_unit_year_id)
     success_msg = "Update for teacher locked" if luy.summary_locked else "Update for teacher unlocked"

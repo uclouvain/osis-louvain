@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Set
 
 from base.models.entity import Entity
 from base.models.person import Person
@@ -37,7 +37,7 @@ class EntityRoleHelper:
        Utility class to provide role-related static methods
     """
     @staticmethod
-    def get_all_entities(person: Person, group_names: List[str]) -> List[Entity]:
+    def get_all_entities(person: Person, group_names: Set[str]) -> List[Entity]:
         role_mdls = [
             r for r in role.role_manager.roles if issubclass(r, EntityRoleModel) and r.group_name in group_names
         ]

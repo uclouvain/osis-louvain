@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect, get_object_or_404
@@ -35,14 +35,14 @@ from base.business.learning_units.simple import deletion
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.send_mail import send_mail_after_the_learning_unit_year_deletion
 from base.views.common import display_success_messages, display_error_messages
-from base.views.learning_units.perms import can_delete_learning_unit_year
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @login_required
 @waffle_flag("learning_unit_delete")
-@permission_required('base.can_delete_learningunit', raise_exception=True)
+@permission_required('base.can_delete_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 @require_POST
-@can_delete_learning_unit_year
 def delete_all_learning_units_year(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
 

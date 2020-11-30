@@ -38,14 +38,13 @@ from attribution.tests.factories.tutor_application import TutorApplicationFactor
 from base import models as mdl_base
 from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
-    copy_learning_unit_data, _apply_action_on_proposals
+    copy_learning_unit_data, _apply_action_on_proposals, can_consolidate_learningunit_proposal
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
-from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES, \
-    is_eligible_to_consolidate_proposal
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, proposal_type, entity_type, \
     learning_container_year_types, learning_unit_year_subtypes, proposal_state
+from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -57,10 +56,11 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from learning_unit.auth.predicates import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -114,21 +114,22 @@ class TestLearningUnitProposalCancel(TestCase):
         self.assertCountEqual(list(mdl_base.learning_unit.LearningUnit.objects.filter(id=lu.id)),
                               [])
 
-    @patch("base.business.learning_units.perms.is_eligible_for_cancel_of_proposal",
-           side_effect=lambda proposal, person, raise_exception: True)
     @patch('base.utils.send_mail.send_mail_cancellation_learning_unit_proposals')
-    def test_cancel_proposals_of_type_suppression(self, mock_send_mail, mock_perm):
-        proposal = self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
-                                         prop_state=proposal_state.ProposalState.FACULTY.name)
+    def test_cancel_proposals_of_type_suppression(self, mock_send_mail):
+        proposal = self._create_proposal(
+            prop_type=proposal_type.ProposalType.SUPPRESSION.name,
+            prop_state=proposal_state.ProposalState.FACULTY.name
+        )
         entity = self.learning_unit_year.learning_container_year.requirement_entity
+        central_manager = CentralManagerFactory(entity=entity)
         proposal.entity = entity
+        proposal.state = ProposalState.ACCEPTED.name
         proposal.save()
-        person_entity = PersonEntityFactory(entity=entity)
-        lu_proposal_business.cancel_proposals_and_send_report([proposal], person_entity.person, [])
-        self.assertCountEqual(list(mdl_base.proposal_learning_unit.ProposalLearningUnit.objects
-                                   .filter(learning_unit_year=self.learning_unit_year)), [])
+        lu_proposal_business.cancel_proposals_and_send_report([proposal], central_manager.person, [])
+        self.assertCountEqual(list(mdl_base.proposal_learning_unit.ProposalLearningUnit.objects.filter(
+            learning_unit_year=self.learning_unit_year
+        )), [])
         self.assertTrue(mock_send_mail.called)
-        self.assertTrue(mock_perm.called)
 
     def _create_proposal(self, prop_type, prop_state):
         initial_data_expected = {
@@ -236,22 +237,19 @@ def create_academic_years():
 class TestConsolidateProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.author = PersonFactory()
-        cls.proposals = [ProposalLearningUnitFactory() for _ in range(2)]
-        person_entity = PersonEntityFactory(person=cls.author)
+        cls.author = FacultyManagerFactory()
+        cls.proposals = [ProposalLearningUnitFactory(state=ProposalState.ACCEPTED.name) for _ in range(2)]
         for proposal in cls.proposals:
             container_year = proposal.learning_unit_year.learning_container_year
-            container_year.requirement_entity = person_entity.entity
+            container_year.requirement_entity = cls.author.entity
             container_year.save()
 
-    @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal",
-                side_effect=lambda proposal, person, raise_exception: True)
     @mock.patch("base.business.learning_unit_proposal.consolidate_proposal",
                 side_effect=lambda prop: {SUCCESS: ["msg_success"]})
     @mock.patch("base.utils.send_mail.send_mail_consolidation_learning_unit_proposal",
                 side_effect=None)
-    def test_call_method_consolidate_proposal(self, mock_mail, mock_consolidate_proposal, mock_perm):
-        result = consolidate_proposals_and_send_report(self.proposals, self.author, [])
+    def test_call_method_consolidate_proposal(self, mock_mail, mock_consolidate_proposal):
+        result = consolidate_proposals_and_send_report(self.proposals, self.author.person, [])
 
         consolidate_args_list = [((self.proposals[0],),), ((self.proposals[1],),)]
         self.assertListEqual(mock_consolidate_proposal.call_args_list, consolidate_args_list)
@@ -266,27 +264,25 @@ class TestConsolidateProposals(TestCase):
         })
 
         self.assertTrue(mock_mail.called)
-        self.assertTrue(mock_perm.called)
 
-    @mock.patch("base.business.learning_units.perms._has_person_the_right_to_consolidate", return_value=True)
-    @mock.patch("base.business.learning_units.perms._is_proposal_in_state_to_be_consolidated", return_value=True)
-    @mock.patch("base.business.learning_units.perms._is_attached_to_initial_or_current_requirement_entity",
-                return_value=True)
-    def test_apply_action_on_proposals_with_tutor_application(self, mock_entity, mock_state, mock_right):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name)
-        TutorApplicationFactory(learning_container_year=proposal.learning_unit_year.learning_container_year)
+    def test_apply_action_on_proposals_with_tutor_application(self):
+        proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, state=ProposalState.ACCEPTED.name)
+        learning_container_year = proposal.learning_unit_year.learning_container_year
+        TutorApplicationFactory(learning_container_year=learning_container_year)
+        manager = FacultyManagerFactory(entity=learning_container_year.requirement_entity)
+
         proposals_with_results = _apply_action_on_proposals(
             [proposal],
             consolidate_proposal,
-            self.author,
-            is_eligible_to_consolidate_proposal
+            manager.person,
+            can_consolidate_learningunit_proposal
         )
 
         self.assertEqual(
             proposals_with_results[0],
             (
                 proposal,
-                {ERROR: _("This learning unit has application.")}
+                {ERROR: _("This learning unit has application this year")}
             )
         )
 

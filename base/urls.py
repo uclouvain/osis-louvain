@@ -202,7 +202,7 @@ urlpatterns = [
                 url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                     name="learning_unit_consolidate_proposal"),
             ])),
-            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition"),
+            url(r'^update_end_date/$', learning_unit_edition_end_date, name="learning_unit_edition_end_date"),
             url(r'^update/$', update_learning_unit, name="edit_learning_unit"),
             url(r'^specifications/$', learning_unit.learning_unit_specifications, name="learning_unit_specifications"),
             url(r'^specifications/edit/$', learning_unit.learning_unit_specifications_edit,

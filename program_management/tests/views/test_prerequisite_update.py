@@ -28,7 +28,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory, \
     EducationGroupYearMasterFactory
@@ -51,7 +51,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             group_year__education_group_type=offer.education_group_type,
             group_year__management_entity=offer.management_entity
         )
-        cls.educucation_group_version = EducationGroupVersionFactory(offer=offer, root_group=root_element.group_year)
+        cls.education_group_version = EducationGroupVersionFactory(offer=offer, root_group=root_element.group_year)
 
         cls.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__learning_container_year__academic_year=cls.academic_year
@@ -134,7 +134,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             learning_unit_year__academic_year=self.academic_year
         )
         GroupElementYearChildLeafFactory(
-            parent_element=self.educucation_group_version.root_group.element,
+            parent_element=self.education_group_version.root_group.element,
             child_element=luy_element
         )
 
@@ -146,7 +146,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         redirect_url = reverse(
             "learning_unit_prerequisite",
             kwargs={
-                'root_element_id': self.educucation_group_version.root_group.element.pk,
+                'root_element_id': self.education_group_version.root_group.element.pk,
                 'child_element_id': self.element_learning_unit_year.pk
             }
         )

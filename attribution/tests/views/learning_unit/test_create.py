@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from django.http import HttpResponse
 from django.test import TestCase
@@ -32,30 +31,30 @@ from django.urls import reverse
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import COORDINATOR
-from base.models.enums.learning_container_year_types import COURSE
+from base.models.enums.learning_container_year_types import MASTER_THESIS
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.tutor import TutorFactory
-from base.views.mixins import RulesRequiredMixin
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
 class TestAddAttribution(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.learning_unit_year = LearningUnitYearFullFactory(learning_container_year__container_type=COURSE)
+        cls.learning_unit_year = LearningUnitYearFullFactory(learning_container_year__container_type=MASTER_THESIS)
         cls.lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
         cls.practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
-        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+
+        # TODO : use TutorFactory when role available
+        cls.manager = FacultyManagerFactory(entity=cls.learning_unit_year.learning_container_year.requirement_entity)
+        cls.person = cls.manager.person
         cls.tutor = TutorFactory(person=cls.person)
+
         cls.url = reverse("add_attribution", args=[cls.learning_unit_year.id])
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
-        self.mocked_permission_function = self.patcher.start()
-        self.addCleanup(self.patcher.stop)
 
     def test_login_required(self):
         self.client.logout()
@@ -66,19 +65,15 @@ class TestAddAttribution(TestCase):
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
 
-        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "attribution/learning_unit/attribution_inner.html")
 
     def test_post(self):
         self.person.employee = True
         self.person.save()
-        start_year = self.learning_unit_year.academic_year.year
         data = {
             'attribution_form-person': self.tutor.person.id,
             'attribution_form-function': COORDINATOR,
-            'attribution_form-start_year': start_year,
-            'attribution_form-duration': 3,
             'lecturing_form-allocation_charge': 50,
             'practical_form-allocation_charge': 10
         }
@@ -87,8 +82,6 @@ class TestAddAttribution(TestCase):
         attribution_qs = AttributionNew.objects.filter(
             tutor__id=self.tutor.id,
             function=COORDINATOR,
-            start_year=start_year,
-            end_year=start_year+2
         )
         self.assertTrue(attribution_qs.exists())
         attribution = attribution_qs.get()

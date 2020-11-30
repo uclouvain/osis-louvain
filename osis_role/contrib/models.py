@@ -59,7 +59,7 @@ class RoleModelMeta(models.base.ModelBase):
 
 class RoleModel(models.Model, metaclass=RoleModelMeta):
     objects = RoleQuerySet.as_manager()
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='+')
 
     class Meta:
         abstract = True
@@ -105,7 +105,7 @@ class EntityRoleModelQueryset(models.QuerySet):
 
 
 class EntityRoleModel(RoleModel):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name='+')
     with_child = models.BooleanField(default=False)
 
     objects = EntityRoleModelQueryset.as_manager()

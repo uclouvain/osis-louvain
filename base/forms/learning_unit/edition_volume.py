@@ -42,6 +42,7 @@ from base.models.enums.learning_container_year_types import LCY_TYPES_WITH_FIXED
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.forms.widgets import DecimalFormatInput
+from rules_management.mixins import PermissionFieldMixin
 
 STYLE_MIN_WIDTH_VOLUME = 'min-width:55px;'
 
@@ -292,14 +293,15 @@ class VolumeEditionFormsetContainer:
         return errors
 
 
-class SimplifiedVolumeForm(forms.ModelForm):
+class SimplifiedVolumeForm(PermissionFieldMixin, forms.ModelForm):
     _learning_unit_year = None
 
     add_field = EmptyField(label="+")
     equal_field = EmptyField(label='=')
 
-    def __init__(self, component_type, index, *args, is_faculty_manager=False, proposal=False, **kwargs):
+    def __init__(self, component_type, index, *args, is_faculty_manager=False, proposal=False, user, **kwargs):
         component_type = component_type
+        self.user = user
         self.is_faculty_manager = is_faculty_manager
         self.index = index
         self.proposal = proposal
@@ -396,9 +398,25 @@ class SimplifiedVolumeForm(forms.ModelForm):
         container_type = self._learning_unit_year.learning_container_year.container_type
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 
+    # PermissionFieldMixin
+    def get_context(self) -> str:
+        context = []
+        if self.instance.pk:
+            if self.instance.learning_unit_year.learning_container_year:
+                context.append(self.instance.learning_unit_year.learning_container_year.container_type)
+            context.append(self.instance.learning_unit_year.subtype)
+        elif self.initial:
+            context.append("NEW")
+            subtype = self.instance.learning_unit_year.subtype
+            context.append(self.initial['subtype'] if 'subtype' in self.initial.keys() else subtype)
+        if self.proposal:
+            context.append("PROPOSAL")
+        return '_'.join(context)
+
 
 class SimplifiedVolumeFormset(forms.BaseModelFormSet):
     def __init__(self, data, person, proposal=False, *args, **kwargs):
+        self.user = person.user
         self.is_faculty_manager = person.is_faculty_manager and not person.is_central_manager
         self.proposal = proposal
         super().__init__(data, *args, prefix="component", **kwargs)
@@ -409,6 +427,7 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
         kwargs['is_faculty_manager'] = self.is_faculty_manager
         kwargs['proposal'] = self.proposal
         kwargs['index'] = index
+        kwargs['user'] = self.user
         return kwargs
 
     @property

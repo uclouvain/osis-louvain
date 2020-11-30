@@ -1,5 +1,11 @@
 {% if load_modal %}
-    <a href="#" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}" data-url="{{ url }}">{{ text | safe }}</a>
+    {% if target %}
+        <a href="#" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}">
+            <span data-toggle="modal" data-target="{{ target }}">{{ text | safe }}</span>
+        </a>
+    {% else %}
+        <a href="#" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}" data-url="{{ url }}">{{ text | safe }}</a>
+    {% endif %}
 {% else %}
     <a href="{{ url }}" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}">{{ text | safe }}</a>
 {% endif %}

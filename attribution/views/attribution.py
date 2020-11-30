@@ -37,7 +37,6 @@ from rest_framework.response import Response
 from attribution.business import attribution_json, attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.enums.function import Functions
-from base.business.learning_units import perms as business_perms
 from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
 from base.views.common import display_warning_messages
@@ -62,16 +61,11 @@ def recompute_portal(request):
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_attributions(request, learning_unit_year_id=None, code=None, year=None):
-
     context = get_common_context_learning_unit_year(request.user.person, learning_unit_year_id, code, year)
-
+    luy = context["learning_unit_year"]
     context['attributions'] = attribution_charge_new.find_attributions_with_charges(learning_unit_year_id)
-    context["can_manage_charge_repartition"] = business_perms.is_eligible_to_manage_charge_repartition(
-        context["learning_unit_year"], request.user.person
-    )
-    context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
-        context["learning_unit_year"], request.user.person
-    )
+    context["can_add_charge_repartition"] = request.user.has_perm('base.can_add_charge_repartition', luy)
+    context["can_change_attribution"] = request.user.has_perm('base.can_change_attribution', luy)
     context["tab_active"] = "learning_unit_attributions"  # Corresponds to url_name
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)

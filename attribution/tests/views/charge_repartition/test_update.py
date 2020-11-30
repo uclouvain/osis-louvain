@@ -23,22 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_new import AttributionNew
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
-from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
-    PracticalLearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.views.mixins import RulesRequiredMixin
 
 
 class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
@@ -54,8 +44,6 @@ class TestEditChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
     def test_template_used_with_get(self):
         response = self.client.get(self.url)
-
-        self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "attribution/charge_repartition/add_charge_repartition_inner.html")
 

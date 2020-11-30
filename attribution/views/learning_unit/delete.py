@@ -29,13 +29,12 @@ from django.views.generic import DeleteView
 
 from attribution.models.attribution_new import AttributionNew
 from attribution.views.learning_unit.common import AttributionBaseViewMixin
-from base.business.learning_units import perms
 from base.views.mixins import AjaxTemplateMixin
 
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
-    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
-             or perms.is_eligible_to_manage_attributions(luy, person)]
+    permission_required = 'base.can_delete_attribution'
+
     model = AttributionNew
     template_name = "attribution/learning_unit/remove_charge_repartition_confirmation_inner.html"
     pk_url_kwarg = "attribution_id"

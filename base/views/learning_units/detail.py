@@ -34,8 +34,6 @@ from reversion.models import Version
 
 from base.business.learning_unit import get_all_attributions, get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
-from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
-    learning_unit_proposal_permissions, is_eligible_for_modification
 from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
@@ -140,14 +138,19 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return context
 
     def get_context_permission(self, proposal):
-        context = {
-            "can_create_partim": is_eligible_to_create_partim(self.object, self.person),
-            'can_manage_volume': is_eligible_for_modification(self.object, self.person),
-        }
+        obj = self.object
 
-        # append permissions
-        context.update(learning_unit_year_permissions(self.object, self.person))
-        context.update(learning_unit_proposal_permissions(proposal, self.person, self.object))
+        context = {
+            'can_create_partim': self.person.user.has_perm('base.can_create_partim', obj),
+            'can_manage_volume': self.person.user.has_perm('base.can_edit_learningunit', obj),
+            'can_propose': self.person.user.has_perm('base.can_propose_learningunit', obj),
+            'can_edit_date': self.person.user.has_perm('base.can_edit_learningunit_date', obj),
+            'can_edit': self.person.user.has_perm('base.can_edit_learningunit', obj),
+            'can_delete': self.person.user.has_perm('base.can_delete_learningunit', obj),
+            'can_cancel_proposal': self.person.user.has_perm('base.can_cancel_proposal', obj),
+            'can_edit_learning_unit_proposal': self.person.user.has_perm('base.can_edit_learning_unit_proposal', obj),
+            'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj)
+        }
 
         return context
 
