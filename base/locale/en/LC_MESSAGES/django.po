@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-24 10:38+0100\n"
+"POT-Creation-Date: 2020-11-24 12:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2522,6 +2522,10 @@ msgid "The partim"
 msgstr ""
 
 msgid "The program aim has been updated"
+msgstr ""
+
+#, python-format
+msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr ""
 
 #, python-format

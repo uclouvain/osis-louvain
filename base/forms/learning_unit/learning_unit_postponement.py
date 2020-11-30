@@ -340,16 +340,25 @@ class LearningUnitPostponementForm:
             for entity_container_type, new_repartition_volume in new_component.repartition_volumes.items():
                 current_repartition = current_component.repartition_volumes[entity_container_type]
                 if new_repartition_volume != current_repartition and entity_container_type in entity_by_type:
-                    name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
-
-                    self.consistency_errors.setdefault(luy.academic_year, []).append(
-                        _("The repartition volume of %(col_name)s has been already modified. "
-                          "(%(new_value)s instead of %(current_value)s)") % {
-                            'col_name': name,
-                            'new_value': new_repartition_volume,
-                            'current_value': current_repartition
-                        }
-                    )
+                    if entity_by_type[entity_container_type]:
+                        name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
+                        self.consistency_errors.setdefault(
+                            luy.academic_year, []
+                        ).append(
+                            _("The repartition volume of %(col_name)s has been already modified. "
+                              "(%(new_value)s instead of %(current_value)s)") % {
+                                  'col_name': name,
+                                  'new_value': new_repartition_volume,
+                                  'current_value': current_repartition
+                              }
+                        )
+                    else:
+                        name = new_component.acronym
+                        self.consistency_errors.setdefault(luy.academic_year, []).append(
+                            _("The repartition volume of %(col_name)s has been already modified.") % {
+                                'col_name': name
+                            }
+                        )
 
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [

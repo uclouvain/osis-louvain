@@ -2578,6 +2578,9 @@ msgstr "Le partim"
 msgid "The program aim has been updated"
 msgstr "L’objectif du programme a été mis à jour avec succès"
 
+msgid "The repartition volume of %(col_name)s has been already modified."
+msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
+
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
