@@ -242,7 +242,7 @@
                                 {% url 'organization_read' organization_id=organization.id as url_organization %}
                                 {% dl_tooltip organization 'country' label_text=_('Country') %}
                                 {% dl_tooltip campus 'campus' label_text=_('City of institution') value=organization.main_address.city %}
-                                {% dl_tooltip organization 'institution' label_text=_('Reference institution') value=organization.name url=url_organization %}
+                                {% dl_tooltip organization 'institution' label_text=_('Reference institution') value=organization.name %}
                             {% endwith %}
                         </div>
                     </div>
