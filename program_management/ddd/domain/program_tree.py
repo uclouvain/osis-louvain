@@ -25,6 +25,7 @@
 ##############################################################################
 import collections
 import copy
+import itertools
 from collections import Counter
 from typing import List, Set, Optional, Dict
 
@@ -223,6 +224,12 @@ class ProgramTree(interface.RootEntity):
             return result
 
         return _get_parents(child_node)
+
+    def get_all_parents(self, child_node: 'Node') -> Set['Node']:
+        paths_using_node = self.get_paths_from_node(child_node)
+        return set(
+            itertools.chain.from_iterable(self.get_parents(path) for path in paths_using_node)
+        )
 
     def get_2m_option_list(self):  # TODO :: unit tests
         tree_without_finalities = self.prune(
@@ -582,6 +589,7 @@ class ProgramTree(interface.RootEntity):
             paths_by_node[child_node].append(path)
         return paths_by_node
 
+    # TODO : to rename into "search_paths_using_node"
     def get_paths_from_node(self, node: 'Node') -> List['Path']:
         return self._paths_by_node().get(node) or []
 
