@@ -117,9 +117,10 @@
                                         {% if deadlines %}
                                             {% with first_item=deadlines|get_first_item %}
                                                 {% with deadline=first_item.0 scores_not_yet_submitted=first_item.1 %}
-                                                    <div class="row row-score-encoding">
+                                                    <div class="row-score-encoding">
                                                         {% include "blocks/deadline_tutor_display.html" %}
                                                         {% if deadlines|length > 1 %}
+                                                            &nbsp;
                                                             <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
                                                                aria-expanded="false"
                                                                aria-controls="tutor_deadlines_collapse_{{ note_detail.learning_unit_year_acronym }}"
