@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import Q, OuterRef, Exists
+from django.db.models import Q, OuterRef, Exists, Case, When, Value, CharField
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
@@ -39,7 +39,7 @@ from base.views.learning_units.search.common import SearchTypes
 
 COMMON_ORDERING_FIELDS = (
     ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
-    ('learning_container_year__container_type', 'type'), ('subtype', 'subtype'),
+    ('type_ordering', 'type'), ('subtype', 'subtype'),
     ('entity_requirement', 'requirement_entity'), ('entity_allocation', 'allocation_entity'),
     ('credits', 'credits'), ('status', 'status'), ('has_proposal', 'has_proposal'),
 )
@@ -197,6 +197,16 @@ class LearningUnitFilter(FilterSet):
         )
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
+
+        queryset = queryset.annotate(
+            type_ordering=Case(
+                When(externallearningunityear__mobility=True, then=Value(str(_('Mobility')))),
+                *[When(learning_container_year__container_type=key, then=Value(str(_(val))))
+                  for i, (key, val) in enumerate(LearningContainerYearType.choices())],
+                default=Value(''),
+                output_field=CharField()
+            )
+        )
         return queryset
 
     def filter_learning_unit_year_field(self, queryset, name, value):
