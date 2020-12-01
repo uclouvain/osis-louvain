@@ -52,7 +52,7 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             "object": object,
-            "admission_condition": object.admissioncondition,
+            "admission_condition": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
@@ -75,8 +75,7 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
         try:
             return EducationGroupYear.objects.look_for_common(
                 academic_year__year=self.kwargs['year'],
-                education_group_type__name=TrainingType.AGGREGATION.name,
-                admissioncondition__isnull=False
+                education_group_type__name=TrainingType.AGGREGATION.name
             ).select_related('admissioncondition').get()
         except EducationGroupYear.DoesNotExist:
             raise Http404
@@ -91,6 +90,12 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
                 'year': self.kwargs['year'],
             }
         )
+
+    def get_admission_condition(self):
+        obj = self.get_object()
+        if hasattr(obj, 'admissioncondition'):
+            return obj.admissioncondition
+        return AdmissionCondition.objects.get_or_create(education_group_year=obj)[0]
 
 
 class UpdateCommonAggregateAdmissionCondition(UpdateCommonCondition):

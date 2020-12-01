@@ -35,6 +35,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.views.general_information.common_master_specialized import Tab
+from rest_framework import status
 
 
 class TestCommonMasterSpecializedAdmissionCondition(TestCase):
@@ -69,12 +70,14 @@ class TestCommonMasterSpecializedAdmissionCondition(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_case_common_exist_but_admission_condition_not_exist(self):
-        EducationGroupYearCommonSpecializedMasterFactory(academic_year__year=1990)
+        obj = EducationGroupYearCommonSpecializedMasterFactory(academic_year__year=1990)
 
         dummy_url = reverse('common_master_specialized_admission_condition', kwargs={'year': 1990})
         response = self.client.get(dummy_url)
 
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.context['object'], obj)
+        self.assertEqual(response.context['admission_condition'].education_group_year, obj)
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
