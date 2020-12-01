@@ -36,6 +36,7 @@ from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
+from base.models.enums.education_group_categories import TRAINING, GROUP, MINI_TRAINING
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import SearchParametersCache
 from base.utils.db import convert_order_by_strings_to_expressions
@@ -107,11 +108,28 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             order_by=order_by_expressions,
         )
     )
+    if isinstance(obj, GroupYear):
+        qs = qs.annotate(
+            previous_category=Window(
+                expression=Lag("education_group_type__category"),
+                order_by=order_by_expressions,
+            ),
+            next_category=Window(
+                expression=Lead("education_group_type__category"),
+                order_by=order_by_expressions,
+            )
+        )
 
-    fields_names = [
-        "id", "acronym", "previous_code", "previous_id", "previous_year", "next_code", "next_id", "next_year",
-        "previous_title", "next_title"
-    ]
+        fields_names = [
+            "id", "acronym", "previous_code", "previous_id", "previous_year", "previous_category", "next_code",
+            "next_id", "next_year", "next_category", "previous_title", "next_title"
+        ]
+    else:
+        fields_names = [
+            "id", "acronym", "previous_code", "previous_id", "previous_year", "next_code", "next_id", "next_year",
+            "previous_title", "next_title"
+        ]
+
     if is_ue:
         qs = qs.values_list(*fields_names, named=True).order_by(*order_by)
     else:
@@ -133,19 +151,30 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
 
     current_row = _get_current_row(qs, obj)
 
+    category = {
+        TRAINING: "training_identification",
+        GROUP: "group_identification",
+        MINI_TRAINING: "mini_training_identification"
+    }
+
     if current_row:
         context.update({
             "next_element_title": _get_title(
                 current_row.next_title, current_row.next_version_label if not is_ue else None
             ),
             "next_url": reverse_url_function(
-                current_row.next_code, current_row.next_year, url_name
+                current_row.next_code,
+                current_row.next_year,
+                category[current_row.next_category] if isinstance(obj, GroupYear) else url_name
             ) + '?path={}'.format(obj.element.id) if current_row.next_id else None,
             "previous_element_title": _get_title(
-                current_row.previous_title, current_row.previous_version_label if not is_ue else None
+                current_row.previous_title,
+                current_row.previous_version_label if not is_ue else None
             ),
             "previous_url": reverse_url_function(
-                current_row.previous_code, current_row.previous_year, url_name
+                current_row.previous_code,
+                current_row.previous_year,
+                category[current_row.previous_category] if isinstance(obj, GroupYear) else url_name
             ) + '?path={}'.format(obj.element.id) if current_row.previous_id else None
         })
     return context
