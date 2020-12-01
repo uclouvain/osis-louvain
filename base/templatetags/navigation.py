@@ -106,21 +106,30 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
         next_id=Window(
             expression=Lead("id"),
             order_by=order_by_expressions,
-        ),
-        previous_category=Window(
-            expression=Lag("education_group_type__category"),
-            order_by=order_by_expressions,
-        ),
-        next_category=Window(
-            expression=Lead("education_group_type__category"),
-            order_by=order_by_expressions,
         )
     )
+    if isinstance(obj, GroupYear):
+        qs = qs.annotate(
+            previous_category=Window(
+                expression=Lag("education_group_type__category"),
+                order_by=order_by_expressions,
+            ),
+            next_category=Window(
+                expression=Lead("education_group_type__category"),
+                order_by=order_by_expressions,
+            )
+        )
 
-    fields_names = [
-        "id", "acronym", "previous_code", "previous_id", "previous_year", "previous_category", "next_code", "next_id",
-        "next_year", "next_category", "previous_title", "next_title"
-    ]
+        fields_names = [
+            "id", "acronym", "previous_code", "previous_id", "previous_year", "previous_category", "next_code",
+            "next_id", "next_year", "next_category", "previous_title", "next_title"
+        ]
+    else:
+        fields_names = [
+            "id", "acronym", "previous_code", "previous_id", "previous_year", "next_code", "next_id", "next_year",
+            "previous_title", "next_title"
+        ]
+
     if is_ue:
         qs = qs.values_list(*fields_names, named=True).order_by(*order_by)
     else:
@@ -154,13 +163,18 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
                 current_row.next_title, current_row.next_version_label if not is_ue else None
             ),
             "next_url": reverse_url_function(
-                current_row.next_code, current_row.next_year, category[current_row.next_category]
+                current_row.next_code,
+                current_row.next_year,
+                category[current_row.next_category] if isinstance(obj, GroupYear) else url_name
             ) + '?path={}'.format(obj.element.id) if current_row.next_id else None,
             "previous_element_title": _get_title(
-                current_row.previous_title, current_row.previous_version_label if not is_ue else None
+                current_row.previous_title,
+                current_row.previous_version_label if not is_ue else None
             ),
             "previous_url": reverse_url_function(
-                current_row.previous_code, current_row.previous_year, category[current_row.previous_category]
+                current_row.previous_code,
+                current_row.previous_year,
+                category[current_row.previous_category] if isinstance(obj, GroupYear) else url_name
             ) + '?path={}'.format(obj.element.id) if current_row.previous_id else None
         })
     return context
