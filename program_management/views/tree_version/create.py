@@ -121,7 +121,7 @@ class CreateProgramTreeVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, V
                 url = reverse(
                     "element_identification",
                     kwargs={'year': self.node_identity.year, 'code': node_identity.code}
-                )
+                ) + "?keep-tab=no"
                 return JsonResponse({
                     'success_url': url
                 })
