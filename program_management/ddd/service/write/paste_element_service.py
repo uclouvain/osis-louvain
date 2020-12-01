@@ -58,13 +58,12 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
         program_tree_version.ProgramTreeVersionRepository()
     )
 
+    program_tree.ProgramTreeRepository().update(tree)
+
     if path_to_detach:
         root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
         tree_to_detach = tree if root_tree_to_detach == root_id else load_tree.load(root_tree_to_detach)
         tree_to_detach.detach_node(path_to_detach, program_tree.ProgramTreeRepository())
-        if tree.entity_id != tree_to_detach.entity_id:
-            program_tree.ProgramTreeRepository().update(tree_to_detach)
-
-    program_tree.ProgramTreeRepository().update(tree)
+        program_tree.ProgramTreeRepository().update(tree_to_detach)
 
     return link_created.entity_id
