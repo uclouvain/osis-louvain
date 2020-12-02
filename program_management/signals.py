@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.dispatch import receiver
 from django.core.cache import cache
+from django.dispatch import receiver
 
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from education_group import publisher
 from education_group.models.group_year import GroupYear
-from program_management.models.element import Element
 from program_management import publisher as publisher_pgrm_management
+from program_management.models.element import Element
 
 
 @receiver(publisher.group_created)

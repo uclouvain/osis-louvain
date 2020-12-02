@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,9 +31,8 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
 from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
+from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 

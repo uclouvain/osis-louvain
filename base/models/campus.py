@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ from base.models.enums import organization_type
 from base.models.enums.organization_type import MAIN
 from base.models.organization import Organization
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
 
 LOUVAIN_LA_NEUVE_CAMPUS_NAME = "Louvain-la-Neuve"
 

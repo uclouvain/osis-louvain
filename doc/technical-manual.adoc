@@ -577,7 +577,7 @@ Close Firefox
 
 == Adding the license to the source code
 
-OSIS is an open source project licensed under GPL v3. As such, it must respect certain rules of the license. The most important one is the addition of a license header in each one of the source files.
+OSIS is an open source project licensed under GPL v3. As such, it must respect certain rules of the license.The most important one is the addition of a license header in each one of the source files.
 
 For Python files, the following text should appear on the top of the file, before any Python code:
 
@@ -590,7 +590,7 @@ For Python files, the following text should appear on the top of the file, befor
     #    The core business involves the administration of students, teachers,
     #    courses, programs and so on.
     #
-    #    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    #    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
     #
     #    This program is free software: you can redistribute it and/or modify
     #    it under the terms of the GNU General Public License as published by
@@ -617,7 +617,7 @@ For HTML/Template files, we change just the comment syntax:
      * The core business involves the administration of students, teachers,
      * courses, programs and so on.
      *
-     * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+     * Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
      *
      * This program is free software: you can redistribute it and/or modify
      * it under the terms of the GNU General Public License as published by

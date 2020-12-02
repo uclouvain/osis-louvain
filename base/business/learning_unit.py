@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.db.models import Prefetch, Max
-from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year

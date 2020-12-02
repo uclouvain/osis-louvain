@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,15 +24,15 @@
 #
 ##############################################################################
 import copy
-import unicodedata
 from decimal import Decimal, Context, Inexact
 
+import unicodedata
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
+from base.auth.roles import program_manager
 from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, offer_year, \
     learning_unit_year
-from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type
 
 

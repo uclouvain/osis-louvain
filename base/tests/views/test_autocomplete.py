@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.organization_type import ACADEMIC_PARTNER, EMBASSY
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory

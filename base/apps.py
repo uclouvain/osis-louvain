@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@ class BaseConfig(AppConfig):
     name = 'base'
 
     def ready(self):
-        from base.models.models_signals import add_to_tutors_group, remove_from_tutor_group, update_person
-        from base.models.utils.lookups import ArrayContainsAny
-        from assessments.views.score_encoding import get_json_data_scores_sheets
+        pass
         # if django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
         # ===> This exception says that there is an error in the implementation of method ready(self) !!

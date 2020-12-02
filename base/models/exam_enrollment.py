@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,16 +25,15 @@
 ##############################################################################
 from decimal import *
 
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery, ManyToManyField
+from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery
 from django.utils.translation import gettext as _
 
 from attribution.models import attribution
+from base.auth.roles import program_manager
 from base.models import person, session_exam_deadline, \
     academic_year as academic_yr, offer_year, tutor
-from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exceptions import JustificationValueException

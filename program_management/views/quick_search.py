@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.utils.urls import reverse_with_get
 from base.views.mixins import AjaxTemplateMixin
-from education_group.views.serializers.group_year import GroupYearSerializer
 from education_group.models.group_year import GroupYear
+from education_group.views.serializers.group_year import GroupYearSerializer
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 CACHE_TIMEOUT = 60

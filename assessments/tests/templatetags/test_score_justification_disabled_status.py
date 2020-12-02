@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,16 +26,12 @@
 
 from django.test import TestCase
 
-from assessments.templatetags.enrollment_state import enrolled_exists
+from assessments.templatetags.score_justification_disabled_status import get_score_justification_disabled_status, \
+    DISABLED, ENABLED
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums import number_session
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.session_examen import SessionExamFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from assessments.templatetags.score_justification_disabled_status import get_score_justification_disabled_status, DISABLED, ENABLED
 from base.models.enums.exam_enrollment_justification_type import CHEATING
+from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+
 
 class ScoreJustificationDisabledStatusForProgramManagerTests(TestCase):
 

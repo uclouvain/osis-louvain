@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from collections import OrderedDict
-from typing import List
-
-import attr
-from django.db.models import OuterRef, Subquery, Q, Count, F
 
 from attribution.models import attribution
-from base.auth.roles import program_manager
 from base.models import offer_year, exam_enrollment, tutor
-from base.models.enums import exam_enrollment_state
-from base.models.exam_enrollment import ExamEnrollment
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year import OfferYear
-from base.models.session_exam_deadline import SessionExamDeadline, compute_deadline_tutor
-from base.models.tutor import Tutor
+from base.models.session_exam_deadline import compute_deadline_tutor
 
 
 def get_scores_encoding_progress(user, offer_year_id, number_session, academic_year, learning_unit_year_ids=None):

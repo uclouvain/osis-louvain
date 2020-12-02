@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ from django.db import transaction, Error
 from base.business.education_groups.postponement import ConsistencyError
 from base.business.utils.model import update_related_object
 from base.business.utils.postponement import AutomaticPostponement
-
 from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText

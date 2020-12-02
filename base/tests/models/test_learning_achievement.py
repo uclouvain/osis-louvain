@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from base.models import learning_achievement
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
 
 A_CODE_NAME = 'AA 1'
 A2_CODE_NAME = 'AA 2'
