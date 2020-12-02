@@ -22,8 +22,8 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from base.ddd.utils import business_validator
-from education_group.ddd.domain import exception
 from education_group.ddd.business_types import *
+from education_group.ddd.domain import exception
 
 
 class StartYearEndYearValidator(business_validator.BusinessValidator):
@@ -33,4 +33,4 @@ class StartYearEndYearValidator(business_validator.BusinessValidator):
 
     def validate(self, *args, **kwargs):
         if self.training.end_year and self.training.end_year < self.training.start_year:
-            raise exception.StartYearGreaterThanEndYear()
+            raise exception.StartYearGreaterThanEndYearException()

@@ -18,10 +18,10 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    AcronymAlreadyExist, StartYearGreaterThanEndYear, CodeAlreadyExistException, \
+    AcronymAlreadyExist, CodeAlreadyExistException, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYearException
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -134,7 +134,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                             isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                         training_form.add_error('min_constraint', e.message)
                         training_form.add_error('max_constraint', '')
-                    elif isinstance(e, StartYearGreaterThanEndYear):
+                    elif isinstance(e, StartYearGreaterThanEndYearException):
                         training_form.add_error('end_year', e.message)
                         training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-10 14:59+0100\n"
+"POT-Creation-Date: 2020-12-01 15:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -134,13 +134,10 @@ msgid "All"
 msgstr "Toutes"
 
 #, python-format
-msgid "Are you sure you want to delete %(acronym)s - %(title)s ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(acronym)s - %(title)s ?"
-
-#, python-format
 msgid "Are you sure you want to delete %(code)s - %(title)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
 
+#, python-format
 msgid "Are you sure you want to delete %(object)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
 
@@ -294,7 +291,7 @@ msgstr "Modifier"
 msgid "End academic year"
 msgstr "Année académique de fin"
 
-msgid "End year must be greater than the start year, or equal"
+msgid "End year must be greater than or equal to the start year"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
 
 msgid "English comment"
@@ -821,10 +818,6 @@ msgstr "Utilisations"
 
 msgid "Validity"
 msgstr "Validité"
-
-msgid "Validity cannot be greater than last year of organization"
-msgstr ""
-"Validité ne peut pas être supérieure à la dernière année d'organisation"
 
 msgid "Version name {} already exists"
 msgstr "Le nom de version {} existe déjà"

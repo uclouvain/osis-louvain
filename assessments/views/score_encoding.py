@@ -259,7 +259,7 @@ def online_encoding_submission(request, learning_unit_year_id):
     scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
     submitted_enrollments = []
-    draft_scores_not_sumitted_yet = scores_list.enrollment_draft_not_submitted
+    draft_scores_not_sumitted_yet = scores_list.remaining_drafts_to_submit_before_deadlines
     not_submitted_enrollments = set([
         ex for ex in scores_list.enrollments
         if not ex.is_final and ex.enrollment_state == exam_enrollment_state.ENROLLED
@@ -596,7 +596,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
         'score_responsibles': list(score_responsibles),
         'tutors': list(tutors),
         'is_coordinator': is_coordinator,
-        'draft_scores_not_submitted': len(scores_list.enrollment_draft_not_submitted),
+        'draft_scores_not_submitted': len(scores_list.remaining_drafts_to_submit_before_deadlines),
         'exam_enrollments_encoded': len(scores_list.enrollment_encoded),
         'total_exam_enrollments': _get_count_still_enrolled(scores_list.enrollments),
         'progress': scores_list.progress,

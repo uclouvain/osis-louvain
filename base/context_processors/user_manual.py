@@ -31,7 +31,7 @@ UNDEFINED_VIEW_NAME = "UNDEFINED"
 
 GLOBAL = UserManual(
     name="global",
-    url="https://uclouvain.be/osis",
+    url="https://uclouvain.be/fare",
     contextual_paths=[]
 )
 

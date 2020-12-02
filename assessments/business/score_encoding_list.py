@@ -268,8 +268,11 @@ class ScoresEncodingList:
         return "{0:.0f}".format(self.progress_int)
 
     @property
-    def enrollment_draft_not_submitted(self):
-        return [enrollment for enrollment in self.enrollments if enrollment.is_draft and not enrollment.is_final]
+    def remaining_drafts_to_submit_before_deadlines(self):
+        return [
+            enrollment for enrollment in self.enrollments
+            if enrollment.is_draft and not enrollment.is_final and not enrollment.deadline_tutor_reached
+        ]
 
     @property
     def enrollment_encoded(self):
