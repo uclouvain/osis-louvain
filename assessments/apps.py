@@ -30,4 +30,4 @@ class AssessmentsConfig(AppConfig):
     name = 'assessments'
 
     def ready(self):
-        pass
+        from assessments.signals import subscribers
