@@ -37,6 +37,7 @@ from base.models import person, session_exam_deadline, \
 from base.auth.roles import program_manager
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -138,27 +139,24 @@ class ExamEnrollment(models.Model):
         if is_absence_justification(self.justification_draft):
             return JUSTIFICATION_ABSENT_FOR_TUTOR
         elif self.justification_draft:
-            return _(self.justification_draft)
-        else:
-            return None
+            return JustificationTypes.get_value(self.justification_draft)
+        return None
 
     @property
     def justification_final_display_as_tutor(self):
         if is_absence_justification(self.justification_final):
             return JUSTIFICATION_ABSENT_FOR_TUTOR
         elif self.justification_final:
-            return _(self.justification_final)
-        else:
-            return None
+            return JustificationTypes.get_value(self.justification_final)
+        return None
 
     @property
     def justification_reencoded_display_as_tutor(self):
         if is_absence_justification(self.justification_reencoded):
             return JUSTIFICATION_ABSENT_FOR_TUTOR
         elif self.justification_reencoded:
-            return _(self.justification_reencoded)
-        else:
-            return None
+            return JustificationTypes.get_value(self.justification_reencoded)
+        return None
 
 
 def get_session_exam_deadline(enrollment):

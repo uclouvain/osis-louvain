@@ -26,6 +26,7 @@
 
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
 
 ABSENCE_UNJUSTIFIED = "ABSENCE_UNJUSTIFIED"
 ABSENCE_JUSTIFIED = "ABSENCE_JUSTIFIED"
@@ -37,7 +38,14 @@ SCORE_MISSING = "SCORE_MISSING"
 #    'ABSENCE_UNJUSTIFIED' => 'S'
 #    'ABSENCE_JUSTIFIED'   => 'M'
 #    'CHEATING'            => 'T'
+# TODO: Use remove this and use JustificationTypes enum class
 JUSTIFICATION_TYPES = (
     (ABSENCE_UNJUSTIFIED, _('Absence unjustified')),  # A -> S
     (ABSENCE_JUSTIFIED, _('Absence justified')),      # M
     (CHEATING, _('Cheating')))                        # T
+
+
+class JustificationTypes(ChoiceEnum):
+    ABSENCE_UNJUSTIFIED = _("Absence unjustified")
+    ABSENCE_JUSTIFIED = _("Absence justified")
+    CHEATING = _("Cheating")

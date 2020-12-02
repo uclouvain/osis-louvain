@@ -29,6 +29,7 @@ from django.test import TestCase
 
 from base.models import exam_enrollment, exceptions
 from base.models.enums import exam_enrollment_state as enrollment_states
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -161,3 +162,47 @@ class ExamEnrollmentTest(TestCase):
             session_exam_number=1,
             only_enrolled=True
         ), [self.exam_enrollment])
+
+
+class ExamEnrollmentDisplayPropertyTest(TestCase):
+    def test_justification_draft_display_property_case_is_absence_of_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_draft=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
+        self.assertEqual(exam_enroll.justification_draft_display, exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR)
+
+    def test_justification_draft_display_property_case_have_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_draft=JustificationTypes.CHEATING.name)
+        self.assertEqual(exam_enroll.justification_draft_display, JustificationTypes.CHEATING.value)
+
+    def test_justification_draft_display_property_case_no_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_draft=None)
+        self.assertIsNone(exam_enroll.justification_draft_display)
+
+    def test_justification_final_display_as_tutor_property_case_is_absence_of_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_final=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
+        self.assertEqual(
+            exam_enroll.justification_final_display_as_tutor,
+            exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR
+        )
+
+    def test_justification_final_display_as_tutor_property_case_have_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_final=JustificationTypes.CHEATING.name)
+        self.assertEqual(exam_enroll.justification_final_display_as_tutor, JustificationTypes.CHEATING.value)
+
+    def test_justification_final_display_as_tutor_property_case_no_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_final=None)
+        self.assertIsNone(exam_enroll.justification_final_display_as_tutor)
+
+    def test_justification_reencoded_display_as_tutor_property_case_is_absence_of_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_reencoded=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
+        self.assertEqual(
+            exam_enroll.justification_reencoded_display_as_tutor,
+            exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR
+        )
+
+    def test_justification_reencoded_display_as_tutor_property_case_have_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_reencoded=JustificationTypes.CHEATING.name)
+        self.assertEqual(exam_enroll.justification_reencoded_display_as_tutor, JustificationTypes.CHEATING.value)
+
+    def test_justification_reencoded_display_as_tutor_property_case_no_justification(self):
+        exam_enroll = ExamEnrollmentFactory(justification_reencoded=None)
+        self.assertIsNone(exam_enroll.justification_reencoded_display_as_tutor)
