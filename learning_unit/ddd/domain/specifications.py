@@ -23,18 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 
 
+@attr.s(slots=True)
 class Specifications:
-
-    def __init__(
-            self,
-            themes_discussed: str = None,
-            themes_discussed_en: str = None,
-            prerequisite: str = None,
-            prerequisite_en: str = None
-    ):
-        self.themes_discussed = themes_discussed
-        self.themes_discussed_en = themes_discussed_en
-        self.prerequisite = prerequisite
-        self.prerequisite_en = prerequisite_en
+    themes_discussed = attr.ib(type=str, default=None)
+    themes_discussed_en = attr.ib(type=str, default=None)
+    prerequisite = attr.ib(type=str, default=None)
+    prerequisite_en = attr.ib(type=str, default=None)

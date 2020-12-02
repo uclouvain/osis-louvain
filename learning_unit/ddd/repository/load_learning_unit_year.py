@@ -28,11 +28,8 @@ from typing import List, Dict
 
 from django.conf import settings
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q, Prefetch
-from django.db.models.expressions import RawSQL
 
 from attribution.ddd.repositories.attribution_repository import AttributionRepository
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS, \
-    CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -42,49 +39,14 @@ from base.models.enums.quadrimesters import DerogationQuadrimester, LearningUnit
 from base.models.learning_achievement import LearningAchievement as LearningAchievementModelDb
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
 from learning_unit.ddd.domain.achievement import AchievementIdentity, Achievement
-from learning_unit.ddd.domain.description_fiche import DescriptionFiche, DescriptionFicheForceMajeure
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
-from learning_unit.ddd.domain.specifications import Specifications
+from learning_unit.ddd.repository.load_description_fiche import bulk_load_description_fiche
+from learning_unit.ddd.repository.load_specification import bulk_load_specification
+from learning_unit.ddd.repository.load_description_fiche_force_majeure import bulk_load_force_majeures
 from learning_unit.ddd.repository.load_teaching_material import bulk_load_teaching_materials
-from osis_common.decorators.deprecated import deprecated
-
-RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE = """
-    WITH last_update_info AS (
-        SELECT upper(person.last_name) || ' ' || person.first_name as author, revision.date_created AS last_update
-        FROM reversion_version version
-        JOIN reversion_revision revision ON version.revision_id = revision.id
-        JOIN auth_user users ON revision.user_id = users.id
-        JOIN base_person person ON person.user_id = users.id
-        join django_content_type ct on version.content_type_id = ct.id
-        left join cms_translatedtext tt on cast(version.object_id as integer) = tt.id and ct.model = 'translatedtext'
-        left join cms_textlabel tl on tt.text_label_id = tl.id
-        left join base_teachingmaterial tm on cast(version.object_id as integer) = tm.id
-        and ct.model = 'teachingmaterial'
-        join base_learningunityear luy on luy.id = tm.learning_unit_year_id or luy.id = tt.reference
-        where ("base_learningunityear"."id" = tt.reference or "base_learningunityear"."id" = tm.learning_unit_year_id)
-        and tl.label in {labels_to_check} and ct.model in ({models_to_check})
-        order by revision.date_created desc limit 1
-    )
-"""
-
-LAST_UPDATE_FICHE_DESCRIPTIVE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY))),
-    models_to_check=','.join(["'translatedtext'", "'teachingmaterial'"])
-) + """
-    SELECT {field_to_select} FROM last_update_info
-"""
-
-LAST_UPDATE_FORCE_MAJEURE = RAW_SQL_TO_GET_LAST_UPDATE_FICHE_DESCRIPTIVE.format(
-    labels_to_check=repr(tuple(map(str, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE))),
-    models_to_check=','.join(["'translatedtext'"])
-) + """
-SELECT {field_to_select} FROM last_update_info
-"""
 
 
 def load_multiple_by_identity(
@@ -104,6 +66,9 @@ def load_multiple_by_identity(
     attributions_by_ue = __build_sorted_attributions_grouped_by_ue(attributions)
 
     teaching_materials_by_learning_unit_identity = bulk_load_teaching_materials(learning_unit_year_identities)
+    description_fiches = bulk_load_description_fiche(learning_unit_year_identities)
+    force_majeures = bulk_load_force_majeures(learning_unit_year_identities)
+    specifications_set = bulk_load_specification(learning_unit_year_identities)
     results = []
     for learning_unit_data in qs:
         learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data.acronym,
@@ -111,7 +76,10 @@ def load_multiple_by_identity(
         luy = __instanciate_learning_unit_year(
             learning_unit_data,
             teaching_materials=teaching_materials_by_learning_unit_identity.get(learning_unit_identity, []),
-            attributions=attributions_by_ue.get(learning_unit_identity)
+            attributions=attributions_by_ue.get(learning_unit_identity),
+            description_fiche=description_fiches[learning_unit_data.id],
+            force_majeure=force_majeures[learning_unit_data.id],
+            specifications=specifications_set[learning_unit_data.id]
         )
 
         results.append(luy)
@@ -162,7 +130,10 @@ def __build_achievements(qs):
 def __instanciate_learning_unit_year(
         learning_unit_data: LearningUnitYearModel,
         teaching_materials=None,
-        attributions=None
+        attributions=None,
+        description_fiche=None,
+        force_majeure=None,
+        specifications=None
 ) -> LearningUnitYear:
     learning_unit_identity = LearningUnitYearIdentity(
         code=learning_unit_data.acronym,
@@ -206,38 +177,9 @@ def __instanciate_learning_unit_year(
         achievements=achievements,
         entities=Entities(requirement_entity_acronym=learning_unit_data.requirement_entity_acronym,
                           allocation_entity_acronym=learning_unit_data.allocation_entity_acronym),
-        description_fiche=DescriptionFiche(
-            resume=learning_unit_data.cms_resume,
-            resume_en=learning_unit_data.cms_resume_en,
-            teaching_methods=learning_unit_data.cms_teaching_methods,
-            teaching_methods_en=learning_unit_data.cms_teaching_methods_en,
-            evaluation_methods=learning_unit_data.cms_evaluation_methods,
-            evaluation_methods_en=learning_unit_data.cms_evaluation_methods_en,
-            other_informations=learning_unit_data.cms_other_informations,
-            other_informations_en=learning_unit_data.cms_other_informations_en,
-            online_resources=learning_unit_data.cms_online_resources,
-            online_resources_en=learning_unit_data.cms_online_resources_en,
-            bibliography=learning_unit_data.cms_bibliography,
-            mobility=learning_unit_data.cms_mobility,
-            last_update=learning_unit_data.last_update,
-            author=learning_unit_data.author
-        ),
-        force_majeure=DescriptionFicheForceMajeure(
-            teaching_methods=learning_unit_data.cms_teaching_methods_force_majeure,
-            teaching_methods_en=learning_unit_data.cms_teaching_methods_force_majeure_en,
-            evaluation_methods=learning_unit_data.cms_evaluation_methods_force_majeure,
-            evaluation_methods_en=learning_unit_data.cms_evaluation_methods_force_majeure_en,
-            other_informations=learning_unit_data.cms_other_informations_force_majeure,
-            other_informations_en=learning_unit_data.cms_other_informations_force_majeure_en,
-            last_update=learning_unit_data.last_update_force_majeure,
-            author=learning_unit_data.author_force_majeure
-        ),
-        specifications=Specifications(
-            themes_discussed=learning_unit_data.cms_themes_discussed,
-            themes_discussed_en=learning_unit_data.cms_themes_discussed_en,
-            prerequisite=learning_unit_data.cms_prerequisite,
-            prerequisite_en=learning_unit_data.cms_prerequisite_en
-        ),
+        description_fiche=description_fiche,
+        force_majeure=force_majeure,
+        specifications=specifications,
         teaching_materials=teaching_materials,
         subtype=learning_unit_data.subtype,
         session=learning_unit_data.session,
@@ -314,64 +256,6 @@ def __get_queryset() -> QuerySet:
 
         requirement_entity_acronym=Subquery(subquery_entity_requirement),
         allocation_entity_acronym=Subquery(subquery_allocation_requirement),
-
     )
-
-    qs = _annotate_with_description_fiche_specifications(qs)
 
     return qs
-
-
-def _annotate_with_description_fiche_specifications(original_qs1):
-    original_qs = original_qs1
-    qs = TranslatedText.objects.filter(
-        reference=OuterRef('pk'),
-        entity=LEARNING_UNIT_YEAR
-    )
-
-    annotations = __build_annotations(
-        qs,
-        CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS,
-        CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
-    )
-    reversion_annot = _get_revision_annotation()
-    original_qs = original_qs.annotate(**annotations, **reversion_annot)
-
-    annotations = __build_annotations(
-        qs,
-        CMS_LABEL_PEDAGOGY_FORCE_MAJEURE,
-        CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
-    )
-    reversion_annot = _get_revision_annotation(is_force_majeure=True)
-    original_qs = original_qs.annotate(**annotations, **reversion_annot)
-
-    return original_qs
-
-
-def __build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
-    annotations = {
-        "cms_{}".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
-        for lbl in fr_labels
-    }
-
-    annotations.update({
-        "cms_{}_en".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
-        for lbl in en_labels}
-    )
-    return annotations
-
-
-def _build_subquery_text_label(qs, cms_text_label, lang):
-    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
-        'text')[:1]
-
-
-def _get_revision_annotation(is_force_majeure=False):
-    suffix = '_force_majeure' if is_force_majeure else ''
-    query = LAST_UPDATE_FORCE_MAJEURE if is_force_majeure else LAST_UPDATE_FICHE_DESCRIPTIVE
-    return {
-        'author' + suffix: RawSQL(query.format(field_to_select='author'), ()),
-        'last_update' + suffix: RawSQL(query.format(field_to_select='last_update'), ())
-    }
