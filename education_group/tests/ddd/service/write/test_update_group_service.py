@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest import mock
+
 from django.test import TestCase
 
 from education_group.ddd.domain import group
@@ -28,6 +30,7 @@ from education_group.ddd.service.write import update_group_service
 from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
 from education_group.tests.factories.factories.command import UpdateGroupCommandFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from testing.mocks import MockPatcherMixin
 
 
@@ -37,9 +40,19 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
         cls.cmd = UpdateGroupCommandFactory()
 
     def setUp(self) -> None:
-        self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2018,)
-        self.group_2019 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2019,)
-        self.groups = [self.group_2018, self.group_2019]
+        self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2018, )
+        self.group_2019 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2019, )
+
+        self.tree_version = ProgramTreeVersionFactory(
+            entity_id__offer_acronym=self.group_2018.abbreviated_title,
+            entity_id__year=2018,
+            entity_id__version_name='TEST',
+        )
+        self.group_version = GroupFactory(
+            entity_identity__code=self.tree_version.program_tree_identity.code,
+            entity_identity__year=self.tree_version.program_tree_identity.year
+        )
+        self.groups = [self.group_2018, self.group_2019, self.group_version]
         self.fake_group_repo = get_fake_group_repository(self.groups)
         self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
@@ -55,11 +68,21 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
         group_updated = self.fake_group_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(group_updated)
 
+    @mock.patch(
+        'program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository.search_all_versions_from_root_node')
+    def test_should_update_unversioned_fields_of_version_groups(self, mock_search):
+        mock_search.return_value = [self.tree_version]
+        update_group_service.update_group(self.cmd)
+
+        group_updated = self.fake_group_repo.get(self.group_version.entity_id)
+        self.assertEqual(group_updated.titles.title_fr, self.cmd.title_fr)
+        self.assertEqual(group_updated.titles.title_en, self.cmd.title_en)
+        self.assertEqual(group_updated.abbreviated_title, self.cmd.abbreviated_title)
+
     def assert_has_same_value_as_update_command(self, update_group: 'group.Group'):
         self.assertEqual(update_group.titles.title_fr, self.cmd.title_fr)
         self.assertEqual(update_group.titles.title_en, self.cmd.title_en)
         self.assertEqual(update_group.credits, self.cmd.credits)
-        self.assertEqual(update_group.titles.title_en, self.cmd.title_en)
         self.assertEqual(update_group.content_constraint.type.name, self.cmd.constraint_type)
         self.assertEqual(update_group.content_constraint.maximum, self.cmd.max_constraint)
         self.assertEqual(update_group.content_constraint.minimum, self.cmd.min_constraint)
