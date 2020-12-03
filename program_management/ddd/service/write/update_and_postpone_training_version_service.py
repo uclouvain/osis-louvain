@@ -26,19 +26,18 @@
 from typing import List
 
 from education_group.ddd.business_types import *
+from education_group.ddd.repository.group import GroupRepository
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateProgramTreeVersionCommand, \
     PostponeGroupVersionCommand, PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.service.write import update_program_tree_version_service, \
-    update_and_postpone_group_version_service, postpone_training_and_program_tree_modifications_service, \
-    postpone_program_tree_service, postpone_tree_version_service
+    update_and_postpone_group_version_service, postpone_program_tree_service, postpone_tree_version_service
 
 
 def update_and_postpone_training_version(
         command: 'UpdateTrainingVersionCommand',
 ) -> List['ProgramTreeVersionIdentity']:
-
     tree_version_identity = update_program_tree_version_service.update_program_tree_version(
         __convert_to_update_tree_version_command(command)
     )
@@ -84,12 +83,13 @@ def __convert_to_postpone_group_version(
         cmd: 'UpdateTrainingVersionCommand',
         group_identity: 'GroupIdentity'
 ) -> 'PostponeGroupVersionCommand':
+    group = GroupRepository().get(group_identity)
     return PostponeGroupVersionCommand(
         code=group_identity.code,
         postpone_from_year=cmd.year,
         abbreviated_title=cmd.offer_acronym,
-        title_fr=cmd.title_fr,
-        title_en=cmd.title_en,
+        title_fr=group.titles.title_fr,
+        title_en=group.titles.title_en,
         credits=cmd.credits,
         constraint_type=cmd.constraint_type,
         min_constraint=cmd.min_constraint,

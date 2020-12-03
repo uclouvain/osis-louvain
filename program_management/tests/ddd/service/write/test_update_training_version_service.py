@@ -25,6 +25,7 @@ import mock
 from django.test import TestCase
 
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.tests.ddd.factories.commands.update_training_version_command import \
@@ -56,7 +57,9 @@ class TestUpdateTrainingVersion(TestCase):
             is_transition=cmd.is_transition,
         )
         mock_update_tree_version_service.return_value = identity_expected
-        mock_identity_converter.return_value = GroupIdentityFactory()
+        group_id = GroupIdentityFactory()
+        mock_identity_converter.return_value = group_id
+        GroupYearFactory(partial_acronym=group_id.code, academic_year__year=group_id.year)
         mock_postpone_group_version_service.return_value = []
 
         result = update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
