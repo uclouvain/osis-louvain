@@ -27,7 +27,10 @@ from django.db import transaction
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import group, exception
+from education_group.ddd.domain._titles import Titles
 from education_group.ddd.repository import group as group_repository
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 @transaction.atomic()
@@ -44,4 +47,22 @@ def copy_group(cmd: command.CopyGroupCommand) -> 'GroupIdentity':
             group_id = repository.create(group_next_year)
     except exception.CodeAlreadyExistException:
         group_id = repository.update(group_next_year)
+
+    _update_others_version_groups(existing_group)
+
     return group_id
+
+
+def _update_others_version_groups(from_group: 'Group'):
+    node_id = NodeIdentity(code=from_group.code, year=from_group.year + 1)
+    versions = ProgramTreeVersionRepository().search_all_versions_from_root_node(node_id)
+    for version in versions:
+        if not version.is_standard:
+            tree_identity = version.program_tree_identity
+            version_group_identity = group.GroupIdentity(code=tree_identity.code, year=tree_identity.year)
+            existing_group_version = group_repository.GroupRepository().get(version_group_identity)
+            existing_group_version.update_unversioned_fields(
+                abbreviated_title=from_group.abbreviated_title,
+                titles=Titles(title_fr=from_group.titles.title_fr, title_en=from_group.titles.title_en),
+            )
+            group_repository.GroupRepository().update(existing_group_version)

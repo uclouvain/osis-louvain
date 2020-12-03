@@ -33,6 +33,8 @@ from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.repository import group as group_repository
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
 @transaction.atomic()
@@ -42,7 +44,25 @@ def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
 
     _update_group(grp, cmd)
     group_repository.GroupRepository.update(grp)
+
+    _update_others_version_groups(grp, cmd)
+
     return group_identity
+
+
+def _update_others_version_groups(grp: 'Group', cmd: command.UpdateGroupCommand):
+    node_id = NodeIdentity(code=grp.code, year=grp.year)
+    versions = ProgramTreeVersionRepository().search_all_versions_from_root_node(node_id)
+    for version in versions:
+        if not version.is_standard:
+            tree_identity = version.program_tree_identity
+            version_group_identity = GroupIdentity(code=tree_identity.code, year=tree_identity.year)
+            grp = group_repository.GroupRepository.get(version_group_identity)
+            grp.update_unversioned_fields(
+                abbreviated_title=cmd.abbreviated_title,
+                titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
+            )
+            group_repository.GroupRepository.update(grp)
 
 
 def _update_group(group_obj: 'Group', cmd: command.UpdateGroupCommand) -> 'Group':

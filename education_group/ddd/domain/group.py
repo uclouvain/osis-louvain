@@ -34,11 +34,11 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Gro
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
+from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList
@@ -158,6 +158,15 @@ class Group(interface.RootEntity):
         self.remark = remark
         self.end_year = end_year
         UpdateGroupValidatorList(self).validate()
+        return self
+
+    def update_unversioned_fields(
+            self,
+            abbreviated_title: str,
+            titles: Titles,
+    ):
+        self.abbreviated_title = abbreviated_title.upper()
+        self.titles = titles
         return self
 
     def has_same_values_as(self, other_group: 'Group') -> bool:
