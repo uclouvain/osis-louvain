@@ -33,7 +33,6 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 
 urlpatterns = [
-
     url(r'^scores_encoding/', include([
         url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^outside_period/$',

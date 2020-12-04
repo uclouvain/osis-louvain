@@ -21,15 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.http import Http404
+
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
-from django.http import Http404
 
 
 def format_version_title(node: 'NodeGroupYear', language: str) -> str:
     if language == LANGUAGE_CODE_EN and node.version_title_en:
-        return "[{}]".format(node.version_title_en)
+        return "[{}]".format(node.version_title_en) if node.version_title_en else ''
     return "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
 
 

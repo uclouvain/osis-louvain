@@ -113,6 +113,10 @@ class TestTrainingReadAdmissionCondition(TestCase):
             get={"path": str(self.training_version.root_group.element.pk)}
         )
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        expected_publish_url = reverse(
+            'publish_general_information', args=[2019, "LDROI200M"]
+        ) + "?path=" + str(self.training_version.root_group.element.pk)
+        self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIn("can_edit_information", response.context)
         self.assertIn("training", response.context)

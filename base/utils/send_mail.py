@@ -27,9 +27,11 @@
 """
 Utility files for mail sending
 """
+from typing import List
 import datetime
 import itertools
 
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
 from django.db.models import Q
@@ -41,6 +43,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from assessments.business import score_encoding_sheet
 from base.models.enums import proposal_type
 from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
+from base.models.exam_enrollment import ExamEnrollment
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -54,7 +57,8 @@ ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE = "assessments_scores_submission"
 ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
 
 
-def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enrollments, all_encoded):
+def send_mail_after_scores_submission(persons: List[Person], learning_unit_name: str,
+                                      submitted_enrollments: List[ExamEnrollment], all_encoded: bool):
     """
     Send an email to all the teachers after the scores submission for a learning unit
     :param persons: The list of the teachers of the learning unit
@@ -84,7 +88,11 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in submitted_enrollments]
 
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    receivers = [
+        message_config.create_receiver(
+            person.id, person.email, person.language if person.language else settings.LANGUAGE_CODE
+        ) for person in persons
+    ]
 
     for receiver in receivers:
         table = message_config.create_table('submitted_enrollments',
@@ -101,7 +109,7 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     return None
 
 
-def send_mail_after_the_learning_unit_year_deletion(managers, acronym, academic_year, msg_list):
+def send_mail_after_the_learning_unit_year_deletion(managers, acronym: str, academic_year, msg_list):
     html_template_ref = 'learning_unit_year_deletion_html'
     txt_template_ref = 'learning_unit_year_deletion_txt'
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]

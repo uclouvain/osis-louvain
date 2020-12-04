@@ -39,6 +39,7 @@ from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     FILL_NO_GRAY, FONT_CELLS, STYLED_CELLS
+from program_management import formatter
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import link
 from program_management.ddd.domain.node import NodeIdentity
@@ -88,13 +89,15 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title
+            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
         }
 
 
 def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
-    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": tree.root_node.year,
-                                                                 "acronym": tree.root_node.code}
+    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {
+        "year": tree.root_node.year,
+        "acronym": tree.root_node.code,
+    }
     worksheet_title = clean_worksheet_title(worksheet_title)
     workbook = Workbook(encoding='utf-8')
 
@@ -104,11 +107,14 @@ def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
 
 
 def _build_excel_lines(tree: 'ProgramTree') -> List:
+    language = translation.get_language()
     content = _first_line_content(
         HeaderLine(
-            egy_acronym=tree.root_node.title,
-            egy_title=tree.root_node.group_title_en if translation.get_language() == LANGUAGE_CODE_EN else
-            tree.root_node.group_title_fr,
+            egy_acronym=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            egy_title="{title}{version_title}".format(
+                title=_get_group_or_offer_title(language, tree),
+                version_title=formatter.format_version_title(tree.root_node, language)
+            ),
             code_header=_('Code'),
             title_header=_('Title'),
             credits_header=_('Cred. rel./abs.'),
@@ -259,13 +265,15 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title
+            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
         }
 
 
 def generate_ue_is_prerequisite_for_workbook(tree: 'ProgramTree') -> Workbook:
-    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": tree.root_node.year,
-                                                                      "acronym": tree.root_node.code}
+    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {
+        "year": tree.root_node.year,
+        "acronym": tree.root_node.code,
+    }
     worksheet_title = clean_worksheet_title(worksheet_title)
     workbook = Workbook()
 
@@ -295,15 +303,19 @@ def _get_workbook(tree: 'ProgramTree',
 
 
 def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
+    language = translation.get_language()
     content = _first_line_content(
-        HeaderLinePrerequisiteOf(node_title=tree.root_node.title,
-                                 tree_title=tree.root_node.group_title_en
-                                 if translation.get_language() == LANGUAGE_CODE_EN else tree.root_node.group_title_fr,
-                                 title_header=_('Title'),
-                                 credits_header=_('Cred. rel./abs.'),
-                                 block_header=_('Block'),
-                                 mandatory_header=_('Mandatory')
-                                 )
+        HeaderLinePrerequisiteOf(
+            node_title=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            tree_title="{title}{version_title}".format(
+                title=_get_group_or_offer_title(language, tree),
+                version_title=formatter.format_version_title(tree.root_node, language)
+            ),
+            title_header=_('Title'),
+            credits_header=_('Cred. rel./abs.'),
+            block_header=_('Block'),
+            mandatory_header=_('Mandatory')
+        )
     )
     for child_node in tree.get_nodes_that_are_prerequisites():
         if child_node.is_prerequisite:
@@ -321,6 +333,13 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
                     first = False
                     content.append(prerequisite_line)
     return content
+
+
+def _get_group_or_offer_title(language, tree):
+    lang_suffix = 'en' if language == LANGUAGE_CODE_EN else 'fr'
+    field_prefix = 'group' if tree.root_node.is_group() else 'offer'
+    attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
+    return getattr(tree.root_node, attr_name)
 
 
 def _build_is_prerequisite_for_line(prerequisite_node: 'NodeLearningUnitYear', first, tree: 'ProgramTree') \

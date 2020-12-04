@@ -169,7 +169,7 @@ class TestContent(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.parent_node = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        cls.child_node = NodeGroupYearFactory()
+        cls.child_node = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         cls.lu = NodeLearningUnitYearFactory()
 
         cls.link_1 = LinkFactory(parent=cls.parent_node, child=cls.child_node, is_mandatory=True)
@@ -527,7 +527,8 @@ def get_expected_data_new(child_node, luy, link, main_gathering=None):
         main_gathering_str = "{} - {}".format(
             main_gathering.title,
             main_gathering.offer_partial_title_fr or '' if main_gathering.is_finality()
-            else main_gathering.group_title_fr) if main_gathering else ''
+            else main_gathering.offer_title_fr
+        ) if main_gathering else ''
     else:
         main_gathering_str = ''
 

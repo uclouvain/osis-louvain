@@ -66,18 +66,15 @@
                                data-modal_class="modal-lg">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
-                            <a class="trigger_modal"
-                               data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </a>
                         {% endif %}
                         {% if can_add_charge_repartition %}
                             <a class="trigger_modal"
                                data-url="{% url "edit_charge_repartition" learning_unit_year.id attribution.pk %}"
                                data-modal_class="modal-lg">
-                                            <span class="glyphicon glyphicon-edit">
-
-                                            </span> </a>
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        {% endif %}
+                        {% if can_delete_attribution %}
                             <a class="trigger_modal"
                                data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
                                 <span class="glyphicon glyphicon-trash"></span>

@@ -48,7 +48,8 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
             "can_edit_information":
                 self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "update_text_url": self.get_update_text_url(),
-            "mini_training": self.get_mini_training()
+            "mini_training": self.get_mini_training(),
+            "publish_url": self.get_publish_url()
         }
 
     @functools.lru_cache()
@@ -71,3 +72,9 @@ class MiniTrainingReadAdmissionCondition(MiniTrainingRead):
                 'code': self.node_identity.code
             }
         )
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())

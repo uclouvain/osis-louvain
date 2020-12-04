@@ -60,6 +60,7 @@ class TrainingReadSkillsAchievements(TrainingRead):
                 'training_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
             ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS),
+            "publish_url": self.get_publish_url()
         }
 
     def get_program_aims_update_url(self):
@@ -95,3 +96,9 @@ class TrainingReadSkillsAchievements(TrainingRead):
     @cached_property
     def training(self):
         return TrainingRepository.get(self.training_identity)
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.path)

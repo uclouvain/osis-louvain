@@ -27,6 +27,7 @@ import re
 from collections import namedtuple, defaultdict
 from typing import Dict, List
 
+from django.conf import settings
 from django.template.defaultfilters import yesno
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -203,13 +204,17 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     optional_data_needed = _optional_data(custom_xls_form)
     font_rows = defaultdict(list)
     idx = 1
+    learning_unit_nodes = tree.get_all_learning_unit_nodes()
 
-    learning_unit_years = load_multiple_by_identity(
-        [
-            LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
-            for learn_unt_child in tree.get_all_learning_unit_nodes()
-        ]
-    )
+    if learning_unit_nodes:
+        learning_unit_years = load_multiple_by_identity(
+            [
+                LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
+                for learn_unt_child in learning_unit_nodes
+            ]
+        )
+    else:
+        learning_unit_years = []
 
     tree_versions = search_all_versions_from_root_nodes(
         [
@@ -515,14 +520,39 @@ def _build_direct_gathering_label(direct_gathering_node: 'NodeGroupYear') -> str
 
 def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['ProgramTreeVersion']) -> str:
     if gathering_node:
-        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(gathering_node.year,
-                                                                             gathering_node.code,
-                                                                             tree_versions)
-        return "{}{} - {}".format(
+        pgm_tree_version = _get_program_tree_version_from_tree_versions_list(
+            gathering_node.year, gathering_node.code, tree_versions
+        )
+        language = translation.get_language()
+        node_title = _get_gathering_node_title(gathering_node, language)
+        node_version_title = _get_gathering_node_version_title(pgm_tree_version, language)
+        return "{}{} - {}{}".format(
             gathering_node.title,
             pgm_tree_version.version_label if pgm_tree_version else '',
-            gathering_node.offer_partial_title_fr if gathering_node.is_finality() else gathering_node.group_title_fr)
+            node_title,
+            node_version_title
+        )
     return '-'
+
+
+def _get_gathering_node_title(gathering_node: 'Node', language: str):
+    lang_suffix = 'en' if language == settings.LANGUAGE_CODE_EN else 'fr'
+    field_prefix = 'group' if gathering_node.is_group() else 'offer'
+
+    if gathering_node.is_finality():
+        attr_name = '{}_partial_title_{}'.format(field_prefix, lang_suffix)
+    else:
+        attr_name = '{}_title_{}'.format(field_prefix, lang_suffix)
+    return getattr(gathering_node, attr_name)
+
+
+def _get_gathering_node_version_title(pgm_tree_version: 'ProgramTreeVersion', language: str):
+    if pgm_tree_version and not pgm_tree_version.is_standard_version:
+        if language == settings.LANGUAGE_CODE_EN and pgm_tree_version.title_en:
+            return "[{}]".format(pgm_tree_version.title_en)
+        elif language == settings.LANGUAGE_CODE_FR and pgm_tree_version.title_fr:
+            return "[{}]".format(pgm_tree_version.title_fr)
+    return ""
 
 
 def volumes_information(lecturing_volume, practical_volume):
