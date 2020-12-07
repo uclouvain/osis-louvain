@@ -41,6 +41,7 @@ from base.views.learning_units.search.common import SearchTypes
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
 
 
 class TestNavigationMixin:
@@ -196,7 +197,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
 
 class TestNavigationGroupYear(TestNavigationMixin, TestCase):
     search_type = GroupYear.__name__
-    current_version_value = 9  # TODO : Devrait être un programTreeVersion
+    current_version_value = StandardProgramTreeVersionFactory()
 
     @classmethod
     def generate_elements(cls):

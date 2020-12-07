@@ -63,8 +63,10 @@ def navigation_group(user, obj: GroupYear, url_name: str, current_version: Optio
 def _navigation_base(filter_class_function, reverse_url_function, user, obj, url_name, code_field_name, is_ue=False,
                      current_version: Optional['ProgramTreeVersion'] = None):
     context = {"current_element": obj}
+    is_standard_version = True
     if current_version:
         context.update({'current_version': current_version})
+        is_standard_version = current_version.is_standard_version
     search_parameters = SearchParametersCache(user, obj.__class__.__name__).cached_data
     if not search_parameters:
         return context
@@ -140,9 +142,9 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             next_url_name = url_name
             previous_url_name = url_name
         else:
-            next_url_name = get_valid_url_name(current_version.is_standard_version, url_name,
+            next_url_name = get_valid_url_name(is_standard_version, url_name,
                                                current_row.next_code, current_row.next_year)
-            previous_url_name = get_valid_url_name(current_version.is_standard_version, url_name,
+            previous_url_name = get_valid_url_name(is_standard_version, url_name,
                                                    current_row.previous_code, current_row.previous_year)
         context.update({
             "next_element_title": _get_title(current_row.next_title,
