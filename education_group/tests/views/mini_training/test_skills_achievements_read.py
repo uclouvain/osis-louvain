@@ -127,6 +127,10 @@ class TestMiniTrainingReadSkillAchievementsRead(TestCase):
             get={"path": str(self.mini_training_version.root_group.element.pk)}
         )
         self.assertEqual(response.context['tree_json_url'], expected_tree_json_url)
+        expected_publish_url = reverse(
+            'publish_general_information', args=[self.academic_year.year, "LBIOL100P"]
+        ) + "?path=" + str(self.mini_training_version.root_group.element.pk)
+        self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['achievements'], List)
         self.assertIn("can_edit_information", response.context)

@@ -33,9 +33,6 @@ from program_management.business.excel import EducationGroupYearLearningUnitsPre
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
 from program_management.business.excel_ue_in_of import EducationGroupYearLearningUnitsContainedToExcel
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.ddd import command as command_pgrm
-from program_management.ddd.service.read import node_identity_service
-from program_management.ddd.repositories.node import NodeRepository
 
 
 @login_required
@@ -47,7 +44,7 @@ def get_learning_unit_prerequisites_excel(request, year, code):
     filename = "{workbook_name}.xlsx".format(
         workbook_name=str(_("prerequisites-%(year)s-%(acronym)s") % {
             "year": year,
-            "acronym": excel['acronym']
+            "acronym": excel['acronym'],
         })
     )
     response['Content-Disposition'] = "%s%s" % ("attachment; filename=", filename)

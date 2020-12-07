@@ -64,7 +64,7 @@ def get_score_sheet_address(off_year):
 def _get_address_as_dict(address):
     field_names = ['recipient', 'location', 'postal_code', 'city', 'country', 'phone', 'fax', 'email']
     if address:
-        return {f_name: getattr(address, f_name, None) for f_name in field_names}
+        return {f_name: getattr(address, f_name, '') for f_name in field_names}
     else:
         return {f_name: None for f_name in field_names}
 

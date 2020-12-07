@@ -113,6 +113,10 @@ class TestTrainingReadSkillAchievementsRead(TestCase):
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
         self.assertEqual(response.context['education_group_version'], self.training_version)
         self.assertIsInstance(response.context['tree_json_url'], str)
+        expected_publish_url = reverse(
+            'publish_general_information', args=[2019, "LDROI200M"]
+        ) + "?path=" + str(self.training_version.root_group.element.pk)
+        self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertIsInstance(response.context['group'], Group)
         self.assertIsInstance(response.context['achievements'], List)
         self.assertIn("can_edit_information", response.context)

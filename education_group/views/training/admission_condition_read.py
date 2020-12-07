@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-
 from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -32,8 +30,6 @@ from django.urls import reverse
 from base.utils.cache_keys import get_tab_lang_keys
 from base.utils.cache import cache
 
-from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
 from education_group.views.serializers import admission_condition
 from education_group.views.training.common_read import TrainingRead, Tab
 
@@ -56,6 +52,7 @@ class TrainingReadAdmissionCondition(TrainingRead):
             "update_text_url": self.get_update_text_url(),
             "common_admission_condition": self.get_common_admission_condition(),
             "admission_condition": self.get_admission_condition(),
+            "publish_url": self.get_publish_url()
         }
 
         if training.is_master_60_credits() or training.is_master_120_credits() or training.is_master_180_240_credits():
@@ -111,3 +108,9 @@ class TrainingReadAdmissionCondition(TrainingRead):
                 'code': self.node_identity.code
             }
         )
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.path)

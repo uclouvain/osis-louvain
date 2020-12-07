@@ -48,7 +48,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
             "year": kwargs['year'],
             "code": kwargs['code'],
             **super().get_context_data(**kwargs),
-            "achievements": achievement.get_achievements(self.get_group(), self.request.GET['path']),
+            "achievements": achievement.get_achievements(self.get_group(), self.get_path()),
             "can_edit_information": self.request.user.has_perm(edition_perm_name, self.get_permission_object()),
             "program_aims_label": self.get_program_aims_label(),
             "program_aims_update_url": self.get_program_aims_update_url(),
@@ -57,7 +57,8 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
             "url_create": reverse(
                 'minitraining_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
-            ) + '?path={}&tab={}'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+            ) + '?path={}&tab={}'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS),
+            "publish_url": self.get_publish_url()
         }
 
     def get_program_aims_update_url(self):
@@ -65,7 +66,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         return reverse(
             'education_group_achievement_program_aim',
             args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
 
     def get_program_aims_label(self):
         return next(
@@ -78,7 +79,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         return reverse(
             'education_group_achievement_additional_information',
             args=[mini_training_id, mini_training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.request.GET['path'], Tab.SKILLS_ACHIEVEMENTS)
+        ) + '?path={}&tab={}#achievement_'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS)
 
     def get_additional_information_skills_label(self):
         return next(
@@ -89,3 +90,9 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
     @functools.lru_cache()
     def get_translated_labels(self):
         return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())
