@@ -117,12 +117,20 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
             next_category=Window(
                 expression=Lead("education_group_type__category"),
                 order_by=order_by_expressions,
+            ),
+            previous_element=Window(
+                expression=Lag("element"),
+                order_by=order_by_expressions,
+            ),
+            next_element=Window(
+                expression=Lead("element"),
+                order_by=order_by_expressions,
             )
         )
 
         fields_names = [
-            "id", "acronym", "previous_code", "previous_id", "previous_year", "previous_category", "next_code",
-            "next_id", "next_year", "next_category", "previous_title", "next_title"
+            "id", "acronym", "previous_code", "previous_id", "previous_year", "previous_category", "previous_element",
+            "next_code", "next_id", "next_year", "next_category", "previous_title", "next_title", "next_element"
         ]
     else:
         fields_names = [
@@ -151,32 +159,41 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
 
     current_row = _get_current_row(qs, obj)
 
-    category = {
-        TRAINING: "training_identification",
-        GROUP: "group_identification",
-        MINI_TRAINING: "mini_training_identification"
-    }
-
     if current_row:
-        context.update({
-            "next_element_title": _get_title(
-                current_row.next_title, current_row.next_version_label if not is_ue else None
-            ),
-            "next_url": reverse_url_function(
-                current_row.next_code,
-                current_row.next_year,
-                category[current_row.next_category] if isinstance(obj, GroupYear) else url_name
-            ) + '?path={}'.format(obj.element.id) if current_row.next_id else None,
-            "previous_element_title": _get_title(
-                current_row.previous_title,
-                current_row.previous_version_label if not is_ue else None
-            ),
-            "previous_url": reverse_url_function(
-                current_row.previous_code,
-                current_row.previous_year,
-                category[current_row.previous_category] if isinstance(obj, GroupYear) else url_name
-            ) + '?path={}'.format(obj.element.id) if current_row.previous_id else None
-        })
+        if isinstance(obj, GroupYear):
+            category = {
+                TRAINING: "training_identification",
+                GROUP: "group_identification",
+                MINI_TRAINING: "mini_training_identification"
+            }
+            context.update({
+                "next_element_title": _get_title(
+                    current_row.next_title, current_row.next_version_label if not is_ue else None
+                ),
+                "next_url": reverse_url_function(
+                    current_row.next_code,
+                    current_row.next_year,
+                    category[current_row.next_category]
+                ) + '?path={}'.format(current_row.next_element) if current_row.next_element else None,
+                "previous_element_title": _get_title(
+                    current_row.previous_title, current_row.previous_version_label if not is_ue else None
+                ),
+                "previous_url": reverse_url_function(
+                    current_row.previous_code, current_row.previous_year, category[current_row.previous_category]
+                ) + '?path={}'.format(current_row.previous_element) if current_row.previous_element else None
+            })
+
+        else:
+            context.update({
+                "next_element_title": _get_title(
+                    current_row.next_title, current_row.next_version_label if not is_ue else None
+                ),
+                "next_url": reverse_url_function(current_row.next_code, current_row.next_year, url_name),
+                "previous_element_title": _get_title(
+                    current_row.previous_title, current_row.previous_version_label if not is_ue else None
+                ),
+                "previous_url": reverse_url_function(current_row.previous_code, current_row.previous_year, url_name)
+            })
     return context
 
 
