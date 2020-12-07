@@ -156,7 +156,7 @@
                                        href="{% url 'online_encoding_form' note_detail.learning_unit_year_id%}?{{ request.GET.urlencode }}"
                                        role="button"
                                        id="lnk_encode_{{ note_detail.learning_unit_year_acronym }}"
-                                       data-toggle="tooltip" data-placement="right"
+                                       data-toggle="tooltip" data-placement="top"
                                        {% if note_detail.exam_enrollments_encoded == note_detail.total_exam_enrollments %}
                                         disabled
                                         title="{% trans 'All the scores were submitted. It is not possible to encode scores anymore.' %}"
