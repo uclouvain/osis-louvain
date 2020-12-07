@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import TestCase
+from django.test import TestCase
 
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.person import PersonFactory

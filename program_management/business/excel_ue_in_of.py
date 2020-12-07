@@ -204,13 +204,17 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
     optional_data_needed = _optional_data(custom_xls_form)
     font_rows = defaultdict(list)
     idx = 1
+    learning_unit_nodes = tree.get_all_learning_unit_nodes()
 
-    learning_unit_years = load_multiple_by_identity(
-        [
-            LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
-            for learn_unt_child in tree.get_all_learning_unit_nodes()
-        ]
-    )
+    if learning_unit_nodes:
+        learning_unit_years = load_multiple_by_identity(
+            [
+                LearningUnitYearIdentity(code=learn_unt_child.code, year=learn_unt_child.year)
+                for learn_unt_child in learning_unit_nodes
+            ]
+        )
+    else:
+        learning_unit_years = []
 
     tree_versions = search_all_versions_from_root_nodes(
         [
