@@ -166,10 +166,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[first_element_index],
             "next_element_title": self.elements_sorted_by_acronym[first_element_index + 1].acronym,
-            "next_url": self._get_element_url(
-                self.query_parameters,
-                first_element_index + 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[first_element_index].element.id),
+            "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
             "previous_element_title": None,
             "previous_url": None,
         }
@@ -182,10 +179,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
             "next_element_title": None,
             "next_url": None,
             "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].acronym,
-            "previous_url": self._get_element_url(
-                self.query_parameters,
-                last_element_index - 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[last_element_index].element.id),
+            "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, last_element_index)
 
@@ -194,15 +188,9 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[inner_element_index],
             "next_element_title": self.elements_sorted_by_acronym[inner_element_index + 1].acronym,
-            "next_url": self._get_element_url(
-                self.query_parameters,
-                inner_element_index + 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
+            "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
             "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
-            "previous_url": self._get_element_url(
-                self.query_parameters,
-                inner_element_index - 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
+            "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
 
@@ -256,7 +244,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "next_url": self._get_element_url(
                 self.query_parameters,
                 first_element_index + 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[first_element_index].element.id),
+            ) + '?path=' + str(self.elements_sorted_by_acronym[first_element_index + 1].element.id),
             "previous_element_title": None,
             "previous_url": None,
         }
@@ -277,7 +265,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "previous_url": self._get_element_url(
                 self.query_parameters,
                 last_element_index - 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[last_element_index].element.id),
+            ) + '?path=' + str(self.elements_sorted_by_acronym[last_element_index - 1].element.id),
             "current_version": None
         }
         self.assertNavigationContextEquals(expected_context, last_element_index, True)
@@ -297,7 +285,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "next_url": self._get_element_url(
                 self.query_parameters,
                 inner_element_index + 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index + 1].element.id),
             "previous_element_title": "{}{}".format(
                 self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
                 "[{}]".format(
@@ -306,7 +294,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "previous_url": self._get_element_url(
                 self.query_parameters,
                 inner_element_index - 1
-            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index].element.id),
+            ) + '?path=' + str(self.elements_sorted_by_acronym[inner_element_index - 1].element.id),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index, True)
 
