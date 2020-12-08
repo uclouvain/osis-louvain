@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 from decimal import Decimal
 
+from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 
@@ -50,9 +52,11 @@ from base.models.enums import learning_component_year_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
+from django.db.models import Case, When
 
 EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
@@ -73,13 +77,14 @@ def learning_unit_titles():
     return basic_titles() + components_titles()
 
 
-def create_xls_comparison(user, learning_unit_years, filters, academic_yr_comparison):
+def create_xls_comparison(user, learning_unit_years: QuerySet, filters, academic_yr_comparison: int):
     working_sheets_data = []
     cells_modified_with_green_font = []
     cells_with_top_border = []
 
     if learning_unit_years:
-        luys_for_2_years = _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years)
+        luys_for_2_years = _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison,
+                                                                       learning_unit_years)
         data = prepare_xls_content(luys_for_2_years)
         working_sheets_data = data.get('data')
         cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
@@ -101,7 +106,11 @@ def create_xls_comparison(user, learning_unit_years, filters, academic_yr_compar
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
-def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning_unit_years):
+def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison: int,
+                                                learning_unit_years: QuerySet) -> List[LearningUnitYear]:
+    l_units_order_to_preserve = [learning_unit_yr.learning_unit for learning_unit_yr in learning_unit_years]
+    preserved = Case(*[When(learning_unit__pk=pk.id, then=pos) for pos, pk in enumerate(l_units_order_to_preserve)])
+
     learning_unit_years = LearningUnitYear.objects.filter(
         learning_unit__in=(_get_learning_units(learning_unit_years)),
         academic_year__year__in=(
@@ -118,7 +127,7 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
         build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
-    ).order_by('learning_unit', 'academic_year__year')
+    ).order_by(preserved, 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years

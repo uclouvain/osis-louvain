@@ -130,7 +130,7 @@ def _create_xls_comparison(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     comparison_year = view_obj.request.GET.get('comparison_year')
-    return create_xls_comparison(user, luys, filters, comparison_year)
+    return create_xls_comparison(user, luys, filters, int(comparison_year) if comparison_year else None)
 
 
 def _create_xls_with_parameters(view_obj, context, **response_kwargs):
