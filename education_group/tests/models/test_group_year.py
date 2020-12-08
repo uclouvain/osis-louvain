@@ -124,3 +124,20 @@ class TestGroupYearVersionManager(TestCase):
         )
         EducationGroupVersionFactory(root_group=group_yr_2)
         self.assertListEqual(list(GroupYear.objects_version.all()), [group_yr_2])
+
+
+class GroupYearFieldForTrigger(TestCase):
+
+    def test_fields_used_by_trigger_not_changed(self):
+        fields = ['title_fr', 'title_en', 'acronym']
+        group_year = GroupYearFactory()
+        model_fields = [field.name for field in group_year._meta.get_fields()]
+        for field in fields:
+            with self.subTest(field=field):
+                error_msg = \
+                    "Field {field_name} is used in trigger {file_name}. Either you edit the trigger, or you rename" \
+                    " the field to its initial value".format(
+                        field_name=field,
+                        file_name='update_group_years_unversioned_fields.sql'
+                    )
+                self.assertIn(field, model_fields, error_msg)

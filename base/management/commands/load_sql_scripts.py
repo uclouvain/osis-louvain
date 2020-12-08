@@ -18,16 +18,22 @@ LOCK_TEMPLATE = """
 """
 
 
-@attr.s()
+@attr.s(frozen=True, slots=True)
 class SQLLockStatement:
     lock_template = attr.ib(type=str, default=LOCK_TEMPLATE)
     lock_mode = attr.ib(type=str, default=None)
 
 
-@attr.s()
+@attr.s(frozen=True, slots=True)
 class LoadSQLFilesToExecute:
     subfolder = attr.ib(type=str, default=None)
-    scripts_path = attr.ib(type=str, default=None)
+    backoffice = attr.ib(type=str, default='backoffice/')
+    scripts_path = attr.ib(type=str)
+    tablename_regex = attr.ib(type=str, default=None)
+
+    @scripts_path.default
+    def _scripts_path(self):
+        return self.backoffice + self.subfolder
 
     def _get_scripts_files(self):
         return os.listdir(self.scripts_path)
@@ -35,7 +41,8 @@ class LoadSQLFilesToExecute:
     def _get_sql_string_from_file(self, file: str) -> str:
         file_extension = file.split(".")[-1].lower()
         if file_extension != 'sql':
-            sys.exit("##### Error: Should load sql file but it is a {} extension".format(file_extension))
+            logger.error("##### Should load sql file but it is a {} extension".format(file_extension))
+            sys.exit()
 
         file = open(self.scripts_path + file)
         return file.read()
@@ -50,50 +57,55 @@ class LoadSQLFilesToExecute:
             )
         return script_strings
 
-
-class LoadSQL(SQLLockStatement, LoadSQLFilesToExecute):
-    backoffice: str = 'backoffice/'
-    cursor = None
-    tablename_regex = None
-
-    def __init__(self):
-        super().__init__()
-        self.cursor = connection.cursor()
-
-    def _get_table_name(self, sql_string: str):
+    def get_table_name(self, sql_string: str):
         table_match = re.search(self.tablename_regex, sql_string, re.IGNORECASE)
         try:
             match = table_match.group(1)
             if match:
                 return match
         except Exception:
-            sys.exit("#### Error: Unable to get table name from sql file ####")
+            logger.error("#### Unable to get table name from sql file ####")
+            sys.exit()
 
 
-class LoadSQLTriggers(LoadSQL):
+@attr.s(frozen=True, slots=True)
+class LoadSQL:
+    cursor = attr.ib()
 
-    def __init__(self):
-        self.subfolder = 'triggers/'
-        self.scripts_path = self.backoffice + self.subfolder
-        self.tablename_regex = r'CREATE TRIGGER[\S\s]*(public..*)'
-        super().__init__()
-        self.lock_mode = 'SHARE ROW EXCLUSIVE'
+    @cursor.default
+    def _cursor(self):
+        return connection.cursor()
+
+    def execute(self, script: str):
+        self.cursor.execute(script)
+
+
+@attr.s(frozen=True, slots=True)
+class LoadSQLTriggers:
+    loadSQL = attr.ib(type=LoadSQL, default=LoadSQL())
+    loadSQLFile = attr.ib(
+        type=LoadSQLFilesToExecute,
+        default=LoadSQLFilesToExecute(
+            subfolder='triggers/', tablename_regex=r'CREATE TRIGGER[\S\s]*(public..*)'
+        )
+    )
+    SQLLock = attr.ib(type=SQLLockStatement, default=SQLLockStatement(lock_mode='SHARE ROW EXCLUSIVE'))
 
     def load_triggers(self):
-        trigger_strings = self.load_scripts()
-        logger.info("## Loading triggers from {} ##".format(self.scripts_path))
+        trigger_strings = self.loadSQLFile.load_scripts()
+        logger.info("## Loading triggers from {} ##".format(self.loadSQLFile.scripts_path))
         for trigger in trigger_strings:
             self.load_trigger(trigger)
         logger.info("## Loading triggers finished ##")
 
     def load_trigger(self, trigger: Dict[str, str]):
-        table_name = self._get_table_name(trigger['script_string'])
-        sql_script = self.lock_template.format(
+        table_name = self.loadSQLFile.get_table_name(trigger['script_string'])
+        sql_script = self.SQLLock.lock_template.format(
             table_to_lock=table_name,
             sql_script=trigger['script_string'],
-            lock_mode=self.lock_mode
+            lock_mode=self.SQLLock.lock_mode
         )
         logger.info("# Load trigger from {filename} #".format(filename=trigger['filename']))
         logger.info("# Table {tablename} LOCKED #".format(tablename=table_name))
-        self.cursor.execute(sql_script)
+        self.loadSQL.execute(sql_script)
         logger.info("# Table {tablename} UNLOCKED #".format(tablename=table_name))
