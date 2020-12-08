@@ -33,7 +33,7 @@ from reference.models.country import Country
 class ScoreSheetAddressForm(forms.ModelForm):
     country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False, label=gettext_lazy('Country'))
     recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'))
-    location = forms.CharField(max_length=255, label=gettext_lazy('Location'))
+    location = forms.CharField(max_length=255, label=gettext_lazy('Locality'))
     postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
     city = forms.CharField(max_length=255, label=gettext_lazy('City'))
     offer_year = forms.CharField()

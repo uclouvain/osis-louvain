@@ -110,8 +110,12 @@ class LearningUnitYearPrerequisitesHyperlinkedIdentityField(serializers.Hyperlin
         url_kwargs = {
             'acronym': offer.acronym,
             'year': offer.academic_year.year,
-            'version_name': obj.education_group_version.version_name
         }
+        if obj.education_group_version.version_name != STANDARD:
+            url_kwargs.update({
+                'version_name': obj.education_group_version.version_name
+            })
+
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
