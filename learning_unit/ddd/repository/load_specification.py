@@ -21,47 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import functools
-import itertools
-import operator
-from collections import defaultdict
 from typing import Iterable, Dict
 
 from django.db.models import Q
 
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS
-from base.models.learning_unit_year import LearningUnitYear
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.specifications import Specifications
-from learning_unit.ddd.repository.load_learning_unit_cms import _translated_texts_to_domain, _build_identity_clause
+from learning_unit.ddd.repository.load_learning_unit_cms import bulk_load_cms
 
 
 def bulk_load_specification(
         learning_unit_identities: Iterable['LearningUnitYearIdentity']
 ) -> Dict[int, 'Specifications']:
-    if not learning_unit_identities:
-        return defaultdict(Specifications)
-
-    identity_clauses = [_build_identity_clause(identity) for identity in learning_unit_identities]
-    identity_filter_clause = functools.reduce(operator.or_, identity_clauses)
-    filtered_reference = LearningUnitYear.objects.filter(identity_filter_clause).values("id")
-
-    qs = TranslatedText.objects.filter(
-        entity=LEARNING_UNIT_YEAR
-    ).filter(
-        Q(text_label__label__in=CMS_LABEL_SPECIFICATIONS, language__in=['fr-be', 'en']),
-        reference__in=filtered_reference
-    ).select_related(
-        "text_label"
-    ).order_by(
-        "reference"
-    ).values_list(
-        "text", "text_label__label", "language", "reference",
-        named=True
-    )
-
-    return defaultdict(Specifications, {
-        int(reference): _translated_texts_to_domain(list(translated_texts), Specifications)
-        for reference, translated_texts in itertools.groupby(qs, key=lambda el: el.reference)
-    })
+    filter_clause = Q(text_label__label__in=CMS_LABEL_SPECIFICATIONS, language__in=['fr-be', 'en'])
+    return bulk_load_cms(learning_unit_identities, filter_clause, Specifications, True)
