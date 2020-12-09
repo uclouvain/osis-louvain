@@ -1056,7 +1056,7 @@ base.validationrule,TrainingForm.MASTER_MS_180_240.international_funding_orienta
 base.validationrule,TrainingForm.MASTER_M1.international_funding_orientation,ALERT,,,,,,
 base.validationrule,TrainingForm.MASTER_MC.international_funding_orientation,ALERT,,,,,,
 base.validationrule,TrainingForm.INTERNSHIP.international_funding_orientation,NOT_REQUIRED,,,,,,
-base.validationrule,TrainingForm.AGGREGATION.decree_category,FIXED,AESS,,,,,
+base.validationrule,TrainingForm.AGGREGATION.decree_category,FIXED,AESSB,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.decree_category,FIXED,FCONT,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.decree_category,FIXED,FCONT,,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.decree_category,FIXED,FCONT,,,,,
