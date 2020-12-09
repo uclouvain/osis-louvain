@@ -20,6 +20,8 @@ class FacultyManager(osis_role_models.EntityRoleModel):
     @classmethod
     def rule_set(cls):
         return rules.RuleSet({
+            'base.can_access_catalog': rules.always_allow,
+            'base.view_educationgroup': rules.always_allow,
             'base.can_create_learningunit': rules.always_allow,
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_requirement_entity &
