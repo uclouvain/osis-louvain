@@ -35,4 +35,4 @@ def bulk_load_specification(
         learning_unit_identities: Iterable['LearningUnitYearIdentity']
 ) -> Dict[int, 'Specifications']:
     filter_clause = Q(text_label__label__in=CMS_LABEL_SPECIFICATIONS, language__in=['fr-be', 'en'])
-    return bulk_load_cms(learning_unit_identities, filter_clause, Specifications, True)
+    return bulk_load_cms(learning_unit_identities, filter_clause, Specifications, False)
