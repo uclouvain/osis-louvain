@@ -64,6 +64,11 @@ def bulk_load_cms(
         "text_label"
     ).order_by(
         "reference"
+    ).only(
+        "reference",
+        "language",
+        "text",
+        "text_label__label"
     )
     if with_revisions:
         qs = qs.prefetch_related(
@@ -73,8 +78,17 @@ def bulk_load_cms(
                     content_type=model_content_type
                 ).order_by(
                     "-revision__date_created"
-                ).select_related("revision__user__person", "revision"),
-                to_attr="tt_versions"
+                ).select_related(
+                    "revision__user__person",
+                    "revision"
+                ).only(
+                    "object_id",
+                    "content_type",
+                    "revision__date_created",
+                    "revision__user__person__first_name",
+                    "revision__user__person__last_name"
+                ),
+                to_attr="old_versions"
             )
         )
 
@@ -87,7 +101,7 @@ def bulk_load_cms(
 def _translated_texts_to_domain(
         translated_texts: List[TranslatedText], domain_class: Generic[LearningUnitCMS]
 ) -> LearningUnitCMS:
-    versions = itertools.chain.from_iterable((getattr(tt, "tt_versions", []) for tt in translated_texts))
+    versions = itertools.chain.from_iterable((getattr(tt, "old_versions", []) for tt in translated_texts))
     versions_by_date = sorted(versions, key=lambda v: v.revision.date_created, reverse=True)
     latest_version = versions_by_date[0] if versions_by_date else None
 
@@ -96,7 +110,7 @@ def _translated_texts_to_domain(
     if latest_version:
         fields.update({
             'last_update': latest_version.revision.date_created,
-            'author': str(latest_version.revision.user.person)
+            'author': latest_version.revision.user.person.full_name
         })
 
     return domain_class(**fields)
