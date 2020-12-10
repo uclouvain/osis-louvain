@@ -27,11 +27,13 @@ from typing import List
 
 from ckeditor.fields import RichTextField
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from reversion.admin import VersionAdmin
+from reversion.models import Version
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
@@ -61,6 +63,7 @@ class TranslatedText(models.Model):
     entity = models.CharField(db_index=True, max_length=25, choices=ENTITY_NAME)
     reference = models.IntegerField(db_index=True)
     text = RichTextField(null=True)
+    versions = GenericRelation(Version, related_query_name="versions")
 
     def __str__(self):
         return self.entity

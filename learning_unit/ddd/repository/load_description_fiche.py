@@ -21,51 +21,24 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import functools
-import itertools
-import operator
-from collections import defaultdict
 from typing import Iterable, Dict
 
 from django.db.models import Q
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_PEDAGOGY_FR_ONLY
-from base.models.learning_unit_year import LearningUnitYear
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
 from learning_unit.ddd.business_types import *
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
-from learning_unit.ddd.repository.load_learning_unit_cms import _annotate_with_last_update_informations, \
-    _translated_texts_to_domain, _build_identity_clause
+from learning_unit.ddd.repository.load_learning_unit_cms import bulk_load_cms
 
 
 def bulk_load_description_fiche(
         learning_unit_identities: Iterable['LearningUnitYearIdentity']
 ) -> Dict[int, 'DescriptionFiche']:
-    if not learning_unit_identities:
-        return defaultdict(DescriptionFiche)
-
-    identity_clauses = [_build_identity_clause(identity) for identity in learning_unit_identities]
-    identity_filter_clause = functools.reduce(operator.or_, identity_clauses)
-    filtered_reference = LearningUnitYear.objects.filter(identity_filter_clause).values("id")
-
-    qs = TranslatedText.objects.filter(
-        entity=LEARNING_UNIT_YEAR
-    ).filter(
-        Q(text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN, language__in=['fr-be', 'en']) |
-        Q(text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY, language="fr-be"),
-        reference__in=filtered_reference,
-    ).select_related(
-        "text_label"
-    ).order_by(
-        "reference"
+    filter_clause = Q(
+        text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN,
+        language__in=['fr-be', 'en']
+    ) | Q(
+        text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY,
+        language="fr-be"
     )
-    qs = _annotate_with_last_update_informations(qs).values_list(
-        "last_date_created", "last_author_last_name", "last_author_first_name", "text", "text_label__label", "language",
-        "reference", named=True
-    )
-
-    return defaultdict(DescriptionFiche, {
-        int(reference): _translated_texts_to_domain(list(translated_texts), DescriptionFiche)
-        for reference, translated_texts in itertools.groupby(qs, key=lambda el: el.reference)
-    })
+    return bulk_load_cms(learning_unit_identities, filter_clause, DescriptionFiche, True)
