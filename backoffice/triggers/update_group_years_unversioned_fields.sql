@@ -14,13 +14,13 @@ BEGIN
     IF EXISTS(
             SELECT *
             FROM public.program_management_educationgroupversion
-            WHERE root_group_id = OLD.id
+            WHERE root_group_id = NEW.id
         ) THEN
         WITH offer_fields AS (
             SELECT egy.acronym, egy.title, egy.title_english, gy.id as group_id
             FROM public.base_educationgroupyear egy
                      JOIN public.program_management_educationgroupversion egv
-                          ON egv.offer_id = egy.id AND egv.root_group_id = OLD.id
+                          ON egv.offer_id = egy.id AND egv.root_group_id = NEW.id
                      JOIN public.program_management_educationgroupversion other_versions
                           ON other_versions.offer_id = egy.id
                      JOIN public.education_group_groupyear gy ON gy.id = other_versions.root_group_id
