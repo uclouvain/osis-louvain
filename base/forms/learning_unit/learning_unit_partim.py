@@ -80,7 +80,7 @@ class LearningUnitPartimModelForm(LearningUnitModelForm):
                                                   label=_('End year'))
 
     class Meta(LearningUnitModelForm.Meta):
-        fields = ('faculty_remark', 'other_remark', 'end_year')
+        fields = ('faculty_remark', 'end_year')
 
 
 def merge_data(data, inherit_lu_values):

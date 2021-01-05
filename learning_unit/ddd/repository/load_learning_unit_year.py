@@ -44,8 +44,8 @@ from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, Lectur
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.repository.load_description_fiche import bulk_load_description_fiche
-from learning_unit.ddd.repository.load_specification import bulk_load_specification
 from learning_unit.ddd.repository.load_description_fiche_force_majeure import bulk_load_force_majeures
+from learning_unit.ddd.repository.load_specification import bulk_load_specification
 from learning_unit.ddd.repository.load_teaching_material import bulk_load_teaching_materials
 
 
@@ -241,7 +241,6 @@ def __get_queryset() -> QuerySet:
         start_year=F('learning_unit__start_year'),
         end_year=F('learning_unit__end_year'),
         type=F('learning_container_year__container_type'),
-        other_remark=F('learning_unit__other_remark'),
         main_language=F('language__name'),
 
         # components (volumes) data

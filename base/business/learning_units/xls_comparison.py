@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 from decimal import Decimal
+from typing import List
 
+from django.db.models import Case, When
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
@@ -52,11 +53,9 @@ from base.models.enums import learning_component_year_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
-from django.db.models import Case, When
 
 EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
@@ -233,7 +232,7 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
     data.extend(
         [
             get_representing_string(learning_unit_yr.learning_unit.faculty_remark),
-            get_representing_string(learning_unit_yr.learning_unit.other_remark),
+            get_representing_string(learning_unit_yr.other_remark),
             _('Yes') if learning_unit_yr.learning_container_year.team else _('No'),
             _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
             get_representing_string(learning_unit_yr.learning_container_year.get_type_declaration_vacant_display()),
@@ -403,7 +402,7 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
         get_representing_string(lu_initial.get('faculty_remark')),
-        get_representing_string(lu_initial.get('other_remark')),
+        get_representing_string(luy_initial.get('other_remark')),
         _('Yes') if lcy_initial.get('team') else _('No'),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),
         dict(vacant_declaration_type.DECLARATION_TYPE)[lcy_initial.get('type_declaration_vacant')] if lcy_initial.get(

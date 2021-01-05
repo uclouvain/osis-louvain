@@ -216,7 +216,7 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
 
     def _test_learning_unit_model_form_instance(self, partim_form, post_data):
         form_instance = partim_form.forms[LearningUnitPartimModelForm]
-        fields_to_validate = ['faculty_remark', 'other_remark']
+        fields_to_validate = ['faculty_remark']
         self._assert_equal_values(form_instance.instance, post_data, fields_to_validate)
 
     def _test_learning_unit_year_model_form_instance(self, partim_form, post_data):
@@ -349,11 +349,11 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             'credits': 2,
             'specific_title': factory.fuzzy.FuzzyText(length=15).fuzz(),
             'specific_title_english': factory.fuzzy.FuzzyText(length=15).fuzz(),
+            'other_remark': factory.fuzzy.FuzzyText(length=15).fuzz()
         }
         post_data.update(update_fields_luy_model)
         update_fields_lu_model = {
             'faculty_remark': factory.fuzzy.FuzzyText(length=15).fuzz(),
-            'other_remark': factory.fuzzy.FuzzyText(length=15).fuzz()
         }
         post_data.update(update_fields_lu_model)
 
@@ -429,10 +429,10 @@ def get_valid_form_data(learning_unit_year_partim):
         'language': learning_unit_year_partim.language.id,
         'campus': CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN).pk,
         'periodicity': learning_unit_year_partim.periodicity,
+        'other_remark': learning_unit_year_partim.other_remark,
 
         # Learning unit data model form
         'faculty_remark': learning_unit_year_partim.learning_unit.faculty_remark,
-        'other_remark': learning_unit_year_partim.learning_unit.other_remark,
 
         # Learning component year data model form
         'component-TOTAL_FORMS': '2',

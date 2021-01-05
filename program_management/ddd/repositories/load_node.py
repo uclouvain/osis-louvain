@@ -239,7 +239,6 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         specific_title_fr=F('specific_title'),
         common_title_fr=F('learning_container_year__common_title'),
         common_title_en=F('learning_container_year__common_title_english'),
-        other_remark=F('learning_unit__other_remark'),
         volume_total_lecturing=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
         volume_total_practical=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
 

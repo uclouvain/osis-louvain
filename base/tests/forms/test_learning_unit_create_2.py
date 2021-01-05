@@ -125,10 +125,10 @@ def get_valid_form_data(academic_year, learning_unit_year=None, entity=None):
         'campus': learning_unit_year.campus.id,
         'language': learning_unit_year.language.pk,
         'periodicity': learning_unit_year.periodicity,
+        'other_remark': learning_unit_year.other_remark,
 
         # Learning unit data model form
         'faculty_remark': learning_unit_year.learning_unit.faculty_remark,
-        'other_remark': learning_unit_year.learning_unit.other_remark,
 
         # Learning container year data model form
         'common_title': learning_unit_year.learning_container_year.common_title,
@@ -305,7 +305,7 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
 
     def _test_learning_unit_model_form_instance(self, full_form):
         form_instance = full_form.forms[LearningUnitModelForm]
-        fields_to_validate = ['faculty_remark', 'other_remark']
+        fields_to_validate = ['faculty_remark']
         self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
 
     def _test_learning_container_model_form_instance(self, full_form):

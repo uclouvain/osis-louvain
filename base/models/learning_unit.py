@@ -106,11 +106,6 @@ class LearningUnit(SerializableModel):
         on_delete=models.PROTECT
     )
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
-    other_remark = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name=_('Other remark (intended for publication)')
-    )
 
     def __str__(self):
         return self.acronym

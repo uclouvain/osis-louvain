@@ -41,9 +41,6 @@ class TestLearningUnitModelFormInit(TestCase):
     def test_faculty_remark_widget_textarea_rows(self):
         self.assertEqual(self.form.fields['faculty_remark'].widget.attrs['rows'], '5', "should assert rows == 5")
 
-    def test_other_remark_widget_textarea_rows(self):
-        self.assertEqual(self.form.fields['other_remark'].widget.attrs['rows'], '5', "should assert rows == 5")
-
 
 class TestLearningUnitModelFormSave(TestCase):
     """Tests LearningUnitModelForm.save()"""
@@ -53,10 +50,7 @@ class TestLearningUnitModelFormSave(TestCase):
     Can you give it to them? 
     Then do not be too eager to deal out death in judgement."""
 
-    quote_2 = """And then her heart changed, or at least she understood it; 
-    and the winter passed, and the sun shone upon her."""
-
-    post_data = {'faculty_remark': quote_1, 'other_remark': quote_2}
+    post_data = {'faculty_remark': quote_1}
 
     @classmethod
     def setUpTestData(cls):
@@ -78,7 +72,6 @@ class TestLearningUnitModelFormSave(TestCase):
         self.assertTrue(self.form.is_valid(), self.form.errors)
         lu = self.form.save(**self.save_kwargs)
         self.assertEqual(lu.faculty_remark, self.quote_1)
-        self.assertEqual(lu.other_remark, self.quote_2)
 
     def test_case_update_correctly_saved(self):
         learning_unit_to_update = LearningUnitFactory(learning_container=self.learning_container,
@@ -87,4 +80,3 @@ class TestLearningUnitModelFormSave(TestCase):
         self.assertTrue(self.form.is_valid(), self.form.errors)
         lu = self.form.save(**self.save_kwargs)
         self.assertEqual(lu.faculty_remark, self.quote_1)
-        self.assertEqual(lu.other_remark, self.quote_2)

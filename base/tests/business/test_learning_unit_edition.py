@@ -840,7 +840,6 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
     def test_with_learning_unit_fields_to_update(self):
         fields_to_update = {
             "faculty_remark": self.faculty_remark,
-            "other_remark": "Other remark"
         }
         update_learning_unit_year_with_report(self.learning_unit_year, fields_to_update, {})
 
@@ -856,7 +855,8 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
             "session": learning_unit_year_session.SESSION_123,
             "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q2.name,
             "attribution_procedure": attribution_procedure.EXTERNAL,
-            "language": self.other_language
+            "language": self.other_language,
+            "other_remark": "Other remark"
         }
 
         update_learning_unit_year_with_report(self.learning_unit_year, fields_to_update, {})

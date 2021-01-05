@@ -109,7 +109,7 @@ class TestComparisonXls(TestCase):
             self.assertEqual(data[0][21], BLANK_VALUE)
         self.assertEqual(data[0][22], self.partim.subdivision)
         self.assertEqual(data[0][23], learning_unit_yr.learning_unit.faculty_remark or BLANK_VALUE)
-        self.assertEqual(data[0][24], learning_unit_yr.learning_unit.other_remark or BLANK_VALUE)
+        self.assertEqual(data[0][24], learning_unit_yr.other_remark or BLANK_VALUE)
         self.assertEqual(data[0][25], _('Yes') if learning_unit_yr.learning_container_year.team else _('No'))
         self.assertEqual(data[0][26], _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'))
         self.assertEqual(data[0][27], learning_unit_yr.learning_container_year.get_type_declaration_vacant_display()
@@ -217,7 +217,7 @@ class TestPropositionComparisonXls(TestCase):
             self.assertEqual(data[21], BLANK_VALUE)
             self.assertEqual(data[22], BLANK_VALUE)
         self.assertEqual(data[23], self.learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE)
-        self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.other_remark or BLANK_VALUE)
+        self.assertEqual(data[24], self.learning_unit_year_1.other_remark or BLANK_VALUE)
         self.assertEqual(data[25], _('Yes') if self.learning_unit_year_1.learning_container_year.team else _('No'))
         self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
         self.assertEqual(data[27],
@@ -309,7 +309,7 @@ class TestPropositionComparisonXls(TestCase):
             to_test.append((data[21], BLANK_VALUE))
             to_test.append((data[22], BLANK_VALUE))
         to_test.append((data[23], self.original_learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE))
-        to_test.append((data[24], self.original_learning_unit_year_1.learning_unit.other_remark or BLANK_VALUE))
+        to_test.append((data[24], self.original_learning_unit_year_1.other_remark or BLANK_VALUE))
         to_test.append((data[25],
                         _('Yes') if self.original_learning_unit_year_1.learning_container_year.team else _('No')))
         to_test.append((data[26],

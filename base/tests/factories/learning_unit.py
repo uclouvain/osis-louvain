@@ -32,7 +32,7 @@ from factory.django import DjangoModelFactory
 from faker import Faker
 
 from base.business.learning_units import edition
-from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearWithComponentsFactory
@@ -50,7 +50,6 @@ class LearningUnitFactory(DjangoModelFactory):
     start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
     end_year = None
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
-    other_remark = factory.fuzzy.FuzzyText(length=255)
 
 
 class LearningUnitFactoryWithAnnualizedData(LearningUnitFactory):

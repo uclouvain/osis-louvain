@@ -93,6 +93,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     campus = factory.SubFactory(CampusFactory)
     periodicity = factory.Iterator(learning_unit_year_periodicity.PERIODICITY_TYPES, getter=operator.itemgetter(0))
     summary_locked = False
+    other_remark = factory.fuzzy.FuzzyText(length=255)
 
     @factory.post_generation
     def gen_acronym(self, create, extracted, **kwargs):
