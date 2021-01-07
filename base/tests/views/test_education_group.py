@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import json
-import urllib
 from unittest import mock
 
 from django.conf import settings
@@ -32,7 +31,6 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpRespons
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from base.forms.education_group_admission import UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums.education_group_types import TrainingType
@@ -41,7 +39,6 @@ from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonAgregationFactory, \
     EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import OfferTextLabelFactory
@@ -238,171 +235,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertTrue(mock_edit_get.called)
 
-    @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
-    @mock.patch('base.views.education_group.render')
-    def test_case_admission_condition_update_existing_line(self, mock_render, mock_get_content):
-        section = 'ucl_bachelors'
-        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
-        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition,
-                                                                         section=section)
-
-        mock_get_content.return_value = {
-            'message': 'read',
-            'section': section,
-            'id': admission_condition_line.id,
-            'diploma': 'Diploma',
-            'conditions': 'Conditions',
-            'access': CONDITION_ADMISSION_ACCESSES[2][0],
-            'remarks': 'Remarks'
-        }
-
-        info = {
-            'section': section,
-            'language': 'fr-be',
-            'id': admission_condition_line.id,
-        }
-        request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))
-
-        from base.views.education_group import education_group_year_admission_condition_update_line_get
-        education_group_year_admission_condition_update_line_get(request)
-
-        mock_get_content.assert_called_once_with('read', admission_condition_line, '')
-
-    @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
-    @mock.patch('base.views.education_group.render')
-    def test_education_group_year_admission_condition_update_line_get_no_admission_condition_line(self,
-                                                                                                  mock_render,
-                                                                                                  mock_get_content):
-        info = {
-            'section': 'ucl_bachelors',
-            'language': 'fr',
-        }
-        request = RequestFactory().get('/?section={section}&language={language}'.format(**info))
-
-        from base.views.education_group import education_group_year_admission_condition_update_line_get
-        education_group_year_admission_condition_update_line_get(request)
-
-        mock_get_content.not_called()
-
-    def test_save_form_to_admission_condition_line_creation_mode_true(self):
-        from base.views.education_group import save_form_to_admission_condition_line
-        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
-        form = mock.Mock(cleaned_data={
-            'language': 'fr',
-            'section': 'ucl_bachelors',
-            'admission_condition_line': '',
-            'diploma': 'Diploma',
-            'conditions': 'Conditions',
-            'remarks': 'Remarks',
-            'access': CONDITION_ADMISSION_ACCESSES[2][0],
-        })
-
-        RequestFactory().get('/')
-
-        queryset = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
-        self.assertEqual(queryset.count(), 0)
-
-        save_form_to_admission_condition_line(self.education_group_child.id, creation_mode=True, form=form)
-
-        self.assertEqual(queryset.count(), 1)
-
-    def test_save_form_to_admission_condition_line_creation_mode_false(self):
-        from base.views.education_group import save_form_to_admission_condition_line
-        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
-        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
-        form = mock.Mock(cleaned_data={
-            'language': 'fr',
-            'section': 'ucl_bachelors',
-            'admission_condition_line': admission_condition_line.id,
-            'diploma': 'Diploma',
-            'conditions': 'Conditions',
-            'remarks': 'Remarks',
-            'access': CONDITION_ADMISSION_ACCESSES[2][0],
-        })
-
-        queryset = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
-        self.assertEqual(queryset.count(), 1)
-
-        save_form_to_admission_condition_line(self.education_group_child.id, creation_mode=False, form=form)
-
-        self.assertEqual(queryset.count(), 1)
-
-    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
-    def test_education_group_year_admission_condition_update_line_post_bad_form(self, mock_save_form):
-        from base.views.education_group import education_group_year_admission_condition_update_line_post
-        form = {
-            'admission_condition_line': '',
-        }
-        request = RequestFactory().post('/', form)
-        response = education_group_year_admission_condition_update_line_post(
-            request,
-            self.education_group_child.id
-        )
-        # the form is not called because this one is not valid
-        mock_save_form.not_called()
-        # we can not test the redirection because we don't have a client with the returned response.
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
-    def test_education_group_year_admission_condition_update_line_post_creation_mode(self, mock_save_form):
-        from base.views.education_group import education_group_year_admission_condition_update_line_post
-        form = {
-            'admission_condition_line': '',
-            'language': 'fr',
-            'section': 'ucl_bachelors',
-            'diploma': 'Diploma',
-            'conditions': 'Conditions',
-            'remarks': 'Remarks',
-            'access': CONDITION_ADMISSION_ACCESSES[2][0],
-        }
-        request = RequestFactory().post('/', form)
-        response = education_group_year_admission_condition_update_line_post(
-            request,
-            self.education_group_child.id
-        )
-
-        education_group_id, creation_mode, unused = mock_save_form.call_args[0]
-        self.assertEqual(education_group_id, self.education_group_child.id)
-        self.assertEqual(creation_mode, True)
-        # we can not test the redirection because we don't have a client with the returned response.
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
-    def test_education_group_year_admission_condition_update_line_post_creation_mode_off(self, mock_save_form):
-        from base.views.education_group import education_group_year_admission_condition_update_line_post
-        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
-        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
-        form = {
-            'admission_condition_line': admission_condition_line.id,
-            'language': 'fr',
-            'section': 'ucl_bachelors',
-            'diploma': 'Diploma',
-            'conditions': 'Conditions',
-            'remarks': 'Remarks',
-            'access': CONDITION_ADMISSION_ACCESSES[2][0]
-        }
-        request = RequestFactory().post('/', form)
-        education_group_year_admission_condition_update_line_post(
-            request,
-            self.education_group_child.id
-        )
-
-        education_group_id, creation_mode, unused = mock_save_form.call_args[0]
-        self.assertEqual(education_group_id, self.education_group_child.id)
-        self.assertEqual(creation_mode, False)
-
-    def test_get_content_of_admission_condition_line(self):
-        from base.views.education_group import get_content_of_admission_condition_line
-
-        admission_condition_line = mock.Mock(diploma='diploma',
-                                             conditions='conditions',
-                                             access=CONDITION_ADMISSION_ACCESSES[2][0],
-                                             remarks='remarks')
-
-        response = get_content_of_admission_condition_line('updated', admission_condition_line, '')
-        self.assertEqual(response['message'], 'updated')
-        self.assertEqual(response['diploma'], 'diploma')
-        self.assertEqual(response['access'], CONDITION_ADMISSION_ACCESSES[2][0])
 
     @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
@@ -445,74 +277,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertTrue(mock_update_post.called)
         self.assertFalse(mock_update_get.called)
-
-    @mock.patch('base.views.education_group.render')
-    def test_get_update_text_admission_condition_ensure_context_data(self, mock_render):
-        AdmissionCondition.objects.create(
-            education_group_year=self.education_group_child,
-            text_free='texte en français',
-            text_free_en='text in english'
-        )
-
-        update_url = reverse(
-            "education_group_year_admission_condition_update_text",
-            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
-        )
-        querystring_data = {'section': 'free', 'language': 'fr', 'title': 'Free Text'}
-        request = RequestFactory().get(update_url, data=querystring_data)
-        request.user = self.person.user
-
-        from base.views.education_group import education_group_year_admission_condition_update_text_get
-        education_group_year_admission_condition_update_text_get(request, self.education_group_child.id)
-
-        unused_request, template_name, context = mock_render.call_args[0]
-
-        self.assertEqual(template_name, 'education_group/condition_text_edit.html')
-        self.assertIn('form', context)
-
-        form = context['form']
-        self.assertIsInstance(form, UpdateTextForm)
-        self.assertEqual(form.initial['section'], querystring_data['section'])
-        self.assertEqual(form.initial['text_fr'], self.education_group_child.admissioncondition.text_free)
-        self.assertEqual(form.initial['text_en'], self.education_group_child.admissioncondition.text_free_en)
-
-    def test_education_group_year_admission_condition_update_text_post_form_is_valid(self):
-        AdmissionCondition.objects.create(education_group_year=self.education_group_child)
-
-        update_url = reverse(
-            "education_group_year_admission_condition_update_text",
-            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
-        )
-        post_data = {'section': 'free', 'text_fr': 'Texte en Français', 'text_en': 'Text in English'}
-        request = RequestFactory().post(update_url, data=post_data)
-        request.user = self.person.user
-
-        from base.views.education_group import education_group_year_admission_condition_update_text_post
-        response = education_group_year_admission_condition_update_text_post(
-            request,
-            self.education_group_child.id,
-        )
-
-        self.education_group_child.admissioncondition.refresh_from_db()
-        self.assertEqual(self.education_group_child.admissioncondition.text_free, post_data['text_fr'])
-        self.assertEqual(self.education_group_child.admissioncondition.text_free_en, post_data['text_en'])
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch('base.forms.education_group_admission.UpdateTextForm.is_valid', return_value=False)
-    def test_education_group_year_admission_condition_update_text_post_form_is_not_valid(self, mock_is_valid):
-        update_url = reverse(
-            "education_group_year_admission_condition_update_text",
-            args=[self.education_group_child.academic_year.year, self.education_group_child.partial_acronym]
-        )
-        request = RequestFactory().post(update_url, data={})
-
-        from base.views.education_group import education_group_year_admission_condition_update_text_post
-        response = education_group_year_admission_condition_update_text_post(
-            request,
-            self.education_group_child.id,
-        )
-
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_webservice_education_group_year_admission_condition_line_order(self):
         kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}

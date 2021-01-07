@@ -104,7 +104,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
 
     @cached_property
-    def education_group_version(self):
+    def education_group_version(self) -> 'EducationGroupVersion':
         try:
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group__academic_year', 'root_group__education_group_type'

@@ -1,0 +1,106 @@
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+import mock
+from django.test import TestCase
+from django.urls import reverse
+
+from base.business.education_groups.general_information_sections import WELCOME_INTRODUCTION
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.text_label import OfferTextLabelFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.group_year import GroupYearBachelorFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
+
+
+class TestTrainingUpdateGeneralInformationView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.standard_training = StandardEducationGroupVersionFactory(
+            root_group=GroupYearBachelorFactory(academic_year__current=True)
+        )
+        ElementGroupYearFactory(group_year=cls.standard_training.root_group)
+        cls.central_manager = CentralManagerFactory()
+        cls.text_label = OfferTextLabelFactory(label=WELCOME_INTRODUCTION)
+
+    def setUp(self) -> None:
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
+        self.url = reverse(
+            "training_general_information_update",
+            args=[
+                self.standard_training.root_group.academic_year.year,
+                self.standard_training.root_group.partial_acronym
+            ]
+        )
+        self.client.force_login(self.central_manager.person.user)
+
+    def test_upsert(self):
+        OfferTranslatedTextFactory(
+            reference=self.standard_training.offer.pk,
+            text_label=self.text_label,
+            text="to update"
+        )
+        self.client.post(self.url, data={
+            "label": WELCOME_INTRODUCTION,
+            "text_english": "Created",
+            "text_french": "Updated"
+        })
+
+        self.assertQuerysetEqual(
+            TranslatedText.objects.filter(reference=self.standard_training.offer.id).values_list("text", flat=True),
+            ['Created', 'Updated'],
+            transform=lambda obj: obj,
+            ordered=False
+        )
+
+    def test_upsert_with_postpone(self):
+        standard_training_next_year = StandardEducationGroupVersionFactory(
+            root_group=GroupYearBachelorFactory(
+                academic_year__year=self.standard_training.root_group.academic_year.year + 1
+            ),
+            offer__education_group=self.standard_training.offer.education_group
+        )
+        self.client.post(self.url, data={
+            "label": WELCOME_INTRODUCTION,
+            "text_english": "Created",
+            "text_french": "Updated",
+            "to_postpone": "on"
+        })
+        self.assertQuerysetEqual(
+            TranslatedText.objects.filter(reference=self.standard_training.offer.id).values_list("text", flat=True),
+            ['Created', 'Updated'],
+            transform=lambda obj: obj,
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            TranslatedText.objects.filter(reference=standard_training_next_year.offer.id).values_list("text", flat=True),
+            ['Created', 'Updated'],
+            transform=lambda obj: obj,
+            ordered=False
+        )

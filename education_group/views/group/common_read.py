@@ -128,7 +128,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         }
 
     @functools.lru_cache()
-    def get_group_year(self):
+    def get_group_year(self) -> 'GroupYear':
         return get_object_or_404(
             GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
             academic_year__year=self.kwargs['year'],

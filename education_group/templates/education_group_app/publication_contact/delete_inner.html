@@ -1,0 +1,26 @@
+{% load i18n bootstrap3 %}
+
+<form method="post" action="{{ request.get_full_path }}">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h4>{% trans 'Delete contact' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        {% trans "Are you sure ?" %}
+    </div>
+
+    {% csrf_token %}
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+        <button type="submit" class="btn btn-danger">{% trans "Yes, I confirm." %}</button>
+        {% if can_postpone %}
+            <button type="button" class="btn btn-danger" onclick="submitFormWithPostponement(this)"
+                    title="{% trans "Delete and postpone changes on next years" %}">
+                {% trans "Delete and postpone." %}*
+            </button>
+            <p class="text-right"><small><strong>*{% trans "Postpone will be apply on all block contact !" %}</strong></small></p>
+        {% endif %}
+    </div>
+
+</form>

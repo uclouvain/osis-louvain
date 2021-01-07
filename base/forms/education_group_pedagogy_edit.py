@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
 from django import forms
 from django.forms import HiddenInput
+
+from base.forms.utils.fields import OsisRichTextFormField
 
 
 class EducationGroupPedagogyEditForm(forms.Form):
     label = forms.CharField(widget=HiddenInput())
-    text_english = RichTextFormField(required=False, config_name='education_group_pedagogy')
-    text_french = RichTextFormField(required=False, config_name='education_group_pedagogy')
+    text_english = OsisRichTextFormField(required=False)
+    text_french = OsisRichTextFormField(required=False)

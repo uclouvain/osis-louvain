@@ -64,11 +64,9 @@ class TrainingReadSkillsAchievements(TrainingRead):
         }
 
     def get_program_aims_update_url(self):
-        training_id = self.education_group_version.offer_id
         return reverse(
-            'education_group_achievement_program_aim',
-            args=[training_id, training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.path, Tab.SKILLS_ACHIEVEMENTS)
+            'training_general_information_update', args=[self.training.year, self.training.code]
+        ) + "?path={}&label={}".format(self.path, general_information_sections.CMS_LABEL_PROGRAM_AIM)
 
     def get_program_aims_label(self):
         return next(
@@ -77,11 +75,9 @@ class TrainingReadSkillsAchievements(TrainingRead):
         )
 
     def get_additional_information_skills_update_url(self):
-        training_id = self.education_group_version.offer_id
         return reverse(
-            'education_group_achievement_additional_information',
-            args=[training_id, training_id]
-        ) + '?path={}&tab={}#achievement_'.format(self.path, Tab.SKILLS_ACHIEVEMENTS)
+            'training_general_information_update', args=[self.training.year, self.training.code]
+        ) + "?path={}&label={}".format(self.path, general_information_sections.CMS_LABEL_ADDITIONAL_INFORMATION)
 
     def get_additional_information_skills_label(self):
         return next(

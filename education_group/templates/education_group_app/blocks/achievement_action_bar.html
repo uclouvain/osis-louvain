@@ -1,0 +1,27 @@
+{% load i18n format %}
+
+
+    <div class="btn-group pull-right {{ additional_class }}" role="group" aria-label="actions">
+
+        <a title="{% trans 'Update' %}" class="trigger_modal"
+           data-url="{{ obj.url_update }}"
+           data-modal_class="modal-lg">
+            <span class="glyphicon glyphicon-edit"></span>
+        </a>
+
+        <button title="{% trans 'Up' %}" class="trigger_modal btn-as-atag" data-modal_class="modal-lg"
+           {% if forloop.counter0 == 0 %} disabled {% else %} data-url="{{ obj.url_action }}&action=up" {% endif %}>
+            <i class="fa fa-arrow-up"></i>
+        </button>
+
+        <button title="{% trans 'Down' %}" class="trigger_modal btn-as-atag" data-modal_class="modal-lg"
+           {% if forloop.last %} disabled {% else %} data-url="{{ obj.url_action }}&action=down" {% endif %}>
+            <i class="fa fa-arrow-down"></i>
+        </button>
+
+        <a title="{% trans 'delete' %}" class="trigger_modal"
+           data-url="{{ obj.url_delete }}"
+           data-modal_class="modal-lg">
+            <span class="glyphicon glyphicon-remove"></span>
+        </a>
+    </div>

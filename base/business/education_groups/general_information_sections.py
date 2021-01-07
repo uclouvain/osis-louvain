@@ -24,13 +24,16 @@
 #
 ##############################################################################
 from collections import namedtuple
+from typing import Union
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from education_group.models.group_year import GroupYear
 
 SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
@@ -610,3 +613,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [AGREGATION, CAAP, PREREQUISITE, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION, ]
     }
 }
+
+
+def can_postpone_general_information(obj: Union['EducationGroupYear', 'GroupYear']) -> bool:
+    return not obj.academic_year.is_past

@@ -110,8 +110,8 @@ class TestTrainingReadGeneralInformation(TestCase):
 
         self.assertEqual(response.context['person'], self.person)
         self.assertEqual(response.context['group_year'], self.training_version.root_group)
-        expected_update_label_url = reverse('education_group_pedagogy_edit', args=[
-            self.training_version.offer_id,
+        expected_update_label_url = reverse('training_general_information_update', args=[
+            self.training_version.offer.academic_year.year, self.training_version.offer.partial_acronym
         ]) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(

@@ -109,7 +109,7 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
     def test_assert_template_used(self):
         response = self.client.get(self.url_create)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_publication_contact_edit_inner.html")
+        self.assertTemplateUsed(response, "education_group/blocks/modal/edit_inner.html")
 
     def test_create_post(self):
         # Remove current
@@ -165,7 +165,7 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
     def test_assert_template_used(self):
         response = self.client.get(self.url_edit)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_publication_contact_edit_inner.html")
+        self.assertTemplateUsed(response, "education_group/blocks/modal/edit_inner.html")
 
 
 class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
@@ -199,7 +199,7 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_delete)
         self.assertTemplateUsed(
             response,
-            "education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html",
+            "education_group/blocks/modal/delete_inner.html",
         )
 
     def test_delete_assert_redirection(self):
@@ -253,7 +253,7 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_update)
         self.assertTemplateUsed(
             response,
-            "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html",
+            "education_group/blocks/modal/entity_edit_inner.html",
         )
 
     def test_update_assert_db(self):

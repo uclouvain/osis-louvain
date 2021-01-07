@@ -29,15 +29,15 @@
         {# Backward compatibility with previous template Must be refacor #}
         {% with root=object education_group_year=object %}
             <!-- Message d'alerte -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
             <!-- Conditions Générales -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_bacs_cond_generales field_en=admission_condition.text_ca_bacs_cond_generales_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_bacs_cond_generales field_en=admission_condition.text_ca_bacs_cond_generales_en can_edit=True %}
             <!-- Conditions Particulières -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=admission_condition.text_ca_bacs_cond_particulieres field_en=admission_condition.text_ca_bacs_cond_particulieres_en can_edit=True %}
             <!-- Examen de langue -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=admission_condition.text_ca_bacs_examen_langue field_en=admission_condition.text_ca_bacs_examen_langue_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=admission_condition.text_ca_bacs_examen_langue field_en=admission_condition.text_ca_bacs_examen_langue_en can_edit=True %}
             <!-- Conditions spéciales -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=admission_condition.text_ca_bacs_cond_speciales field_en=admission_condition.text_ca_bacs_cond_speciales_en can_edit=True%}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=admission_condition.text_ca_bacs_cond_speciales field_en=admission_condition.text_ca_bacs_cond_speciales_en can_edit=True%}
         {% endwith %}
         </div>
     </div>

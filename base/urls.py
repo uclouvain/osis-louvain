@@ -48,7 +48,6 @@ from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, student
 from base.views import teaching_material
-from base.views.education_groups import urls as education_groups_urls
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -60,6 +59,7 @@ from base.views.learning_units.update import update_learning_unit, learning_unit
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete
+from education_group import urls as education_group_urls
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -280,7 +280,7 @@ urlpatterns = [
         url(r'^search$', offer.offers_search, name='offers_search'),
     ])),
 
-    url(r'^educationgroups/', include(education_groups_urls.urlpatterns)),
+    url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),

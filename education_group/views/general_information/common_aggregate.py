@@ -27,13 +27,12 @@ from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
-from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
-from education_group.views.general_information.update_common_condition import UpdateCommonCondition
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -85,9 +84,10 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
 
     def get_update_text_url(self) -> str:
         return reverse(
-            'update_common_aggregate_admission_condition',
+            'education_group_year_admission_condition_update_text',
             kwargs={
-                'year': self.kwargs['year'],
+                'year': self.get_object().academic_year.year,
+                'code': self.get_object().partial_acronym
             }
         )
 
@@ -96,16 +96,3 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
         if hasattr(obj, 'admissioncondition'):
             return obj.admissioncondition
         return AdmissionCondition.objects.get_or_create(education_group_year=obj)[0]
-
-
-class UpdateCommonAggregateAdmissionCondition(UpdateCommonCondition):
-    def get_admission_condition(self):
-        common = EducationGroupYear.objects.look_for_common(
-            academic_year__year=self.kwargs['year'],
-            education_group_type__name=TrainingType.AGGREGATION.name,
-            admissioncondition__isnull=False
-        ).select_related('admissioncondition').get()
-        return common.admissioncondition
-
-    def get_success_url(self) -> str:
-        return reverse('common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})

@@ -78,6 +78,13 @@ function CKupdate() {
         CKEDITOR.instances[instance].updateElement();
 }
 
+function submitFormWithPostponement(element){
+    var input = $("<input>")
+        .attr("type", "hidden")
+        .attr("name", "to_postpone").val(1);
+    $(element).closest("form").append(input).submit();
+}
+
 function bind_trigger_modal() {
     $(".trigger_modal").click(function () {
         let url = $(this).data("url");

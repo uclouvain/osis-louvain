@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearCommonFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
@@ -100,6 +101,7 @@ class TestCommonGeneralInformation(TestCase):
 class TestUpdateCommonGetGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory(current=True)
         cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
         cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
 
@@ -133,42 +135,4 @@ class TestUpdateCommonGetGeneralInformation(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_pedagogy_edit_inner.html")
-
-
-class TestUpdateCommonPostGeneralInformation(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
-        cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
-
-        cls.label_name = random.choice(general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific'])
-        TextLabelFactory(label=cls.label_name, entity=entity_name.OFFER_YEAR)
-
-        cls.url = reverse('update_common_general_information', kwargs={'year': 2018}) + "?label=" + cls.label_name
-
-    def setUp(self) -> None:
-        self.client.force_login(self.central_manager.person.user)
-
-    def test_case_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url)
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    def test_case_user_have_not_permission(self):
-        self.client.force_login(UserFactory())
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
-
-    def test_case_assert_redirect(self):
-        expected_redirect = reverse('common_general_information', kwargs={
-            'year': self.common_education_group_year.academic_year.year
-        })
-        response = self.client.post(self.url, {
-            'label': self.label_name,
-            'text_french': "Text in french",
-            'text_english': "Text in english"
-        })
-        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
+        self.assertTemplateUsed(response, "cms/modal/modal_cms_edit_inner.html")
