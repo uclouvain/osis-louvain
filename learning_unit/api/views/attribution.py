@@ -27,10 +27,12 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
+from attribution.ddd.repositories import load_attribution
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.attribution import LearningUnitAttributionSerializer
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
 class LearningUnitAttribution(generics.ListAPIView):
@@ -43,29 +45,6 @@ class LearningUnitAttribution(generics.ListAPIView):
     paginator = None
 
     def get_queryset(self):
-        luy = get_object_or_404(
-            LearningUnitYear.objects.all().only('pk', 'learning_container_year_id'),
-            acronym__iexact=self.kwargs['acronym'],
-            academic_year__year=self.kwargs['year']
-        )
-
-        attribution_qs = AttributionNew.objects.select_related('substitute').only(
-            'tutor__person', 'substitute', 'function'
-        ).distinct('tutor', 'function').annotate(
-            first_name=F('tutor__person__first_name'),
-            middle_name=F('tutor__person__middle_name'),
-            last_name=F('tutor__person__last_name'),
-            email=F('tutor__person__email'),
-            global_id=F('tutor__person__global_id'),
-        )
-
-        coordinator_qs = attribution_qs.filter(
-            learning_container_year_id=luy.learning_container_year_id,
-            function=Functions.COORDINATOR.name
-        )
-        others_function_qs = attribution_qs.filter(
-            attributionchargenew__learning_component_year__learning_unit_year_id=luy.pk
-        )
-
-        # Working with union improve performance
-        return coordinator_qs.union(others_function_qs)
+        luy_identity = LearningUnitYearIdentity(code=self.kwargs['acronym'].upper(), year=self.kwargs['year'])
+        attribution_qs = load_attribution.load_attributions([luy_identity])
+        return attribution_qs

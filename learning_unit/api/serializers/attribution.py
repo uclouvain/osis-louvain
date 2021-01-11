@@ -29,7 +29,7 @@ from attribution.models.attribution_new import AttributionNew
 from base.models.person import Person
 
 
-class PersonAttributionSerializer(serializers.ModelSerializer):
+class PersonAttributionSerializer(serializers.Serializer):
     global_id = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     middle_name = serializers.CharField(read_only=True)
@@ -37,7 +37,6 @@ class PersonAttributionSerializer(serializers.ModelSerializer):
     email = serializers.CharField(read_only=True)
 
     class Meta:
-        model = Person
         fields = (
             'first_name',
             'middle_name',
@@ -47,14 +46,19 @@ class PersonAttributionSerializer(serializers.ModelSerializer):
         )
 
 
-class LearningUnitAttributionSerializer(PersonAttributionSerializer):
-    function_text = serializers.CharField(source='get_function_display', read_only=True)
-    substitute = PersonAttributionSerializer(read_only=True)
+class LearningUnitAttributionSerializer(serializers.Serializer):
+    function = serializers.CharField(source='teacher.function.name', read_only=True)
+    function_text = serializers.CharField(source='teacher.function.value', read_only=True)
+    substitute = PersonAttributionSerializer(read_only=True, allow_null=True)
 
     class Meta:
-        model = AttributionNew
-        fields = PersonAttributionSerializer.Meta.fields + (
+        fields = (
             'function',
             'function_text',
             'substitute'
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.update(**PersonAttributionSerializer(instance.teacher).data)
+        return data

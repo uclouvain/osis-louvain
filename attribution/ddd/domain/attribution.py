@@ -42,6 +42,8 @@ class Attribution(interface.RootEntity):
             self,
             learning_unit_year: LearningUnitYearIdentity = None,
             teacher: Teacher = None,
+            substitute: Teacher = None
     ):
         self.learning_unit_year = learning_unit_year
         self.teacher = teacher
+        self.substitute = substitute

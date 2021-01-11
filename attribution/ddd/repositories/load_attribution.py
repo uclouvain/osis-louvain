@@ -30,6 +30,7 @@ from django.db.models import F, Q
 from attribution.ddd.domain.attribution import Attribution
 from attribution.ddd.domain.teacher import Teacher
 from attribution.models import attribution_charge_new
+from attribution.models.enums.function import Functions
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
@@ -49,11 +50,19 @@ def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) 
                   teacher_first_name=F('attribution__tutor__person__first_name'),
                   teacher_middle_name=F('attribution__tutor__person__middle_name'),
                   teacher_email=F('attribution__tutor__person__email'),
+                  teacher_global_id=F('attribution__tutor__person__global_id'),
+                  teacher_function=F('attribution__function'),
+                  substitute_last_name=F('attribution__substitute__last_name'),
+                  substitute_first_name=F('attribution__substitute__first_name'),
+                  substitute_middle_name=F('attribution__substitute__middle_name'),
+                  substitute_email=F('attribution__substitute__email'),
+                  substitute_global_id=F('attribution__substitute__global_id'),
                   acronym_ue=F('learning_component_year__learning_unit_year__acronym'),
                   year_ue=F('learning_component_year__learning_unit_year__academic_year__year'),
                   ) \
-        .values('teacher_last_name', 'teacher_first_name',
-                'teacher_middle_name', 'teacher_email', 'acronym_ue', 'year_ue')
+        .values('teacher_last_name', 'teacher_first_name', 'teacher_global_id', 'teacher_middle_name', 'teacher_email',
+                'teacher_function', 'substitute_last_name', 'substitute_first_name', 'substitute_middle_name',
+                'substitute_email', 'substitute_global_id', 'acronym_ue', 'year_ue')
 
     return _build_sorted_attributions(qs)
 
@@ -82,13 +91,19 @@ def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
     return Attribution(
         learning_unit_year=LearningUnitYearIdentity(code=attributions_dict['acronym_ue'],
                                                     year=attributions_dict['year_ue']),
-        teacher=instanciate_teacher_object(attributions_dict)
+        teacher=instanciate_teacher_object(attributions_dict),
+        substitute=instanciate_teacher_object(attributions_dict, is_substitute=True)
     )
 
 
-def instanciate_teacher_object(attribution_data: dict) -> Teacher:
-    return Teacher(last_name=attribution_data.get('teacher_last_name'),
-                   first_name=attribution_data.get('teacher_first_name'),
-                   middle_name=attribution_data.get('teacher_middle_name'),
-                   email=attribution_data.get('teacher_email'),
-                   )
+def instanciate_teacher_object(attribution_data: dict, is_substitute=False) -> Teacher:
+    prefix = 'substitute_' if is_substitute else 'teacher_'
+    function = attribution_data.get(prefix + 'function')
+    has_substitute = attribution_data.get(prefix + 'global_id')  or attribution_data.get(prefix + 'email')
+    return Teacher(last_name=attribution_data.get(prefix + 'last_name'),
+                   first_name=attribution_data.get(prefix + 'first_name'),
+                   middle_name=attribution_data.get(prefix + 'middle_name'),
+                   email=attribution_data.get(prefix + 'email'),
+                   function=getattr(Functions, function) if function else None,
+                   global_id=attribution_data.get(prefix + 'global_id'),
+                   ) if not is_substitute or has_substitute else None

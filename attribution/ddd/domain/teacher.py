@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from attribution.models.enums.function import Functions
 
 
 class Teacher:
@@ -33,11 +34,15 @@ class Teacher:
             first_name: str = None,
             middle_name: str = None,
             email: str = None,
+            global_id: str = None,
+            function: Functions = None,
     ):
         self.last_name = last_name
         self.first_name = first_name
         self.middle_name = middle_name
         self.email = email
+        self.global_id = global_id
+        self.function = function
 
     def __eq__(self, other):
         return self.last_name == other.last_name and \
