@@ -34,18 +34,16 @@ from attribution.models.enums.function import Functions
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
-def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) \
+def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity'], distinct_tutor=False) \
         -> List['Attribution']:
     qs = attribution_charge_new.AttributionChargeNew.objects.all()
     filter_search_from = __build_where_clause(learning_unit_year_ids[0])
     for identity in learning_unit_year_ids[1:]:
         filter_search_from |= __build_where_clause(identity)
     qs = qs.filter(filter_search_from)
-    qs = qs\
+    qs = qs \
         .select_related('learning_component_year', 'attribution__tutor__person') \
-        .order_by('attribution__tutor__person__last_name',
-                  'attribution__tutor__person__first_name',
-                  'attribution__tutor__person__middle_name') \
+        .order_by('attribution__tutor', 'attribution__function') \
         .annotate(teacher_last_name=F('attribution__tutor__person__last_name'),
                   teacher_first_name=F('attribution__tutor__person__first_name'),
                   teacher_middle_name=F('attribution__tutor__person__middle_name'),
@@ -59,19 +57,25 @@ def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) 
                   substitute_global_id=F('attribution__substitute__global_id'),
                   acronym_ue=F('learning_component_year__learning_unit_year__acronym'),
                   year_ue=F('learning_component_year__learning_unit_year__academic_year__year'),
-                  ) \
-        .values('teacher_last_name', 'teacher_first_name', 'teacher_global_id', 'teacher_middle_name', 'teacher_email',
-                'teacher_function', 'substitute_last_name', 'substitute_first_name', 'substitute_middle_name',
-                'substitute_email', 'substitute_global_id', 'acronym_ue', 'year_ue')
+                  )
+    if distinct_tutor:
+        qs = qs.distinct('attribution__tutor', 'attribution__function')
+    qs = qs.values(
+        'teacher_last_name', 'teacher_first_name', 'teacher_global_id', 'teacher_middle_name',
+        'teacher_email', 'teacher_function',
+        'substitute_last_name', 'substitute_first_name', 'substitute_middle_name', 'substitute_email',
+        'substitute_global_id',
+        'acronym_ue', 'year_ue'
+    )
 
     return _build_sorted_attributions(qs)
 
 
 def __build_where_clause(learning_unit_identity: 'LearningUnitYearIdentity') -> Q:
     return Q(
-            learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year
-        )
+        learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
+        learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year
+    )
 
 
 def _build_sorted_attributions(qs_attributions) -> List['Attribution']:
@@ -99,7 +103,7 @@ def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
 def instanciate_teacher_object(attribution_data: dict, is_substitute=False) -> Teacher:
     prefix = 'substitute_' if is_substitute else 'teacher_'
     function = attribution_data.get(prefix + 'function')
-    has_substitute = attribution_data.get(prefix + 'global_id')  or attribution_data.get(prefix + 'email')
+    has_substitute = attribution_data.get(prefix + 'global_id') or attribution_data.get(prefix + 'email')
     return Teacher(last_name=attribution_data.get(prefix + 'last_name'),
                    first_name=attribution_data.get(prefix + 'first_name'),
                    middle_name=attribution_data.get(prefix + 'middle_name'),

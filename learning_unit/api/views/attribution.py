@@ -46,5 +46,5 @@ class LearningUnitAttribution(generics.ListAPIView):
 
     def get_queryset(self):
         luy_identity = LearningUnitYearIdentity(code=self.kwargs['acronym'].upper(), year=self.kwargs['year'])
-        attribution_qs = load_attribution.load_attributions([luy_identity])
+        attribution_qs = load_attribution.load_attributions([luy_identity], distinct_tutor=True)
         return attribution_qs
