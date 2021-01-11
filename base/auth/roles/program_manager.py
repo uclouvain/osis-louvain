@@ -37,6 +37,7 @@ from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
 from education_group.contrib.admin import EducationGroupRoleModelAdmin
 from education_group.contrib.models import EducationGroupRoleModel
 from osis_role.contrib import predicates as osis_role_predicates
@@ -104,7 +105,9 @@ class ProgramManager(EducationGroupRoleModel):
             'base.change_link_data': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a link")
             ),
-            'base.change_training': is_linked_to_offer,
+            'base.change_training':
+                is_linked_to_offer &
+                is_education_group_extended_daily_management_calendar_open,
             'base.change_minitraining': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a minitraining")
             ),

@@ -69,9 +69,9 @@ def _build_sorted_attributions(qs_attributions) -> List['Attribution']:
     sorted_attributions = sorted(qs_attributions,
                                  key=lambda attribution: (attribution['acronym_ue'],
                                                           attribution['year_ue'],
-                                                          attribution['teacher_last_name'],
-                                                          attribution['teacher_first_name'],
-                                                          attribution['teacher_middle_name']
+                                                          attribution['teacher_last_name'] or "",
+                                                          attribution['teacher_first_name'] or "",
+                                                          attribution['teacher_middle_name'] or ""
                                                           )
                                  )
 

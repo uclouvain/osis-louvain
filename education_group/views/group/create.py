@@ -16,7 +16,7 @@ from base.views.common import display_success_messages
 from education_group.ddd import command
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    CodeAlreadyExistException
+    CodeAlreadyExistException, ContentConstraintMaximumInvalid, ContentConstraintMinimumInvalid
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
@@ -119,6 +119,10 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                             isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                         group_form.add_error('min_constraint', e.message)
                         group_form.add_error('max_constraint', '')
+                    elif isinstance(e, ContentConstraintMinimumInvalid):
+                        group_form.add_error('min_constraint', e.message)
+                    elif isinstance(e, ContentConstraintMaximumInvalid):
+                        group_form.add_error('max_constraint', e.message)
                     else:
                         group_form.add_error(None, e.message)
             if not group_form.errors:

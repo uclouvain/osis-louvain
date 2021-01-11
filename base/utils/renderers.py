@@ -32,3 +32,11 @@ import dal_select2.widgets
 class OsisBootstrap3FieldRenderer(bootstrap3.renderers.FieldRenderer):
     WIDGETS_NO_FORM_CONTROL = bootstrap3.renderers.FieldRenderer.WIDGETS_NO_FORM_CONTROL + \
                               (dal_select2.widgets.ModelSelect2Multiple, )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.display_empty_warning_field_as_warning()
+
+    def display_empty_warning_field_as_warning(self):
+        if getattr(self.field.field, "warning", False) and self.field.form.is_bound and not self.field.value():
+            self.form_group_class = " ".join([self.form_group_class, "has-warning"])

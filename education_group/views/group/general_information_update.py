@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -51,15 +52,13 @@ class GroupUpdateGeneralInformation(GroupRead):
                 reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path())
             )
         form = self.get_form_class()(request.POST)
-        redirect_url = reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path())
+        redirect_url = reverse('group_general_information', kwargs=self.kwargs) + "?path={}".format(self.get_path())
 
         if form.is_valid():
             label = form.cleaned_data['label']
-
             self.update_cms(form, label)
-
             redirect_url += "#section_{label_name}".format(label_name=label)
-        return redirect(redirect_url)
+        return JsonResponse({"success": form.is_valid(), "success_url": redirect_url, "force_reload": True})
 
     def update_cms(self, form: EducationGroupPedagogyEditForm, label: str):
         for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:

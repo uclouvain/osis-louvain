@@ -31,7 +31,7 @@
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}" class="validate">
+            <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}" class="osis-form">
                 {% csrf_token %}
                 {% bootstrap_formset_errors content_formset %}
 
@@ -39,9 +39,16 @@
 
                 {% include "blocks/modal/confirmation_modal.html" %}
 
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+                    <button type="submit" class="btn btn-primary pull-right">
+                        <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+                    </button>
+                </div>
             </form>
 
             <script src="{% static 'js/jquery.formset.js' %}"></script>
+            <script src="{% static 'js/osis-form.js' %}"></script>
             <script>
                 $(document).ready(function() {
                     document.getElementById("modal_dialog_id").classList.add("modal-xl");
@@ -54,12 +61,7 @@
             </script>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-            <button type="submit" onclick="$('#form_attach_node').submit();" class="btn btn-primary pull-right">
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
-            </button>
-        </div>
+
     {% else %}
         <div class="modal-body">
             {% include 'template_messages.html' %}

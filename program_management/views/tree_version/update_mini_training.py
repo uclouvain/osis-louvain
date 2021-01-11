@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
@@ -63,9 +64,9 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.mini_training_version_form.is_valid():
             version_identities = self.update_mini_training_version()
-            self.display_success_messages(version_identities)
-            self.display_delete_messages(version_identities)
             if not self.mini_training_version_form.errors:
+                self.display_success_messages(version_identities)
+                self.display_delete_messages(version_identities)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -135,6 +136,23 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
             self.mini_training_version_form.add_error("min_constraint", e.message)
             self.mini_training_version_form.add_error("max_constraint", "")
+        except MultipleBusinessExceptions as multiple_exceptions:
+            for e in multiple_exceptions.exceptions:
+                if isinstance(e, exception_education_group.ContentConstraintTypeMissing):
+                    self.mini_training_version_form.add_error("constraint_type", e.message)
+                elif isinstance(e, exception_education_group.ContentConstraintMinimumMaximumMissing) or \
+                        isinstance(
+                            e,
+                            exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+                        ):
+                    self.mini_training_version_form.add_error("min_constraint", e.message)
+                    self.mini_training_version_form.add_error("max_constraint", "")
+                elif isinstance(e, exception_education_group.ContentConstraintMinimumInvalid):
+                    self.mini_training_version_form.add_error("min_constraint", e.message)
+                elif isinstance(e, exception_education_group.ContentConstraintMaximumInvalid):
+                    self.mini_training_version_form.add_error("max_constraint", e.message)
+                else:
+                    self.mini_training_version_form.add_error(None, e.message)
         except exception_education_group.GroupCopyConsistencyException as e:
             display_warning_messages(self.request, e.message)
             return [
@@ -153,7 +171,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateMiniTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
-            event_perm_obj=self.get_permission_object(),
+            year=self.kwargs['year'],
             mini_training_version_identity=mini_training_version_identity,
             mini_training_type=self.get_mini_training_obj().type,
             initial=self._get_mini_training_version_form_initial_values()

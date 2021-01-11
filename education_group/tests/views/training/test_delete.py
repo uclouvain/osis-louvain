@@ -30,6 +30,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -59,6 +61,10 @@ class TestDeleteTrainingGetMethod(TestCase):
         )
 
         cls.central_manager = CentralManagerFactory()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year__year=cls.root_node.year
+        )
         cls.url = reverse('training_delete', kwargs={'year': cls.root_node.year, 'code': cls.root_node.code})
 
         # Need for permission checking
@@ -137,6 +143,11 @@ class TestDeleteTrainingPostMethod(TestCase):
         )
 
         cls.central_manager = CentralManagerFactory()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year__year=cls.root_node.year
+        )
+
         cls.url = reverse('training_delete', kwargs={'year': cls.root_node.year, 'code': cls.root_node.code})
 
         # Need for permission checking

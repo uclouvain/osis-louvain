@@ -68,6 +68,7 @@ def _create_faculty_learning_container_type_list():
     return add_blank(LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY)
 
 
+# TODO Is it really useful ?
 class LearningUnitModelForm(forms.ModelForm):
 
     def save(self, **kwargs):
@@ -78,11 +79,7 @@ class LearningUnitModelForm(forms.ModelForm):
 
     class Meta:
         model = LearningUnit
-        fields = ('faculty_remark', 'other_remark')
-        widgets = {
-            'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
-            'other_remark': forms.Textarea(attrs={'rows': '5'})
-        }
+        fields = ()
 
 
 # TODO Is it really useful ?
@@ -134,7 +131,7 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
         model = LearningUnitYear
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language', 'periodicity')
+                  'professional_integration', 'campus', 'language', 'periodicity', 'faculty_remark', 'other_remark')
         field_classes = {'acronym': AcronymField}
         error_messages = {
             'credits': {
@@ -149,6 +146,8 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
         }
         widgets = {
             'credits': DecimalFormatInput(render_value=True),
+            'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark': forms.Textarea(attrs={'rows': '5'})
         }
 
     def __clean_acronym_external(self):

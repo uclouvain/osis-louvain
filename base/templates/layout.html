@@ -168,7 +168,9 @@
         </div>
     {% endif %}
 
-    {% include "template_messages.html" %}
+    {% block messages %}
+        {% include "template_messages.html" %}
+    {% endblock %}
 
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
@@ -230,6 +232,11 @@
 
 <script src="{% static 'js/osis.js' %}"></script>
 <script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
+<script type="text/javascript" src="{% static "js/parsley/parsley.min.js" %}"></script>
+{% if LANGUAGE_CODE == 'fr-be' %}
+<script type="text/javascript" src="{% static "js/parsley/fr.js" %}"></script>
+{% endif %}
+<script type="text/javascript" src="{% static "js/osis-form.js" %}"></script>
 
 {% block script %}{% endblock %}
 

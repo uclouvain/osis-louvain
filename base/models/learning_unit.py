@@ -105,7 +105,6 @@ class LearningUnit(SerializableModel):
         related_name='learning_unit_end_years',
         on_delete=models.PROTECT
     )
-    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
     other_remark = models.TextField(
         blank=True,
         null=True,

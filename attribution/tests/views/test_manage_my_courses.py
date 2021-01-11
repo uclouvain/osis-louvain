@@ -48,7 +48,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -80,7 +80,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
         for ac_year in ac_year_in_past + [cls.current_ac_year] + cls.ac_year_in_future:
-            learning_container_year = LearningContainerYearFactory(
+            learning_container_year = LearningContainerYearInChargeFactory(
                 academic_year=ac_year,
                 requirement_entity=requirement_entity
             )

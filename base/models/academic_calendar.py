@@ -101,8 +101,8 @@ class AcademicCalendar(SerializableModel):
             raise StartDateHigherThanEndDateException(_('End date must be lower than start date'))
 
     def validation_mandatory_dates(self):
-        if self.start_date is None or self.end_date is None:
-            raise AttributeError(_('Start date and end date are mandatory'))
+        if self.start_date is None:
+            raise AttributeError(_('Start date is mandatory'))
 
     def get_category(self):
         if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):

@@ -1299,7 +1299,6 @@ class TestLearningUnitProposalComparison(TestCase):
                 "common_title": cls.learning_unit_year.learning_container_year.common_title,
                 "common_title_english": cls.learning_unit_year.learning_container_year.common_title_english,
                 "container_type": cls.learning_unit_year.learning_container_year.container_type,
-                "in_charge": cls.learning_unit_year.learning_container_year.in_charge,
                 "type_declaration_vacant": cls.learning_unit_year.learning_container_year.type_declaration_vacant,
                 "requirement_entity": requirement_entity.id,
                 "allocation_entity": None,

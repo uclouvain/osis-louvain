@@ -29,6 +29,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse, exceptions
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
@@ -42,6 +44,7 @@ from reference.tests.factories.language import FrenchLanguageFactory
 class TestTrainingCreateView(TestCase):
     @classmethod
     def setUpTestData(cls):
+        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
         cls.central_manager = CentralManagerFactory()
         cls.training_type = EducationGroupTypeFactory()
         FrenchLanguageFactory()

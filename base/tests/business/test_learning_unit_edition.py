@@ -837,15 +837,6 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         self.assertDictEqual(old_luy_values, new_luy_values)
         self.assertDictEqual(old_lc_values, new_lc_values)
 
-    def test_with_learning_unit_fields_to_update(self):
-        fields_to_update = {
-            "faculty_remark": self.faculty_remark,
-            "other_remark": "Other remark"
-        }
-        update_learning_unit_year_with_report(self.learning_unit_year, fields_to_update, {})
-
-        self.assert_fields_updated(self.learning_unit_year.learning_unit, fields_to_update)
-
     def test_with_learning_unit_year_fields_to_update(self):
         fields_to_update = {
             "specific_title": "Mon cours",
@@ -856,7 +847,8 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
             "session": learning_unit_year_session.SESSION_123,
             "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q2.name,
             "attribution_procedure": attribution_procedure.EXTERNAL,
-            "language": self.other_language
+            "language": self.other_language,
+            "other_remark": "Other remark"
         }
 
         update_learning_unit_year_with_report(self.learning_unit_year, fields_to_update, {})
@@ -886,13 +878,11 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
                                                                           a_learning_unit,
                                                                           learning_unit_year_periodicity.ANNUAL)
 
-        learning_unit_fields_to_update = {
-            "faculty_remark": self.faculty_remark
-        }
         learning_unit_year_fields_to_update = {
             "specific_title_english": self.my_course,
             "credits": 45,
-            "attribution_procedure": attribution_procedure.EXTERNAL
+            "attribution_procedure": attribution_procedure.EXTERNAL,
+            "faculty_remark": self.faculty_remark
         }
         learning_container_year_fields_to_update = {
             "team": True,
@@ -901,7 +891,6 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         }
 
         fields_to_update = dict()
-        fields_to_update.update(learning_unit_fields_to_update)
         fields_to_update.update(learning_unit_year_fields_to_update)
         fields_to_update.update(learning_container_year_fields_to_update)
         update_learning_unit_year_with_report(learning_unit_years[1], fields_to_update, {},
@@ -911,7 +900,6 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         self.assert_fields_not_updated(learning_unit_years[0].learning_container_year)
 
         for index, luy in enumerate(learning_unit_years[1:]):
-            self.assert_fields_updated(luy.learning_unit, learning_unit_fields_to_update)
             if index == 0:
                 self.assert_fields_updated(luy, learning_unit_year_fields_to_update)
                 self.assert_fields_updated(luy.learning_container_year, learning_container_year_fields_to_update)
@@ -930,13 +918,11 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
 
-        learning_unit_fields_to_update = {
-            "faculty_remark": self.faculty_remark
-        }
         learning_unit_year_fields_to_update = {
             "specific_title_english": self.my_course,
             "credits": 45,
-            "attribution_procedure": attribution_procedure.EXTERNAL
+            "attribution_procedure": attribution_procedure.EXTERNAL,
+            "faculty_remark": self.faculty_remark
         }
         learning_container_year_fields_to_update = {
             "team": True,
@@ -945,13 +931,11 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         }
 
         fields_to_update = dict()
-        fields_to_update.update(learning_unit_fields_to_update)
         fields_to_update.update(learning_unit_year_fields_to_update)
         fields_to_update.update(learning_container_year_fields_to_update)
 
         update_learning_unit_year_with_report(learning_unit_years[0], fields_to_update, {}, with_report=False)
 
-        self.assert_fields_updated(learning_unit_years[0].learning_unit, learning_unit_fields_to_update)
         self.assert_fields_updated(learning_unit_years[0], learning_unit_year_fields_to_update)
         self.assert_fields_updated(learning_unit_years[0].learning_container_year,
                                    learning_container_year_fields_to_update)

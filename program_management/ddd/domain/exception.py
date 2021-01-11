@@ -359,3 +359,21 @@ class CannotDetachOptionsException(BusinessException):
             "finality_acronym": finality
         }
         super().__init__(message)
+
+
+class InvalidVersionNameException(BusinessException):
+    def __init__(self):
+        message = _("Invalid name version")
+        super().__init__(message)
+
+
+class VersionNameAlreadyExist(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} already exists").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class VersionNameExistedException(BusinessException):
+    def __init__(self, version_name: str, *args, **kwargs):
+        message = _("Version name {} existed").format(version_name)
+        super().__init__(message, **kwargs)

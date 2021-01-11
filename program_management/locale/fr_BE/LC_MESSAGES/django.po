@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-27 13:01+0100\n"
+"POT-Creation-Date: 2021-01-05 10:36+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -353,6 +353,9 @@ msgstr "Inclus dans"
 msgid "Internship"
 msgstr "Stage"
 
+msgid "Invalid name version"
+msgstr "Nom de version invalide"
+
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
 
@@ -522,9 +525,6 @@ msgstr "Nouvelle version particulière"
 
 msgid "New training"
 msgstr "Nouvelle Formation"
-
-msgid "New version"
-msgstr "Nouvelle version"
 
 msgid "No"
 msgstr "Non"
@@ -698,6 +698,9 @@ msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Save will prolong the past version"
+msgstr "Enregistrer va prolonger la version existante."
 
 msgid "Schedule type"
 msgstr "Type horaire"
@@ -913,6 +916,12 @@ msgstr "Version"
 
 msgid "Version name"
 msgstr "Sigle de la version"
+
+msgid "Version name {} already exists"
+msgstr "Nom de version {} existe déjà"
+
+msgid "Version name {} existed"
+msgstr "Nom de version {} a déjà existé dans le passé"
 
 msgid "Volume"
 msgstr "Volume"

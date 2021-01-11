@@ -131,17 +131,24 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         try:
             update_command = self._convert_form_to_update_training_version_command(self.training_version_form)
             return update_and_postpone_training_version_service.update_and_postpone_training_version(update_command)
-        except exception_education_group.ContentConstraintTypeMissing as e:
-            self.training_version_form.add_error("constraint_type", e.message)
-        except (exception_education_group.ContentConstraintMinimumMaximumMissing,
-                exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum) as e:
-            self.training_version_form.add_error("min_constraint", e.message)
-            self.training_version_form.add_error("max_constraint", "")
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, program_exception.FinalitiesEndDateGreaterThanTheirMasters2MException) or \
                         isinstance(e, program_exception.Program2MEndDateLowerThanItsFinalitiesException):
                     self.training_version_form.add_error('end_year', e.message)
+                elif isinstance(e, exception_education_group.ContentConstraintTypeMissing):
+                    self.training_version_form.add_error("constraint_type", e.message)
+                elif isinstance(e, exception_education_group.ContentConstraintMinimumMaximumMissing) or \
+                        isinstance(
+                            e,
+                            exception_education_group.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+                        ):
+                    self.training_version_form.add_error("min_constraint", e.message)
+                    self.training_version_form.add_error("max_constraint", "")
+                elif isinstance(e, exception_education_group.ContentConstraintMinimumInvalid):
+                    self.training_version_form.add_error("min_constraint", e.message)
+                elif isinstance(e, exception_education_group.ContentConstraintMaximumInvalid):
+                    self.training_version_form.add_error("max_constraint", e.message)
                 else:
                     self.training_version_form.add_error(None, e.message)
         except exception_education_group.GroupCopyConsistencyException as e:
@@ -162,7 +169,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         return version.UpdateTrainingVersionForm(
             data=self.request.POST or None,
             user=self.request.user,
-            event_perm_obj=self.get_permission_object(),
+            year=self.kwargs['year'],
             training_version_identity=training_version_identity,
             training_type=self.get_training_obj().type,
             initial=self._get_training_version_form_initial_values()

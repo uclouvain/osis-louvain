@@ -15,7 +15,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    CreditShouldBeGreaterOrEqualsThanZero
+    CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid
 from education_group.ddd.domain.group import Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import update_group_service
@@ -104,6 +104,10 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                     group_form.add_error('min_constraint', e.message)
                     group_form.add_error('max_constraint', '')
+                elif isinstance(e, ContentConstraintMinimumInvalid):
+                    group_form.add_error('min_constraint', e.message)
+                elif isinstance(e, ContentConstraintMaximumInvalid):
+                    group_form.add_error('max_constraint', e.message)
                 else:
                     group_form.add_error(None, e.message)
 

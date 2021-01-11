@@ -34,6 +34,8 @@ from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
     CMS_LABEL_ADDITIONAL_INFORMATION
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
@@ -221,6 +223,10 @@ class TestEducationGroupAchievementCMSSetup(TestCase):
         self.academic_year = AcademicYearFactory(current=True)
         self.education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=self.academic_year
+        )
         self.client.force_login(self.person.user)
 
 

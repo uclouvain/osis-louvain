@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-03 16:01+0100\n"
+"POT-Creation-Date: 2020-12-08 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,32 +14,18 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-msgid "Close all"
-msgstr "Fermer tout"
-
 msgid "Collapse"
 msgstr "Fermer"
 
-msgid "Copy"
-msgstr "Copier"
-
-msgid "Cut"
-msgstr "Couper"
-
-msgid "Detach"
-msgstr "Retirer"
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Existed code for "
 msgstr "Code a déjà existé pour "
 
-msgid "Existed name version in "
-msgstr "Cette version existe dans le passé en "
-
 msgid "Existing code in "
 msgstr "Code déjà existant en "
-
-msgid "Existing name version"
-msgstr "Cette version existe déjà"
 
 msgid "Insertion of a link to a CDN document"
 msgstr "Insertion d'un lien vers un document du CDN"
@@ -47,29 +33,11 @@ msgstr "Insertion d'un lien vers un document du CDN"
 msgid "Invalid code"
 msgstr "Code non valide"
 
-msgid "Invalid name version"
-msgstr "Sigle de version invalide"
-
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
-msgid "Loading..."
-msgstr "Chargement en cours..."
-
-msgid "Modify the link"
-msgstr "Modifier le lien"
-
-msgid "New version"
-msgstr "Nouvelle version"
-
 msgid "Open"
 msgstr "Ouvrir"
-
-msgid "Open all"
-msgstr "Ouvrir tout"
-
-msgid "Paste"
-msgstr "Coller"
 
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
@@ -85,12 +53,6 @@ msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
 msgid "Please use the Ctrl+v shortcut to paste content."
 msgstr "Vous devez utiliser le raccourci Ctrl+V pour coller."
-
-msgid "Prolong"
-msgstr "Prolonger"
-
-msgid "Search"
-msgstr "Rechercher"
 
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"

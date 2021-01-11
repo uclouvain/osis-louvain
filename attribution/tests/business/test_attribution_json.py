@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@ from base.models.enums import learning_component_year_type, learning_unit_year_s
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
+from base.models.enums.learning_container_year_types import EXTERNAL
 
 
 class AttributionJsonTest(TestCase):
@@ -48,10 +48,9 @@ class AttributionJsonTest(TestCase):
         cls.academic_year = AcademicYearFactory(current=True)
 
         # Creation Container / UE and components related
-        cls.l_container = LearningContainerYearFactory(
+        cls.l_container = LearningContainerYearInChargeFactory(
             academic_year=cls.academic_year,
-            acronym="LBIR1210",
-            in_charge=True
+            acronym="LBIR1210"
         )
         cls.learning_unit_yr = LearningUnitYearWithComponentFactory(
             academic_year=cls.academic_year,
@@ -118,7 +117,7 @@ class AttributionJsonTest(TestCase):
         self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES], "0.0")
 
     def test_learning_unit_in_charge_false(self):
-        self.l_container.in_charge = False
+        self.l_container.container_type = EXTERNAL
         self.l_container.save()
 
         attrib_list = attribution_json._compute_list()

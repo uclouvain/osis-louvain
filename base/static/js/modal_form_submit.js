@@ -49,10 +49,10 @@ var formAjaxSubmit = function (form, modal) {
                     form = $("#"+form.attr('id'));
                     // Binding the new content with submit method.
                     formAjaxSubmit(form, modal);
-                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
+                    document.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
                 } else {
                     redirect_after_success(modal, xhr);
-                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:success", {}));
+                    document.dispatchEvent(new CustomEvent("formAjaxSubmit:success", {}));
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {

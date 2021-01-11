@@ -34,8 +34,6 @@ from django.views.generic import TemplateView
 
 from base import models as mdl
 from base.business.education_groups import general_information_sections
-from base.business.education_groups.general_information_sections import \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.utils.urls import reverse_with_get
@@ -210,12 +208,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return read.validate_active_tab(tab_urls)
 
     def have_general_information_tab(self):
-        return self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-               self._is_general_info_and_condition_admission_in_display_range()
-
-    def _is_general_info_and_condition_admission_in_display_range(self):
-        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_group().year < \
-               self.get_current_academic_year().year + 2
+        return self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
 
 def _get_view_name_from_tab(tab: Tab):

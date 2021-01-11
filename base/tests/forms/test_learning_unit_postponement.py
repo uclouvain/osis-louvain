@@ -39,6 +39,8 @@ from base.models.enums import learning_unit_year_subtypes, quadrimesters
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_container_year_types import MASTER_THESIS
+from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -47,8 +49,6 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 FULL_ACRONYM = 'LAGRO1000'
@@ -683,10 +683,8 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
             'language': learning_unit_year_instance.language.id,
             'campus': learning_unit_year_instance.campus.id,
             'periodicity': learning_unit_year_instance.periodicity,
-
-            # Learning unit data model form
-            'faculty_remark': learning_unit_instance.faculty_remark,
-            'other_remark': learning_unit_instance.other_remark,
+            'other_remark': learning_unit_year_instance.other_remark,
+            'faculty_remark': learning_unit_year_instance.faculty_remark,
 
             # Learning container year data model form
             'common_title': container_year.common_title,

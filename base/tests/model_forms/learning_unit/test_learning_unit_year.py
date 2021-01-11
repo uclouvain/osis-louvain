@@ -48,11 +48,12 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import CentralManagerForUEFactory, FacultyManagerForUEFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class TestLearningUnitYearModelFormInit(TestCase):
     """Tests LearningUnitYearModelForm.__init__()"""
+
     @classmethod
     def setUpTestData(cls):
         create_current_academic_year()
@@ -97,9 +98,14 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
         self.assertFalse(self.form.fields['internship_subtype'].disabled)
 
+    def test_other_remark_widget_textarea_rows(self):
+        self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
+        self.assertEqual(self.form.fields['other_remark'].widget.attrs['rows'], '5')
+
 
 class TestLearningUnitYearModelFormSave(TestCase):
     """Tests LearningUnitYearModelForm.save()"""
+
     def setUp(self):
         self.central_manager = CentralManagerForUEFactory()
         self.faculty_manager = FacultyManagerForUEFactory()
@@ -134,6 +140,12 @@ class TestLearningUnitYearModelFormSave(TestCase):
             'campus': campus.pk,
             'language': self.language.pk,
             'periodicity': ANNUAL,
+            'other_remark': """And then her heart changed, or at least she understood it; 
+    and the winter passed, and the sun shone upon her.""",
+            'faculty_remark': """Many that live deserve death. 
+    And some that die deserve life. 
+    Can you give it to them? 
+    Then do not be too eager to deal out death in judgement.""",
 
             # Learning component year data model form
             'form-TOTAL_FORMS': '2',
@@ -194,6 +206,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(luy.status, self.post_data['status'])
         self.assertEqual(luy.internship_subtype, self.post_data['internship_subtype'])
         self.assertEqual(luy.attribution_procedure, self.post_data['attribution_procedure'])
+        self.assertEqual(luy.other_remark, self.post_data['other_remark'])
+        self.assertEqual(luy.faculty_remark, self.post_data['faculty_remark'])
 
     def test_case_update_post_data_correctly_saved(self):
         learning_unit_year_to_update = LearningUnitYearFactory(
@@ -224,7 +238,7 @@ class TestLearningUnitYearModelFormSave(TestCase):
 
         self.assertEqual(form.instance.warnings, [_("The credits value of the partim %(acronym)s is greater or "
                                                     "equal than the credits value of the parent learning unit.") % {
-            'acronym': partim.acronym}])
+                                                      'acronym': partim.acronym}])
 
     def test_no_warnings_credit(self):
         """ This test will ensure that no message warning message is displayed when no PARTIM attached to FULL"""

@@ -25,6 +25,8 @@
 import mock
 from django.test import TestCase
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -63,6 +65,10 @@ class TestMiniTrainingUpdateView(TestCase):
             partial_acronym=cls.mini_training.code,
             academic_year__year=cls.mini_training.year,
             management_entity=EntityWithVersionFactory(organization=cls.organization)
+        )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.egy.academic_year
         )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 
 from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase
@@ -247,11 +248,42 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             Link(parent=None, child=training),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
         self.assertEqual(serializer.data['children'][0]['code'], minor.code)
+
+    def test_ensure_get_mini_training_without_children_if_within_minor_major_list_from_bachelor(self):
+        training = NodeGroupYearFactory(
+            year=self.year,
+            node_type=TrainingType.BACHELOR
+        )
+        training_list = NodeGroupYearFactory(
+            year=self.year,
+            node_type=random.choice(GroupType.minor_major_list_choice_enums()),
+        )
+        minor = NodeGroupYearFactory(
+            year=self.year,
+            node_type=MiniTrainingType.ACCESS_MINOR,
+        )
+        luy = NodeLearningUnitYearFactory(year=self.year)
+        LinkFactory(parent=training, child=training_list)
+        LinkFactory(parent=training_list, child=minor)
+        LinkFactory(parent=minor, child=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.title,
+            'year': self.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+            }
+        )
+        minor = serializer.data['children'][0]['children'][0]
+        self.assertNotIn('children', minor)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)

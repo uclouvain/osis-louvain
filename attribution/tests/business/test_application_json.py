@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,14 +31,14 @@ from django.test.utils import override_settings
 from attribution.business import application_json
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 
 
 class AttributionJsonTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.l_container_1 = LearningContainerYearFactory(in_charge=True)
+        cls.l_container_1 = LearningContainerYearInChargeFactory()
         cls.global_id = '00012345'
         cls.tutor_application_1 = TutorApplicationFactory(
             tutor__person__global_id=cls.global_id,

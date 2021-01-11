@@ -29,8 +29,9 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -61,7 +62,10 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         GroupElementYearFactory(parent_element=cls.element_parent, child_element=cls.element_child)
         cls.person = CentralManagerFactory(entity=cls.element_parent.group_year.management_entity).person
-
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.academic_year
+        )
         cls.url = reverse("learning_unit_prerequisite_update",
                           args=[cls.element_parent.id, cls.element_child.id])
 

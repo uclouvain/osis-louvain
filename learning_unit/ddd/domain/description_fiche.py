@@ -24,61 +24,34 @@
 #
 ##############################################################################
 import datetime
+import attr
 
 
+@attr.s(slots=True)
 class DescriptionFiche:
-
-    def __init__(
-            self,
-            resume: str = None,
-            resume_en: str = None,
-            teaching_methods: str = None,
-            teaching_methods_en: str = None,
-            evaluation_methods: str = None,
-            evaluation_methods_en: str = None,
-            other_informations: str = None,
-            other_informations_en: str = None,
-            online_resources: str = None,
-            online_resources_en: str = None,
-            bibliography: str = None,
-            mobility: str = None,
-            last_update: datetime.datetime = None,
-            author: str = None
-    ):
-        self.resume = resume
-        self.resume_en = resume_en
-        self.teaching_methods = teaching_methods
-        self.teaching_methods_en = teaching_methods_en
-        self.evaluation_methods = evaluation_methods
-        self.evaluation_methods_en = evaluation_methods_en
-        self.other_informations = other_informations
-        self.other_informations_en = other_informations_en
-        self.online_resources = online_resources
-        self.online_resources_en = online_resources_en
-        self.bibliography = bibliography
-        self.mobility = mobility
-        self.last_update = last_update
-        self.author = author
+    resume = attr.ib(type=str, default=None)
+    resume_en = attr.ib(type=str, default=None)
+    teaching_methods = attr.ib(type=str, default=None)
+    teaching_methods_en = attr.ib(type=str, default=None)
+    evaluation_methods = attr.ib(type=str, default=None)
+    evaluation_methods_en = attr.ib(type=str, default=None)
+    other_informations = attr.ib(type=str, default=None)
+    other_informations_en = attr.ib(type=str, default=None)
+    online_resources = attr.ib(type=str, default=None)
+    online_resources_en = attr.ib(type=str, default=None)
+    bibliography = attr.ib(type=str, default=None)
+    mobility = attr.ib(type=str, default=None)
+    last_update = attr.ib(type=datetime.datetime, default=None)
+    author = attr.ib(type=str, default=None)
 
 
+@attr.s(slots=True)
 class DescriptionFicheForceMajeure:
-
-    def __init__(
-            self,
-            teaching_methods: str = None,
-            teaching_methods_en: str = None,
-            evaluation_methods: str = None,
-            evaluation_methods_en: str = None,
-            other_informations: str = None,
-            other_informations_en: str = None,
-            last_update: datetime.datetime = None,
-            author: str = None
-    ):
-        self.teaching_methods = teaching_methods
-        self.teaching_methods_en = teaching_methods_en
-        self.evaluation_methods = evaluation_methods
-        self.evaluation_methods_en = evaluation_methods_en
-        self.other_informations = other_informations
-        self.other_informations_en = other_informations_en
-        self.last_update = last_update
-        self.author = author
+    teaching_methods = attr.ib(type=str, default=None)
+    teaching_methods_en = attr.ib(type=str, default=None)
+    evaluation_methods = attr.ib(type=str, default=None)
+    evaluation_methods_en = attr.ib(type=str, default=None)
+    other_informations = attr.ib(type=str, default=None)
+    other_informations_en = attr.ib(type=str, default=None)
+    last_update = attr.ib(type=datetime.datetime, default=None)
+    author = attr.ib(type=str, default=None)

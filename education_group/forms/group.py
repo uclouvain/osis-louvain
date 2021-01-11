@@ -26,11 +26,12 @@
 from typing import Dict
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import campus
@@ -48,26 +49,14 @@ class GroupForm(ValidationRuleMixin, forms.Form):
     abbreviated_title = UpperCaseCharField(max_length=40, label=_("Acronym/Short title"), required=False)
     title_fr = forms.CharField(max_length=240, label=_("Title in French"), required=False)
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
-    credits = forms.IntegerField(
-        label=_("Credits"),
-        required=False,
-        widget=forms.TextInput
-    )
+    credits = fields.CreditField(required=False)
     constraint_type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(ConstraintTypeEnum.choices()),
         label=_("Type of constraint"),
         required=False,
     )
-    min_constraint = forms.IntegerField(
-        label=_("minimum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
-    max_constraint = forms.IntegerField(
-        label=_("maximum constraint"),
-        required=False,
-        widget=forms.TextInput
-    )
+    min_constraint = forms.IntegerField(label=_("minimum constraint"), required=False)
+    max_constraint = forms.IntegerField(label=_("maximum constraint"), required=False)
     management_entity = forms.CharField(required=False)  # TODO: Replace with select2 widget
     teaching_campus = fields.MainCampusChoiceField(
         queryset=None,
@@ -89,13 +78,13 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         if self.user.person.is_faculty_manager:
-            self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years()\
-                .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        else:
-            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
-                year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION
-            )
+            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
+
+        self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+            year__in=target_years_opened
+        )
 
     def __init_management_entity_field(self):
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
@@ -133,8 +122,8 @@ class GroupAttachForm(GroupForm):
 
 
 class GroupUpdateForm(PermissionFieldMixin, GroupForm):
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year: int = None, **kwargs):
+        self.year = year
 
         super().__init__(*args, **kwargs)
         self.fields['academic_year'].disabled = True
@@ -144,10 +133,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
         return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

@@ -97,6 +97,10 @@ class TestCreateProgramTreeVersion(TestCase):
             min_count_authorized=1,
         )
         ValidationRuleFactory(
+            field_reference="GroupForm.COMMON_CORE.abbreviated_title",
+            initial_value="PARTIEDEBASE",
+        )
+        ValidationRuleFactory(
             field_reference="GroupForm.COMMON_CORE.title_fr",
             initial_value="	Contenu: ",
         )
@@ -110,6 +114,10 @@ class TestCreateProgramTreeVersion(TestCase):
             min_count_authorized=1,
         )
         ValidationRuleFactory(
+            field_reference="GroupForm.FINALITY_120_LIST_CHOICE.abbreviated_title",
+            initial_value="",
+        )
+        ValidationRuleFactory(
             field_reference="GroupForm.FINALITY_120_LIST_CHOICE.title_fr",
             initial_value="List au choix",
         )
@@ -121,6 +129,10 @@ class TestCreateProgramTreeVersion(TestCase):
             parent_type=root_type,
             child_type=EducationGroupTypeFactory(name=GroupType.OPTION_LIST_CHOICE.name),
             min_count_authorized=1,
+        )
+        ValidationRuleFactory(
+            field_reference="GroupForm.OPTION_LIST_CHOICE.abbreviated_title",
+            initial_value="",
         )
         ValidationRuleFactory(
             field_reference="GroupForm.OPTION_LIST_CHOICE.title_fr",

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List
+from typing import List, Iterable
 
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -211,12 +211,6 @@ class MiniTrainingHaveLinkWithEPC(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class VersionNameAlreadyExist(BusinessException):
-    def __init__(self, version_name: str, *args, **kwargs):
-        message = _("Version name {} already exists").format(version_name)
-        super().__init__(message, **kwargs)
-
-
 class MultipleEntitiesFoundException(BusinessException):
     def __init__(self, entity_acronym: str, year: int, *args, **kwargs):
         message = _(
@@ -236,47 +230,52 @@ class AbstractConsistencyException(ABC):
         super().__init__(message, **kwargs)
 
     def __map_field_to_label(self, field_name: str) -> str:
-        return {
-            "credits": _("Credits"),
-            "titles": _("Titles"),
-            "status": _("Status"),
-            "schedule_type": _("Schedule type"),
-            "duration": _("Duration"),
-            "duration_unit": _("duration unit"),
-            "keywords": _("Keywords"),
-            "internship_presence": _("Internship"),
-            "is_enrollment_enabled": _("Enrollment enabled"),
-            "has_online_re_registration": _("Web re-registration"),
-            "has_partial_deliberation": _("Partial deliberation"),
-            "has_admission_exam": _("Admission exam"),
-            "has_dissertation": _("dissertation"),
-            "produce_university_certificate": _("University certificate"),
-            "decree_category": _("Decree category"),
-            "rate_code": _("Rate code"),
-            "main_language": _("Primary language"),
-            "english_activities": _("activities in English").capitalize(),
-            "other_language_activities": _("Other languages activities"),
-            "internal_comment": _("comment (internal)").capitalize(),
-            "main_domain": _("main domain"),
-            "secondary_domains": _("secondary domains"),
-            "isced_domain": _("ISCED domain"),
-            "management_entity": _("Management entity"),
-            "administration_entity": _("Administration entity"),
-            "teaching_campus": _("Learning location"),
-            "enrollment_campus": _("Enrollment campus"),
-            "other_campus_activities": _("Activities on other campus"),
-            "funding": _("Funding"),
-            "hops": _("hops"),
-            "co_graduation": _("co-graduation"),
-            "academic_type": _("Academic type"),
-            "diploma": _("Diploma"),
-            "content_constraint": _("Content constraint"),
-            "remark": _("Remark"),
-            "professional_title": _("Professionnal title"),
-            "printing_title": _('Diploma title'),
-            "leads_to_diploma": _('Leads to diploma/certificate'),
-            "certificate_aims": _("certificate aims"),
-        }.get(field_name, field_name)
+        return MAP_FIELDS_TO_NAME.get(field_name, field_name)
+
+
+MAP_FIELDS_TO_NAME = {
+    "credits": _("Credits"),
+    "titles": _("Titles"),
+    "status": _("Status"),
+    "schedule_type": _("Schedule type"),
+    "duration": _("Duration"),
+    "duration_unit": _("duration unit"),
+    "keywords": _("Keywords"),
+    "internship_presence": _("Internship"),
+    "is_enrollment_enabled": _("Enrollment enabled"),
+    "has_online_re_registration": _("Web re-registration"),
+    "has_partial_deliberation": _("Partial deliberation"),
+    "has_admission_exam": _("Admission exam"),
+    "has_dissertation": _("dissertation"),
+    "produce_university_certificate": _("University certificate"),
+    "decree_category": _("Decree category"),
+    "rate_code": _("Rate code"),
+    "main_language": _("Primary language"),
+    "english_activities": _("activities in English").capitalize(),
+    "other_language_activities": _("Other languages activities"),
+    "internal_comment": _("comment (internal)").capitalize(),
+    "main_domain": _("main domain").capitalize(),
+    "secondary_domains": _("secondary domains"),
+    "isced_domain": _("ISCED domain"),
+    "management_entity": _("Management entity"),
+    "administration_entity": _("Administration entity"),
+    "teaching_campus": _("Learning location"),
+    "enrollment_campus": _("Enrollment campus"),
+    "other_campus_activities": _("Activities on other campus"),
+    "funding": _("Funding"),
+    "hops": _("hops"),
+    "co_graduation": _("co-graduation"),
+    "academic_type": _("Academic type"),
+    "diploma": _("Diploma"),
+    "content_constraint": _("Content constraint"),
+    "remark": _("Remark"),
+    "professional_title": _("Professionnal title"),
+    "printing_title": _('Diploma title'),
+    "leads_to_diploma": _('Leads to diploma/certificate'),
+    "certificate_aims": _("certificate aims"),
+    "funding_orientation": _("Funding direction"),
+    "international_funding_orientation": _('Funding international cooperation CCD/CUD direction'),
+}
 
 
 class GroupCopyConsistencyException(AbstractConsistencyException, BusinessException):
@@ -293,6 +292,15 @@ class MiniTrainingCopyConsistencyException(AbstractConsistencyException, Busines
 
 class CertificateAimsCopyConsistencyException(AbstractConsistencyException, BusinessException):
     pass
+
+
+class TrainingEmptyFieldException(BusinessException):
+    def __init__(self, empty_fields: Iterable[str], *args, **kwargs):
+        self.fields = [str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in empty_fields]
+        message = _("The following fields are empty: %(fields)s ") % {
+            "fields": ", ".join(self.fields)
+        }
+        super().__init__(message, **kwargs)
 
 
 class HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):

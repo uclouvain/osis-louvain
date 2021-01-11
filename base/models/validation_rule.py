@@ -78,7 +78,7 @@ class ValidationRule(models.Model):
         verbose_name=_("french help text")
     )
 
-    placeholder = models.CharField(max_length=25, verbose_name=_('Placeholder'), blank=True,)
+    placeholder = models.CharField(max_length=35, verbose_name=_('Placeholder'), blank=True, )
 
     class Meta:
         verbose_name = _("validation rule")

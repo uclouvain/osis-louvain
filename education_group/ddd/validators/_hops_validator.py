@@ -59,4 +59,4 @@ class HopsValuesValidator(business_validator.BusinessValidator):
                 exceptions.append(AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
 
         if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
+            raise MultipleBusinessExceptions(exceptions=set(exceptions))

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
-from education_group.ddd.domain.exception import VersionNameAlreadyExist
+from program_management.ddd.domain.exception import VersionNameAlreadyExist
 
 
 class VersionNameExistsValidator(BusinessValidator):

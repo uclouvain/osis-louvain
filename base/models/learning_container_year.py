@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,8 +36,9 @@ from base.models.enums import learning_unit_year_subtypes, entity_container_year
 from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
-from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_container_year_types import LearningContainerYearType, IN_CHARGE_TYPES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+
 
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 
@@ -45,7 +46,7 @@ FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'academic_year', 'container_type', 'acronym', 'common_title')
     search_fields = ['acronym']
-    list_filter = ('academic_year', 'in_charge', 'is_vacant',)
+    list_filter = ('academic_year', 'is_vacant',)
 
 
 class LearningContainerYear(SerializableModel):
@@ -70,7 +71,6 @@ class LearningContainerYear(SerializableModel):
     type_declaration_vacant = models.CharField(max_length=100, blank=True, null=True,
                                                verbose_name=_('Decision'),
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
-    in_charge = models.BooleanField(default=False)
 
     requirement_entity = models.ForeignKey(
         to="base.Entity",
@@ -98,6 +98,10 @@ class LearningContainerYear(SerializableModel):
     )
 
     _warnings = None
+
+    @property
+    def in_charge(self):
+        return self.container_type and self.container_type in IN_CHARGE_TYPES
 
     def __str__(self):
         return u"%s - %s" % (self.acronym, self.common_title)

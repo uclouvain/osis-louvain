@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,10 +28,10 @@ import operator
 
 import factory.fuzzy
 
-from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_container import LearningContainerFactory
+from base.models.enums import learning_container_year_types
 
 
 class LearningContainerYearFactory(factory.django.DjangoModelFactory):
@@ -52,10 +52,27 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
         datetime.datetime(2017, 3, 1)
     )
 
-    in_charge = False
     type_declaration_vacant = None
 
     requirement_entity = factory.SubFactory(EntityFactory)
     allocation_entity = factory.LazyAttribute(lambda o: o.requirement_entity)
     additional_entity_1 = None
     additional_entity_2 = None
+
+
+class LearningContainerYearInChargeFactory(LearningContainerYearFactory):
+    container_type = factory.Iterator(
+        [learning_container_year_types.COURSE,
+         learning_container_year_types.DISSERTATION,
+         learning_container_year_types.INTERNSHIP]
+    )
+
+
+class LearningContainerYearNotInChargeFactory(LearningContainerYearFactory):
+    container_type = factory.Iterator([
+        learning_container_year_types.OTHER_COLLECTIVE,
+        learning_container_year_types.OTHER_INDIVIDUAL,
+        learning_container_year_types.MASTER_THESIS,
+        learning_container_year_types.EXTERNAL
+    ]
+    )

@@ -94,9 +94,7 @@ def get_valid_external_learning_unit_form_data(academic_year, learning_unit_year
         'campus': learning_unit_year.campus.id,
         'language': learning_unit_year.language.pk,
         'periodicity': learning_unit_year.periodicity,
-
-        # Learning unit data model form
-        'faculty_remark': learning_unit_year.learning_unit.faculty_remark,
+        'faculty_remark': learning_unit_year.faculty_remark,
 
         # Learning container year data model form
         'common_title': learning_unit_year.learning_container_year.common_title,

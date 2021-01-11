@@ -67,7 +67,7 @@ class TestExecuteSQLTriggers(TestCase):
             TEST
             CREATE TRIGGER TEST
                 TEST
-
+                
                 ON {tablename}
                 TEST
                 WHEN TEST
@@ -96,16 +96,15 @@ class TestExecuteSQLTriggers(TestCase):
         expected_locked_script = """
             BEGIN WORK;
             LOCK TABLE public.education_group_groupyear IN SHARE ROW EXCLUSIVE MODE;
-
+            
             TEST
             CREATE TRIGGER TEST
                 TEST
-
                 ON public.education_group_groupyear
                 TEST
                 WHEN TEST
             TEST;
-
+            
             COMMIT WORK;
         """.replace(' ', '')
         self.assertEqual(mock_execute.call_args[0][0].replace(' ', ''), expected_locked_script)

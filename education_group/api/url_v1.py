@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -62,12 +62,12 @@ urlpatterns = [
         name=TrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]+)$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/versions/(?P<version_name>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/versions/(?P<version_name>[\w]+)/',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/versions/(?P<version_name>[\w]+)/',
         include([
             url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
             url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
@@ -76,7 +76,7 @@ urlpatterns = [
     ),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     # TODO: Limit special characters authorized in mini trainings urls (in 4831)
-    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})/', include([
+    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)/', include([
         url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
         url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
         url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
@@ -84,7 +84,7 @@ urlpatterns = [
             name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
     ])),
     url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+([&/\-_:É ][\w]+){0,3})$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<acronym>[a-zA-Z0-9/\-_]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),

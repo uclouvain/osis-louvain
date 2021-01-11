@@ -73,7 +73,7 @@
                     </td>
                     <td style="width:10%">
                         {% with form.child_obj.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
-                            {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits field_class='without_arrow' %}
+                            {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
                         {% endwith %}
                     </td>
                 {% else %}
@@ -110,7 +110,7 @@
                     </td>
                     <td style="width:8%">
                         {% if form.block %}
-                            {% bootstrap_field form.block show_label=False field_class='without_arrow' %}
+                            {% bootstrap_field form.block show_label=False%}
                         {% endif %}
                     </td>
                     <td style="width:12%">

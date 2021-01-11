@@ -68,7 +68,7 @@ class TestHopsValidator(SimpleTestCase):
             validator.is_valid()
 
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            e.exception.exceptions.pop(),
             HopsFieldsAllOrNone
         )
 
@@ -99,6 +99,6 @@ class TestHopsValidator(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as e:
             validator.is_valid()
         self.assertIsInstance(
-            e.exception.exceptions[0],
+            e.exception.exceptions.pop(),
             exception_raised
         )

@@ -555,3 +555,9 @@ class PublishCommonPedagogyCommand(interface.CommandRequest):
 class CopyCertificateAimsToNextYearCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetTrainingEmptyFieldsOnWarningCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)

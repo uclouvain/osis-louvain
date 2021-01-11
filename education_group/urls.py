@@ -7,7 +7,7 @@ from base.views.education_groups.achievement.delete import DeleteEducationGroupA
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     UpdateEducationGroupAchievement, EducationGroupDetailedAchievementAction, UpdateEducationGroupDetailedAchievement
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
-    AcronymConverter
+    AcronymConverter, MiniTrainingAcronymConverter
 from education_group.views import group, training, mini_training, general_information
 from education_group.views.autocomplete import EducationGroupTypeAutoComplete, CertificateAimAutocomplete
 from education_group.views.configuration.common_list import CommonListView
@@ -21,6 +21,7 @@ register_converter(GroupTypeConverter, 'group_type')
 register_converter(MiniTrainingTypeConverter, 'mini_training_type')
 register_converter(TrainingTypeConverter, 'training_type')
 register_converter(AcronymConverter, 'acronym')
+register_converter(MiniTrainingAcronymConverter, 'mini_training_acronym')
 
 urlpatterns = [
     path('groups/', include([
@@ -46,7 +47,7 @@ urlpatterns = [
                 mini_training.MiniTrainingReadIdentification.as_view(),
                 name='mini_training_identification'
             ),
-            path('<acronym:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(),
+            path('<mini_training_acronym:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(),
                  name='mini_training_update'),
             path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
             path('utilization/', mini_training.MiniTrainingReadUtilization.as_view(), name='mini_training_utilization'),

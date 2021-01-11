@@ -23,9 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from abc import ABC
+from typing import List
 
+import attr
 from django.core.exceptions import PermissionDenied
+from django.db.models import F
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -33,10 +37,80 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
-from education_group.models.group_year import GroupYear
+
+
+@attr.s(frozen=True, slots=True)
+class AcademicEvent:
+    title = attr.ib(type=str)
+    authorized_target_year = attr.ib(type=int)
+    start_date = attr.ib(type=datetime.date)
+    end_date = attr.ib(type=datetime.date)
+
+    def is_open_now(self) -> bool:
+        """
+        Returns True only if this event is open right now
+        """
+        date = datetime.date.today()
+        return self.is_open(date)
+
+    def is_open(self, date) -> bool:
+        """
+        Returns True only if this event is open on the date specified
+        """
+        return self.start_date <= date and (self.end_date is None or self.end_date >= date)
+
+    def is_target_year_authorized(self, target_year: int) -> bool:
+        return self.authorized_target_year == target_year
+
+
+class AcademicEventCalendarHelper(ABC):
+    event_reference = None
+
+    def is_target_year_authorized(self, target_year: int = None) -> bool:
+        """
+        Check if the target year provided in kwargs is authorized to modification.
+        If no target_year provided, it check if there is at least on year authorized to modification today
+        """
+        target_years_opened = self.get_target_years_opened()
+        if target_year is None:
+            return bool(target_years_opened)
+        return bool(next((year for year in target_years_opened if year == target_year), False))
+
+    def get_target_years_opened(self, date=None) -> List[int]:
+        """
+        Return list of year authorized according to a date provided in kwargs.
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+        return sorted([
+            academic_event.authorized_target_year for academic_event in self._get_academic_events
+            if academic_event.is_open(date)
+        ])
+
+    @cached_property
+    def _get_academic_events(self) -> List[AcademicEvent]:
+        return AcademicEventFactory().get_academic_events(self.event_reference)
+
+    @classmethod
+    def ensure_consistency_until_n_plus_6(cls):
+        """
+        This function will be called by a Celery job in order to ensure that event exist to N + 6.
+        This function must be implemented in idempotent way.
+        """
+        raise NotImplementedError()
+
+
+class AcademicEventFactory:
+    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
+        qs = AcademicCalendar.objects.filter(
+            reference=event_reference
+        ).annotate(
+            authorized_target_year=F('data_year__year')
+        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
+        return [AcademicEvent(**obj) for obj in qs]
 
 
 class EventPerm(ABC):
@@ -138,12 +212,6 @@ class EventPermClosed(EventPerm):
 class EventPermOpened(EventPerm):
     def is_open(self):
         return True
-
-
-class EventPermEducationGroupEdition(EventPerm):
-    model = GroupYear
-    event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
-    error_msg = _("This education group is not editable during this period.")
 
 
 class EventPermLearningUnitFacultyManagerEdition(EventPerm):

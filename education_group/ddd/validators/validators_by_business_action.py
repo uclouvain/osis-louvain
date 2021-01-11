@@ -97,7 +97,9 @@ class CreateTrainingValidatorList(MultipleExceptionBusinessListValidator):
 class UpdateTrainingValidatorList(MultipleExceptionBusinessListValidator):
 
     def __init__(self, training: 'Training'):
-        self.validators = [HopsValuesValidator(training)]
+        self.validators = [
+            HopsValuesValidator(training)
+        ]
         super().__init__()
 
 

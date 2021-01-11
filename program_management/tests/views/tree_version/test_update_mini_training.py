@@ -27,6 +27,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
@@ -60,6 +62,10 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         # Create db data for permission
         group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year, )
         cls.central_manager = CentralManagerFactory(entity=group_year_db.management_entity)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=group_year_db.academic_year
+        )
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)
@@ -173,6 +179,10 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
         # Create db data for permission
         group_year_db = GroupYearDBFactory(partial_acronym=cls.group_obj.code, academic_year__year=cls.group_obj.year,)
         cls.central_manager = CentralManagerFactory(entity=group_year_db.management_entity)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=group_year_db.academic_year
+        )
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)

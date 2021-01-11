@@ -140,16 +140,17 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
 
     def test_post_pedagogy_info_case_user_with_permission(self):
         response = self.client.post(self.url, data={})
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_education_group_year_pedagogy_edit_post(self):
         post_data = {'label': 'welcome_introduction', 'text_french': 'Salut', 'text_english': 'Hello'}
 
         response = self.client.post(self.url, data=post_data)
+        json_response = response.json()
 
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         anchor_expected = '#section_welcome_introduction'
-        self.assertIn(anchor_expected, response.url)
+        self.assertIn(anchor_expected, json_response['success_url'])
 
 
 class AdmissionConditionEducationGroupYearTest(TestCase):

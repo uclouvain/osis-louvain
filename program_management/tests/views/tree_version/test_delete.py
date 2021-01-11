@@ -30,6 +30,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
@@ -57,6 +59,10 @@ class TestDeleteVersionGetMethod(TestCase):
             management_entity=cls.central_manager.entity,
             partial_acronym=cls.node_identity.code,
             academic_year__year=cls.node_identity.year
+        )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.group_year_db.academic_year
         )
 
     def setUp(self) -> None:
@@ -170,6 +176,10 @@ class TestDeleteTreeVersionPostMethod(TestCase):
             management_entity=cls.central_manager.entity,
             partial_acronym=cls.node_identity.code,
             academic_year__year=cls.node_identity.year
+        )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.group_year_db.academic_year
         )
 
     def setUp(self) -> None:

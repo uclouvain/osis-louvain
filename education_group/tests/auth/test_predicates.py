@@ -219,7 +219,8 @@ class TestIsEditionProgramPeriodOpen(TestCase):
         self.predicate_context_mock.start()
         self.addCleanup(self.predicate_context_mock.stop)
 
-    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_edition_program_period_open(self, mock_event_perm_is_open):
         self.assertTrue(
             predicates.is_program_edition_period_open(
@@ -228,12 +229,172 @@ class TestIsEditionProgramPeriodOpen(TestCase):
             )
         )
 
-    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition', return_value=False)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=False)
     def test_case_edition_program_period_closed(self, mock_event_perm_is_open):
         self.assertFalse(
             predicates.is_program_edition_period_open(
                 self.user,
                 self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.get_target_years_opened', return_value=[2020, 2021])
+    def test_assert_education_group_preparation_period_opened_case_no_group_year_provided(self, mock_get_years_opened):
+        self.assertTrue(
+            predicates.is_program_edition_period_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.get_target_years_opened', return_value=[])
+    def test_assert_education_group_preparation_period_closed_case_no_group_year_provided(self, mock_get_years_opened):
+        self.assertFalse(
+            predicates.is_program_edition_period_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+
+class TestIsEducationGroupExtendedDailyManagementCalendarOpen(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group_year = GroupYearFactory()
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    @mock.patch('education_group.calendar.education_group_extended_daily_management.'
+                'EducationGroupExtendedDailyManagementCalendar.is_target_year_authorized', return_value=True)
+    def test_assert_education_group_extended_daily_management_calendar_open_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertTrue(
+            predicates.is_education_group_extended_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_extended_daily_management.'
+                'EducationGroupExtendedDailyManagementCalendar.is_target_year_authorized', return_value=False)
+    def test_assert_education_group_extended_daily_management_calendar_closed_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertFalse(
+            predicates.is_education_group_extended_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_extended_daily_management.'
+                'EducationGroupExtendedDailyManagementCalendar.get_target_years_opened', return_value=[2020, 2021])
+    def test_assert_education_group_extended_daily_management_calendar_opened_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
+        self.assertTrue(
+            predicates.is_education_group_extended_daily_management_calendar_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_extended_daily_management.'
+                'EducationGroupExtendedDailyManagementCalendar.get_target_years_opened', return_value=[])
+    def test_assert_education_group_extended_daily_management_calendar_closed_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
+        self.assertFalse(
+            predicates.is_education_group_extended_daily_management_calendar_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+
+class TestIsEducationGroupLimitedDailyManagementCalendarOpen(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.group_year = GroupYearFactory()
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.is_target_year_authorized', return_value=True)
+    def test_assert_education_group_limited_daily_management_calendar_open_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertTrue(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.is_target_year_authorized', return_value=False)
+    def test_assert_education_group_limited_daily_management_calendar_closed_case_instance_provided(
+            self,
+            mock_event_perm_is_open
+    ):
+        self.assertFalse(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                self.group_year
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.get_target_years_opened', return_value=[2020, 2021])
+    def test_assert_education_group_limited_daily_management_calendar_opened_case_no_instance_provided(
+            self, mock_get_years_opened
+    ):
+        self.assertTrue(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                group_year=None
+            )
+        )
+
+    @mock.patch('education_group.calendar.education_group_limited_daily_management.'
+                'EducationGroupLimitedDailyManagementCalendar.get_target_years_opened', return_value=[])
+    def test_assert_education_group_limited_daily_management_calendar_closed_case_no_instance_provided(
+            self,
+            mock_get_years_opened
+    ):
+        self.assertFalse(
+            predicates.is_education_group_limited_daily_management_calendar_open(
+                self.user,
+                group_year=None
             )
         )
 
@@ -379,7 +540,8 @@ class TestAreAllEducationGroupRemovable(TestCase):
             )
         )
 
-    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_all_minitrainings_are_removable(self, mock_open):
         minitraining_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
         person = FacultyManagerFactory(entity=minitraining_roots[0].management_entity).person
@@ -390,7 +552,8 @@ class TestAreAllEducationGroupRemovable(TestCase):
             )
         )
 
-    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    @mock.patch('education_group.calendar.education_group_preparation_calendar.'
+                'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
     def test_case_all_groups_are_not_removable(self, mock_open):
         groups = [GroupYearFactory()]
         person = FacultyManagerFactory(entity=groups[0].management_entity).person

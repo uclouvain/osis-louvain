@@ -384,7 +384,9 @@ def _get_default_common_value_learning_unit_year(learning_container_year, subtyp
         'quadrimester': quadrimesters.LearningUnitYearQuadrimester.Q1.name,
         'internship_subtype': None,
         'language': language,
-        'periodicity': learning_unit_year_periodicity.ANNUAL
+        'periodicity': learning_unit_year_periodicity.ANNUAL,
+        'other_remark': 'Other Remark',
+        'faculty_remark': 'Faculty Remark'
     }
     if subtype == learning_unit_year_subtypes.PARTIM:
         common_data['acronym'] += 'A'

@@ -99,7 +99,10 @@ class QuickGroupYearFilter(FilterSet):
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
-        if not self.data:
+        # 'changed_data' has been used instead of 'has_changed' here because the hidden field 'academic_year'
+        # which never is empty so need to check the 3 other fields of the form
+        watched_form_fields = ['acronym', 'partial_acronym', 'title']
+        if not self.data or not any(field in self.form.changed_data for field in watched_form_fields):
             return GroupYear.objects.none()
         return GroupYear.objects.all()
 
@@ -137,7 +140,11 @@ class QuickSearchGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTe
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        if context["form"].is_valid() and not context["paginator"].count:
+        # 'changed_data' has been used instead of 'has_changed' here because the hidden field 'academic_year'
+        # which never is empty so need to check the 3 other fields of the form
+        watched_form_fields = ['acronym', 'partial_acronym', 'title']
+        if context["form"].is_valid() and not context["paginator"].count and \
+                any(field in context["form"].changed_data for field in watched_form_fields):
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
@@ -189,7 +196,11 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        if context["form"].is_valid() and not context["paginator"].count:
+        # 'changed_data' has been used instead of 'has_changed' here because the hidden field 'academic_year'
+        # which never is empty so need to check the 2 other fields of the form
+        watched_form_fields = ['acronym', 'title']
+        if context["form"].is_valid() and not context["paginator"].count and \
+                any(field in context["form"].changed_data for field in watched_form_fields):
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 

@@ -28,6 +28,8 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from base.utils.urls import reverse_with_get
@@ -40,6 +42,7 @@ from program_management.ddd.domain import node
 class TestCreate(TestCase):
     @classmethod
     def setUpTestData(cls):
+        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
         cls.mini_training_type = MiniTrainingEducationGroupTypeFactory()
 
         cls.central_manager = CentralManagerFactory()

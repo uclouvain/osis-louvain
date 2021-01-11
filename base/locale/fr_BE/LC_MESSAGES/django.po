@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-08 10:10+0100\n"
+"POT-Creation-Date: 2021-01-05 10:43+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -791,7 +791,13 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
-msgstr "Édition des programmes"
+msgstr "Préparation des formations"
+
+msgid "Education group extended daily management"
+msgstr "Gestion journalière étendue - catalogue"
+
+msgid "Education group limited daily management"
+msgstr "Gestion journalière limitée - catalogue"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
@@ -2296,6 +2302,9 @@ msgstr "Date de début"
 
 msgid "Start date and end date are mandatory"
 msgstr "Les dates de début et de fin sont obligatoires"
+
+msgid "Start date is mandatory"
+msgstr "La date de début est obligatoire"
 
 msgid "Start date must be lower than end date"
 msgstr "La date de début doit être inférieure à la date de fin"

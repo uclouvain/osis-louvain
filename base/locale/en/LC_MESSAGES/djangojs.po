@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-03 16:01+0100\n"
+"POT-Creation-Date: 2020-12-08 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,20 +14,11 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-msgid "Close all"
-msgstr ""
-
 msgid "Collapse"
 msgstr ""
 
-msgid "Copy"
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
-
-msgid "Cut"
-msgstr ""
-
-msgid "Detach"
-msgstr "Remove"
 
 msgid "Existed code for "
 msgstr ""
@@ -44,19 +35,7 @@ msgstr ""
 msgid "Link to CDN Doc"
 msgstr ""
 
-msgid "Loading..."
-msgstr ""
-
-msgid "Modify the link"
-msgstr ""
-
 msgid "Open"
-msgstr ""
-
-msgid "Open all"
-msgstr ""
-
-msgid "Paste"
 msgstr ""
 
 msgid "Please enter a valid URL."
@@ -72,9 +51,6 @@ msgid "Please enter a value that is a multiple of 0.5."
 msgstr ""
 
 msgid "Please use the Ctrl+v shortcut to paste content."
-msgstr ""
-
-msgid "Search"
 msgstr ""
 
 msgid "Selection of target files"

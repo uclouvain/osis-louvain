@@ -250,7 +250,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return training_forms.UpdateTrainingForm(
             self.request.POST or None,
             user=self.request.user,
-            event_perm_obj=self.get_permission_object(),
+            year=self.kwargs['year'],
             training_type=self.get_training_obj().type.name,
             attach_path=self.get_attach_path(),
             initial=self._get_training_form_initial_values(),

@@ -30,6 +30,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
@@ -47,6 +49,10 @@ class TestDeleteGroupGetMethod(TestCase):
 
         cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
         cls.central_manager = CentralManagerFactory()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year__year=cls.group.year
+        )
         cls.url = reverse('group_delete', kwargs={'year': cls.group.year, 'code': cls.group.code})
 
         cls.group_year_db = GroupYearDBFactory(
@@ -107,6 +113,10 @@ class TestDeleteGroupPostMethod(TestCase):
 
         cls.group.entity_identity = GroupIdentity(year=2018, code='LBIR100M')
         cls.central_manager = CentralManagerFactory()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year__year=cls.group.year
+        )
         cls.url = reverse('group_delete', kwargs={'year': cls.group.year, 'code': cls.group.code})
 
         cls.group_year_db = GroupYearDBFactory(

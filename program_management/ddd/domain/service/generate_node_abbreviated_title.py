@@ -34,7 +34,9 @@ class GenerateNodeAbbreviatedTitle(interface.DomainService):
 
     @classmethod
     def generate(cls, parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> str:
-        default_value = FieldValidationRule.get(child_node_type, 'title_fr').initial_value
+        default_abbreviated_title = FieldValidationRule.get(child_node_type, 'abbreviated_title').initial_value
+        default_title = FieldValidationRule.get(child_node_type, 'title_fr').initial_value
+        default_value = default_abbreviated_title or default_title
         return "{child_title}{parent_abbreviated_title}".format(
             child_title=default_value.replace(" ", "").upper(),
             parent_abbreviated_title=parent_node.title

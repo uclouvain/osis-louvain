@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-01 15:56+0100\n"
+"POT-Creation-Date: 2021-01-06 08:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -197,6 +197,11 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+"Les conditions d'admission communes peuvent seulement être modifiées par un "
+"gestionnaire en central"
+
 msgid "Common admission conditions have been updated"
 msgstr "Les conditions d'admission communes ont été mises à jour"
 
@@ -205,6 +210,11 @@ msgstr "Les conditions d'admission communes seront publiées sous peu"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
+
+msgid "Common pedagogy informations can only be edited by central manager"
+msgstr ""
+"Les informations pédagogiques communes peuvent seulement être modifiées par "
+"un gestionnaire en central"
 
 msgid "Conditions"
 msgstr "Conditions"
@@ -226,10 +236,6 @@ msgstr "Contenu"
 
 msgid "Content constraint"
 msgstr "Contrainte"
-
-msgid "Coorganization can only be changed by central manager"
-msgstr ""
-"Co-organisation peuvent seulement être modifié par les gestionnaire centraux"
 
 msgid "Copied element"
 msgstr "Élément copié"
@@ -658,6 +664,10 @@ msgstr ""
 "Les valeurs des champs concernant les données de l'ARES doivent être "
 "supérieures ou égales à 1 et inférieures ou égales à 9999"
 
+#, python-format
+msgid "The following fields are empty: %(fields)s "
+msgstr "Les champs suivants sont vides: %(fields)s"
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -724,8 +734,16 @@ msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 msgid "The value of this attribute is inherited from the standard OF"
 msgstr "La valeur de ce champ est hérité de la version standard"
 
+msgid "There are warnings in the form."
+msgstr "Il y a des avertissements dans le formulaire."
+
 msgid "There can only be one type 2 expectation"
 msgstr "Il ne peut y avoir qu'un seul attendu de type 2"
+
+msgid "This education group is not editable during this period."
+msgstr ""
+"La période de modification des formations n'est pas ouverte durant cette "
+"période."
 
 msgid "Title"
 msgstr "Intitulé"
@@ -818,9 +836,6 @@ msgstr "Utilisations"
 
 msgid "Validity"
 msgstr "Validité"
-
-msgid "Version name {} already exists"
-msgstr "Le nom de version {} existe déjà"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"

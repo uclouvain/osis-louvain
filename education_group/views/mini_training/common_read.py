@@ -35,8 +35,6 @@ from django.views.generic import TemplateView
 
 from base import models as mdl
 from base.business.education_groups import general_information_sections
-from base.business.education_groups.general_information_sections import \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
@@ -322,22 +320,15 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     def have_general_information_tab(self):
         return self.current_version.is_standard_version and \
-            self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
-            self._is_general_info_and_condition_admission_in_display_range()
+            self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
     def have_skills_and_achievements_tab(self):
         return self.current_version.is_standard_version and \
-            self.get_group().type.name in MiniTrainingType.with_skills_achievements() and \
-            self._is_general_info_and_condition_admission_in_display_range()
+            self.get_group().type.name in MiniTrainingType.with_skills_achievements()
 
     def have_admission_condition_tab(self):
         return self.current_version.is_standard_version and \
-            self.get_group().type.name in MiniTrainingType.with_admission_condition() and \
-            self._is_general_info_and_condition_admission_in_display_range()
-
-    def _is_general_info_and_condition_admission_in_display_range(self):
-        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_group().year < \
-               self.get_current_academic_year().year + 2
+            self.get_group().type.name in MiniTrainingType.with_admission_condition()
 
 
 def _get_view_name_from_tab(tab: Tab):

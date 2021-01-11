@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from ajax_select import register, LookupChannel
 from django import forms
@@ -39,7 +39,9 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import EventPermEducationGroupEdition
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
 from base.models import campus
@@ -99,12 +101,10 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     min_constraint = forms.IntegerField(
         label=_("minimum constraint").capitalize(),
         required=False,
-        widget=forms.TextInput
     )
     max_constraint = forms.IntegerField(
         label=_("maximum constraint").capitalize(),
         required=False,
-        widget=forms.TextInput
     )
     title_fr = forms.CharField(max_length=240, label=_("Title in French"))
     title_en = forms.CharField(max_length=240, label=_("Title in English"), required=False)
@@ -121,8 +121,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     duration = forms.IntegerField(
         initial=1,
         label=_("Duration"),
-        validators=[MinValueValidator(1)],
-        widget=forms.TextInput(),
+        min_value=1,
     )
     duration_unit = forms.ChoiceField(
         initial=DurationUnitsEnum.QUADRIMESTER.name,
@@ -261,18 +260,26 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
     remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
 
     # HOPS panel
-    ares_code = forms.IntegerField(label=_('ARES study code'), widget=forms.TextInput(), required=False,
-                                   max_value=9999)
-    ares_graca = forms.IntegerField(label=_('ARES-GRACA'), widget=forms.TextInput(), required=False,
-                                    max_value=9999)
-    ares_authorization = forms.IntegerField(label=_('ARES ability'), widget=forms.TextInput(), required=False,
-                                            max_value=9999)
+    ares_code = forms.IntegerField(
+        label=_('ARES study code'),
+        required=False,
+        max_value=9999
+    )
+    ares_graca = forms.IntegerField(
+        label=_('ARES-GRACA'),
+        required=False,
+        max_value=9999
+    )
+    ares_authorization = forms.IntegerField(
+        label=_('ARES ability'),
+        required=False,
+        max_value=9999
+    )
     code_inter_cfb = forms.CharField(max_length=8, label=_('Code co-graduation inter CfB'), required=False)
     coefficient = forms.DecimalField(
         max_digits=7,
         decimal_places=4,
         label=_('Co-graduation total coefficient'),
-        widget=forms.TextInput(),
         required=False,
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
@@ -307,7 +314,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
     )
 
-    def __init__(self, *args, user: User, training_type: str, attach_path: str, training: 'Training' = None,  **kwargs):
+    def __init__(self, *args, user: User, training_type: str, attach_path: Optional[str],
+                 training: 'Training' = None, **kwargs):
         self.user = user
         self.training_type = training_type
         self.attach_path = attach_path
@@ -328,14 +336,14 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     def __init_academic_year_field(self):
         if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            working_academic_years = EventPermEducationGroupEdition.get_academic_years()
+            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
         else:
-            working_academic_years = AcademicYear.objects.all()
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
 
-        working_academic_years = working_academic_years.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
         self.fields['academic_year'].queryset = working_academic_years
         self.fields['end_year'].queryset = AcademicYear.objects.filter(
-            year__gte=working_academic_years.first().year
+            year__gte=getattr(working_academic_years.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION)
         )
 
     def __init_management_entity_field(self):
@@ -393,8 +401,8 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
         to_field_name="year"
     )
 
-    def __init__(self, *args, event_perm_obj=None, **kwargs):
-        self.event_perm_obj = event_perm_obj
+    def __init__(self, *args, year: int = None, **kwargs):
+        self.year = year
 
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
@@ -420,10 +428,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
-        is_edition_period_opened = EventPermEducationGroupEdition(
-            obj=self.event_perm_obj,
-            raise_exception=False
-        ).is_open()
+        is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
         return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin

@@ -26,6 +26,8 @@ import mock
 from django.http import HttpResponse
 from django.test import TestCase
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -52,6 +54,10 @@ class TestTrainingUpdateView(TestCase):
         )
         cls.training = TrainingFactory()
         cls.egy = EducationGroupYearFactory(partial_acronym=cls.training.code, academic_year__year=cls.training.year)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.egy.academic_year
+        )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
 
     def setUp(self):
@@ -106,10 +112,16 @@ class TestTrainingUpdateView(TestCase):
         self.assertRedirects(response, expected_redirec_url, fetch_redirect_response=False)
 
     def test_should_disable_or_enable_certificate_aim_according_to_role(self):
+        # For faculty manager, we must have an opened calendar for creation of training
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+            data_year=self.egy.academic_year
+        )
+
         rules = [
-            {'role': CentralManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
-            {'role': FacultyManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
-            {'role': ProgramManagerFactory(education_group=self.egy.education_group), 'is_disabled': False},
+           {'role': CentralManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+           {'role': FacultyManagerFactory(entity=self.egy.management_entity), 'is_disabled': True},
+           {'role': ProgramManagerFactory(education_group=self.egy.education_group), 'is_disabled': False},
         ]
         for rule in rules:
             self._test_certificate_aim_according_to_role(role=rule['role'], is_disabled=rule['is_disabled'])

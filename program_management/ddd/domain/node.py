@@ -145,10 +145,7 @@ class NodeFactory:
             year=parent_node.year,
             teaching_campus=parent_node.teaching_campus,
             management_entity_acronym=parent_node.management_entity_acronym,
-            group_title_fr="{child_title} {parent_abbreviated_title}".format(
-                child_title=generated_child_title,
-                parent_abbreviated_title=parent_node.title
-            ),
+            group_title_fr=generated_child_title,
             start_year=parent_node.year,
         )
         child._has_changed = True

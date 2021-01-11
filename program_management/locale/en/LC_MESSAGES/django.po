@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-27 13:01+0100\n"
+"POT-Creation-Date: 2021-01-05 10:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -327,6 +327,9 @@ msgstr ""
 msgid "Internship"
 msgstr ""
 
+msgid "Invalid name version"
+msgstr ""
+
 msgid "Invalid tree path"
 msgstr ""
 
@@ -482,9 +485,6 @@ msgid "New specific version"
 msgstr ""
 
 msgid "New training"
-msgstr ""
-
-msgid "New version"
 msgstr ""
 
 msgid "No"
@@ -655,6 +655,9 @@ msgid "Root group"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Save will prolong the past version"
 msgstr ""
 
 msgid "Schedule type"
@@ -849,6 +852,12 @@ msgid "Version"
 msgstr ""
 
 msgid "Version name"
+msgstr ""
+
+msgid "Version name {} already exists"
+msgstr ""
+
+msgid "Version name {} existed"
 msgstr ""
 
 msgid "Volume"

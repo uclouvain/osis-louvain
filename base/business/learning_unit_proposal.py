@@ -72,12 +72,12 @@ INITIAL_DATA_FIELDS = {
         'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
     ],
     'learning_unit': [
-        "id", "end_year", "faculty_remark", "other_remark"
+        "id", "end_year",
     ],
     'learning_unit_year': [
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
-        "attribution_procedure",
+        "attribution_procedure", "faculty_remark", "other_remark"
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
@@ -112,7 +112,7 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
-        if attribute_name != "id":
+        if attribute_name != "id" and attribute_name != "in_charge":
             cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()

@@ -125,10 +125,8 @@ def get_valid_form_data(academic_year, learning_unit_year=None, entity=None):
         'campus': learning_unit_year.campus.id,
         'language': learning_unit_year.language.pk,
         'periodicity': learning_unit_year.periodicity,
-
-        # Learning unit data model form
-        'faculty_remark': learning_unit_year.learning_unit.faculty_remark,
-        'other_remark': learning_unit_year.learning_unit.other_remark,
+        'other_remark': learning_unit_year.other_remark,
+        'faculty_remark': learning_unit_year.faculty_remark,
 
         # Learning container year data model form
         'common_title': learning_unit_year.learning_container_year.common_title,
@@ -298,15 +296,9 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year, person=self.central_person)
         self.assertTrue(form.is_valid(), form.errors)
-        self._test_learning_unit_model_form_instance(form)
         self._test_learning_unit_year_model_form_instance(form)
         self._test_learning_container_model_form_instance(form)
         self._test_learning_container_year_model_form_instance(form)
-
-    def _test_learning_unit_model_form_instance(self, full_form):
-        form_instance = full_form.forms[LearningUnitModelForm]
-        fields_to_validate = ['faculty_remark', 'other_remark']
-        self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
 
     def _test_learning_container_model_form_instance(self, full_form):
         self.assertIn(LearningContainerModelForm, full_form.forms)
@@ -315,7 +307,7 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         form_instance = full_form.forms[LearningUnitYearModelForm]
         fields_to_validate = ['acronym', 'specific_title', 'specific_title_english', 'credits',
                               'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                              'subtype', 'periodicity']
+                              'subtype', 'periodicity', 'other_remark', 'faculty_remark']
         self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
         self.assertEqual(form_instance.instance.academic_year.id, self.post_data['academic_year'])
 

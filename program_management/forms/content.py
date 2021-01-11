@@ -4,6 +4,7 @@ from django import forms
 from django.forms import formset_factory, BaseFormSet
 
 import program_management.ddd.domain.exception
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.forms.exceptions import InvalidFormException
 from base.forms.utils import choice_field
 from base.models.enums.education_group_types import TrainingType
@@ -12,7 +13,6 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.service.write import bulk_update_link_service, update_link_service
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
 class LinkForm(forms.Form):

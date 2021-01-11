@@ -135,8 +135,6 @@ COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales',)
 }
 
-MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION = 2017
-
 SECTIONS_PER_OFFER_TYPE = {
     TrainingType.AGGREGATION.name: {
         'common': [AGREGATION, CAAP, EVALUATION, ],

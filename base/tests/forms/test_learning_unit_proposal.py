@@ -338,7 +338,6 @@ def build_initial_data(learning_unit_year, entity):
             "acronym": learning_unit_year.learning_container_year.acronym,
             "common_title": learning_unit_year.learning_container_year.common_title,
             "container_type": learning_unit_year.learning_container_year.container_type,
-            "in_charge": learning_unit_year.learning_container_year.in_charge,
             "team": learning_unit_year.learning_container_year.team,
             "common_title_english": learning_unit_year.learning_container_year.common_title_english,
             "is_vacant": learning_unit_year.learning_container_year.is_vacant,
@@ -363,12 +362,12 @@ def build_initial_data(learning_unit_year, entity):
             "specific_title_english": learning_unit_year.specific_title_english,
             "professional_integration": learning_unit_year.professional_integration,
             "attribution_procedure": learning_unit_year.attribution_procedure,
+            "other_remark": learning_unit_year.other_remark,
+            "faculty_remark": learning_unit_year.faculty_remark,
         },
         "learning_unit": {
             "id": learning_unit_year.learning_unit.id,
             'end_year': learning_unit_year.learning_unit.end_year,
-            "other_remark": learning_unit_year.learning_unit.other_remark,
-            "faculty_remark": learning_unit_year.learning_unit.faculty_remark,
         },
         "learning_component_years": [],
         "volumes": {}

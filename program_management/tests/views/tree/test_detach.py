@@ -31,6 +31,8 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -55,6 +57,10 @@ class TestDetachNodeView(TestCase):
             child_element__group_year__academic_year=cls.academic_year
         )
         cls.person = CentralManagerFactory(entity=element.group_year.management_entity).person
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            data_year=cls.academic_year
+        )
         cls.path_to_detach = '|'.join([
             str(cls.group_element_year.parent_element_id),
             str(cls.group_element_year.child_element_id)

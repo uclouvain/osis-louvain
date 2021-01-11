@@ -239,12 +239,12 @@ class TestLearningUnitModificationProposal(TestCase):
                 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
             ],
             'learning_unit': [
-                "id", "end_year", "faculty_remark", "other_remark",
+                "id", "end_year",
             ],
             'learning_unit_year': [
                 "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
                 "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester",
-                "session", "attribution_procedure",
+                "session", "attribution_procedure", "faculty_remark", "other_remark",
             ],
             'learning_component_year': [
                 "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",

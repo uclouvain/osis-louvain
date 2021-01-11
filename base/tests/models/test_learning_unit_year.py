@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
     LecturingLearningComponentYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory, \
+    LearningContainerYearNotInChargeFactory, LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.tutor import TutorFactory
@@ -62,11 +63,13 @@ class LearningUnitYearTest(TestCase):
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
         cls.academic_year = create_current_academic_year()
+        learning_container_yr = LearningContainerYearNotInChargeFactory()
         cls.learning_unit_year = LearningUnitYearFactory(
             acronym="LDROI1004",
             specific_title="Juridic law courses",
             academic_year=cls.academic_year,
-            subtype=learning_unit_year_subtypes.FULL
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year=learning_container_yr
         )
 
     def test_find_by_tutor_with_none_argument(self):
@@ -94,13 +97,9 @@ class LearningUnitYearTest(TestCase):
     def test_property_in_charge(self):
         self.assertFalse(self.learning_unit_year.in_charge)
 
-        a_container_year = LearningContainerYearFactory(acronym=self.learning_unit_year.acronym,
-                                                        academic_year=self.academic_year)
+        a_container_year = LearningContainerYearInChargeFactory(acronym=self.learning_unit_year.acronym,
+                                                                academic_year=self.academic_year)
         self.learning_unit_year.learning_container_year = a_container_year
-
-        self.assertFalse(self.learning_unit_year.in_charge)
-
-        a_container_year.in_charge = True
 
         self.assertTrue(self.learning_unit_year.in_charge)
 
@@ -302,7 +301,6 @@ class LearningUnitYearWarningsTest(TestCase):
         learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
         learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
         learning_component_year_partim_lecturing.save()
-
 
         self.luy_full.quadrimester = None
         self.luy_full.save()
