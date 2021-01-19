@@ -84,7 +84,8 @@ urlpatterns = [
             path('update/', achievement.UpdateEducationGroupAchievement.as_view(),
                  name='minitraining_achievement_update'),
             path('<int:education_group_detail_achievement_pk>/', include([
-                path('actions/', education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
+                path('actions/',
+                     education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
                      name='minitraining_detailed_achievement_actions'),
                 path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
                      name='minitraining_detailed_achievement_delete'),
@@ -134,7 +135,8 @@ urlpatterns = [
                 path('update/', achievement.UpdateEducationGroupAchievement.as_view(),
                      name='training_achievement_update'),
                 path('<int:education_group_detail_achievement_pk>/', include([
-                    path('actions/', education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
+                    path('actions/',
+                         education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
                          name='training_detailed_achievement_actions'),
                     path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
                          name='training_detailed_achievement_delete'),
