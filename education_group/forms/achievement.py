@@ -67,4 +67,3 @@ class EducationGroupDetailedAchievementForm(EducationGroupAchievementForm):
 
 class ActionForm(forms.Form):
     action = forms.ChoiceField(choices=ACTION_CHOICES, required=True, widget=forms.HiddenInput())
-
