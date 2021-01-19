@@ -90,5 +90,5 @@ class OrderAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin, 
 
     def get_success_message(self, cleaned_data):
         if self.request.POST.get('to_postpone'):
-            return _("Condition has been reorderd (with postpone)")
+            return _("Condition has been reordered (with postpone)")
         return _("Condition has been reordered")
