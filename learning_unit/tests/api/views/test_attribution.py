@@ -97,22 +97,3 @@ class LearningUnitAttributionTestCase(APITestCase):
 
         serializer = LearningUnitAttributionSerializer([attribution], many=True)
         self.assertEqual(response.data, serializer.data)
-
-    def test_get_results_coordinator_without_volume(self):
-        AttributionNew.objects.all().delete()
-        attribution_without_volume = AttributionNewFactory(
-            learning_container_year=self.luy.learning_container_year,
-            function=Functions.COORDINATOR.name,
-        )
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        attribution_annotated = AttributionNew.objects.annotate(
-            first_name=F('tutor__person__first_name'),
-            middle_name=F('tutor__person__middle_name'),
-            last_name=F('tutor__person__last_name'),
-            email=F('tutor__person__email'),
-            global_id=F('tutor__person__global_id'),
-        ).get(id=attribution_without_volume.pk)
-
-        serializer = LearningUnitAttributionSerializer([attribution_annotated], many=True)
-        self.assertEqual(response.data, serializer.data)

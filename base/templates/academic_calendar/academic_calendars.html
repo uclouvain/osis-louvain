@@ -68,24 +68,6 @@
                             </label>
                         </td>
                     </tr>
-                    <tr>
-                        <td><label>{% trans "project events" as project_events %}{{ project_events|title }}</label><br></td>
-                        <td style="padding-left: 0.5em; padding-top: 4px;">
-                            <label class="switch">
-                              <input type="checkbox" name="show_project_events" title="{{ project_events|title }}" onclick='this.form.submit();' {% if show_project_events %}checked{% endif %} />
-                              <span class="slider round"></span>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label>{% trans "ad hoc events" as ad_hoc_events %}{{ ad_hoc_events|title }}</label><br></td>
-                        <td style="padding-left: 0.5em; padding-top: 4px;">
-                            <label class="switch">
-                                <input type="checkbox" name="show_ad_hoc_events" title="{{ ad_hoc_events|title }}" onclick='this.form.submit();' {% if show_ad_hoc_events %}checked{% endif %} />
-                                <span class="slider round"></span>
-                            </label>
-                        </td>
-                    </tr>
                 </table>
             {% else %}
                 <input type="hidden" name="show_academic_events" title="{{ academic_events|title }}" value="on" />
@@ -169,29 +151,9 @@
             + "{% trans 'Details'%}</a>";
         };
 
-        /* Update lines style for project events */
-        let setRowStyleFunction = function (start, end, task) {
-            if (task.category === 'PROJECT')
-                return "projectRow";
-        };
-        gantt.templates.grid_row_class = setRowStyleFunction; // update first cell style
-        gantt.templates.task_row_class = setRowStyleFunction; // update end of row style
-
         gantt.addMarker({
             start_date: new Date() // this is today
         });
-
-        var data = {{ ad_hoc_list|safe }}['ad_hoc_events'];
-        for (var i=0;i<data.length;i++) {
-            var parts =data[i]['start_date'].split('-');
-            var mm = parts[1]-1;
-
-            gantt.addMarker({
-                start_date: new Date(parts[2],mm , parts[0]),
-                css: 'releaseCol',
-                text: get_release_title(parts[0], parts[1], parts[2], data[i]['id']),
-            });
-        }
 
         gantt.config.autosize = "y";
         gantt.init("gantt_div");

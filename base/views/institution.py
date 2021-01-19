@@ -37,8 +37,10 @@ from base.business.institution import find_summary_course_submission_dates_for_e
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
 from base.models import entity_version as entity_version_mdl
+from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion
 from base.views.common import paginate_queryset
+from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -82,16 +84,19 @@ def entity_read(request, entity_version_id):
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
 
-    event_perm = event_perms.EventPermSummaryCourseSubmission()
-    if event_perm.is_open():
-        data_year = event_perm.get_academic_years().get()
+    calendar = LearningUnitSummaryEditionCalendar()
+    target_years_opened = calendar.get_target_years_opened()
+    if target_years_opened:
+        target_year_displayed = target_years_opened[0]
     else:
-        data_year = event_perm.get_previous_opened_calendar().data_year
+        previous_academic_event = calendar.get_previous_academic_event()
+        target_year_displayed = previous_academic_event.authorized_target_year
+
+    academic_year = AcademicYear.objects.get(year=target_year_displayed)
     calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(
         entity_version=entity_version,
-        ac_year=data_year
+        ac_year=academic_year
     )
-
     context = {
         'entity_version': entity_version,
         'entity_parent': entity_parent,

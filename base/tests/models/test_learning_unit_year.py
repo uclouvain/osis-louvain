@@ -42,7 +42,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.entity import EntityFactory
@@ -228,51 +227,6 @@ class LearningUnitYearGetEntityTest(TestCase):
 
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
         self.assertIsNone(result)
-
-
-class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.learning_unit_year = LearningUnitYearFactory(
-            academic_year=cls.current_academic_year,
-            learning_container_year__academic_year=cls.current_academic_year,
-        )
-        cls.tutor = TutorFactory()
-        AttributionFactory(learning_unit_year=cls.learning_unit_year, tutor=cls.tutor)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_occurrence_found(self):
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertEqual(result.count(), 1)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_distinct_occurrence_found(self):
-        """In this test, we ensure that user see one line per learning unit year despite multiple attribution"""
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor, function=COORDINATOR)
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor, function=CO_HOLDER)
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor)
-
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertEqual(result.count(), 1)
-
-    def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_no_occurrence_found(self):
-        """In this test, we ensure that if the learning unit year as no learning container, it is not taking account"""
-        self.learning_unit_year.learning_container_year = None
-        self.learning_unit_year.save()
-
-        result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_year=self.current_academic_year,
-            tutor=self.tutor
-        )
-        self.assertIsInstance(result, QuerySet)
-        self.assertFalse(result.count())
 
 
 class LearningUnitYearWarningsTest(TestCase):

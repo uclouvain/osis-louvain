@@ -57,15 +57,8 @@ class LearningUnitAttribution(generics.ListAPIView):
             last_name=F('tutor__person__last_name'),
             email=F('tutor__person__email'),
             global_id=F('tutor__person__global_id'),
-        )
-
-        coordinator_qs = attribution_qs.filter(
-            learning_container_year_id=luy.learning_container_year_id,
-            function=Functions.COORDINATOR.name
-        )
-        others_function_qs = attribution_qs.filter(
+        ).filter(
             attributionchargenew__learning_component_year__learning_unit_year_id=luy.pk
         )
 
-        # Working with union improve performance
-        return coordinator_qs.union(others_function_qs)
+        return attribution_qs

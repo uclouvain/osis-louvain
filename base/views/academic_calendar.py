@@ -37,19 +37,19 @@ from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
-from base.models.enums.academic_calendar_type import ACADEMIC_CATEGORY, PROJECT_CATEGORY, AD_HOC_CATEGORY
+from base.models.enums.academic_calendar_type import ACADEMIC_CATEGORY
 from base.utils.cache import cache_filter
 from base.views import common
 from base.views.mixins import RulesRequiredMixin
 from osis_common.utils.models import get_object_or_none
 
 
-def _build_gantt_json(academic_calendar_list, show_academic_events, show_project_events):
+def _build_gantt_json(academic_calendar_list, show_academic_events):
     academic_calendar_data = []
     for calendar in academic_calendar_list:
         category = calendar.get_category()
 
-        if _item_must_be_skipped(calendar, category, show_academic_events, show_project_events):
+        if _item_must_be_skipped(calendar, category, show_academic_events):
             continue
 
         data = {
@@ -78,12 +78,10 @@ def _compute_progress(calendar):
     return progress
 
 
-def _item_must_be_skipped(calendar, category, show_academic_events, show_project_events):
+def _item_must_be_skipped(calendar, category, show_academic_events):
     return calendar.start_date is None or \
         calendar.end_date is None or \
-        (category == ACADEMIC_CATEGORY and not show_academic_events) or \
-        (category == PROJECT_CATEGORY and not show_project_events) or \
-        category == AD_HOC_CATEGORY
+        (category == ACADEMIC_CATEGORY and not show_academic_events)
 
 
 def _get_undated_calendars(academic_calendar_list):
@@ -96,7 +94,7 @@ def _get_undated_calendars(academic_calendar_list):
 
 @login_required
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
-@cache_filter(show_academic_events='on', show_project_events='on')
+@cache_filter(show_academic_events='on')
 def academic_calendars(request):
     # TODO :: Use a Django form instead of hardcoded form in template academic_calendars.html
     academic_year = request.GET.get('academic_year') or mdl.academic_year.starting_academic_year().pk
@@ -104,12 +102,9 @@ def academic_calendars(request):
     academic_years = AcademicYear.objects.all()
 
     show_academic_events = request.GET.get('show_academic_events')
-    show_project_events = request.GET.get('show_project_events') and request.user.is_superuser
-    show_ad_hoc_events = request.GET.get('show_ad_hoc_events') and request.user.is_superuser
     academic_calendar_list = AcademicCalendar.objects.filter(academic_year=academic_year).order_by('start_date')
-    academic_calendar_json = _build_gantt_json(academic_calendar_list, show_academic_events, show_project_events)
+    academic_calendar_json = _build_gantt_json(academic_calendar_list, show_academic_events)
     undated_calendars_list = _get_undated_calendars(academic_calendar_list)
-    ad_hoc_list = {'ad_hoc_events': _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events)}
     show_gantt_diagram = bool(len(academic_calendar_json['data']))
 
     return render(
@@ -119,26 +114,11 @@ def academic_calendars(request):
             'academic_year': academic_year,
             'academic_years': academic_years,
             'show_academic_events': show_academic_events,
-            'show_project_events': show_project_events,
             'academic_calendar_json': academic_calendar_json,
             'undated_calendars_list': undated_calendars_list,
             'show_gantt_diagram': show_gantt_diagram,
-            'ad_hoc_list': ad_hoc_list,
-            'show_ad_hoc_events': show_ad_hoc_events,
         }
     )
-
-
-def _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events):
-    return [
-        {
-            'id': calendar.pk,
-            'text': calendar.title,
-            'start_date': calendar.start_date.strftime('%d-%m-%Y'),
-        }
-        for calendar in academic_calendar_list
-        if calendar.get_category() == 'AD_HOC' and show_ad_hoc_events and calendar.start_date
-    ]
 
 
 @login_required

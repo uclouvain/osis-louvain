@@ -31,7 +31,6 @@ import attr
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.db.models.query import QuerySet
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -90,9 +89,60 @@ class AcademicEventCalendarHelper(ABC):
             if academic_event.is_open(date)
         ])
 
+    def get_opened_academic_events(self, date=None) -> List[AcademicEvent]:
+        """
+        Return all current academic event opened based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+        return [academic_event for academic_event in self._get_academic_events if academic_event.is_open(date)]
+
+    def get_next_academic_event(self, date=None) -> AcademicEvent:
+        """
+        Return next academic event based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+
+        events_filtered = [
+            event for event in self._get_academic_events
+            if event.end_date is None or event.end_date > date
+        ]
+        return events_filtered[0] if events_filtered else None
+
+    def get_previous_academic_event(self, date=None) -> AcademicEvent:
+        """
+        Return previous academic event based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+
+        events_filtered = [
+            event for event in self._get_academic_events if
+            event.end_date is not None and event.end_date < date
+        ]
+        return events_filtered[-1] if events_filtered else None
+
+    def get_academic_event(self, target_year: int) -> AcademicEvent:
+        """
+        Return academic event related to target_year provided
+        """
+        return next(
+            (academic_event for academic_event in self._get_academic_events
+             if academic_event.authorized_target_year == target_year
+             ),
+            None
+        )
+
     @cached_property
     def _get_academic_events(self) -> List[AcademicEvent]:
-        return AcademicEventFactory().get_academic_events(self.event_reference)
+        return sorted(
+            AcademicEventFactory().get_academic_events(self.event_reference),
+            key=lambda academic_event: academic_event.start_date
+        )
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
@@ -177,28 +227,6 @@ class EventPerm(ABC):
             qs = qs.filter(data_year__year__lte=max_academic_y)
         return qs.values_list('data_year', flat=True)
 
-    @classmethod
-    def get_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
-        if not date:
-            date = timezone.now()
-        qs = AcademicCalendar.objects.filter(end_date__lte=date).order_by('end_date')
-
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-
-        return qs.last()
-
-    @classmethod
-    def get_next_opened_calendar(cls, date=None) -> AcademicCalendar:
-        if not date:
-            date = timezone.now()
-        qs = AcademicCalendar.objects.filter(start_date__gte=date).order_by('start_date')
-
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-
-        return qs.first()
-
 
 class EventPermClosed(EventPerm):
     def is_open(self):
@@ -276,15 +304,3 @@ def generate_event_perm_modification_transformation_proposal(person, obj=None, r
         return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
-
-
-class EventPermSummaryCourseSubmission(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-    error_msg = _("Summary course submission is not allowed for tutors during this period.")
-
-
-class EventPermSummaryCourseSubmissionForceMajeure(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
-    error_msg = _("Summary course submission (Force majeure) is not allowed for tutors during this period.")

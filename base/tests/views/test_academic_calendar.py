@@ -50,9 +50,6 @@ class AcademicCalendarViewTestCase(TestCase):
             for i in range(len(cls.academic_years))
         ]
 
-        cls.academic_calendars[2].reference = academic_calendar_type.TESTING
-        cls.academic_calendars[2].save()
-
         cls.person = PersonWithPermissionsFactory("can_access_academic_calendar", user__superuser=True)
         cls.url = reverse('academic_calendars')
 
@@ -73,16 +70,6 @@ class AcademicCalendarViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'academic_calendar/academic_calendars.html')
         self._compare_academic_calendar_json(response.context, self.academic_calendars[1])
-
-    def test_project_calendars_search(self):
-        response = self.client.get(
-            self.url,
-            data={'academic_year': self.academic_years[2].id, 'show_academic_events': 'on', 'show_project_events': 'on'}
-        )
-
-        self.assertTemplateUsed(response, 'academic_calendar/academic_calendars.html')
-        self._compare_academic_calendar_json(response.context, self.academic_calendars[2],
-                                             category=academic_calendar_type.PROJECT_CATEGORY)
 
     def _compare_academic_calendar_json(self, context, calendar, category=academic_calendar_type.ACADEMIC_CATEGORY):
         self.assertDictEqual(

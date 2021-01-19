@@ -615,6 +615,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         partim = LearningUnitYearPartimFactory(
             learning_container_year=luy.learning_container_year,
             academic_year=academic_years[0],
+            learning_unit__start_year=academic_years[0],
             learning_unit__end_year=academic_years[0]
         )
 

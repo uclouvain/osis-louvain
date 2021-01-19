@@ -110,6 +110,9 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     proposal = serializers.SerializerMethodField()
     summary_status = serializers.SerializerMethodField()
 
+    remark = serializers.CharField(source='other_remark', read_only=True)
+    remark_en = serializers.CharField(source='other_remark_english', read_only=True)
+
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitSerializer.Meta.fields + (
@@ -125,10 +128,13 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'partims',
             'proposal',
             'summary_status',
-            'professional_integration'
+            'professional_integration',
+            'remark',
+            'remark_en'
         )
 
-    def get_proposal(self, learning_unit_year):
+    @staticmethod
+    def get_proposal(learning_unit_year):
         if not hasattr(learning_unit_year, "proposallearningunit"):
             return {}
 

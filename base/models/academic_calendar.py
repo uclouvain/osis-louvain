@@ -86,7 +86,7 @@ class AcademicCalendar(SerializableModel):
     highlight_title = models.CharField(max_length=50, blank=True, null=True)
     highlight_description = models.CharField(max_length=255, blank=True, null=True)
     highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=academic_calendar_type.CALENDAR_TYPES, max_length=70)
+    reference = models.CharField(choices=academic_calendar_type.ACADEMIC_CALENDAR_TYPES, max_length=70)
 
     objects = AcademicCalendarQuerySet.as_manager()
 
@@ -107,10 +107,6 @@ class AcademicCalendar(SerializableModel):
     def get_category(self):
         if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):
             return academic_calendar_type.ACADEMIC_CATEGORY
-        elif self.reference in _list_types(academic_calendar_type.PROJECT_CALENDAR_TYPES):
-            return academic_calendar_type.PROJECT_CATEGORY
-        elif self.reference in _list_types(academic_calendar_type.AD_HOC_CALENDAR_TYPES):
-            return academic_calendar_type.AD_HOC_CATEGORY
         return ''
 
     def __str__(self):

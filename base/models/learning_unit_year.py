@@ -697,15 +697,6 @@ def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
 
 
-def find_learning_unit_years_by_academic_year_tutor_attributions(academic_year, tutor):
-    """ In this function, only learning unit year with containers is visible! [no classes] """
-    qs = LearningUnitYear.objects_with_container.filter(
-        academic_year=academic_year,
-        attribution__tutor=tutor,
-    ).distinct().order_by('academic_year__year', 'acronym')
-    return qs
-
-
 def toggle_summary_locked(learning_unit_year_id):
     luy = LearningUnitYear.objects.get(pk=learning_unit_year_id)
     luy.summary_locked = not luy.summary_locked

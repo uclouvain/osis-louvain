@@ -97,33 +97,6 @@ class AcademicCalendarTest(TestCase):
         )
 
 
-class TestIsAcademicCalendarHasStarted(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.current_academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-        )
-
-    def test_project_calendar_types(self):
-        excepted_project_calendar_types = (
-            (academic_calendar_type.TESTING, _("Testing")),
-        )
-        self.assertCountEqual(
-            academic_calendar_type.PROJECT_CALENDAR_TYPES,
-            excepted_project_calendar_types
-        )
-
-    def test_calendar_types(self):
-        self.assertCountEqual(
-            academic_calendar_type.ACADEMIC_CALENDAR_TYPES +
-            academic_calendar_type.PROJECT_CALENDAR_TYPES +
-            academic_calendar_type.AD_HOC_CALENDAR_TYPES,
-            academic_calendar_type.CALENDAR_TYPES
-        )
-
-
 class TestGetStartingAcademicCalendar(TestCase):
     @classmethod
     def setUpTestData(cls):

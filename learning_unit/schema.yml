@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
    description: 'Production server'
 info:
-  version: '1.01'
+  version: '1.02'
   title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
@@ -496,6 +496,10 @@ components:
               type: string
             professional_integration:
               type: boolean
+            remark:
+              type: string
+            remark_en:
+              type: string
     ExternalLearningUnit:
       allOf:
         - $ref: '#/components/schemas/LearningUnitDetailed'

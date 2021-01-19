@@ -1,5 +1,4 @@
 {% load i18n dictionnary %}
-{% load date_operations %}
 
 {% if learning_unit_years_with_errors %}
     <table id="table_learning_units" class="table table-striped table-hover">
@@ -31,8 +30,7 @@
                         {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
                             <td {% if event_perm_desc_fiche_open %}style="color: green" {% else %}style="color: red"{% endif %}>
                                 {% trans 'From' context "Du" %} {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %}
-                                {% trans 'to' context "au" %} {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|shift_date:-1|date:"d/m/Y" }} {% endif %}
-                                <!-- TODO :: Remove shift_date when end_date is included in period -->
+                                {% trans 'to' context "au" %} {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|date:"d/m/Y" }} {% endif %}
                                 {% if error.errors|length > 1 %}
                                     {% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}
                                 {% else %}
@@ -46,8 +44,7 @@
 
                     <td {% if event_perm_force_majeure_open %}style="color: green"{% else %}style="color: red"{% endif %}>
                         {% trans 'From' context "Du" %} {{ event_perm_force_majeure_start_date|date:"d/m/Y" }}
-                        {% trans 'to' context "au" %} {{ event_perm_force_majeure_end_date|shift_date:-1|date:"d/m/Y" }}
-                        <!-- TODO :: Remove shift_date when end_date is included in period -->
+                        {% trans 'to' context "au" %} {{ event_perm_force_majeure_end_date|date:"d/m/Y" }}
                         {% if error_force_majeure.errors|length > 1 %}
                             {% include "blocks/span/span_status.html" with status=error_force_majeure.is_valid title_status_false=error_force_majeure.as_ul %}
                         {% else %}

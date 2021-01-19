@@ -50,7 +50,7 @@ class TestAdministrativeDataForm(TestCase):
 
         cls.academic_calendars = [
             AcademicCalendarFactory(reference=i[0], academic_year=cls.academic_year)
-            for i in academic_calendar_type.CALENDAR_TYPES
+            for i in academic_calendar_type.ACADEMIC_CALENDAR_TYPES
         ]
 
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)

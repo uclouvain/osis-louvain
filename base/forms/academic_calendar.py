@@ -45,15 +45,7 @@ class AcademicCalendarForm(forms.ModelForm):
         (
             _("academic events").capitalize(),
             _get_sorted_choices(academic_calendar_type.ACADEMIC_CALENDAR_TYPES)
-        ),
-        (
-            _("project events").capitalize(),
-            _get_sorted_choices(academic_calendar_type.PROJECT_CALENDAR_TYPES)
-        ),
-        (
-            _("ad hoc events").capitalize(),
-            _get_sorted_choices(academic_calendar_type.AD_HOC_CALENDAR_TYPES),
-        ),
+        )
     )
 
     academic_year = forms.ModelChoiceField(
