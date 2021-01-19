@@ -30,6 +30,7 @@ from django.views.generic import CreateView
 
 from base.business.education_groups.admission_condition import can_postpone_admission_condition
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
+from base.models.enums.admission_condition_sections import ConditionSectionsTypes
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import CreateLineEnglishForm, \
     CreateLineFrenchForm
@@ -51,6 +52,7 @@ class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin,
         context["can_postpone"] = can_postpone_admission_condition(
             self.get_admission_condition_object().education_group_year
         )
+        context["section"] = ConditionSectionsTypes.get_value(self.request.GET["section"])
         return context
 
     def get_initial(self):

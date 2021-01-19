@@ -19,7 +19,7 @@
                     title="{% trans "Delete and postpone changes on next years" %}">
                 {% trans "Delete and postpone." %}*
             </button>
-            <p class="text-right"><small><strong>*{% trans "Postpone will be apply on all section block !" %}</strong></small></p>
+            <p class="text-right"><small><strong>*{% blocktrans %} Postpone will be apply on all section block "{{ section }}" ! {% endblocktrans %}</strong></small></p>
         {% endif %}
     </div>
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 13:51+0100\n"
+"POT-Creation-Date: 2021-01-19 15:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid " Postpone will be apply on all section block \"%(section)s\" ! "
+msgstr ""
+"Le report va être appliqué sur l'entiéreté de la section \"%(section)s\" !"
 
 #, python-format
 msgid ""
@@ -53,12 +58,13 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s rubriques communes"
 
+#, python-format
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été mis à jour"
 
 #, python-format
 msgid "%(title)s has been updated (with postpone)"
-msgstr ""
+msgstr "%(title)s a été mis à jour (avec report)"
 
 msgid "ARES ability"
 msgstr "Habilitation ARES"
@@ -262,11 +268,11 @@ msgstr "Une condition a été supprimée"
 msgid "Condition has been removed (with postpone)"
 msgstr "Une condition a été supprimée (avec report)"
 
-msgid "Condition has been reordered (with postpone)"
-msgstr "Une condition a été réordonnée (avec report)"
-
 msgid "Condition has been reordered"
 msgstr "Une condition a été réordonnée"
+
+msgid "Condition has been reordered (with postpone)"
+msgstr "Une condition a été réordonnée (avec report)"
 
 msgid "Condition has been updated"
 msgstr "Une condition a été mise à jour"
@@ -687,16 +693,10 @@ msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Postpone will be apply on all achievement block !"
-msgstr "Le report va être appliqué sur tout le bloque acquis !"
+msgstr "Le report va être appliqué sur l'entiéreté des acquis !"
 
 msgid "Postpone will be apply on all block contact !"
-msgstr "Le report va être appliqué sur tout le bloque contact !"
-
-msgid "Postpone will be apply on all section !"
-msgstr "Le report va être appliqué sur toute la section !"
-
-msgid "Postpone will be apply on all section block !"
-msgstr "Le report va être appliqué sur toute la section !"
+msgstr "Le report va être appliqué sur l'entiéreté des contacts !"
 
 msgid "Primary language"
 msgstr "Langue principale"

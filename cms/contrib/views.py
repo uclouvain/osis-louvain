@@ -26,6 +26,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.models.person import get_user_interface_language
@@ -55,8 +56,8 @@ class UpdateCmsView(FormView):
 
     def get_success_message(self, to_postpone: bool):
         if to_postpone:
-            return "%(label)s has been updated (with postpone)" % {"label": self.translated_label}
-        return "%(label)s has been updated" % {"label": self.translated_label}
+            return _("%(label)s has been updated (with postpone)") % {"label": self.translated_label}
+        return _("%(label)s has been updated") % {"label": self.translated_label}
 
     @property
     def label(self):

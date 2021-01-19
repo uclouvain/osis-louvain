@@ -114,6 +114,7 @@ class UpdateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin,
         context["can_postpone"] = can_postpone_admission_condition(
             self.get_object().admission_condition.education_group_year
         )
+        context["section"] = self.object.get_section_display()
         return context
 
     def get_form_class(self):

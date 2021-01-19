@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 13:51+0100\n"
+"POT-Creation-Date: 2021-01-19 15:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid " Postpone will be apply on all section block \"%(section)s\" ! "
+msgstr ""
 
 #, python-format
 msgid ""
@@ -247,10 +251,10 @@ msgstr ""
 msgid "Condition has been removed (with postpone)"
 msgstr ""
 
-msgid "Condition has been reorderd (with postpone)"
+msgid "Condition has been reordered"
 msgstr ""
 
-msgid "Condition has been reordered"
+msgid "Condition has been reordered (with postpone)"
 msgstr ""
 
 msgid "Condition has been updated"
@@ -656,12 +660,6 @@ msgid "Postpone will be apply on all achievement block !"
 msgstr ""
 
 msgid "Postpone will be apply on all block contact !"
-msgstr ""
-
-msgid "Postpone will be apply on all section !"
-msgstr ""
-
-msgid "Postpone will be apply on all section block !"
 msgstr ""
 
 msgid "Primary language"

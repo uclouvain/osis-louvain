@@ -8,6 +8,7 @@ from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.admission_condition_sections import ConditionSectionsTypes
 from base.models.enums.education_group_types import TrainingType
 from osis_common.models import osis_model_admin
 
@@ -121,10 +122,10 @@ class AdmissionConditionLineQuerySet(models.QuerySet):
 
 class AdmissionConditionLine(OrderedModel):
     admission_condition = models.ForeignKey(
-        AdmissionCondition, on_delete=models.CASCADE
+        AdmissionCondition, on_delete=models.CASCADE,
     )
 
-    section = models.CharField(max_length=32)
+    section = models.CharField(max_length=32, choices=ConditionSectionsTypes.choices())
     # this external_id is used just for the import, once reddot is dead, we could remove it.
     external_id = models.CharField(max_length=32, null=True, db_index=True)
 
