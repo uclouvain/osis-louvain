@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 08:58+0100\n"
+"POT-Creation-Date: 2021-01-19 15:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -163,9 +163,6 @@ msgstr ""
 msgid "Accepted"
 msgstr ""
 
-msgid "Access"
-msgstr ""
-
 msgid "Access condition"
 msgstr ""
 
@@ -227,19 +224,10 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add the English content of this paragraph"
-msgstr ""
-
-msgid "Add the French content of this paragraph"
-msgstr ""
-
 msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
-msgstr ""
-
-msgid "Add/Modify a line"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -317,14 +305,7 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-#, python-format
-msgid "Are you sure you want to delete %(education_group_year)s?"
-msgstr ""
-
 msgid "Are you sure you want to delete the achievement?"
-msgstr ""
-
-msgid "Are you sure you want to delete the contact ?"
 msgstr ""
 
 msgid "Are you sure you want to delete the event"
@@ -387,6 +368,9 @@ msgid "Attributions"
 msgstr ""
 
 msgid "Bachelor"
+msgstr ""
+
+msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr ""
 
 msgid "Back to messages"
@@ -545,9 +529,6 @@ msgstr ""
 msgid "Components"
 msgstr ""
 
-msgid "Conditions"
-msgstr ""
-
 msgid "Configurable list of learning units"
 msgstr ""
 
@@ -570,9 +551,6 @@ msgstr ""
 msgid "Consolidate the proposal"
 msgstr ""
 
-msgid "Contacts"
-msgstr ""
-
 msgid "Coordinator"
 msgstr ""
 
@@ -589,9 +567,6 @@ msgid "Course enrollment"
 msgstr ""
 
 msgid "Create"
-msgstr ""
-
-msgid "Create contact"
 msgstr ""
 
 msgid "Create specific version"
@@ -655,9 +630,6 @@ msgstr ""
 msgid "Default learning unit enrollment"
 msgstr ""
 
-msgid "Delete"
-msgstr ""
-
 msgid "Delete learning unit year definitively"
 msgstr ""
 
@@ -689,9 +661,6 @@ msgid "Detailed program"
 msgstr ""
 
 msgid "Details"
-msgstr ""
-
-msgid "Diploma"
 msgstr ""
 
 msgid "Diploma title"
@@ -993,6 +962,9 @@ msgstr ""
 msgid "Force state"
 msgstr ""
 
+msgid "Foreign Bachelors"
+msgstr ""
+
 msgid "Formation PhD"
 msgstr ""
 
@@ -1064,6 +1036,9 @@ msgstr ""
 
 msgctxt "carousel"
 msgid "Go"
+msgstr ""
+
+msgid "Graduates"
 msgstr ""
 
 msgid "Group"
@@ -1153,9 +1128,6 @@ msgstr ""
 msgid "Introduced by"
 msgstr ""
 
-msgid "Invalid action"
-msgstr ""
-
 msgid "Invalid code"
 msgstr ""
 
@@ -1180,9 +1152,6 @@ msgid "Junior year"
 msgstr ""
 
 msgid "Jury member"
-msgstr ""
-
-msgid "Jury members"
 msgstr ""
 
 msgid "Justification"
@@ -1468,6 +1437,9 @@ msgstr ""
 msgid "Master of specialist"
 msgstr ""
 
+msgid "Masters"
+msgstr ""
+
 msgid "Max. credits"
 msgstr ""
 
@@ -1711,16 +1683,10 @@ msgstr ""
 msgid "Other academic responsible"
 msgstr ""
 
-msgid "Other academic responsibles"
-msgstr ""
-
 msgid "Other collective"
 msgstr ""
 
 msgid "Other contact"
-msgstr ""
-
-msgid "Other contacts"
 msgstr ""
 
 msgid "Other individual"
@@ -1736,6 +1702,9 @@ msgid "Other remark in english (intended for publication)"
 msgstr ""
 
 msgid "Other special needs"
+msgstr ""
+
+msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr ""
 
 msgid "Own components"
@@ -2077,9 +2046,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr ""
 
-msgid "Remarks"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2294,15 +2260,7 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
-msgid ""
-"Summary course submission (Force majeure) is not allowed for tutors during "
-"this period."
-msgstr ""
-
 msgid "Summary course submission force majeure"
-msgstr ""
-
-msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
 
 msgid "Suppression"
@@ -2344,9 +2302,6 @@ msgstr ""
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
-msgid "The additional informations has been updated"
-msgstr ""
-
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""
 
@@ -2361,12 +2316,6 @@ msgid ""
 msgstr ""
 
 msgid "The configuration of you user profile"
-msgstr ""
-
-msgid "The contact has been created"
-msgstr ""
-
-msgid "The contacts modifications has been saved"
 msgstr ""
 
 #, python-format
@@ -2495,9 +2444,6 @@ msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
 msgid "The partim"
-msgstr ""
-
-msgid "The program aim has been updated"
 msgstr ""
 
 #, python-format
@@ -2676,6 +2622,9 @@ msgstr ""
 msgid "Type of training"
 msgstr ""
 
+msgid "UCL Bachelors"
+msgstr ""
+
 msgid "UCL Diploma"
 msgstr ""
 
@@ -2713,15 +2662,6 @@ msgid "Unscheduled events"
 msgstr ""
 
 msgid "Up"
-msgstr ""
-
-msgid "Update"
-msgstr ""
-
-msgid "Update contact"
-msgstr ""
-
-msgid "Update entity"
 msgstr ""
 
 msgid "Update for teacher locked"
@@ -2830,9 +2770,6 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
-msgid "You can not delete this object because some dependencies are protected"
-msgstr ""
-
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -2901,9 +2838,6 @@ msgstr ""
 "Subdivision with one character"
 
 msgid "activities in English"
-msgstr ""
-
-msgid "additional informations"
 msgstr ""
 
 msgid "aim number"
@@ -3125,9 +3059,6 @@ msgid "text in French"
 msgstr ""
 
 msgid "the"
-msgstr ""
-
-msgid "the program aims"
 msgstr ""
 
 #, python-format
