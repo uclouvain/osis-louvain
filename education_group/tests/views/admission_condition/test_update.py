@@ -83,11 +83,11 @@ class TestUpdateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
         self.en_url = reverse(
             "education_group_year_admission_condition_update_line",
             args=[self.education_group_year.academic_year.year, self.education_group_year.partial_acronym]
-        ) + "?section={}&language=en&id={}".format(self.SECTION, self.admission_condition_line.id)
+        ) + "?section={}&language=en&id={}".format(self.LINE_SECTION, self.admission_condition_line.id)
         self.fr_url = reverse(
             "education_group_year_admission_condition_update_line",
             args=[self.education_group_year.academic_year.year, self.education_group_year.partial_acronym]
-        ) + "?section={}&language=fr&id={}".format(self.SECTION, self.admission_condition_line.id)
+        ) + "?section={}&language=fr&id={}".format(self.LINE_SECTION, self.admission_condition_line.id)
         self.client.force_login(self.person.user)
 
     def test_success_post_should_update_achievement(self):

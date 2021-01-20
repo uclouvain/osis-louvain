@@ -41,11 +41,11 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
         self.en_url = reverse(
             "education_group_year_admission_condition_create_line",
             args=[self.education_group_year.academic_year.year, self.education_group_year.partial_acronym]
-        ) + "?section={}&language=en".format(self.SECTION)
+        ) + "?section={}&language=en".format(self.LINE_SECTION)
         self.fr_url = reverse(
             "education_group_year_admission_condition_create_line",
             args=[self.education_group_year.academic_year.year, self.education_group_year.partial_acronym]
-        ) + "?section={}&language=fr".format(self.SECTION)
+        ) + "?section={}&language=fr".format(self.LINE_SECTION)
         self.client.force_login(self.person.user)
 
     def test_success_post_should_create_achievement(self):
@@ -53,8 +53,8 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
             admission_condition=self.admission_condition
         ).count()
 
-        self.client.post(self.fr_url, data=self.generate_fr_post_data())
-        self.client.post(self.en_url, data=self.generate_en_post_data())
+        response = self.client.post(self.fr_url, data=self.generate_fr_post_data())
+        response = self.client.post(self.en_url, data=self.generate_en_post_data())
 
         self.assertEqual(
             AdmissionConditionLine.objects.filter(admission_condition=self.admission_condition).count(),
@@ -69,7 +69,7 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
     @classmethod
     def generate_fr_post_data(cls, to_postpone=False):
         post_data = {
-            "section": "section",
+            "section": cls.LINE_SECTION,
             "access": CONDITION_ADMISSION_ACCESSES[0][0],
             "conditions": "Conditions",
             "remarks": "test test",
@@ -82,7 +82,7 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
     @classmethod
     def generate_en_post_data(cls, to_postpone=False):
         post_data = {
-            "section": "section",
+            "section": cls.LINE_SECTION,
             "access": CONDITION_ADMISSION_ACCESSES[0][0],
             "conditions_en": "Conditions",
             "remarks_en": "test test",

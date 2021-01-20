@@ -28,12 +28,14 @@ from django.db.models import Model
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.admission_condition_sections import ConditionSectionsTypes
 from base.tests.factories.admission_condition import AdmissionConditionLineFactory, AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 class TestAdmissionConditionMixin:
     SECTION = "ca_maitrise_fr"
+    LINE_SECTION = ConditionSectionsTypes.ucl_bachelors.name
 
     def generate_condition_data(self):
         self.admission_condition = AdmissionConditionFactory(education_group_year__academic_year__current=True)
@@ -43,11 +45,11 @@ class TestAdmissionConditionMixin:
     def generate_condition_line_data(self):
         self.admission_condition_line = AdmissionConditionLineFactory(
             admission_condition__education_group_year__academic_year__current=True,
-            section=self.SECTION
+            section=self.LINE_SECTION
         )
         self.other_admission_condition_line = AdmissionConditionLineFactory(
             admission_condition=self.admission_condition_line.admission_condition,
-            section=self.SECTION
+            section=self.LINE_SECTION
         )
         self.admission_condition = self.admission_condition_line.admission_condition
         self.education_group_year = self.admission_condition.education_group_year
