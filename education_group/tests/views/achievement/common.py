@@ -44,10 +44,12 @@ class TestAchievementMixin:
 
     def generate_detailed_achievement_data(self):
         self.detailed_achievement = EducationGroupDetailedAchievementFactory(
-            education_group_achievement__education_group_year__academic_year__current=True
+            education_group_achievement__education_group_year__academic_year__current=True,
+            order=None
         )
         self.other_detailed_achievement = EducationGroupDetailedAchievementFactory(
-            education_group_achievement=self.detailed_achievement.education_group_achievement
+            education_group_achievement=self.detailed_achievement.education_group_achievement,
+            order=None
         )
         self.achievement = self.detailed_achievement.education_group_achievement
         self.education_group_year = self.achievement.education_group_year

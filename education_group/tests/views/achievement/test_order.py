@@ -120,7 +120,6 @@ class TestOrderDetailedAchievement(TestCase, TestAchievementMixin):
 
     def test_should_up_achievement(self):
         self.client.post(self.url, data=self.generate_up_post_data())
-
         self.assertQuerysetEqual(
             EducationGroupDetailedAchievement.objects.filter(education_group_achievement=self.achievement),
             [self.detailed_achievement_second.id, self.detailed_achievement_first.id],
