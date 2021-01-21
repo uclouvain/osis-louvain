@@ -54,7 +54,10 @@ def _postpone_admission_condition(
         admission_condition_to_postpone: 'AdmissionCondition',
         fields: List[str]
 ) -> None:
-    values_to_upsert = {field: getattr(admission_condition_to_postpone, field) for field in fields}
+    values_to_upsert = {
+        field: getattr(admission_condition_to_postpone, field) for field in fields
+        if field not in ("education_group_year", "education_group_year_id")
+    }
     obj, created = AdmissionCondition.objects.update_or_create(
         education_group_year=egy,
         defaults=values_to_upsert

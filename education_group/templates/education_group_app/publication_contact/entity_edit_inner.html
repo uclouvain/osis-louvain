@@ -25,7 +25,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form class="form" role="form" method="POST" action="{{ request.path }}" id="form_publication_contact_entity">
+<form class="osis-form" role="form" method="POST" action="{{ request.get_full_path }}">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{% trans "Update entity" %}</h4>
@@ -47,4 +47,3 @@
         {% endif %}
     </div>
 </form>
-

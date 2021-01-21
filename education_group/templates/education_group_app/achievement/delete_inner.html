@@ -22,7 +22,7 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<form method="post" action="{{ request.path }}">
+<form method="post" action="{{ request.get_full_path }}" class="osis-form">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{% trans "Delete achievement" %}</h4>

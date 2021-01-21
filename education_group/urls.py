@@ -1,6 +1,5 @@
 from django.urls import include, path, register_converter
 
-import education_group.views.achievement.order
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
     AcronymConverter, MiniTrainingAcronymConverter
 from education_group.views import group, training, mini_training, general_information, admission_condition, \
@@ -75,7 +74,7 @@ urlpatterns = [
              name='minitraining_achievement_create'),
         path('delete/', MiniTrainingDeleteView.as_view(), name='mini_training_delete'),
         path('<int:education_group_achievement_pk>/', include([
-            path('actions/', education_group.views.achievement.order.EducationGroupAchievementAction.as_view(),
+            path('actions/', achievement.EducationGroupAchievementAction.as_view(),
                  name='minitraining_achievement_actions'),
             path('create/', achievement.CreateEducationGroupDetailedAchievement.as_view(),
                  name='minitraining_detailed_achievement_create'),
@@ -85,7 +84,7 @@ urlpatterns = [
                  name='minitraining_achievement_update'),
             path('<int:education_group_detail_achievement_pk>/', include([
                 path('actions/',
-                     education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
+                     achievement.EducationGroupDetailedAchievementAction.as_view(),
                      name='minitraining_detailed_achievement_actions'),
                 path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
                      name='minitraining_detailed_achievement_delete'),
@@ -126,7 +125,7 @@ urlpatterns = [
             path('create/', achievement.CreateEducationGroupAchievement.as_view(), name='training_achievement_create'),
             path('delete/', TrainingDeleteView.as_view(), name='training_delete'),
             path('achievement/<int:education_group_achievement_pk>/', include([
-                path('actions/', education_group.views.achievement.order.EducationGroupAchievementAction.as_view(),
+                path('actions/', achievement.EducationGroupAchievementAction.as_view(),
                      name='training_achievement_actions'),
                 path('create/', achievement.CreateEducationGroupDetailedAchievement.as_view(),
                      name='training_detailed_achievement_create'),
@@ -136,7 +135,7 @@ urlpatterns = [
                      name='training_achievement_update'),
                 path('<int:education_group_detail_achievement_pk>/', include([
                     path('actions/',
-                         education_group.views.achievement.order.EducationGroupDetailedAchievementAction.as_view(),
+                         achievement.EducationGroupDetailedAchievementAction.as_view(),
                          name='training_detailed_achievement_actions'),
                     path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
                          name='training_detailed_achievement_delete'),

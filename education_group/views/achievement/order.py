@@ -52,9 +52,9 @@ class EducationGroupAchievementAction(PermissionRequiredMixin, EducationGroupAch
         return self.get_object()
 
     def form_valid(self, form):
-        if form.cleaned_data['action'] == 'up':
+        if form.is_up():
             self.get_object().up()
-        elif form.cleaned_data['action'] == 'down':
+        elif form.is_down():
             self.get_object().down()
         if self.request.POST.get('to_postpone'):
             postpone_achievements(self.object.education_group_year)
@@ -74,9 +74,9 @@ class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementM
         return self.education_group_achievement.education_group_year
 
     def form_valid(self, form):
-        if form.cleaned_data['action'] == 'up':
+        if form.is_up():
             self.get_object().up()
-        elif form.cleaned_data['action'] == 'down':
+        elif form.is_down():
             self.get_object().down()
         if self.request.POST.get('to_postpone'):
             postpone_achievements(self.object.education_group_achievement.education_group_year)

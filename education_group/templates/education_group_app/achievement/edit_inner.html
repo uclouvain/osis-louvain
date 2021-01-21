@@ -26,7 +26,7 @@
 {% endcomment %}
 
 
-<form method="post" action="{{ request.path }}">
+<form method="post" action="{{ request.get_full_path }}" class="osis-form validate">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{% trans "Edit achievement" %}</h4>

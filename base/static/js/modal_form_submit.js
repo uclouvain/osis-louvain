@@ -22,15 +22,11 @@ function addDispatchEventOnSubmitAjaxForm(e) {
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
         if ($(this).hasClass("validate")){
-            inputs = document.getElementById($(this).attr("id")).elements;
-            arrayInputs = Array.from(inputs);
-            validityStates = arrayInputs.map(input => input.reportValidity())
-            isFormValid = validityStates.every(state => state === true);
-
-            if (isFormValid === false){
+            if (! $(this).parsley().isValid()) {
                 return false;
             }
         }
+
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
         addDispatchEventOnSubmitAjaxForm(e);

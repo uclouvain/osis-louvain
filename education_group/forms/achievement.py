@@ -67,3 +67,9 @@ class EducationGroupDetailedAchievementForm(EducationGroupAchievementForm):
 
 class ActionForm(forms.Form):
     action = forms.ChoiceField(choices=ACTION_CHOICES, required=True, widget=forms.HiddenInput())
+
+    def is_up(self) -> bool:
+        return self.cleaned_data['action'] == UP
+
+    def is_down(self) -> bool:
+        return self.cleaned_data['action'] == DOWN
