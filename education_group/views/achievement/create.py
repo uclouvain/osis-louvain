@@ -65,7 +65,6 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
         return super().form_valid(form)
 
     def get_permission_object(self):
-        print(self.request.is_ajax())
         return self.education_group_year
 
     def get_success_message(self, cleaned_data):
