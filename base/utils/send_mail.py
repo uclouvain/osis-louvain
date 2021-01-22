@@ -310,7 +310,7 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
     receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
 
     for receiver_lang, receivers in receivers_by_lang:
-
+        receivers = list(receivers)
         table = message_config.create_table(
             'enrollments',
             get_enrollment_headers(receiver_lang),
