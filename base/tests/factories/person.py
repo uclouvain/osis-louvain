@@ -62,6 +62,10 @@ class PersonFactory(factory.DjangoModelFactory):
     global_id = None
 
 
+class SuperUserPersonFactory(PersonFactory):
+    user = factory.SubFactory(UserFactory, superuser=True)
+
+
 class PersonWithoutUserFactory(PersonFactory):
     user = None
     first_name = factory.Faker('first_name')

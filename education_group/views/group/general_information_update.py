@@ -23,106 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.http import JsonResponse
-from django.shortcuts import redirect
-from django.urls import reverse
-
-from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.models.person import get_user_interface_language
+from base.business.education_groups.general_information_sections import can_postpone_general_information
+from cms.contrib.views import UpdateCmsView
 from cms.enums import entity_name
-from cms.models import translated_text_label, translated_text
-from cms.models.text_label import TextLabel
-from cms.models.translated_text import TranslatedText
+from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
-from osis_common.utils.models import get_object_or_none
 
 
-class GroupUpdateGeneralInformation(GroupRead):
-    template_name = 'education_group/blocks/modal/modal_pedagogy_edit_inner.html'
+class GroupUpdateGeneralInformation(GroupRead, UpdateCmsView):
     active_tab = Tab.GENERAL_INFO
-
-    @staticmethod
-    def get_form_class():
-        return EducationGroupPedagogyEditForm
-
-    def post(self, request, *args, **kwargs):
-        if not self.have_general_information_tab():
-            return redirect(
-                reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path())
-            )
-        form = self.get_form_class()(request.POST)
-        redirect_url = reverse('group_general_information', kwargs=self.kwargs) + "?path={}".format(self.get_path())
-
-        if form.is_valid():
-            label = form.cleaned_data['label']
-            self.update_cms(form, label)
-            redirect_url += "#section_{label_name}".format(label_name=label)
-        return JsonResponse({"success": form.is_valid(), "success_url": redirect_url, "force_reload": True})
-
-    def update_cms(self, form: EducationGroupPedagogyEditForm, label: str):
-        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
-            self._update_cms_for_specific_lang(form, lang, label)
-
-    def _update_cms_for_specific_lang(self, form: EducationGroupPedagogyEditForm, lang: str, label: str):
-        group = self.get_group()
-
-        entity = entity_name.get_offers_or_groups_entity_from_group(group)
-        obj = translated_text.get_groups_or_offers_cms_reference_object(group)
-        text_label = TextLabel.objects.filter(label=label, entity=entity).first()
-        record, created = TranslatedText.objects.get_or_create(
-            reference=obj.pk,
-            entity=entity,
-            text_label=text_label,
-            language=lang
-        )
-        record.text = form.cleaned_data['text_english' if lang == settings.LANGUAGE_CODE_EN else 'text_french']
-        record.save()
-
-    def get_context_data(self, **kwargs):
-        group = self.get_group()
-
-        label_name = self.request.GET.get('label')
-
-        initial_values = self.get_translated_texts(group)
-
-        context = {
-            'label': label_name,
-            'form': EducationGroupPedagogyEditForm(initial=initial_values),
-            'translated_label': translated_text_label.get_label_translation(
-                text_entity=entity_name.get_offers_or_groups_entity_from_group(group),
-                label=label_name,
-                language=get_user_interface_language(self.request.user)
-            )
-        }
-
-        return {
-            **super().get_context_data(**kwargs),
-            **context
-        }
-
-    def get_translated_texts(self, group: 'Group'):
-        initial_values = {'label': self.request.GET.get('label')}
-        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
-            initial_values.update(self._get_translated_text_from_lang(group, lang))
-        return initial_values
-
-    def _get_translated_text_from_lang(self, group: 'Group', lang: str):
-        obj = translated_text.get_groups_or_offers_cms_reference_object(group)
-        entity = entity_name.get_offers_or_groups_entity_from_group(group)
-        label = self.request.GET.get('label')
-        text = get_object_or_none(
-            TranslatedText.objects.select_related('text_label'),
-            reference=str(obj.pk),
-            text_label__label=label,
-            text_label__entity=entity,
-            entity=entity,
-            language=lang
-        )
-        if text:
-            return {'text_english' if lang == settings.LANGUAGE_CODE_EN else 'text_french': text.text}
-        return {}
+    permission_required = 'base.change_pedagogyinformation'
 
     def get_success_url(self):
-        group = self.get_group()
-        return reverse('group_general_information', args=[group.year, group.code]) + '?path={}'.format(self.get_path())
+        return ""
+
+    def get_entity(self):
+        return entity_name.GROUP_YEAR
+
+    def get_reference(self):
+        return self.get_group_year().id
+
+    def get_references(self):
+        return GroupYear.objects.filter(
+            group=self.get_group_year().group,
+            academic_year__year__gte=self.get_group_year().academic_year.year
+        ).values_list(
+            'id',
+            flat=True
+        )
+
+    def can_postpone(self) -> bool:
+        return can_postpone_general_information(self.get_group_year())

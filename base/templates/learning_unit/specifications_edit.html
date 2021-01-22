@@ -28,7 +28,7 @@
     <h4>{{ text_label_translated.label }}</h4>
 </div>
 <div class="modal-body">
-    <form class="pedagogy-form" role="form" method="POST" id="specification_edit_form"
+    <form role="form" method="POST" id="specification_edit_form" class="osis-form"
           action="{% url 'learning_unit_specifications_edit' learning_unit_year_id=form.learning_unit_year.id %}">
         {% csrf_token %}
         <ul class="nav nav-tabs" id="modification_tabs" role="tablist">

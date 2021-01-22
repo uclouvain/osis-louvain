@@ -1,6 +1,7 @@
 from .admission_condition_read import MiniTrainingReadAdmissionCondition
 from .content_read import MiniTrainingReadContent
 from .general_information_read import MiniTrainingReadGeneralInformation
+from .general_information_update import MiniTrainingUpdateGeneralInformation
 from .identification_read import MiniTrainingReadIdentification
 from .skills_achievements_read import MiniTrainingReadSkillsAchievements
 from .utilization_read import MiniTrainingReadUtilization

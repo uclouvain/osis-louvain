@@ -21,6 +21,10 @@ document.addEventListener("formAjaxSubmit:error", function (e){
     init();
 })
 
+$('#form-ajax-modal').on("shown.bs.modal", function (e){
+    init();
+})
+
 function init() {
     styleBusinessErrorMessages();
     window.Parsley.addAsyncValidator('async-osis', remoteFieldValidation);

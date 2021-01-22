@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-06 08:24+0100\n"
+"POT-Creation-Date: 2021-01-19 15:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid " Postpone will be apply on all section block \"%(section)s\" ! "
+msgstr ""
 
 #, python-format
 msgid ""
@@ -45,6 +49,14 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 
+#, python-format
+msgid "%(title)s has been updated"
+msgstr ""
+
+#, python-format
+msgid "%(title)s has been updated (with postpone)"
+msgstr ""
+
 msgid "ARES ability"
 msgstr ""
 
@@ -70,6 +82,30 @@ msgid "Access"
 msgstr ""
 
 msgid "Access condition"
+msgstr ""
+
+msgid "Achievement has been created"
+msgstr ""
+
+msgid "Achievement has been created (with postpone)"
+msgstr ""
+
+msgid "Achievement has been deleted"
+msgstr ""
+
+msgid "Achievement has been deleted (with postpone)"
+msgstr ""
+
+msgid "Achievement has been reordered"
+msgstr ""
+
+msgid "Achievement has been reordered (with postpone)"
+msgstr ""
+
+msgid "Achievement has been updated"
+msgstr ""
+
+msgid "Achievement has been updated (with postpone)"
 msgstr ""
 
 msgid "Acronym already exists"
@@ -100,6 +136,9 @@ msgstr ""
 msgid "Add the French content of this paragraph"
 msgstr ""
 
+msgid "Add/Modify a line"
+msgstr ""
+
 msgid "Additional info"
 msgstr ""
 
@@ -123,6 +162,9 @@ msgstr ""
 
 msgctxt "female plural"
 msgid "All"
+msgstr ""
+
+msgid "Are you sure ?"
 msgstr ""
 
 #, python-format
@@ -188,9 +230,6 @@ msgstr ""
 msgid "Common admission conditions can only be edited by central manager"
 msgstr ""
 
-msgid "Common admission conditions have been updated"
-msgstr ""
-
 msgid "Common admission conditions will be published soon"
 msgstr ""
 
@@ -198,6 +237,30 @@ msgid "Common general informations will be published soon"
 msgstr ""
 
 msgid "Common pedagogy informations can only be edited by central manager"
+msgstr ""
+
+msgid "Condition has been created"
+msgstr ""
+
+msgid "Condition has been created (with postpone)"
+msgstr ""
+
+msgid "Condition has been removed"
+msgstr ""
+
+msgid "Condition has been removed (with postpone)"
+msgstr ""
+
+msgid "Condition has been reordered"
+msgstr ""
+
+msgid "Condition has been reordered (with postpone)"
+msgstr ""
+
+msgid "Condition has been updated"
+msgstr ""
+
+msgid "Condition has been updated (with postpone)"
 msgstr ""
 
 msgid "Conditions"
@@ -209,6 +272,24 @@ msgstr ""
 #, python-format
 msgid ""
 "Consistency error in %(academic_year)s: %(fields)s has already been modified"
+msgstr ""
+
+msgid "Contact has been created"
+msgstr ""
+
+msgid "Contact has been created (with postpone)"
+msgstr ""
+
+msgid "Contact has been removed"
+msgstr ""
+
+msgid "Contact has been removed (with postpone)"
+msgstr ""
+
+msgid "Contact has been updated"
+msgstr ""
+
+msgid "Contact has been updated (with postpone)"
 msgstr ""
 
 msgid "Contacts"
@@ -227,6 +308,9 @@ msgid "Course enrollment"
 msgstr ""
 
 msgid "Create"
+msgstr ""
+
+msgid "Create/Update contact"
 msgstr ""
 
 msgid "Cred. rel./abs."
@@ -253,6 +337,21 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgid "Delete a condition"
+msgstr ""
+
+msgid "Delete achievement"
+msgstr ""
+
+msgid "Delete and postpone changes on next years"
+msgstr ""
+
+msgid "Delete and postpone."
+msgstr ""
+
+msgid "Delete contact"
+msgstr ""
+
 msgid "Deliberation"
 msgstr ""
 
@@ -271,16 +370,25 @@ msgstr ""
 msgid "Dissertation submission"
 msgstr ""
 
+msgid "Down"
+msgstr ""
+
 msgid "Duration"
 msgstr ""
 
 msgid "Edit"
 msgstr ""
 
+msgid "Edit achievement"
+msgstr ""
+
 msgid "End academic year"
 msgstr ""
 
 msgid "End year must be greater than or equal to the start year"
+msgstr ""
+
+msgid "English"
 msgstr ""
 
 msgid "English comment"
@@ -296,6 +404,12 @@ msgid "Enter text to search"
 msgstr ""
 
 msgid "Entity"
+msgstr ""
+
+msgid "Entity has been updated"
+msgstr ""
+
+msgid "Entity has been updated (with postpone)"
 msgstr ""
 
 msgid "Error(s) in form: The modifications are not saved"
@@ -317,6 +431,9 @@ msgid "Foreign Bachelors"
 msgstr ""
 
 msgid "Formation catalogue"
+msgstr ""
+
+msgid "French"
 msgstr ""
 
 msgid "French language proficiency examination"
@@ -347,9 +464,6 @@ msgid "General Conditions"
 msgstr ""
 
 msgid "General informations"
-msgstr ""
-
-msgid "General informations have been updated"
 msgstr ""
 
 msgid "Graduates"
@@ -481,6 +595,12 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
+msgid "Modify order achievement"
+msgstr ""
+
+msgid "Modify order of condition"
+msgstr ""
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr ""
@@ -536,6 +656,12 @@ msgstr ""
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
 
+msgid "Postpone will be apply on all achievement block !"
+msgstr ""
+
+msgid "Postpone will be apply on all block contact !"
+msgstr ""
+
 msgid "Primary language"
 msgstr ""
 
@@ -570,6 +696,15 @@ msgid "Remark"
 msgstr ""
 
 msgid "Remarks"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
 msgstr ""
 
 msgid "Schedule type"
@@ -765,7 +900,16 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Up"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
 msgid "Update Training"
+msgstr ""
+
+msgid "Update entity"
 msgstr ""
 
 msgid "User"
@@ -848,6 +992,9 @@ msgid "comment (internal)"
 msgstr ""
 
 msgid "credits"
+msgstr ""
+
+msgid "delete"
 msgstr ""
 
 msgid "dissertation"

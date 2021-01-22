@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 07:54+0100\n"
+"POT-Creation-Date: 2021-01-19 15:20+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -174,9 +174,6 @@ msgstr "Année académique"
 msgid "Accepted"
 msgstr "Accepté"
 
-msgid "Access"
-msgstr "Accès"
-
 msgid "Access condition"
 msgstr "Condition d'accès"
 
@@ -238,20 +235,11 @@ msgstr "Ajouter"
 msgid "Add another"
 msgstr "Ajouter un autre"
 
-msgid "Add the English content of this paragraph"
-msgstr "Ajouter le contenu Anglais de ce paragraphe"
-
-msgid "Add the French content of this paragraph"
-msgstr "Ajouter le contenu Français de ce paragraphe"
-
 msgid "Add. requ. ent. 1"
 msgstr "Ent.charges compl. 1"
 
 msgid "Add. requ. ent. 2"
 msgstr "Ent.charges compl. 2"
-
-msgid "Add/Modify a line"
-msgstr "Ajouter/Modifier une ligne"
 
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
@@ -330,15 +318,8 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-#, python-format
-msgid "Are you sure you want to delete %(education_group_year)s?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer %(education_group_year)s?"
-
 msgid "Are you sure you want to delete the achievement?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
-
-msgid "Are you sure you want to delete the contact ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer le contact ?"
 
 msgid "Are you sure you want to delete the event"
 msgstr "Êtes-vous sûr·e de vouloir supprimer l'événement"
@@ -403,6 +384,9 @@ msgstr "Attributions"
 
 msgid "Bachelor"
 msgstr "Bachelier"
+
+msgid "Bachelors of the Dutch speaking Community of Belgium"
+msgstr "Bachelier de la Communauté flamande de Belgique"
 
 msgid "Back to messages"
 msgstr "Retourner à la liste des messages"
@@ -560,9 +544,6 @@ msgstr "Composant"
 msgid "Components"
 msgstr "Composants"
 
-msgid "Conditions"
-msgstr "Conditions"
-
 msgid "Configurable list of learning units"
 msgstr "Liste personnalisée des unités d'enseignement"
 
@@ -585,9 +566,6 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
-msgid "Contacts"
-msgstr "Contacts"
-
 msgid "Coordinator"
 msgstr "Coordinateur"
 
@@ -605,9 +583,6 @@ msgstr "Inscription aux cours"
 
 msgid "Create"
 msgstr "Créer"
-
-msgid "Create contact"
-msgstr "Créer contact"
 
 msgid "Create specific version"
 msgstr "Créer une version particulière"
@@ -675,9 +650,6 @@ msgstr "Approfondissement"
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 
-msgid "Delete"
-msgstr "Supprimer"
-
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
 
@@ -710,9 +682,6 @@ msgstr "Programme détaillé"
 
 msgid "Details"
 msgstr "Détails"
-
-msgid "Diploma"
-msgstr "Diplôme"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
@@ -1024,6 +993,9 @@ msgstr "Cas de force majeure : adaptation de la fiche descriptive"
 msgid "Force state"
 msgstr "Forcer l'état"
 
+msgid "Foreign Bachelors"
+msgstr "Bacheliers étrangers"
+
 msgid "Formation PhD"
 msgstr "Formation doctorale"
 
@@ -1096,6 +1068,9 @@ msgstr "Continuer"
 msgctxt "carousel"
 msgid "Go"
 msgstr "Accéder"
+
+msgid "Graduates"
+msgstr "Diplômés"
 
 msgid "Group"
 msgstr "Groupe"
@@ -1186,9 +1161,6 @@ msgstr "Stages"
 msgid "Introduced by"
 msgstr "Introduit par"
 
-msgid "Invalid action"
-msgstr "Action invalide"
-
 msgid "Invalid code"
 msgstr "Code non valide"
 
@@ -1216,9 +1188,6 @@ msgstr "Junior year"
 
 msgid "Jury member"
 msgstr "Membre du jury"
-
-msgid "Jury members"
-msgstr "Membres du jury"
 
 msgid "Justification"
 msgstr "Justification"
@@ -1513,6 +1482,9 @@ msgstr "Master en 60 crédits"
 msgid "Master of specialist"
 msgstr "Master de spécialisation"
 
+msgid "Masters"
+msgstr "Masters"
+
 msgid "Max. credits"
 msgstr "Créd. max."
 
@@ -1764,17 +1736,11 @@ msgstr "Organisations"
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
-msgid "Other academic responsibles"
-msgstr "Autres responsables académiques"
-
 msgid "Other collective"
 msgstr "Autre collectif"
 
 msgid "Other contact"
 msgstr "Autre contact"
-
-msgid "Other contacts"
-msgstr "Autres contacts"
 
 msgid "Other individual"
 msgstr "Autre individuel"
@@ -1790,6 +1756,9 @@ msgstr "Autre remarque en anglais (destinée à la publication)"
 
 msgid "Other special needs"
 msgstr "Autre HTM"
+
+msgid "Others Bachelors of the French speaking Community of Belgium"
+msgstr "Autres bacheliers de la Communauté française de Belgique"
 
 msgid "Own components"
 msgstr "Composants propres"
@@ -2146,9 +2115,6 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
 
-msgid "Remarks"
-msgstr "Remarques"
-
 msgid "Req. Entities"
 msgstr "Ent. charges"
 
@@ -2405,9 +2371,6 @@ msgstr "Le"
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
-msgid "The additional informations has been updated"
-msgstr "Les informations supplémentaires ont été sauvegardées avec succès"
-
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
@@ -2425,12 +2388,6 @@ msgstr ""
 
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
-
-msgid "The contact has been created"
-msgstr "Le contact a été créé avec succès"
-
-msgid "The contacts modifications has been saved"
-msgstr "Les données de contact ont été sauvegardées"
 
 #, python-format
 msgid ""
@@ -2583,9 +2540,6 @@ msgstr "L'UE complète est inactive et au moins un partim est actif"
 
 msgid "The partim"
 msgstr "Le partim"
-
-msgid "The program aim has been updated"
-msgstr "L’objectif du programme a été mis à jour avec succès"
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -2795,6 +2749,9 @@ msgstr "Type d'événement"
 msgid "Type of training"
 msgstr "Type de formation"
 
+msgid "UCL Bachelors"
+msgstr "Bacheliers UCL"
+
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
 
@@ -2835,15 +2792,6 @@ msgstr "Événements non planifiés"
 
 msgid "Up"
 msgstr "Haut"
-
-msgid "Update"
-msgstr "Mettre à jour"
-
-msgid "Update contact"
-msgstr "Mise-à-jour contact"
-
-msgid "Update entity"
-msgstr "Mise-à-jour entité"
 
 msgid "Update for teacher locked"
 msgstr "Mise-à-jour bloquée pour l'enseignant"
@@ -2951,11 +2899,6 @@ msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
 
-msgid "You can not delete this object because some dependencies are protected"
-msgstr ""
-"Vous ne pouvez pas supprimer cet objet car certaines dépendances sont "
-"protégées"
-
 #, python-format
 msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
@@ -3045,9 +2988,6 @@ msgstr ""
 
 msgid "activities in English"
 msgstr "activités en anglais"
-
-msgid "additional informations"
-msgstr "informations supplémentaires"
 
 msgid "aim number"
 msgstr "numéro de l'attendu"
@@ -3272,9 +3212,6 @@ msgstr "texte en français"
 
 msgid "the"
 msgstr "le"
-
-msgid "the program aims"
-msgstr "le programme vise"
 
 #, python-format
 msgid ""

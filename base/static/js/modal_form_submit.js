@@ -22,15 +22,11 @@ function addDispatchEventOnSubmitAjaxForm(e) {
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
         if ($(this).hasClass("validate")){
-            inputs = document.getElementById($(this).attr("id")).elements;
-            arrayInputs = Array.from(inputs);
-            validityStates = arrayInputs.map(input => input.reportValidity())
-            isFormValid = validityStates.every(state => state === true);
-
-            if (isFormValid === false){
+            if (! $(this).parsley().isValid()) {
                 return false;
             }
         }
+
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
         addDispatchEventOnSubmitAjaxForm(e);
@@ -76,6 +72,13 @@ function bindTextArea() {
 function CKupdate() {
     for (let instance in CKEDITOR.instances)
         CKEDITOR.instances[instance].updateElement();
+}
+
+function submitFormWithPostponement(element){
+    var input = $("<input>")
+        .attr("type", "hidden")
+        .attr("name", "to_postpone").val(1);
+    $(element).closest("form").append(input).submit();
 }
 
 function bind_trigger_modal() {

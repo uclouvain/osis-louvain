@@ -107,6 +107,14 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
         except KeyError:
             self.partial_acronym = generate_partial_acronym()
 
+    @classmethod
+    def next_year_from(cls, from_obj: 'EducationGroupYear'):
+        return cls(
+            education_group=from_obj.education_group,
+            academic_year__year=from_obj.academic_year.year+1,
+            management_entity=from_obj.management_entity,
+        )
+
 
 class MiniTrainingFactory(EducationGroupYearFactory):
     education_group_type__minitraining = True

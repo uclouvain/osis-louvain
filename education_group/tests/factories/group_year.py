@@ -28,6 +28,8 @@ import string
 
 import factory.fuzzy
 
+from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -66,3 +68,21 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     academic_year = factory.SubFactory(AcademicYearFactory)
     main_teaching_campus = factory.SubFactory(CampusFactory)
     management_entity = factory.SubFactory(EntityFactory)
+
+
+class GroupYearBachelorFactory(GroupYearFactory):
+    acronym = 'ACTU1BA'
+    partial_acronym = 'ACTU1BA'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=TrainingType.BACHELOR.name,
+        category=education_group_categories.TRAINING
+    )
+
+
+class GroupYearDeepeningFactory(GroupYearFactory):
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=MiniTrainingType.DEEPENING.name,
+        category=education_group_categories.MINI_TRAINING
+    )

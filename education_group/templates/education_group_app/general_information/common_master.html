@@ -29,15 +29,15 @@
         {# Backward compatibility with previous template Must be refacor #}
         {% with root=object education_group_year=object %}
             <!-- Message d'alerte -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
             <!-- Bacheliers non universitaires -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en can_edit=True %}
             <!-- Adultes en reprise d'études -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
             <!-- Accès personnalisé -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en can_edit=True %}
             <!-- Procédures d'admission et d'inscription -->
-            {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en can_edit=True %}
         {% endwith %}
         </div>
     </div>
