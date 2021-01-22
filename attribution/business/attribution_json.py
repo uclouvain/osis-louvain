@@ -35,6 +35,7 @@ from django.utils import timezone
 from attribution import models as mdl_attribution
 from base import models as mdl_base
 from base.models.enums.learning_container_year_types import IN_CHARGE_TYPES
+from base.models.proposal_learning_unit import is_in_suppression_proposal
 from osis_common.queue import queue_sender
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -108,15 +109,16 @@ def _split_attribution_by_learning_unit_year(attribution):
         allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
         attribution_splitted.setdefault(lunit_year.id, {
-                'acronym': lunit_year.acronym,
-                'title': lunit_year.complete_title,
-                'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
-                'start_year': attribution.start_year,
-                'end_year': attribution.end_year,
-                'function': attribution.function,
-                'year': lunit_year.academic_year.year,
-                'weight': str(lunit_year.credits) if lunit_year.credits else '',
-                'is_substitute': bool(attribution.substitute)
+            'acronym': lunit_year.acronym,
+            'title': lunit_year.complete_title,
+            'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
+            'start_year': attribution.start_year,
+            'end_year': attribution.end_year,
+            'function': attribution.function,
+            'year': lunit_year.academic_year.year,
+            'weight': str(lunit_year.credits) if lunit_year.credits else '',
+            'is_substitute': bool(attribution.substitute),
+            'is_in_suppression_proposal': is_in_suppression_proposal(lunit_year),
         }).update({
             allocation_charge_key: str(attrib_charge.allocation_charge) if attrib_charge.allocation_charge is not None
             else '0.0'

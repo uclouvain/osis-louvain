@@ -132,6 +132,13 @@ def is_in_creation_proposal(luy: LearningUnitYear):
     ).exists()
 
 
+def is_in_suppression_proposal(luy: LearningUnitYear):
+    return ProposalLearningUnit.objects.filter(
+        learning_unit_year=luy,
+        type=ProposalType.SUPPRESSION.name
+    ).exists()
+
+
 def is_in_proposal_of_transformation(luy: LearningUnitYear):
     return ProposalLearningUnit.objects.filter(
         learning_unit_year=luy,

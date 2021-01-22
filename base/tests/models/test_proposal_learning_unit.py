@@ -108,6 +108,10 @@ class TestSearchCases(TestCase):
     def test_is_in_creation_proposal(self):
         self.assertTrue(proposal_learning_unit.is_in_creation_proposal(self.a_learning_unit_year))
 
+    def test_is_in_suppression_proposal(self):
+        suppression_proposal = ProposalLearningUnitFactory(type=proposal_type.ProposalType.SUPPRESSION.name)
+        self.assertTrue(proposal_learning_unit.is_in_suppression_proposal(suppression_proposal.learning_unit_year))
+
 
 class TestEnsureFolderIdValidator(TestCase):
     def test_ensure_folder_id_is_not_to_big(self):
