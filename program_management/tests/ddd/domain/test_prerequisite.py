@@ -29,9 +29,11 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import NullPrerequisite
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteItemFactory, PrerequisiteFactory, \
     PrerequisiteItemGroupFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestPrerequisiteItem(SimpleTestCase):
@@ -84,30 +86,59 @@ class TestPrerequisiteGroupItem(SimpleTestCase):
 
 class TestPrerequisite(SimpleTestCase):
     def setUp(self):
+
+        year = 2018
+        self.node_having_prerequisites = NodeLearningUnitYearFactory(year=year)
+        ldroi1300 = NodeLearningUnitYearFactory(code="LDROI1300", year=year)
+        lagro2400 = NodeLearningUnitYearFactory(code="LAGRO2400", year=year)
+        ldroi1400 = NodeLearningUnitYearFactory(code="LDROI1400", year=year)
+
+        self.tree = ProgramTreeFactory(root_node__code="LDROI100B", root_node__year=year)
+        self.tree.root_node.add_child(self.node_having_prerequisites)
+        self.tree.root_node.add_child(ldroi1300)
+        self.tree.root_node.add_child(lagro2400)
+        self.tree.root_node.add_child(ldroi1400)
+
         self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
-        self.p_group.add_prerequisite_item('LDROI1300', 2018)
-        self.p_group.add_prerequisite_item('LAGRO2400', 2018)
+        self.p_group.add_prerequisite_item(ldroi1300.code, ldroi1300.year)
+        self.p_group.add_prerequisite_item(lagro2400.code, lagro2400.year)
 
         self.p_group_2 = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
-        self.p_group_2.add_prerequisite_item('LDROI1400', 2018)
+        self.p_group_2.add_prerequisite_item(ldroi1400.code, ldroi1400.year)
 
     def test_case_assert_invalid_main_operator_raise_exception(self):
         with self.assertRaises(AssertionError):
-            prerequisite.Prerequisite(main_operator="XOR")
+            prerequisite.Prerequisite(
+                main_operator="XOR",
+                node_having_prerequisites=self.node_having_prerequisites,
+                context_tree=ProgramTreeFactory().entity_id
+            )
 
     def test_case_assert_str_method_no_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisites,
+            context_tree=self.tree.entity_id
+        )
         self.assertEqual(str(p_req), '')
 
     def test_case_assert_str_method_with_one_group(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisites,
+            context_tree=self.tree.entity_id
+        )
         p_req.add_prerequisite_item_group(self.p_group)
 
         expected_str = 'LDROI1300 {OR} LAGRO2400'.format(OR=_(prerequisite_operator.OR))
         self.assertEqual(str(p_req), expected_str)
 
     def test_case_assert_str_method_with_multiple_groups(self):
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req = prerequisite.Prerequisite(
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisites,
+            context_tree=self.tree.entity_id
+        )
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 
@@ -197,14 +228,24 @@ class TestgetAllPrerequisiteItems(SimpleTestCase):
 class TestConstructPrerequisiteFromExpression(SimpleTestCase):
     def test_return_null_prerequisite_when_empty_expression_given(self):
         self.assertIsInstance(
-            prerequisite.factory.from_expression("", 2019),
+            prerequisite.factory.from_expression("", NodeLearningUnitYearFactory(), ProgramTreeFactory().entity_id),
             NullPrerequisite
         )
 
     def test_return_prerequisite_object_when_expression_given(self):
+        tree = ProgramTreeFactory()
+        node_having_prerequisites = NodeLearningUnitYearFactory()
+        LinkFactory(parent=tree.root_node, child=node_having_prerequisites)
+        LinkFactory(parent=tree.root_node, child__code='LOSIS4525')
+        LinkFactory(parent=tree.root_node, child__code='LMARC5823')
+        LinkFactory(parent=tree.root_node, child__code='BRABD6985')
         prerequisite_expression = "LOSIS4525 OU (LMARC5823 ET BRABD6985)"
 
-        prerequisite_obj = prerequisite.factory.from_expression(prerequisite_expression, 2019)
+        prerequisite_obj = prerequisite.factory.from_expression(
+            prerequisite_expression=prerequisite_expression,
+            node_having_prerequisites=node_having_prerequisites,
+            context_tree=tree.entity_id
+        )
         self.assertEqual(
             prerequisite_expression,
             str(prerequisite_obj)

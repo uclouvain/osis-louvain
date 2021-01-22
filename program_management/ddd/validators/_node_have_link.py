@@ -22,19 +22,17 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from base.ddd.utils import business_validator
-from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import NodeHaveLinkException
-from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
 class NodeHaveLinkValidator(business_validator.BusinessValidator):
-    def __init__(self, node: 'Node'):
+    def __init__(self, node: 'Node', tree_repository: 'ProgramTreeRepository'):
         super().__init__()
         self.node = node
+        self.tree_repository = tree_repository
 
     def validate(self, *args, **kwargs):
-        cmd = command.GetProgramTreesFromNodeCommand(code=self.node.code, year=self.node.year)
-        program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
+        program_trees = self.tree_repository.search_from_children([self.node.entity_id])
         if len(program_trees) > 0:
             raise NodeHaveLinkException(node=self.node)

@@ -30,6 +30,8 @@ from typing import Union, List
 
 from django.db.models import F, Subquery, Q
 
+from program_management.ddd.business_types import *
+
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
@@ -150,6 +152,9 @@ class NodeIdentitySearch(interface.DomainService):
             return NodeIdentity(code=group_year['partial_acronym'], year=group_year['academic_year__year'])
         except GroupYear.DoesNotExist:
             return None
+
+    def get_from_prerequisite_item(self, prerequisite_item: 'PrerequisiteItem') -> 'NodeIdentity':
+        return NodeIdentity(code=prerequisite_item.code, year=prerequisite_item.year)
 
 
 class ProgramTreeIdentitySearch(interface.DomainService):

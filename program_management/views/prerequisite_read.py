@@ -66,7 +66,8 @@ class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, L
             self.program_tree.root_node
         ).is_valid()
         context["program_links"] = self.program_tree.get_all_links()
-        context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
+        context["is_prerequisite_of_list"] = self.program_tree.search_is_prerequisite_of(context["node"])
+        context["prerequisite"] = self.program_tree.get_prerequisite(context["node"])
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -74,7 +75,11 @@ class LearningUnitPrerequisiteTrainingandMiniTraining(PermissionRequiredMixin, L
         return super().render_to_response(context, **response_kwargs)
 
     def add_warning_messages(self, context):
-        validator = PrerequisiteItemsValidator(str(self.node.prerequisite), self.node, self.program_tree)
+        validator = PrerequisiteItemsValidator(
+            str(self.program_tree.get_prerequisite(self.node)),
+            self.node,
+            self.program_tree
+        )
         if not validator.is_valid():
             display_business_warning_messages(
                 self.request,

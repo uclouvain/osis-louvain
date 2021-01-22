@@ -23,13 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
+
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from education_group.enums.node_type import NodeType
+from program_management.ddd.domain.prerequisite import NullPrerequisites
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
+from program_management.tests.ddd.factories.domain.program_tree.LDROI200M_DROI2M import ProgramTreeDROI2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestAddChildNode(SimpleTestCase):
@@ -242,28 +248,59 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
         self.assertSetEqual(result, expected_result)
 
 
-class TestGetIsPrerequisiteOf(SimpleTestCase):
+class TestSearchIsPrerequisiteOf(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.tree = ProgramTreeDROI2MFactory()
+        self.ldrop2011 = self.tree.get_node_by_code_and_year(code="LDROP2011", year=self.tree.entity_id.year)
+        self.ldrop2012 = self.tree.get_node_by_code_and_year(code="LDROP2012", year=self.tree.entity_id.year)
+        self.ldrop2013 = self.tree.get_node_by_code_and_year(code="LDROP2013", year=self.tree.entity_id.year)
+        self.ldroi2101 = self.tree.get_node_by_code_and_year(code="LDROI2101", year=self.tree.entity_id.year)
 
     def test_when_is_prerequisite_of_nothing(self):
-        node = NodeLearningUnitYearFactory(is_prerequisite_of=[])
-        self.assertEqual(node.get_is_prerequisite_of(), [])
+        tree = ProgramTreeDROI2MFactory(prerequisites=NullPrerequisites())
+        link = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory(year=tree.root_node.year))
+        self.assertEqual(tree.search_is_prerequisite_of(link.child), [])
 
-    def test_when_id_prerequisite_of_mutliple_nodes(self):
-        multiple_nodes = [NodeLearningUnitYearFactory(), NodeLearningUnitYearFactory()]
-        node = NodeLearningUnitYearFactory(is_prerequisite_of=multiple_nodes)
-        self.assertListEqual(node.get_is_prerequisite_of(), multiple_nodes)
+    def test_when_is_prerequisite_of_mutliple_nodes(self):
+        tree = copy.deepcopy(self.tree)
+
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2011
+        )
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2012
+        )
+        expected_result = [
+            self.ldrop2011,
+            self.ldrop2012
+        ]
+        result = tree.search_is_prerequisite_of(
+            self.ldroi2101
+        )
+        self.assertListEqual(result, expected_result)
 
     def test_ordering(self):
-        ldroi1002 = NodeLearningUnitYearFactory(code='LDROI1002')
-        lecge1010 = NodeLearningUnitYearFactory(code='LECGE1010')
-        ldroi1001 = NodeLearningUnitYearFactory(code='LDROI1001')
+        tree = copy.deepcopy(self.tree)
 
-        wrong_order = [lecge1010, ldroi1002, ldroi1001]
-        node = NodeLearningUnitYearFactory(is_prerequisite_of=wrong_order)
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2011
+        )
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2012
+        )
+        tree.set_prerequisite(
+            prerequisite_expression="LDROI2101",
+            node_having_prerequisites=self.ldrop2013
+        )
 
         error_msg = "This order is used to order prerequisite nodes in excel file."
-        expected_result = [ldroi1001, ldroi1002, lecge1010]
-        self.assertListEqual(node.get_is_prerequisite_of(), expected_result, error_msg)
+        expected_result = [self.ldrop2011, self.ldrop2012, self.ldrop2013]
+        self.assertListEqual(tree.search_is_prerequisite_of(self.ldroi2101), expected_result, error_msg)
 
 
 class TestGetAllChildrenAsLearningUnitNodes(SimpleTestCase):

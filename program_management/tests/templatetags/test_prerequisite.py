@@ -33,21 +33,32 @@ from program_management.templatetags import prerequisite as prerequisite_tags
 from program_management.ddd.domain import prerequisite as prerequisite_domain
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestPrerequisiteHtmlDisplay(SimpleTestCase):
     def setUp(self):
+        year = 2019
+        self.tree = ProgramTreeFactory(root_node__year=year)
+        self.node_having_prerequisite = NodeLearningUnitYearFactory(year=year)
         self.links = [
             LinkFactory(
-                child=NodeLearningUnitYearFactory(code="OSIS1452", title="OSIS", year=2019, credits=Decimal(5)),
+                parent=self.tree.root_node,
+                child=self.node_having_prerequisite,
+            ),
+            LinkFactory(
+                parent=self.tree.root_node,
+                child=NodeLearningUnitYearFactory(code="OSIS1452", title="OSIS", year=year, credits=Decimal(5)),
                 relative_credits=3
             ),
             LinkFactory(
-                child=NodeLearningUnitYearFactory(code="OSIS1358", title="DEV", year=2019, credits=Decimal(7)),
+                parent=self.tree.root_node,
+                child=NodeLearningUnitYearFactory(code="OSIS1358", title="DEV", year=year, credits=Decimal(7)),
                 relative_credits=1
             ),
             LinkFactory(
-                child=NodeLearningUnitYearFactory(code="MERC1469", title="What", year=2019, credits=Decimal(8)),
+                parent=self.tree.root_node,
+                child=NodeLearningUnitYearFactory(code="MERC1469", title="What", year=year, credits=Decimal(8)),
                 relative_credits=None
             ),
         ]
@@ -65,9 +76,10 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
             [prerequisite_domain.PrerequisiteItem("OSIS1452", 2019)]
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
-            prerequisite_operator.AND,
-            [prerequisite_items_group_obj]
-
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisite,
+            context_tree=self.tree.entity_id,
+            prerequisite_item_groups=[prerequisite_items_group_obj]
         )
 
         result = prerequisite_tags.prerequisite_as_html(prerequisite_obj, self.links)
@@ -89,9 +101,10 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
              prerequisite_domain.PrerequisiteItem("MERC1469", 2019)]
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
-            prerequisite_operator.AND,
-            [prerequisite_items_group_obj_1, prerequisite_items_group_obj_2]
-
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisite,
+            context_tree=self.tree.entity_id,
+            prerequisite_item_groups=[prerequisite_items_group_obj_1, prerequisite_items_group_obj_2]
         )
 
         result = prerequisite_tags.prerequisite_as_html(prerequisite_obj, self.links)
@@ -114,8 +127,10 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
             [prerequisite_domain.PrerequisiteItem("OSIS5452", 2019)]
         )
         prerequisite_obj = prerequisite_domain.Prerequisite(
-            prerequisite_operator.AND,
-            [prerequisite_items_group_obj]
+            main_operator=prerequisite_operator.AND,
+            node_having_prerequisites=self.node_having_prerequisite,
+            context_tree=self.tree.entity_id,
+            prerequisite_item_groups=[prerequisite_items_group_obj]
 
         )
 

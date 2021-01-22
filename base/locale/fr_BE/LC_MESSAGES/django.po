@@ -816,8 +816,14 @@ msgstr "Fin inscription aux examens"
 msgid "English"
 msgstr "Anglais"
 
+msgid "English title common part"
+msgstr "Intitulé en EN partie commune"
+
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
+
+msgid "English title specific complement"
+msgstr "Intitulé en EN compl. spéc. à l'UE"
 
 msgid "Enrolled"
 msgstr "Inscrit"
@@ -2683,11 +2689,17 @@ msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "Title common part"
+msgstr "Intitulé partie commune"
+
 msgid "Title in English"
 msgstr "Intitulé en anglais"
 
 msgid "Title in French"
 msgstr "Intitulé en français"
+
+msgid "Title specific complement"
+msgstr "Intitulé compl. spéc. à l'UE"
 
 msgid "To complete"
 msgstr "A compléter"

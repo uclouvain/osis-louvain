@@ -27,11 +27,12 @@ from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain import prerequisite
+from program_management.ddd.business_types import *
 
 
 class PrerequisiteExpressionSyntaxValidator(BusinessValidator):
 
-    def __init__(self, prerequisite_string: prerequisite.PrerequisiteExpression, *args, **kwargs):
+    def __init__(self, prerequisite_string: 'PrerequisiteExpression', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.prerequisite_string = prerequisite_string
 

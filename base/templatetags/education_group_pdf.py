@@ -113,11 +113,11 @@ BRANCH_CONSTRAINT = """\
 
 
 @register.filter  # TODO :: Remove this tag and move the code into a Serializer
-def pdf_tree_list(value: List['Link']):
-    return mark_safe(list_formatter(value))
+def pdf_tree_list(tree: 'ProgramTree'):
+    return mark_safe(list_formatter(tree, tree.root_node.children))
 
 
-def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
+def list_formatter(tree: 'ProgramTree', links_under_root: List['Link'], tabs=1, depth=None):
     output = []
     depth = depth if depth else 1
     for link in links_under_root:
@@ -125,12 +125,12 @@ def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
         padding = 2 * depth
         if link.child.children:
             sublist = '%s' % (
-                list_formatter(link.child.children, tabs + 1, depth + 1))
-        append_output(link, output, padding, sublist)
+                list_formatter(tree, link.child.children, tabs + 1, depth + 1))
+        append_output(tree, link, output, padding, sublist)
     return '\n'.join(output)
 
 
-def append_output(link: 'Link', output, padding, sublist):
+def append_output(tree: 'ProgramTree', link: 'Link', output, padding, sublist):
     comment = _get_verbose_comment(link)
     if link.is_link_with_learning_unit():
         mandatory_picture = get_mandatory_picture(link)
@@ -140,7 +140,7 @@ def append_output(link: 'Link', output, padding, sublist):
                               icon_list_2=mandatory_picture,
                               icon_list_3=get_status_picture(link.child),
                               icon_list_4=get_biennial_picture(link.child),
-                              icon_list_5=get_prerequis_picture(link.child),
+                              icon_list_5=get_prerequis_picture(tree, link.child),
                               value=force_text(get_verbose_link(link)),
                               comment=comment,
                               sublist=sublist,
@@ -266,8 +266,8 @@ def get_mandatory_picture(link: 'Link'):
     return MANDATORY_PNG if link.is_mandatory else OPTIONAL_PNG
 
 
-def get_prerequis_picture(node: 'NodeLearningUnitYear'):
-    return PREREQUIS if node.has_prerequisite else None
+def get_prerequis_picture(tree: 'ProgramTree', node: 'NodeLearningUnitYear'):
+    return PREREQUIS if tree.has_prerequisites(node) else None
 
 
 def get_case_picture(node: 'NodeLearningUnitYear'):

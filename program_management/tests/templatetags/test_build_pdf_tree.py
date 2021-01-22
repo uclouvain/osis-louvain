@@ -33,6 +33,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from program_management.ddd.repositories import load_tree
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
@@ -96,9 +97,9 @@ class TestBuildPDFTree(TestCase):
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': tree.root_node.children
+            'tree': tree
         }))
-        self.assertEqual(out, _build_correct_tree_list(tree.root_node.children))
+        self.assertEqual(out, _build_correct_tree_list(tree))
 
     def test_build_pdf_tree_with_optional(self):
         self.group_element_year_1.is_mandatory = False
@@ -111,24 +112,15 @@ class TestBuildPDFTree(TestCase):
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': tree.root_node.children
+            'tree': tree
         }))
-        self.assertEqual(out, _build_correct_tree_list(tree.root_node.children))
+        self.assertEqual(out, _build_correct_tree_list(tree))
 
-    def test_tree_list_with_none(self):
+    def test_tree_list_with_empty_program(self):
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': []
-        }))
-        self.assertEqual(out, "")
-
-    def test_tree_list_with_empty(self):
-        out = Template(
-            "{% load education_group_pdf %}"
-            "{{ tree|pdf_tree_list }}"
-        ).render(Context({
-            'tree': []
+            'tree': ProgramTreeFactory()
         }))
         self.assertEqual(out, "")

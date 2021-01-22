@@ -28,12 +28,11 @@ from base.models.enums import education_group_types
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.node import Node
 from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedLinkTypeValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: Node, link_type: Optional[LinkTypes]):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', link_type: Optional[LinkTypes]):
         self.tree = tree
         self.parent_node = tree.root_node
         self.node_to_add = node_to_add

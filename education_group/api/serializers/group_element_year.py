@@ -185,11 +185,14 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         decimal_places=2,
         default=None
     )
-    with_prerequisite = serializers.BooleanField(source='child.has_prerequisite', read_only=True)
+    with_prerequisite = serializers.SerializerMethodField(read_only=True)
     periodicity = serializers.CharField(source='child.periodicity.name', allow_null=True, read_only=True)
     quadrimester = serializers.CharField(source='child.quadrimester.name', allow_null=True, read_only=True)
     status = serializers.BooleanField(source='child.status', read_only=True)
     proposal_type = serializers.CharField(source='child.proposal_type', allow_null=True, read_only=True)
+
+    def get_with_prerequisite(self, obj: 'Link') -> bool:
+        return self.context['program_tree'].has_prerequisites(obj.child)
 
     def get_title(self, obj: 'Link'):
         return self._get_ue_title_from_lang(obj, settings.LANGUAGE_CODE_FR)

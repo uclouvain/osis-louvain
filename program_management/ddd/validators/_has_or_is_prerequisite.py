@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import Set, List
 
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
@@ -32,19 +32,35 @@ from program_management.ddd.domain.exception import CannotDetachLearningUnitsWho
 
 
 class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator):
-    def __init__(self, parent_node: 'Node', node_to_detach: 'Node', program_tree_repository: 'ProgramTreeRepository'):
+    def __init__(
+            self,
+            parent_node: 'Node',
+            node_to_detach: 'Node',
+            program_tree_repository: 'ProgramTreeRepository',
+            prerequisite_repository: 'TreePrerequisitesRepository'
+    ):
         super().__init__()
         self.node_to_detach = node_to_detach
         self.parent_node = parent_node
         self.program_tree_repository = program_tree_repository
+        self.prerequisite_repository = prerequisite_repository
 
     def validate(self, *args, **kwargs):
-        trees = self.program_tree_repository.search_from_children([self.parent_node.entity_id])
-        for tree in trees:
-            node_to_detach = tree.get_node_by_code_and_year(self.node_to_detach.code, self.node_to_detach.year)
+        learning_unit_nodes = self.__get_learning_unit_nodes_to_detach()
+        if learning_unit_nodes:
+            prerequisites = self.prerequisite_repository.search(learning_unit_nodes=learning_unit_nodes)
+            tree_identities = [p.context_tree for p in prerequisites]
+            trees_containing_prerequisites = self.program_tree_repository.search(entity_ids=tree_identities)
+            for tree in trees_containing_prerequisites:
+                if tree.contains(self.parent_node) and tree.root_node != self.node_to_detach:
+                    _IsPrerequisiteValidator(tree, self.node_to_detach).validate()
+                    _HasPrerequisiteValidator(tree, self.node_to_detach).validate()
 
-            _IsPrerequisiteValidator(tree, node_to_detach).validate()
-            _HasPrerequisiteValidator(tree, node_to_detach).validate()
+    def __get_learning_unit_nodes_to_detach(self):
+        if self.node_to_detach.is_learning_unit():
+            return [self.node_to_detach]
+        else:
+            return self.node_to_detach.get_all_children_as_learning_unit_nodes()
 
 
 class _IsPrerequisiteValidator(business_validator.BusinessValidator):
@@ -67,7 +83,10 @@ class _IsPrerequisiteValidator(business_validator.BusinessValidator):
         if self.node_to_detach.is_learning_unit():
             learning_unit_nodes_detached.append(self.node_to_detach)
 
-        return {n for n in learning_unit_nodes_detached if n.is_prerequisite}
+        return {
+            n for n in learning_unit_nodes_detached
+            if self.tree.is_prerequisite(n) and self.tree.count_usages_distinct(n) <= 1
+        }
 
 
 class _HasPrerequisiteValidator(business_validator.BusinessValidator):
@@ -90,4 +109,7 @@ class _HasPrerequisiteValidator(business_validator.BusinessValidator):
         if self.node_to_detach.is_learning_unit():
             learning_unit_nodes_removed.append(self.node_to_detach)
 
-        return {node for node in learning_unit_nodes_removed if node.has_prerequisite}
+        return {
+            node for node in learning_unit_nodes_removed
+            if self.tree.has_prerequisites(node) and self.tree.count_usages_distinct(node) <= 1
+        }

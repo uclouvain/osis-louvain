@@ -47,7 +47,6 @@ from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
@@ -271,6 +270,9 @@ class Node(interface.Entity):
     def is_common_core(self) -> bool:
         return self.node_type == GroupType.COMMON_CORE
 
+    def is_bachelor(self) -> bool:
+        return self.node_type == TrainingType.BACHELOR
+
     def is_indirect_parent(self) -> bool:
         return self.is_training() or self.is_minor_or_deepening()
 
@@ -321,7 +323,7 @@ class Node(interface.Entity):
 
     def get_all_children_as_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         sorted_links = sorted(
-            [link for link in self.get_all_children() if isinstance(link.child, NodeLearningUnitYear)],
+            [link for link in self.get_all_children() if link.child.is_learning_unit()],
             key=lambda link: (link.order, link.parent.code)
         )
         return [link.child for link in sorted_links]
@@ -527,10 +529,8 @@ class NodeLearningUnitYear(Node):
     type = NodeType.LEARNING_UNIT
     node_type = attr.ib(type=NodeType, default=NodeType.LEARNING_UNIT)
 
-    is_prerequisite_of = attr.ib(type=List, factory=list)
     status = attr.ib(type=bool, default=None)
     periodicity = attr.ib(type=PeriodicityEnum, default=None)
-    prerequisite = attr.ib(type=Prerequisite, default=NullPrerequisite())
     common_title_fr = attr.ib(type=str, default=None)
     specific_title_fr = attr.ib(type=str, default=None)
     common_title_en = attr.ib(type=str, default=None)
@@ -556,26 +556,8 @@ class NodeLearningUnitYear(Node):
         return _get_full_title(self.common_title_en, self.specific_title_en)
 
     @property
-    def has_prerequisite(self) -> bool:
-        return bool(self.prerequisite)
-
-    @property
-    def is_prerequisite(self) -> bool:
-        return bool(self.is_prerequisite_of)
-
-    @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
-
-    def get_is_prerequisite_of(self) -> List['NodeLearningUnitYear']:
-        return sorted(self.is_prerequisite_of, key=lambda node: node.code)
-
-    def set_prerequisite(self, prerequisite: Prerequisite):
-        self.prerequisite = prerequisite
-        self.prerequisite.has_changed = True
-
-    def remove_all_prerequisite_items(self) -> None:
-        self.prerequisite.remove_all_prerequisite_items()
 
 
 def _get_full_title(common_title, specific_title):

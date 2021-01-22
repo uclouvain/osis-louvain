@@ -128,10 +128,14 @@ def __delete_links(tree: 'ProgramTree', node: 'Node'):
 
 def __persist_deleted_prerequisites(tree: 'ProgramTree', node: 'Node'):
     if node.is_learning_unit():
-        _persist_prerequisite._persist(tree.root_node, node)
+        prerequisite = tree.get_prerequisite(node)
+        if prerequisite:
+            _persist_prerequisite._persist(tree.root_node, prerequisite)
     else:
         for child_node in node.get_all_children_as_learning_unit_nodes():
-            _persist_prerequisite._persist(tree.root_node, child_node)
+            prerequisite = tree.get_prerequisite(child_node)
+            if prerequisite:
+                _persist_prerequisite._persist(tree.root_node, prerequisite)
 
 
 def __delete_group_element_year(link):

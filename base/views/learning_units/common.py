@@ -36,6 +36,8 @@ from base.business.learning_unit import get_organization_from_learning_unit_year
     get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.edition import create_learning_unit_year_creation_message
+from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
+    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.models import proposal_learning_unit
 from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
@@ -146,3 +148,19 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
 def get_text_label_translated(text_lb, user_language):
     return next((txt for txt in text_lb.translated_text_labels
                  if txt.language == user_language), None)
+
+
+def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
+    luy_in_current_or_future_anac = not learning_unit_year.academic_year.is_past
+    perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
+    perm_to_edit_force_majeure = is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(
+        learning_unit_year,
+        person
+    )
+
+    return {
+        'enable_publish_button':  (perm_to_edit or perm_to_edit_force_majeure) and luy_in_current_or_future_anac,
+        'luy_in_current_or_future_anac': luy_in_current_or_future_anac,
+        'can_edit_information': perm_to_edit,
+        'can_edit_force_majeur_section': perm_to_edit_force_majeure
+    }

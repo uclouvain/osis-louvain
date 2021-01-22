@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db.models import F
+from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
@@ -42,25 +43,33 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     filter_backends = []
     paginator = None
 
-    def get_object(self):
+    @cached_property
+    def version_name(self):
+        return self.kwargs.pop('version_name', '')
+
+    @cached_property
+    def element(self) -> Element:
         queryset = self.filter_queryset(self.get_queryset())
-        version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-
-        element = get_object_or_404(
+        return get_object_or_404(
             queryset,
             **filter_kwargs,
-            group_year__educationgroupversion__version_name__iexact=version_name
+            group_year__educationgroupversion__version_name__iexact=self.version_name
         )
 
-        self.check_object_permissions(self.request, element.education_group_year_obj)
+    @cached_property
+    def program_tree(self) -> 'ProgramTree':
+        return load_tree.load(self.element.id)
+
+    def get_object(self):
+        self.check_object_permissions(self.request, self.element.education_group_year_obj)
         tree_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=self.kwargs.get('acronym').upper() or self.kwargs.get('partial_acronym').upper(),
             year=self.kwargs['year'],
-            version_name=version_name.upper(),
+            version_name=self.version_name.upper(),
             is_transition=False,
         )
 
@@ -69,11 +78,11 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         except exception.ProgramTreeVersionNotFoundException:
             self.tree_version = None
 
-        tree = load_tree.load(element.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+        return link.factory.get_link(parent=None, child=self.program_tree.root_node)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+        context['program_tree'] = self.program_tree
         if hasattr(self, 'tree_version') and self.tree_version:
             context.update(
                 {
@@ -132,18 +141,19 @@ class GroupTreeView(EducationGroupTreeView):
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('group_year')
 
-    def get_object(self):
+    @cached_property
+    def element(self) -> Element:
         queryset = self.filter_queryset(self.get_queryset())
         filter_kwargs = {
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
 
-        element = get_object_or_404(
+        return get_object_or_404(
             queryset,
             **filter_kwargs,
         )
-        self.check_object_permissions(self.request, element.education_group_year_obj)
 
-        tree = load_tree.load(element.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+    def get_object(self):
+        self.check_object_permissions(self.request, self.element.education_group_year_obj)
+        return link.factory.get_link(parent=None, child=self.program_tree.root_node)

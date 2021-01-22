@@ -42,13 +42,12 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
-from program_management.ddd.domain import prerequisite, exception
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -177,6 +176,12 @@ class ProgramTree(interface.RootEntity):
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
+    prerequisites = attr.ib(type='Prerequisites')
+
+    @prerequisites.default
+    def _default_prerequisite(self) -> 'Prerequisites':
+        from program_management.ddd.domain.prerequisite import NullPrerequisites
+        return NullPrerequisites()
 
     def is_empty(self, parent_node=None):
         parent_node = parent_node or self.root_node
@@ -196,8 +201,18 @@ class ProgramTree(interface.RootEntity):
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
+    def is_bachelor(self) -> bool:
+        return self.root_node.is_bachelor()
+
     def is_root(self, node: 'Node'):
         return self.root_node == node
+
+    def is_used_only_inside_minor_or_deepening(self, node: 'Node') -> bool:
+        usages = []
+        for path in self.search_paths_using_node(node):
+            inside_minor_or_deepening = any(p for p in self.get_parents(path) if p.is_minor_or_deepening())
+            usages.append(inside_minor_or_deepening)
+        return all(usages)
 
     def allows_learning_unit_child(self, node: 'Node') -> bool:
         try:
@@ -226,7 +241,7 @@ class ProgramTree(interface.RootEntity):
         return _get_parents(child_node)
 
     def get_all_parents(self, child_node: 'Node') -> Set['Node']:
-        paths_using_node = self.get_paths_from_node(child_node)
+        paths_using_node = self.search_paths_using_node(child_node)
         return set(
             itertools.chain.from_iterable(self.get_parents(path) for path in paths_using_node)
         )
@@ -340,37 +355,39 @@ class ProgramTree(interface.RootEntity):
     def get_all_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
         return self.root_node.get_all_children_as_learning_unit_nodes()
 
-    def get_nodes_by_type(self, node_type_value) -> Set['Node']:
-        return {node for node in self.get_all_nodes() if node.type == node_type_value}
+    def get_nodes_permitted_as_prerequisite(self) -> List['NodeLearningUnitYear']:
+        nodes_permitted = set()
+        for node in self.get_all_learning_unit_nodes():
+            if self.is_bachelor() and self.is_used_only_inside_minor_or_deepening(node):
+                continue
+            nodes_permitted.add(node)
+        return list(sorted(nodes_permitted, key=lambda n: n.code))
 
     def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
         return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-                    if node_obj.has_prerequisite
+                    node_obj for node_obj in self.get_all_learning_unit_nodes()
+                    if self.has_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
         )
-
-    def get_codes_permitted_as_prerequisite(self) -> List[str]:
-        learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-        return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
 
     def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
         return list(
             sorted(
                 (
                     node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.is_prerequisite
+                    if node_obj.is_learning_unit() and self.is_prerequisite(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
         )
 
-    def count_usage(self, node: 'Node') -> int:
-        return Counter(_nodes_from_root(self.root_node))[node]
+    def count_usages_distinct(self, node: 'Node') -> int:
+        """Count the usage of the nodes with distinct parent. 2 links with the same parent are considered as 1 usage."""
+        return len(set(self.search_links_using_node(node)))
 
     def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
@@ -397,7 +414,11 @@ class ProgramTree(interface.RootEntity):
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
-        return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
+        return ProgramTree(
+            root_node=copied_root_node,
+            authorized_relationships=self.authorized_relationships,
+            prerequisites=self.prerequisites
+        )
 
     def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
         return self.authorized_relationships.get_ordered_mandatory_children_types(parent_node.node_type)
@@ -447,25 +468,9 @@ class ProgramTree(interface.RootEntity):
     def set_prerequisite(
             self,
             prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
+            node_having_prerequisites: 'NodeLearningUnitYear'
     ) -> List['BusinessValidationMessage']:
-        """
-        Set prerequisite for the node corresponding to the path.
-        """
-        is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
-        if is_valid:
-            node.set_prerequisite(
-                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year)
-            )
-        return messages
-
-    def clean_set_prerequisite(
-            self,
-            prerequisite_expression: 'PrerequisiteExpression',
-            node: 'NodeLearningUnitYear'
-    ) -> (bool, List['BusinessValidationMessage']):
-        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
-        return validator.is_valid(), validator.messages
+        return self.prerequisites.set_prerequisite(node_having_prerequisites, prerequisite_expression, self)
 
     def get_remaining_children_after_detach(self, path_node_to_detach: 'Path'):
         children_with_counter = self.root_node.get_all_children_with_counter()
@@ -478,7 +483,12 @@ class ProgramTree(interface.RootEntity):
 
         return {node_obj for node_obj, number in children_with_counter.items() if number > 0}
 
-    def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
+    def detach_node(
+            self,
+            path_to_node_to_detach: Path,
+            tree_repository: 'ProgramTreeRepository',
+            prerequisite_repository: 'TreePrerequisitesRepository'
+    ) -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
@@ -494,7 +504,8 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_detach,
             parent_path,
-            tree_repository
+            tree_repository,
+            prerequisite_repository
         ).validate()
 
         return parent.detach_child(node_to_detach)
@@ -589,12 +600,11 @@ class ProgramTree(interface.RootEntity):
             paths_by_node[child_node].append(path)
         return paths_by_node
 
-    # TODO : to rename into "search_paths_using_node"
-    def get_paths_from_node(self, node: 'Node') -> List['Path']:
+    def search_paths_using_node(self, node: 'Node') -> List['Path']:
         return self._paths_by_node().get(node) or []
 
     def search_indirect_parents(self, node: 'Node') -> List['NodeGroupYear']:
-        paths = self.get_paths_from_node(node)
+        paths = self.search_paths_using_node(node)
         indirect_parents = []
         for path in paths:
             for parent in self.get_parents(path):
@@ -605,6 +615,24 @@ class ProgramTree(interface.RootEntity):
 
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
+
+    def get_all_prerequisites(self) -> List['Prerequisite']:
+        return self.prerequisites.prerequisites
+
+    def has_prerequisites(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.has_prerequisites(node)
+
+    def is_prerequisite(self, node: 'NodeLearningUnitYear') -> bool:
+        return self.prerequisites.is_prerequisite(node)
+
+    def search_is_prerequisite_of(self, search_from_node: 'NodeLearningUnitYear') -> List['NodeLearningUnitYear']:
+        return [
+            self.get_node_by_code_and_year(node_identity.code, node_identity.year)
+            for node_identity in self.prerequisites.search_is_prerequisite_of(search_from_node)
+        ]
+
+    def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
+        return self.prerequisites.get_prerequisite(node)
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

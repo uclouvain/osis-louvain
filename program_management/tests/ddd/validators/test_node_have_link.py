@@ -28,6 +28,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from program_management.ddd.domain.exception import NodeHaveLinkException
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._node_have_link import NodeHaveLinkValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -36,18 +37,17 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 class TestNodeHaveLinkValidator(SimpleTestCase):
     def setUp(self):
         self.node = NodeGroupYearFactory()
+        self.repository = ProgramTreeRepository()
 
-    @mock.patch('program_management.ddd.service.read.search_program_trees_using_node_service'
-                '.search_program_trees_using_node')
+    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children')
     def test_should_raise_exception_if_node_have_links(self, mock_search_tree):
         mock_search_tree.return_value = [ProgramTreeFactory(), ProgramTreeFactory()]
 
         with self.assertRaises(NodeHaveLinkException):
-            NodeHaveLinkValidator(self.node).validate()
+            NodeHaveLinkValidator(self.node, self.repository).validate()
 
-    @mock.patch('program_management.ddd.service.read.search_program_trees_using_node_service'
-                '.search_program_trees_using_node')
+    @mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children')
     def test_should_not_raise_exception_when_node_doesnt_have_links(self, mock_search_tree):
         mock_search_tree.return_value = []
 
-        NodeHaveLinkValidator(self.node).validate()
+        NodeHaveLinkValidator(self.node, self.repository).validate()

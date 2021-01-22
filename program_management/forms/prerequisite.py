@@ -23,18 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from education_group.forms.fields import UpperCaseCharField
 from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import UpdatePrerequisiteValidatorList
 
 
 class PrerequisiteForm(forms.Form):
-    prerequisite_string = forms.CharField(
+    prerequisite_string = UpperCaseCharField(
         label=_("Prerequisite"),
         required=False,
         help_text=_(

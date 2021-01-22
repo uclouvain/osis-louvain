@@ -163,9 +163,11 @@ class TrainingTreeViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         training_element = Element.objects.get(group_year__educationgroupversion__offer=self.training)
+        program_tree = load_tree.load(training_element.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(training_element.id).root_node),
+            Link(parent=None, child=program_tree.root_node),
             context={
+                'program_tree': program_tree,
                 'request': RequestFactory().get(self.url),
                 'version_name': self.training_version.version_name,
                 'version_title_fr': self.training_version.title_fr,
@@ -257,9 +259,11 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        program_tree = load_tree.load(self.mini_training_element.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.mini_training_element.id).root_node),
+            Link(parent=None, child=program_tree.root_node),
             context={
+                'program_tree': program_tree,
                 'request': RequestFactory().get(self.url),
             }
         )
@@ -338,9 +342,11 @@ class GroupTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        program_tree = load_tree.load(self.element_common_core.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.element_common_core.id).root_node),
+            Link(parent=None, child=program_tree.root_node),
             context={
+                'program_tree': program_tree,
                 'request': RequestFactory().get(self.url),
             }
         )

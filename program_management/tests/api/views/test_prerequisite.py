@@ -36,6 +36,7 @@ from base.tests.factories.person import PersonFactory
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -91,15 +92,13 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
         LinkFactory(parent=cls.subgroup2, child=cls.ldroi1300)
         LinkFactory(parent=cls.subgroup2, child=cls.lagro2400)
 
-        cls.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        cls.p_group.add_prerequisite_item('LDROI1300', 2018)
-        cls.p_group.add_prerequisite_item('LAGRO2400', 2018)
-
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        p_req.add_prerequisite_item_group(cls.p_group)
-        cls.ldroi100a.set_prerequisite(p_req)
-
         cls.tree = ProgramTree(root_node=cls.root_node)
+
+        PrerequisitesFactory.produce_inside_tree(
+            context_tree=cls.tree,
+            node_having_prerequisite=cls.ldroi100a.entity_id,
+            nodes_that_are_prequisites=[cls.ldroi1300, cls.lagro2400]
+        )
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)

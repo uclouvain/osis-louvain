@@ -92,10 +92,6 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
-msgctxt "UE acronym"
-msgid "Acronym"
-msgstr ""
-
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -726,6 +722,12 @@ msgstr ""
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
+"inside %(training)s"
 msgstr ""
 
 msgid "The learning unit has prerequisites"

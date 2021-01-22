@@ -168,8 +168,17 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
             tree: 'ProgramTree',
             node_to_detach: 'Node',
             path_to_parent: 'Path',
-            tree_repository: 'ProgramTreeRepository') -> None:
+            tree_repository: 'ProgramTreeRepository',
+            prerequisite_repository: 'TreePrerequisitesRepository'
+    ) -> None:
         detach_from = tree.get_node(path_to_parent)
+
+        prerequisites_validator = IsHasPrerequisiteForAllTreesValidator(
+            detach_from,
+            node_to_detach,
+            tree_repository,
+            prerequisite_repository
+        )
 
         if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
@@ -177,7 +186,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
                 DetachRootValidator(tree, path_to_node_to_detach),
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                prerequisites_validator,
                 DetachOptionValidator(tree, path_to_node_to_detach, tree_repository),
             ]
 
@@ -185,7 +194,7 @@ class DetachNodeValidatorList(MultipleExceptionBusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsHasPrerequisiteForAllTreesValidator(detach_from, node_to_detach, tree_repository),
+                prerequisites_validator,
             ]
 
         else:
@@ -210,10 +219,10 @@ class UpdatePrerequisiteValidatorList(business_validator.BusinessListValidator):
 
 
 class DeleteProgramTreeValidatorList(business_validator.BusinessListValidator):
-    def __init__(self, program_tree: 'ProgramTree'):
+    def __init__(self, program_tree: 'ProgramTree', tree_repository: 'ProgramTreeRepository'):
         self.validators = [
             EmptyProgramTreeValidator(program_tree),
-            NodeHaveLinkValidator(program_tree.root_node)
+            NodeHaveLinkValidator(program_tree.root_node, tree_repository)
         ]
         super().__init__()
 

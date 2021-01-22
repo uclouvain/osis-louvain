@@ -106,7 +106,6 @@ class NodeLearningUnitYearFactory(NodeFactory):
         abstract = False
 
     node_type = NodeType.LEARNING_UNIT
-    is_prerequisite_of = factory.LazyFunction(list)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)

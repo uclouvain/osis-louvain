@@ -25,9 +25,9 @@ import osis_common.ddd.interface
 from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import MiniTrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree as program_tree_domain
 from program_management.ddd.validators import _end_date_between_finalities_and_masters
 from program_management.ddd.validators import _paste_option
+from program_management.ddd.domain.service import identity_search
 
 
 class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
@@ -70,8 +70,5 @@ class ValidateFinalitiesEndDateAndOptions(business_validator.BusinessValidator):
             or self.node_to_paste.is_option()
 
     def _get_tree_of_node_to_paste(self):
-        tree_identity = program_tree_domain.ProgramTreeIdentity(
-            code=self.node_to_paste.code,
-            year=self.node_to_paste.academic_year.year
-        )
+        tree_identity = identity_search.ProgramTreeIdentitySearch.get_from_node_identity(self.node_to_paste.entity_id)
         return self.tree_repository.get(tree_identity)

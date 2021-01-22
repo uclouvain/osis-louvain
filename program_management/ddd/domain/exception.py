@@ -325,24 +325,24 @@ class CannotDetachRootException(BusinessException):
 
 
 class CannotDetachLearningUnitsWhoArePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units are prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
             "learning_units": ", ".join([n.code for n in nodes]),
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
         }
         super().__init__(message)
 
 
 class CannotDetachLearningUnitsWhoHavePrerequisiteException(BusinessException):
-    def __init__(self, root_node: 'Node', nodes: Iterable['NodeLearningUnitYear']):
+    def __init__(self, root_node: 'NodeGroupYear', nodes: Iterable['NodeLearningUnitYear']):
         message = _(
             "Cannot detach because the following learning units have prerequisite "
             "in %(formation)s: %(learning_units)s"
         ) % {
-            "formation": root_node.title,
+            "formation": root_node.full_acronym(),
             "learning_units": ", ".join([n.code for n in nodes])
         }
         super().__init__(message)

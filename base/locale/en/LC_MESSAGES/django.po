@@ -795,7 +795,13 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English title common part"
+msgstr ""
+
 msgid "English title proper"
+msgstr ""
+
+msgid "English title specific complement"
 msgstr ""
 
 msgid "Enrolled"
@@ -2568,10 +2574,16 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "Title common part"
+msgstr ""
+
 msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
+msgstr ""
+
+msgid "Title specific complement"
 msgstr ""
 
 msgid "To complete"

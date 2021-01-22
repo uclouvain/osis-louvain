@@ -37,12 +37,13 @@ from program_management.ddd.repositories import persist_tree
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.models.enums.node_type import NodeType
-from program_management.views.generic import LearningUnitGeneric
+from program_management.views.generic import LearningUnitGeneric, Tab
 
 
 class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, LearningUnitGeneric, FormView):
     template_name = "learning_unit/tab_prerequisite_update.html"
     form_class = PrerequisiteForm
+    active_tab = Tab.PREREQUISITE
 
     permission_required = 'base.change_prerequisite'
     raise_exception = True
@@ -57,7 +58,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
         form_kwargs["program_tree"] = self.program_tree
         form_kwargs["node"] = node
         form_kwargs["initial"] = {
-            "prerequisite_string": str(node.prerequisite)
+            "prerequisite_string": str(self.program_tree.get_prerequisite(node) or '')
         }
         return form_kwargs
 

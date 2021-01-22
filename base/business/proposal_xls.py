@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,10 +59,10 @@ def basic_titles_part_1():
         str(_('Periodicity')),
         str(_('Quadrimester')),
         str(_('Session derogation')),
-        str(_('Common title')),
-        str(_('French title proper')),
-        str(_('Common English title')),
-        str(_('English title proper')),
+        str(_('Title common part')),
+        str(_('Title specific complement')),
+        str(_('English title common part')),
+        str(_('English title specific complement')),
         str(_('Req. Entities')),
         str(_('Alloc. Ent.')),
         str(_('Add. requ. ent. 1')),
