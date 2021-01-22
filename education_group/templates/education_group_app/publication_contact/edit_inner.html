@@ -25,7 +25,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form class="osis-form" role="form" method="POST" action="{{ request.get_full_path }}">
+<form class="osis-form validate" role="form" method="POST" action="{{ request.get_full_path }}">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{% trans "Create/Update contact" %}</h4>
@@ -52,10 +52,17 @@
 <script>
     no_role = ['OTHER_ACADEMIC_RESPONSIBLE', 'ACADEMIC_RESPONSIBLE'];
     $('#id_type').change(function (e) {
-        var typeContact = $(this).val();
-        var to_disable = no_role.indexOf(typeContact) >= 0
-        $('#id_role_fr').attr('disabled', to_disable);
-        $('#id_role_en').attr('disabled', to_disable);
+        adaptRolesState($(this));
     })
+    $(function(){
+        adaptRolesState($('#id_type'));
+    })
+
+    function adaptRolesState($typeContact){
+        var typeContact = $typeContact.val();
+        var to_disable = no_role.indexOf(typeContact) >= 0
+        $('#id_role_fr').attr('disabled', to_disable).attr('required', !to_disable);
+        $('#id_role_en').attr('disabled', to_disable).attr('required', !to_disable);
+    }
 
 </script>
