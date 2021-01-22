@@ -64,7 +64,7 @@ class AttributionNew(models.Model):
     end_year = models.IntegerField(blank=True, null=True)
     score_responsible = models.BooleanField(default=False)
     substitute = models.ForeignKey('base.Person', blank=True, null=True, on_delete=models.CASCADE)
-    decision_making = models.CharField(max_length=30, blank=True, null=False, choices=DecisionMakings.choices(),
+    decision_making = models.CharField(max_length=40, blank=True, null=False, choices=DecisionMakings.choices(),
                                        default='')
 
     objects = models.Manager()
