@@ -101,7 +101,7 @@
                         {% endfor %}
                         {% if can_edit_information %}
                             <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
-                                    data-url="{{ achievement.url_create }}">
+                                    data-url="{{ achievement.url_create }}" data-modal_class="modal-lg">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             </button>
                         {% endif %}
@@ -111,7 +111,7 @@
             <hr>
         {% endfor %}
          {% if can_edit_information %}
-            <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal" data-url="{{ url_create }}">
+            <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal" data-url="{{ url_create }}" data-modal_class="modal-lg">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </button>
         {% endif %}

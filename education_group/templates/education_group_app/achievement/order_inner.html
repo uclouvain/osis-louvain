@@ -39,11 +39,13 @@
 
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <button type="submit" class="btn btn-primary" onclick="CKupdate()">{% trans "Save" %}</button>
+        <button type="submit" class="btn btn-primary" onclick="CKupdate()">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save" %}
+        </button>
         {% if can_postpone %}
             <button type="button" class="btn btn-primary" onclick="CKupdate(); submitFormWithPostponement(this)"
                     title="{% trans "Save and postpone changes on next years" %}">
-                {% trans "Save and postpone" %}*
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save and postpone" %}*
             </button>
             <p class="text-right"><small><strong>*{% trans "Postpone will be apply on all achievement block !" %}</strong></small></p>
         {% endif %}
