@@ -167,19 +167,24 @@ class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupC
     pass
 
 
+class VolumeField(serializers.DecimalField):
+    def to_representation(self, value):
+        return '%g' % value
+
+
 class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     node_type = serializers.ReadOnlyField(default=NodeType.LEARNING_UNIT.name)
     subtype = serializers.CharField(source='child.learning_unit_type.name', read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
     remark_en = serializers.CharField(source='child.other_remark_english', read_only=True)
-    lecturing_volume = serializers.DecimalField(
+    lecturing_volume = VolumeField(
         source='child.volume_total_lecturing',
         max_digits=6,
         decimal_places=2,
-        default=None
+        default=None,
     )
-    practical_exercise_volume = serializers.DecimalField(
+    practical_exercise_volume = VolumeField(
         source='child.volume_total_practical',
         max_digits=6,
         decimal_places=2,
