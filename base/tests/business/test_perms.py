@@ -30,6 +30,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
@@ -186,8 +187,10 @@ class PermsTestCase(TestCase):
         mock_context = SimpleNamespace(context={'perm_name': 'undefined perm'})
         self.assertFalse(check_external(mock_context, person.user, learning_unit_year))
 
-    def test_cannot_faculty_manager_modify_end_date_no_container(self):
-        luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_container_year=None)
+    def test_cannot_faculty_manager_modify_end_date_with_attributions_in_future(self):
+        luy = LearningUnitYearFactory(academic_year=self.academic_yr)
+        next_year_lu = LearningUnitYearFactory(learning_unit=luy.learning_unit, academic_year=self.academic_yr_1)
+        AttributionChargeNewFactory(learning_component_year__learning_unit_year=next_year_lu)
         self.assertFalse(self.faculty_manager.person.user.has_perm('base.can_edit_learningunit_date', luy))
 
     def test_can_central_manager_modify_end_date_full(self):

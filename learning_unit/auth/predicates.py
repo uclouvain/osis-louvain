@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rules import predicate
 
+from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
@@ -346,7 +347,7 @@ def has_learning_unit_no_application_all_years(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_failed_msg(message=_("This learning unit has an application in the future"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
     if learning_unit_year:
@@ -354,6 +355,17 @@ def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
         return not TutorApplication.objects.filter(
             learning_container_year__learning_container=learning_container,
             learning_container_year__academic_year__year__gt=learning_unit_year.academic_year.year
+        ).exists()
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has an attribution in the future"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_attribution_in_future(self, user, learning_unit_year):
+    if learning_unit_year:
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_unit=learning_unit_year.learning_unit,
+            learning_component_year__learning_unit_year__academic_year__year__gt=learning_unit_year.academic_year.year
         ).exists()
 
 

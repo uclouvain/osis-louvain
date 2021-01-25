@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-07 20:49+0100\n"
+"POT-Creation-Date: 2021-01-22 08:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,10 +63,13 @@ msgstr ""
 "type qui n'est pas parmi les types suivants: %(types)s"
 
 msgid "The learning unit has proposal for this or a previous year"
-msgstr "L'unité d'enseignement est en proposition pour cette année ou une année antérieure"
+msgstr ""
+"L'unité d'enseignement est en proposition pour cette année ou une année "
+"antérieure"
 
 msgid "The learning unit has proposal for this or any other year"
-msgstr "L'unité d'enseignement est en proposition pour cette année ou une autre année"
+msgstr ""
+"L'unité d'enseignement est en proposition pour cette année ou une autre année"
 
 msgid "The learning unit is a partim"
 msgstr "L'unité d'enseignement est un partim"
@@ -84,11 +87,17 @@ msgstr "L'année de début de l'unité d'enseignement est définie avant %(year)
 msgid "The proposal is not on this academic year"
 msgstr "La proposition n'est pas sur cette année académique"
 
+msgid "This learning unit has an application in the future"
+msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
+
+msgid "This learning unit has an attribution in the future"
+msgstr "L'unité d'enseignement possède au moins une attribution dans le futur"
+
 msgid "This learning unit has application"
-msgstr "L'unité d'enseignement a au moins une application"
+msgstr "L'unité d'enseignement a au moins une candidature"
 
 msgid "This learning unit has application this year"
-msgstr "L'unité d'enseignement a au moins une application cette année"
+msgstr "L'unité d'enseignement a au moins une candidature cette année"
 
 msgid "This learning unit is not editable this period."
 msgstr "L'unité d'enseignement n'est pas modifiable durant cette période."
