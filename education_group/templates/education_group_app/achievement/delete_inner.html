@@ -37,11 +37,12 @@
 
    <div class="modal-footer">
        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-       <button type="submit" class="btn btn-danger">{% trans "Yes, I confirm." %}</button>
+       <button type="submit" class="btn btn-danger">
+           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans "Delete" %}</button>
        {% if can_postpone %}
            <button type="button" class="btn btn-danger" onclick="submitFormWithPostponement(this)"
                   title="{% trans "Delete and postpone changes on next years" %}">
-               {% trans "Delete and postpone." %}*
+               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans "Delete and postpone." %}*
            </button>
            <p class="text-right"><small><strong>*{% trans "Postpone will be apply on all achievement block !" %}</strong></small></p>
        {% endif %}

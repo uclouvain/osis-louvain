@@ -38,11 +38,13 @@
 
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+        <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save" %}
+        </button>
         {% if can_postpone %}
             <button type="button" class="btn btn-primary" onclick="submitFormWithPostponement(this)"
                     title="{% trans "Save and postpone changes on next years" %}">
-                {% trans "Save and postpone" %}
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save and postpone" %}
             </button>
         {% endif %}
     </div>
