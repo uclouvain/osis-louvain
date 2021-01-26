@@ -189,7 +189,7 @@ msgid "Are you sure you want to delete %(object)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
 
 msgid "Are you sure you want to delete a condition ?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer  une condition ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer une condition ?"
 
 msgid "Are you sure you want to delete an achievement ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer un acquis ?"
