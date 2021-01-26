@@ -163,6 +163,45 @@ class AcademicEventFactory:
         return [AcademicEvent(**obj) for obj in qs]
 
 
+@attr.s(frozen=True, slots=True)
+class AcademicSessionEvent(AcademicEvent):
+    session = attr.ib(type=int)
+
+
+class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
+    def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
+        """
+        Return academic session event related to target_year and session provided
+        """
+        return next(
+            (academic_session_event for academic_session_event in self._get_academic_events
+             if academic_session_event.authorized_target_year == target_year and
+                academic_session_event.session == session
+             ),
+            None
+        )
+
+    @cached_property
+    def _get_academic_events(self) -> List[AcademicSessionEvent]:
+        return sorted(
+            AcademicEventSessionFactory().get_academic_session_events(self.event_reference),
+            key=lambda academic_session_event: academic_session_event.start_date
+        )
+
+
+class AcademicEventSessionFactory:
+    def get_academic_session_events(self, event_reference: str) -> List[AcademicSessionEvent]:
+        qs = AcademicCalendar.objects.filter(
+            reference=event_reference
+        ).exclude(
+            sessionexamcalendar__isnull=True
+        ).annotate(
+            authorized_target_year=F('data_year__year'),
+            session=F('sessionexamcalendar__number_session')
+        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'session')
+        return [AcademicSessionEvent(**obj) for obj in qs]
+
+
 class EventPerm(ABC):
     academic_year_field = 'academic_year'
     model = None  # To instantiate == ex : EducationGroupYear
@@ -235,11 +274,6 @@ class EventPermClosed(EventPerm):
     @classmethod
     def get_open_academic_calendars_queryset(cls) -> QuerySet:
         return AcademicCalendar.objects.none()
-
-
-class EventPermOpened(EventPerm):
-    def is_open(self):
-        return True
 
 
 class EventPermLearningUnitFacultyManagerEdition(EventPerm):

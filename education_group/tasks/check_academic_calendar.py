@@ -1,4 +1,5 @@
 from backoffice.celery import app as celery_app
+from education_group.calendar.dissertation_submission_calendar import DissertationSubmissionCalendar
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_limited_daily_management import \
@@ -13,4 +14,5 @@ def run() -> dict:
     EducationGroupExtendedDailyManagementCalendar.ensure_consistency_until_n_plus_6()
     EducationGroupLimitedDailyManagementCalendar.ensure_consistency_until_n_plus_6()
     EducationGroupSwitchCalendar.ensure_consistency_until_n_plus_6()
+    DissertationSubmissionCalendar.ensure_consistency_until_n_plus_6()
     return {}

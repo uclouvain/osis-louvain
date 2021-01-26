@@ -499,3 +499,5 @@ MAPBOX = {
         'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
     ).split(' '),
 }
+
+INTERNSHIP_PORTAL_ACCOUNT_CREATION_URL = os.environ.get("INTERNSHIP_PORTAL_ACCOUNT_CREATION_URL", "")
