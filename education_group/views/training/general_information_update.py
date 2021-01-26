@@ -22,7 +22,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.business.education_groups.general_information_sections import can_postpone_general_information
+from django.utils.translation import gettext_lazy as _
+
+from base.business.education_groups.general_information_sections import can_postpone_general_information, \
+    CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.models.education_group_year import EducationGroupYear
 from cms.contrib.views import UpdateCmsView
 from cms.enums import entity_name
@@ -50,6 +53,22 @@ class TrainingUpdateGeneralInformation(TrainingRead, UpdateCmsView):
             'id',
             flat=True
         )
+
+    def get_success_message(self, to_postpone: bool):
+        if self.label == CMS_LABEL_PROGRAM_AIM:
+            return _("The program aim has been updated (with postpone)") if to_postpone\
+                else _("The program aim has been updated")
+        elif self.label == CMS_LABEL_ADDITIONAL_INFORMATION:
+            return _("The additional informations has been updated (with postpone)") if to_postpone \
+                else _("The additional informations has been updated")
+        return super().get_success_message(to_postpone)
+
+    def get_title(self) -> str:
+        if self.label == CMS_LABEL_PROGRAM_AIM:
+            return _("the program aims")
+        elif self.label == CMS_LABEL_ADDITIONAL_INFORMATION:
+            return _("additional informations")
+        return super().get_title()
 
     def can_postpone(self) -> bool:
         return can_postpone_general_information(self.education_group_version.offer)

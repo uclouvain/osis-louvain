@@ -78,13 +78,16 @@ class UpdateCmsView(FormView):
             language=get_user_interface_language(self.request.user)
         )
 
+    def get_title(self):
+        return self.translated_label
+
     def can_postpone(self) -> bool:
         return False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["label"] = self.label
-        context["translated_label"] = self.translated_label
+        context["title"] = self.get_title()
         context["can_postpone"] = self.can_postpone()
         return context
 
