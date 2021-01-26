@@ -35,10 +35,12 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import UpdateTextForm, UpdateLineFrenchForm, \
     UpdateLineEnglishForm
+from education_group.views.admission_condition.common import AdmissionConditionMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
+class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, AdmissionConditionMixin,
+                               FormView):
     template_name = "education_group_app/admission_condition/edit.html"
     permission_required = "base.change_admissioncondition"
     form_class = UpdateTextForm
@@ -83,11 +85,7 @@ class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, Aja
 
     @cached_property
     def object(self) -> 'AdmissionCondition':
-        return get_object_or_404(
-            AdmissionCondition,
-            education_group_year__partial_acronym=self.kwargs["code"],
-            education_group_year__academic_year__year=self.kwargs['year']
-        )
+        return self.get_admission_condition_object()
 
     def get_section(self) -> str:
         return self.request.GET.get("section") or self.request.POST.get("section", "")

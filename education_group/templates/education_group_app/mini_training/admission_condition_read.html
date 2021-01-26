@@ -40,26 +40,7 @@
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            <div class="panel">
-                <div class="panel-body">
-                     <h3>
-                        {{ admission_requirements_label.label_translated }}
-                        {% if can_edit_information %}
-                            {% url 'education_group_year_admission_condition_update_text' group.year group.code as update_text_url %}
-                            <a href="#" role="button"
-                               class="button modify-text-btn"
-                               data-form="{{ update_text_url }}?section=free&title={{ admission_requirements_label.label_translated.split|join:"%20" }}">
-                                <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
-                            </a>
-                        {% endif %}
-                    </h3>
-                    <div class="row">
-                         <div class="col-md-12">
-                            {% include "education_group_app/blocks/row_translation_side_by_side.html" with label=admission_requirements_label %}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="free" text=_("Specific admission requirements") field=admission_requirements_label.text_fr field_en=admission_requirements_label.text_en can_edit=True %}
         </div>
     </div>
 

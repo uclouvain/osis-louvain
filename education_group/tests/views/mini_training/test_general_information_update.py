@@ -25,13 +25,15 @@
 import mock
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.general_information_sections import WELCOME_INTRODUCTION
+from base.business.education_groups.general_information_sections import WELCOME_INTRODUCTION, \
+    CMS_LABEL_ADDITIONAL_INFORMATION, CMS_LABEL_PROGRAM_AIM
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from education_group.tests.factories.group_year import GroupYearBachelorFactory, GroupYearDeepeningFactory
+from education_group.tests.factories.group_year import GroupYearDeepeningFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -59,6 +61,14 @@ class TestMiniTrainingUpdateGeneralInformationView(TestCase):
             ]
         )
         self.client.force_login(self.central_manager.person.user)
+
+    def test_title_value(self):
+        specific_labels = (CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION)
+        expected_title_values = (_("the program aims"), _("additional informations"))
+        for label, expected_title in zip(specific_labels, expected_title_values):
+            with self.subTest(label=label):
+                response = self.client.get(self.url, {"label": label})
+                self.assertEqual(response.context["title"], expected_title)
 
     def test_upsert(self):
         OfferTranslatedTextFactory(

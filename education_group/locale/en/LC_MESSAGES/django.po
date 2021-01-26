@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-25 08:24+0100\n"
+"POT-Creation-Date: 2021-01-26 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,6 +140,9 @@ msgstr ""
 msgid "Add the French content of this paragraph"
 msgstr ""
 
+msgid "Add/Edit achievement"
+msgstr ""
+
 msgid "Add/Modify a line"
 msgstr ""
 
@@ -168,15 +171,24 @@ msgctxt "female plural"
 msgid "All"
 msgstr ""
 
-msgid "Are you sure ?"
-msgstr ""
-
 #, python-format
 msgid "Are you sure you want to delete %(code)s - %(title)s ?"
 msgstr ""
 
 #, python-format
 msgid "Are you sure you want to delete %(object)s ?"
+msgstr ""
+
+msgid "Are you sure you want to delete a condition ?"
+msgstr ""
+
+msgid "Are you sure you want to delete an achievement ?"
+msgstr ""
+
+msgid "Are you sure you want to modify the order ?"
+msgstr ""
+
+msgid "Are you sure you want to modify the order of a condition?"
 msgstr ""
 
 msgid "Bachelors of the Dutch speaking Community of Belgium"
@@ -381,9 +393,6 @@ msgid "Duration"
 msgstr ""
 
 msgid "Edit"
-msgstr ""
-
-msgid "Edit achievement"
 msgstr ""
 
 msgid "End academic year"
@@ -753,6 +762,12 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+msgid "The additional informations has been updated"
+msgstr ""
+
+msgid "The additional informations has been updated (with postpone)"
+msgstr ""
+
 msgid "The field can contain only one value."
 msgstr ""
 
@@ -787,6 +802,12 @@ msgstr ""
 msgid ""
 "The mini-training {abbreviated_title} ({academic_year}) have links in EPC "
 "application"
+msgstr ""
+
+msgid "The program aim has been updated"
+msgstr ""
+
+msgid "The program aim has been updated (with postpone)"
 msgstr ""
 
 msgid ""

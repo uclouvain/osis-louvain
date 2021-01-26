@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-25 08:24+0100\n"
+"POT-Creation-Date: 2021-01-26 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-
+#, python-format
 msgid " Are you sure you want to delete %(obj_repr)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
 
@@ -149,6 +149,9 @@ msgstr "Ajouter le contenu Anglais de ce paragraphe"
 msgid "Add the French content of this paragraph"
 msgstr "Ajouter le contenu Français de ce paragraphe"
 
+msgid "Add/Edit achievement"
+msgstr "Ajouter/Modifier acquis"
+
 msgid "Add/Modify a line"
 msgstr "Ajouter/Modifier une ligne"
 
@@ -177,9 +180,6 @@ msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
 
-msgid "Are you sure ?"
-msgstr "Êtes-vous sur ?"
-
 #, python-format
 msgid "Are you sure you want to delete %(code)s - %(title)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
@@ -187,6 +187,18 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
 #, python-format
 msgid "Are you sure you want to delete %(object)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
+
+msgid "Are you sure you want to delete a condition ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer une condition ?"
+
+msgid "Are you sure you want to delete an achievement ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer un acquis ?"
+
+msgid "Are you sure you want to modify the order ?"
+msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre ?"
+
+msgid "Are you sure you want to modify the order of a condition?"
+msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre d'une condition ?"
 
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr "Bachelier de la Communauté flamande de Belgique"
@@ -400,9 +412,6 @@ msgstr "Durée"
 
 msgid "Edit"
 msgstr "Modifier"
-
-msgid "Edit achievement"
-msgstr "Modifier acquis"
 
 msgid "End academic year"
 msgstr "Année académique de fin"
@@ -635,10 +644,10 @@ msgid "Modification"
 msgstr "Modification"
 
 msgid "Modify order achievement"
-msgstr "Modifier ordre acquis"
+msgstr "Modifier l'ordre des acquis"
 
 msgid "Modify order of condition"
-msgstr "Modifier ordre condition"
+msgstr "Modifier l'ordre d'une condition"
 
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
@@ -789,6 +798,12 @@ msgstr "Année académique de début"
 msgid "Status"
 msgstr "Statut"
 
+msgid "The additional informations has been updated"
+msgstr "Les informations supplémentaires ont été sauvegardées avec succès"
+
+msgid "The additional informations has been updated (with postpone)"
+msgstr "Les informations supplémentaires ont été sauvegardées avec succès (avec report)"
+
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
 
@@ -833,6 +848,12 @@ msgid ""
 msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
+
+msgid "The program aim has been updated"
+msgstr "L’objectif du programme a été mis à jour avec succès"
+
+msgid "The program aim has been updated (with postpone)"
+msgstr "L’objectif du programme a été mis à jour avec succès (avec report)"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
