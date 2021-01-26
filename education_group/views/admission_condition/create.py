@@ -34,10 +34,12 @@ from base.models.enums.admission_condition_sections import ConditionSectionsType
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import CreateLineEnglishForm, \
     CreateLineFrenchForm
+from education_group.views.admission_condition.common import AdmissionConditionMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, CreateView):
+class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin,
+                                   AdmissionConditionMixin, CreateView):
     template_name = "education_group_app/admission_condition/line_edit.html"
     permission_required = 'base.change_admissioncondition'
     raise_exception = True
@@ -69,13 +71,6 @@ class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin,
         if language == settings.LANGUAGE_CODE_EN:
             return CreateLineEnglishForm
         return CreateLineFrenchForm
-
-    def get_admission_condition_object(self):
-        return get_object_or_404(
-            AdmissionCondition,
-            education_group_year__academic_year__year=self.kwargs["year"],
-            education_group_year__partial_acronym=self.kwargs["code"]
-        )
 
     def get_success_url(self):
         return ""
