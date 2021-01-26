@@ -49,6 +49,7 @@ class SaveAdmissionLineMixin:
 
 
 class UpdateLineFrenchForm(SaveAdmissionLineMixin, forms.ModelForm):
+    diploma = OsisRichTextFormField(required=False)
     conditions = OsisRichTextFormField(required=False)
     remarks = OsisRichTextFormField(required=False)
 
@@ -58,6 +59,7 @@ class UpdateLineFrenchForm(SaveAdmissionLineMixin, forms.ModelForm):
 
 
 class UpdateLineEnglishForm(SaveAdmissionLineMixin, forms.ModelForm):
+    diploma = OsisRichTextFormField(required=False)
     conditions_en = OsisRichTextFormField(required=False)
     remarks_en = OsisRichTextFormField(required=False)
 
@@ -67,6 +69,7 @@ class UpdateLineEnglishForm(SaveAdmissionLineMixin, forms.ModelForm):
 
 
 class CreateLineFrenchForm(SaveAdmissionLineMixin, forms.ModelForm):
+    diploma = OsisRichTextFormField(required=False)
     conditions = OsisRichTextFormField(required=False)
     remarks = OsisRichTextFormField(required=False)
 
@@ -77,6 +80,7 @@ class CreateLineFrenchForm(SaveAdmissionLineMixin, forms.ModelForm):
 
 
 class CreateLineEnglishForm(SaveAdmissionLineMixin, forms.ModelForm):
+    diploma = OsisRichTextFormField(required=False)
     conditions_en = OsisRichTextFormField(required=False)
     remarks_en = OsisRichTextFormField(required=False)
 
