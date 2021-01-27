@@ -53,6 +53,28 @@ urlpatterns = [
                     name='mini_training_general_information_update'
                 ),
             ])),
+            path('create/', achievement.CreateEducationGroupAchievement.as_view(),
+                 name='minitraining_achievement_create'),
+            path('delete/', MiniTrainingDeleteView.as_view(), name='mini_training_delete'),
+            path('<int:education_group_achievement_pk>/', include([
+                path('actions/', achievement.EducationGroupAchievementAction.as_view(),
+                     name='minitraining_achievement_actions'),
+                path('create/', achievement.CreateEducationGroupDetailedAchievement.as_view(),
+                     name='minitraining_detailed_achievement_create'),
+                path('delete/', achievement.DeleteEducationGroupAchievement.as_view(),
+                     name='minitraining_achievement_delete'),
+                path('update/', achievement.UpdateEducationGroupAchievement.as_view(),
+                     name='minitraining_achievement_update'),
+                path('<int:education_group_detail_achievement_pk>/', include([
+                    path('actions/',
+                         achievement.EducationGroupDetailedAchievementAction.as_view(),
+                         name='minitraining_detailed_achievement_actions'),
+                    path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
+                         name='minitraining_detailed_achievement_delete'),
+                    path('update/', achievement.UpdateEducationGroupDetailedAchievement.as_view(),
+                         name='minitraining_detailed_achievement_update'),
+                ]))
+            ])),
             path('<mini_training_acronym:acronym>/update/', mini_training.MiniTrainingUpdateView.as_view(),
                  name='mini_training_update'),
             path('content/', mini_training.MiniTrainingReadContent.as_view(), name='mini_training_content'),
@@ -70,28 +92,6 @@ urlpatterns = [
         ])),
     ])),
     path('mini_trainings/<int:year>/<str:code>/', include([
-        path('create/', achievement.CreateEducationGroupAchievement.as_view(),
-             name='minitraining_achievement_create'),
-        path('delete/', MiniTrainingDeleteView.as_view(), name='mini_training_delete'),
-        path('<int:education_group_achievement_pk>/', include([
-            path('actions/', achievement.EducationGroupAchievementAction.as_view(),
-                 name='minitraining_achievement_actions'),
-            path('create/', achievement.CreateEducationGroupDetailedAchievement.as_view(),
-                 name='minitraining_detailed_achievement_create'),
-            path('delete/', achievement.DeleteEducationGroupAchievement.as_view(),
-                 name='minitraining_achievement_delete'),
-            path('update/', achievement.UpdateEducationGroupAchievement.as_view(),
-                 name='minitraining_achievement_update'),
-            path('<int:education_group_detail_achievement_pk>/', include([
-                path('actions/',
-                     achievement.EducationGroupDetailedAchievementAction.as_view(),
-                     name='minitraining_detailed_achievement_actions'),
-                path('delete/', achievement.DeleteEducationGroupDetailedAchievement.as_view(),
-                     name='minitraining_detailed_achievement_delete'),
-                path('update/', achievement.UpdateEducationGroupDetailedAchievement.as_view(),
-                     name='minitraining_detailed_achievement_update'),
-            ]))
-        ])),
         path(
             'identification/',
             mini_training.MiniTrainingReadIdentification.as_view(),
