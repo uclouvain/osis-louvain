@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 08:26+0100\n"
+"POT-Creation-Date: 2021-01-27 08:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,11 +54,11 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 
 #, python-format
-msgid "%(title)s has been updated"
+msgid "%(title)s has been updated (with postpone)"
 msgstr ""
 
 #, python-format
-msgid "%(title)s has been updated (with postpone)"
+msgid "%(title)s has been updated (without postpone)"
 msgstr ""
 
 msgid "ARES ability"
@@ -88,28 +88,28 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
-msgid "Achievement has been created"
-msgstr ""
-
 msgid "Achievement has been created (with postpone)"
 msgstr ""
 
-msgid "Achievement has been deleted"
+msgid "Achievement has been created (without postpone)"
 msgstr ""
 
 msgid "Achievement has been deleted (with postpone)"
 msgstr ""
 
-msgid "Achievement has been reordered"
+msgid "Achievement has been deleted (without postpone)"
 msgstr ""
 
 msgid "Achievement has been reordered (with postpone)"
 msgstr ""
 
-msgid "Achievement has been updated"
+msgid "Achievement has been reordered (without postpone)"
 msgstr ""
 
 msgid "Achievement has been updated (with postpone)"
+msgstr ""
+
+msgid "Achievement has been updated (without postpone)"
 msgstr ""
 
 msgid "Acronym already exists"
@@ -144,6 +144,9 @@ msgid "Add/Edit achievement"
 msgstr ""
 
 msgid "Add/Modify a line"
+msgstr ""
+
+msgid "Add/Update contact"
 msgstr ""
 
 msgid "Additional info"
@@ -255,28 +258,28 @@ msgstr ""
 msgid "Common pedagogy informations can only be edited by central manager"
 msgstr ""
 
-msgid "Condition has been created"
-msgstr ""
-
 msgid "Condition has been created (with postpone)"
 msgstr ""
 
-msgid "Condition has been removed"
+msgid "Condition has been created (without postpone)"
 msgstr ""
 
 msgid "Condition has been removed (with postpone)"
 msgstr ""
 
-msgid "Condition has been reordered"
+msgid "Condition has been removed (without postpone)"
 msgstr ""
 
 msgid "Condition has been reordered (with postpone)"
 msgstr ""
 
-msgid "Condition has been updated"
+msgid "Condition has been reordered (without postpone)"
 msgstr ""
 
 msgid "Condition has been updated (with postpone)"
+msgstr ""
+
+msgid "Condition has been updated (without postpone)"
 msgstr ""
 
 msgid "Conditions"
@@ -326,9 +329,6 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
-msgid "Create/Update contact"
-msgstr ""
-
 msgid "Cred. rel./abs."
 msgstr ""
 
@@ -359,10 +359,10 @@ msgstr ""
 msgid "Delete achievement"
 msgstr ""
 
-msgid "Delete and postpone changes on next years"
+msgid "Delete and postpone"
 msgstr ""
 
-msgid "Delete and postpone."
+msgid "Delete and postpone changes on next years"
 msgstr ""
 
 msgid "Delete contact"
@@ -762,10 +762,10 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-msgid "The additional informations has been updated"
+msgid "The additional informations has been updated (with postpone)"
 msgstr ""
 
-msgid "The additional informations has been updated (with postpone)"
+msgid "The additional informations has been updated (without postpone)"
 msgstr ""
 
 msgid "The field can contain only one value."
@@ -804,10 +804,10 @@ msgid ""
 "application"
 msgstr ""
 
-msgid "The program aim has been updated"
+msgid "The program aim has been updated (with postpone)"
 msgstr ""
 
-msgid "The program aim has been updated (with postpone)"
+msgid "The program aim has been updated (without postpone)"
 msgstr ""
 
 msgid ""

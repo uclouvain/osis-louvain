@@ -50,7 +50,7 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Achievement has been created (with postpone)")
-        return _("Achievement has been created")
+        return _("Achievement has been created (without postpone)")
 
 
 class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
@@ -70,4 +70,4 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Achievement has been created (with postpone)")
-        return _("Achievement has been created")
+        return _("Achievement has been created (without postpone)")

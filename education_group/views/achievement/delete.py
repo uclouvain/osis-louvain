@@ -52,7 +52,7 @@ class DeleteEducationGroupAchievement(PermissionRequiredMixin, EducationGroupAch
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Achievement has been deleted (with postpone)")
-        return _("Achievement has been deleted")
+        return _("Achievement has been deleted (without postpone)")
 
 
 class DeleteEducationGroupDetailedAchievement(PermissionRequiredMixin, EducationGroupDetailedAchievementMixin,
@@ -74,5 +74,5 @@ class DeleteEducationGroupDetailedAchievement(PermissionRequiredMixin, Education
 
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
-            return _("Achievement has been created (with postpone)")
-        return _("Achievement has been created")
+            return _("Achievement has been deleted (with postpone)")
+        return _("Achievement has been deleted (without postpone)")

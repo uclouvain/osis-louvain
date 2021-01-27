@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 14:40+0100\n"
+"POT-Creation-Date: 2021-01-27 07:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #, python-format
-msgid "%(label)s has been updated"
-msgstr "%(label)s a été mis à jour"
-
-#, python-format
 msgid "%(label)s has been updated (with postpone)"
 msgstr "%(label)s a été mis à jour (avec report)"
+
+msgid "%(label)s has been updated (without postpone)"
+msgstr "%(label)s a été mis à jour (sans report)"
 
 msgid "Cancel"
 msgstr "Annuler"

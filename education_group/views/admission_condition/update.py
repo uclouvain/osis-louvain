@@ -81,7 +81,7 @@ class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, Aja
     def get_success_message(self, cleaned_data):
         if self.request.POST.get('to_postpone'):
             return _("%(title)s has been updated (with postpone)") % {"title": self.request.GET["title"]}
-        return _("%(title)s has been updated") % {"title": self.request.GET["title"]}
+        return _("%(title)s has been updated (without postpone)") % {"title": self.request.GET["title"]}
 
     @cached_property
     def object(self) -> 'AdmissionCondition':
@@ -133,4 +133,4 @@ class UpdateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin,
     def get_success_message(self, cleaned_data):
         if self.request.POST.get('to_postpone'):
             return _("Condition has been updated (with postpone)")
-        return _("Condition has been updated")
+        return _("Condition has been updated (without postpone)")
