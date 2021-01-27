@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django.utils.translation import gettext_lazy as _
 
 from assistant.models import tutoring_learning_unit_year
-from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.models import learning_unit_enrollment, learning_unit_year as learn_unit_year_model, \
     academic_year
+from base.models.learning_unit_year import LearningUnitYear
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
@@ -85,16 +87,9 @@ def _check_group_element_year_deletion(group_element_year):
     }
 
 
-def _check_attribution_deletion(learning_unit_year):
+def _check_attribution_deletion(learning_unit_year: LearningUnitYear) -> Dict[AttributionNew, str]:
     msg = {}
     error_attribution = "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
-
-    for attribution in Attribution.objects.filter(learning_unit_year=learning_unit_year):
-        msg[attribution] = _(error_attribution) % {
-            'subtype': _str_partim_or_full(learning_unit_year),
-            'acronym': learning_unit_year.acronym,
-            'tutor': attribution.tutor,
-            'year': learning_unit_year.academic_year}
 
     for attribution_new in AttributionNew.objects.filter(
             learning_container_year=learning_unit_year.learning_container_year,

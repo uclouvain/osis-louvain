@@ -43,6 +43,7 @@ url_api_v1 = [
 ]
 
 webservice_apps = [
+    'attribution',
     'education_group',
     'learning_unit',
     'reference',

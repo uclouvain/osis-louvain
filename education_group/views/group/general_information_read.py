@@ -45,7 +45,6 @@ class GroupReadGeneralInformation(GroupRead):
             **super().get_context_data(**kwargs),
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
-            "publish_url": self.get_publish_url(),
             "can_edit_information": self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year())
         }
 
@@ -57,8 +56,3 @@ class GroupReadGeneralInformation(GroupRead):
         return reverse('group_general_information_update', args=[group.year, group.code]) + "?path={}".format(
             self.get_path()
         )
-
-    def get_publish_url(self):
-        group = self.get_group()
-        return reverse('publish_general_information', args=[group.year, group.code]) + \
-            "?path={}".format(self.get_path())

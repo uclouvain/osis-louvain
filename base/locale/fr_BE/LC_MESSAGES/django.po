@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-19 15:20+0100\n"
+"POT-Creation-Date: 2021-01-26 08:30+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -309,6 +309,9 @@ msgstr "Annuel"
 msgctxt "female"
 msgid "Annual"
 msgstr "Annuelle"
+
+msgid "Application for vacant courses"
+msgstr "Candidature aux cours vacants"
 
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
@@ -2343,9 +2346,6 @@ msgstr "Suspendu"
 
 msgid "T=Cheating"
 msgstr "T=Tricherie"
-
-msgid "Teaching charge application"
-msgstr "Candidature en ligne"
 
 msgid "Teaching internship"
 msgstr "Stage d’enseignement"

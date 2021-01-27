@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ class ProgramManager(EducationGroupRoleModel):
             'program_management.change_minitraining_version': osis_role_predicates.always_deny(
                 message=_("Program manager is not allowed to modify a specific version")
             ),
+            'base.view_publish_btn': rules.always_deny,
         })
 
 

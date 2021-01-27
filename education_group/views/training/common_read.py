@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.auth.roles import program_manager
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -151,9 +152,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             return root_node
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
             "group": self.group,
@@ -199,6 +201,12 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               ]
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
+            "view_publish_btn":
+                self.request.user.has_perm('base.view_publish_btn') and
+                (self.have_general_information_tab() or self.have_admission_condition_tab() or
+                 self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url(),
+
         }
 
     def get_permission_object(self) -> 'GroupYear':
@@ -345,6 +353,12 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def have_admission_condition_tab(self):
         return self.current_version.is_standard_version and \
                self.group.type.name in TrainingType.with_admission_condition()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.path)
 
 
 def _get_view_name_from_tab(tab: Tab):

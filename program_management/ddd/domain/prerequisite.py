@@ -29,6 +29,8 @@ from typing import List, Dict
 import attr
 from django.utils.translation import gettext as _
 
+from django.utils.translation import gettext as _
+
 from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
@@ -95,8 +97,12 @@ class PrerequisiteItemGroup:
             return True
         return False
 
-    def __str__(self):
-        return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
+    def get_prerequisite_item_expression(self, translate: bool = True) -> PrerequisiteExpression:
+        operator = _(self.operator) if translate else self.operator
+        return str(" " + operator + " ").join(str(p_item) for p_item in self.prerequisite_items)
+
+    def __str__(self) -> PrerequisiteExpression:
+        return self.get_prerequisite_item_expression()
 
 
 @attr.s(slots=True)
@@ -133,12 +139,18 @@ class Prerequisite(interface.Entity):
             for prereq_item_group in self.prerequisite_item_groups
         )
 
-    def __str__(self) -> PrerequisiteExpression:
+    def get_prerequisite_expression(self, translate: bool = True) -> PrerequisiteExpression:
         def _format_group(group: PrerequisiteItemGroup):
             return "({})" if len(group.prerequisite_items) > 1 and len(self.prerequisite_item_groups) > 1 else "{}"
-        return str(" " + _(self.main_operator) + " ").join(
-            _format_group(group).format(group) for group in self.prerequisite_item_groups
+
+        main_operator = _(self.main_operator) if translate else self.main_operator
+        return str(" " + main_operator + " ").join(
+            _format_group(group).format(group.get_prerequisite_item_expression(translate=translate))
+            for group in self.prerequisite_item_groups
         )
+
+    def __str__(self) -> PrerequisiteExpression:
+        return self.get_prerequisite_expression()
 
     def secondary_operator(self):
         return OR if self.main_operator == AND else AND

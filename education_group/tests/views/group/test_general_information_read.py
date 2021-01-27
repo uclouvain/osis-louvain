@@ -112,10 +112,6 @@ class TestGroupReadGeneralInformation(TestCase):
             self.element_group_year.group_year.partial_acronym
         ]) + "?path={}".format(self.element_group_year.id)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
-        expected_publish_url = reverse(
-            'publish_general_information', args=["2018", "LTRONC100B"]
-        ) + "?path=" + str(self.element_group_year.pk)
-        self.assertEqual(response.context['publish_url'], expected_publish_url)
         expected_tree_json_url = reverse_with_get(
             'tree_json',
             kwargs={'root_id': self.element_group_year.pk},

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
-from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory
+from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
@@ -189,43 +189,6 @@ class LearningUnitDelete(TestCase):
                          'acronym': ly1.acronym,
                          'year': ly1.academic_year,
                          'count': 1},
-                      msg)
-
-        # Check that record is not deleted
-        self.assertTrue(LearningUnitYear.objects.filter(pk=ly1.pk).exists())
-
-        # Check redirection to identification
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('learning_unit', kwargs={'learning_unit_year_id': ly1.pk}))
-
-    def test_delete_all_learning_units_year_case_error_have_attribution(self):
-        learning_unit_years = self.learning_unit_year_list
-        ly1 = learning_unit_years[1]
-        attrib_1 = AttributionFactory(learning_unit_year=ly1)
-
-        request_factory = RequestFactory()
-
-        request = request_factory.post(reverse(delete_all_learning_units_year, args=[ly1.id]))
-        request.user = self.user
-
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
-
-        # Get message from context
-        msg = [m.message for m in get_messages(request)]
-        msg_level = [m.level for m in get_messages(request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-
-        # Check error message
-        subtype = self.the_partim_str if ly1.is_partim() else self.the_lu_str
-        self.assertIn(_("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
-                      % {'subtype': subtype,
-                         'acronym': ly1.acronym,
-                         'tutor': attrib_1.tutor,
-                         'year': ly1.academic_year},
                       msg)
 
         # Check that record is not deleted

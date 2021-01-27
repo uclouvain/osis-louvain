@@ -51,8 +51,7 @@ class TrainingReadAdmissionCondition(TrainingRead):
                 self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "update_text_url": self.get_update_text_url(),
             "common_admission_condition": self.get_common_admission_condition(),
-            "admission_condition": self.get_admission_condition(),
-            "publish_url": self.get_publish_url()
+            "admission_condition": self.get_admission_condition()
         }
 
         if training.is_master_60_credits() or training.is_master_120_credits() or training.is_master_180_240_credits():
@@ -108,9 +107,3 @@ class TrainingReadAdmissionCondition(TrainingRead):
                 'code': self.node_identity.code
             }
         )
-
-    def get_publish_url(self):
-        return reverse('publish_general_information', args=[
-            self.node_identity.year,
-            self.node_identity.code
-        ]) + "?path={}".format(self.path)

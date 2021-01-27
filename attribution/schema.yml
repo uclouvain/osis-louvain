@@ -1,0 +1,97 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be/api/v1/attribution/
+   variables:
+     environment:
+       default: dev
+       enum:
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/attribution/
+   description: 'Production server'
+info:
+  version: '1.00'
+  title: 'Attribution Service'
+  description: |-
+    A set of API endpoints that allow you to get information about attribution
+paths:
+  /application/calendars:
+    get:
+      description: Return all calendars related to application courses.
+      operationId: applicationcoursescalendars_list
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApplicationCourseCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    ApplicationCourseCalendar:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Candidature aux cours vacants"
+        start_date:
+          type: string
+          format: date
+          example: "2021-02-15"
+        end_date:
+          type: string
+          format: date
+          example: "2021-02-28"
+        authorized_target_year:
+          type: integer
+          example: 2022
+        is_open:
+          type: boolean
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+security:
+  - Token: []

@@ -58,7 +58,6 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
                 'minitraining_achievement_create',
                 args=[kwargs['year'], kwargs['code']]
             ) + '?path={}&tab={}'.format(self.get_path(), Tab.SKILLS_ACHIEVEMENTS),
-            "publish_url": self.get_publish_url()
         }
 
     def get_program_aims_update_url(self):
@@ -88,9 +87,3 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
     @functools.lru_cache()
     def get_translated_labels(self):
         return achievement.get_skills_labels(self.get_group(), self.request.LANGUAGE_CODE)
-
-    def get_publish_url(self):
-        return reverse('publish_general_information', args=[
-            self.node_identity.year,
-            self.node_identity.code
-        ]) + "?path={}".format(self.get_path())

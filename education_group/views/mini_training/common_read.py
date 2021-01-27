@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -152,9 +152,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return int(self.get_path().split("|")[0])
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "group": self.get_group(),
             "mini_training": self.get_mini_training(),
@@ -198,6 +199,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_version_url": self.get_create_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
+            "view_publish_btn":
+                self.request.user.has_perm('base.view_publish_btn') and
+                (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url()
         }
 
     def get_permission_object(self):
@@ -324,6 +329,12 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     def have_admission_condition_tab(self):
         return self.current_version.is_standard_version and \
             self.get_group().type.name in MiniTrainingType.with_admission_condition()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())
 
 
 def _get_view_name_from_tab(tab: Tab):

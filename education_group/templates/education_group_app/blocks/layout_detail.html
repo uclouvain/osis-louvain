@@ -84,7 +84,18 @@
                 <div class="col-md-7">
                     <div class="pull-right" style="margin-right: 15px;">
                         {% block top_action_bar %}
-                            {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+                            <table>
+                                <tr>
+                                    {% if view_publish_btn %}
+                                        <td>
+                                            {% include  "education_group_app/blocks/refresh_publication_button.html" %}
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+                                    </td>
+                                </tr>
+                            </table>
                         {% endblock %}
                     </div>
                 </div>

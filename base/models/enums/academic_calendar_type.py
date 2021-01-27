@@ -55,7 +55,7 @@ ACADEMIC_CALENDAR_TYPES = (
     (EXAM_ENROLLMENTS, _("Exam enrollments")),
     (SCORES_EXAM_DIFFUSION, _("Scores exam diffusion")),
     (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
-    (TEACHING_CHARGE_APPLICATION, _("Teaching charge application")),
+    (TEACHING_CHARGE_APPLICATION, _("Application for vacant courses")),
     (COURSE_ENROLLMENT, _("Course enrollment")),
     (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
     (SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE, _("Summary course submission force majeure")),

@@ -169,5 +169,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'program_management.delete_minitraining_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_user_linked_to_all_scopes_of_management_entity
+                predicates.is_user_linked_to_all_scopes_of_management_entity,
+            'base.can_update_publication':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                (predicates.is_continuing_education_group_year |
+                 predicates.is_education_group_limited_daily_management_calendar_open),
+            'base.view_publish_btn': rules.always_allow,
         })

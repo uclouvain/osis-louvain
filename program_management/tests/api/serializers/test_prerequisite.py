@@ -1,10 +1,8 @@
 from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
-from base.models.enums import prerequisite_operator
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer, \
     NodeBaseSerializer
-from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -69,6 +67,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
             'prerequisites_string',
@@ -91,7 +90,10 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
             self.assertEqual("LDROI100A", self.serializer.data.get('code'))
 
         with self.subTest('prerequisites_string'):
-            self.assertEqual("LDROI1300 AND LAGRO2400", self.serializer.data.get('prerequisites_string'))
+            self.assertEqual(
+                self.tree.get_prerequisite(self.ldroi100a).get_prerequisite_expression(translate=False),
+                self.serializer.data.get('prerequisites_string')
+            )
 
 
 class TestLearningUnitBaseSerializer(SimpleTestCase):
@@ -128,6 +130,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
+            'title_en',
             'url',
             'code',
         ]
