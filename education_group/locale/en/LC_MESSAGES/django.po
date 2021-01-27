@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 08:05+0100\n"
+"POT-Creation-Date: 2021-01-27 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -293,22 +293,22 @@ msgid ""
 "Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 
-msgid "Contact has been created"
-msgstr ""
-
 msgid "Contact has been created (with postpone)"
 msgstr ""
 
-msgid "Contact has been removed"
+msgid "Contact has been created (without postpone)"
 msgstr ""
 
 msgid "Contact has been removed (with postpone)"
 msgstr ""
 
-msgid "Contact has been updated"
+msgid "Contact has been removed (without postpone)"
 msgstr ""
 
 msgid "Contact has been updated (with postpone)"
+msgstr ""
+
+msgid "Contact has been updated (without postpone)"
 msgstr ""
 
 msgid "Contacts"
@@ -419,10 +419,10 @@ msgstr ""
 msgid "Entity"
 msgstr ""
 
-msgid "Entity has been updated"
+msgid "Entity has been updated (with postpone)"
 msgstr ""
 
-msgid "Entity has been updated (with postpone)"
+msgid "Entity has been updated (without postpone)"
 msgstr ""
 
 msgid "Error(s) in form: The modifications are not saved"

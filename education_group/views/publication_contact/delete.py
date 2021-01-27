@@ -44,4 +44,4 @@ class EducationGroupPublicationContactDeleteView(CommonEducationGroupPublication
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Contact has been removed (with postpone)")
-        return _("Contact has been removed")
+        return _("Contact has been removed (without postpone)")

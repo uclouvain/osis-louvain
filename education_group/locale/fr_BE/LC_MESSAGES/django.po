@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 08:05+0100\n"
+"POT-Creation-Date: 2021-01-27 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -311,23 +311,23 @@ msgid ""
 msgstr ""
 "Erreur de consistance en %(academic_year)s: %(fields)s a déjà été modifié"
 
-msgid "Contact has been created"
-msgstr "Un contact a été créé"
-
 msgid "Contact has been created (with postpone)"
 msgstr "Un contact a été créé (avec report)"
 
-msgid "Contact has been removed"
-msgstr "Un contact a été supprimé"
+msgid "Contact has been created (without postpone)"
+msgstr "Un contact a été créé (sans report)"
 
 msgid "Contact has been removed (with postpone)"
 msgstr "Un contact a été supprimé (avec report)"
 
-msgid "Contact has been updated"
-msgstr "Un contact a été mis à jour"
+msgid "Contact has been removed (without postpone)"
+msgstr "Un contact a été supprimé (sans report)"
 
 msgid "Contact has been updated (with postpone)"
 msgstr "Un contact a été mis à jour (avec report)"
+
+msgid "Contact has been updated (without postpone)"
+msgstr "Un contact a été mis à jour (sans report)"
 
 msgid "Contacts"
 msgstr "Contacts"
@@ -437,11 +437,11 @@ msgstr "Entrez le texte à rechercher"
 msgid "Entity"
 msgstr "Entité"
 
-msgid "Entity has been updated"
-msgstr "Entité a été modifiée"
-
 msgid "Entity has been updated (with postpone)"
 msgstr "Entité a été modifiée (avec report)"
+
+msgid "Entity has been updated (without postpone)"
+msgstr "Entité a été modifiée (sans report)"
 
 msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
