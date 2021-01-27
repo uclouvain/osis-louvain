@@ -32,7 +32,7 @@ class CreateEducationGroupPublicationContactView(CommonEducationGroupPublication
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Contact has been created (with postpone)")
-        return _("Contact has been created")
+        return _("Contact has been created (without postpone)")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

@@ -36,7 +36,7 @@ class UpdateEducationGroupPublicationContactView(CommonEducationGroupPublication
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Contact has been updated (with postpone)")
-        return _("Contact has been updated")
+        return _("Contact has been updated (without postpone)")
 
 
 class UpdateEducationGroupEntityPublicationContactView(CommonEducationGroupPublicationContactView, UpdateView):
@@ -50,4 +50,4 @@ class UpdateEducationGroupEntityPublicationContactView(CommonEducationGroupPubli
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Entity has been updated (with postpone)")
-        return _("Entity has been updated")
+        return _("Entity has been updated (without postpone)")
