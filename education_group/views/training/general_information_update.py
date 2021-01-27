@@ -57,10 +57,10 @@ class TrainingUpdateGeneralInformation(TrainingRead, UpdateCmsView):
     def get_success_message(self, to_postpone: bool):
         if self.label == CMS_LABEL_PROGRAM_AIM:
             return _("The program aim has been updated (with postpone)") if to_postpone\
-                else _("The program aim has been updated")
+                else _("The program aim has been updated (without postpone)")
         elif self.label == CMS_LABEL_ADDITIONAL_INFORMATION:
             return _("The additional informations has been updated (with postpone)") if to_postpone \
-                else _("The additional informations has been updated")
+                else _("The additional informations has been updated (without postpone)")
         return super().get_success_message(to_postpone)
 
     def get_title(self) -> str:

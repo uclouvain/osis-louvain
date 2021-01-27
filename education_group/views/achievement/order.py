@@ -66,7 +66,7 @@ class EducationGroupAchievementAction(PermissionRequiredMixin, EducationGroupAch
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Achievement has been reordered (with postpone)")
-        return _("Achievement has been reordered")
+        return _("Achievement has been reordered (without postpone)")
 
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):

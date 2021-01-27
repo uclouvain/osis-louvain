@@ -78,4 +78,4 @@ class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin,
     def get_success_message(self, cleaned_data):
         if self.request.POST.get('to_postpone'):
             return _("Condition has been created (with postpone)")
-        return _("Condition has been created")
+        return _("Condition has been created (without postpone)")

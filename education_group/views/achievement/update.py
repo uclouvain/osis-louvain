@@ -48,7 +48,7 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
     def get_success_message(self, cleaned_data):
         if self.to_postpone():
             return _("Achievement has been updated (with postpone)")
-        return _("Achievement has been updated")
+        return _("Achievement has been updated (without postpone)")
 
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):

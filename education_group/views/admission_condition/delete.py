@@ -74,4 +74,4 @@ class DeleteAdmissionConditionLine(PermissionRequiredMixin, AjaxTemplateMixin, D
     def get_success_message(self, cleaned_data):
         if self.request.POST.get('to_postpone'):
             return _("Condition has been removed (with postpone)")
-        return _("Condition has been removed")
+        return _("Condition has been removed (without postpone)")

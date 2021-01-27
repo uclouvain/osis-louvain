@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 08:26+0100\n"
+"POT-Creation-Date: 2021-01-27 08:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,12 +63,12 @@ msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s rubriques communes"
 
 #, python-format
-msgid "%(title)s has been updated"
-msgstr "%(title)s a été mis à jour"
-
-#, python-format
 msgid "%(title)s has been updated (with postpone)"
 msgstr "%(title)s a été mis à jour (avec report)"
+
+#, python-format
+msgid "%(title)s has been updated (without postpone)"
+msgstr "%(title)s a été mis à jour (sans report)"
 
 msgid "ARES ability"
 msgstr "Habilitation ARES"
@@ -97,29 +97,29 @@ msgstr "Accès"
 msgid "Access condition"
 msgstr "Condition d'accès"
 
-msgid "Achievement has been created"
-msgstr "Un acquis a été créé"
-
 msgid "Achievement has been created (with postpone)"
 msgstr "Un acquis a été créé (avec report)"
 
-msgid "Achievement has been deleted"
-msgstr "Un acquis a été supprimé"
+msgid "Achievement has been created (without postpone)"
+msgstr "Un acquis a été créé (sans report)"
 
 msgid "Achievement has been deleted (with postpone)"
 msgstr "Un acquis a été supprimé (avec report)"
 
-msgid "Achievement has been reordered"
-msgstr "Un acquis a été réordonné"
+msgid "Achievement has been deleted (without postpone)"
+msgstr "Un acquis a été supprimé (sans report)"
 
 msgid "Achievement has been reordered (with postpone)"
 msgstr "Un acquis a été réordonné (avec report)"
 
-msgid "Achievement has been updated"
-msgstr "Un acquis a été mis à jour"
+msgid "Achievement has been reordered (without postpone)"
+msgstr "Un acquis a été réordonné (sans report)"
 
 msgid "Achievement has been updated (with postpone)"
 msgstr "Un acquis a été mis à jour (avec report)"
+
+msgid "Achievement has been updated (without postpone)"
+msgstr "Un acquis a été mis à jour (sans report)"
 
 msgid "Acronym already exists"
 msgstr "Le sigle existe déjà"
@@ -150,10 +150,13 @@ msgid "Add the French content of this paragraph"
 msgstr "Ajouter le contenu Français de ce paragraphe"
 
 msgid "Add/Edit achievement"
-msgstr "Ajouter/Modifier acquis"
+msgstr "Ajouter/Modifier un acquis"
 
 msgid "Add/Modify a line"
 msgstr "Ajouter/Modifier une ligne"
+
+msgid "Add/Update contact"
+msgstr "Ajouter/Modifier un contact"
 
 msgid "Additional info"
 msgstr "Infos complémentaires"
@@ -272,29 +275,29 @@ msgstr ""
 "Les informations pédagogiques communes peuvent seulement être modifiées par "
 "un gestionnaire en central"
 
-msgid "Condition has been created"
-msgstr "Une condition a été créée"
-
 msgid "Condition has been created (with postpone)"
 msgstr "Une condition a été créée (avec report)"
 
-msgid "Condition has been removed"
-msgstr "Une condition a été supprimée"
+msgid "Condition has been created (without postpone)"
+msgstr "Une condition a été créée (sans report)"
 
 msgid "Condition has been removed (with postpone)"
 msgstr "Une condition a été supprimée (avec report)"
 
-msgid "Condition has been reordered"
-msgstr "Une condition a été réordonnée"
+msgid "Condition has been removed (without postpone)"
+msgstr "Une condition a été supprimée (sans report)"
 
 msgid "Condition has been reordered (with postpone)"
 msgstr "Une condition a été réordonnée (avec report)"
 
-msgid "Condition has been updated"
-msgstr "Une condition a été mise à jour"
+msgid "Condition has been reordered (without postpone)"
+msgstr "Une condition a été réordonnée (sans report)"
 
 msgid "Condition has been updated (with postpone)"
 msgstr "Une condition a été mise à jour (avec report)"
+
+msgid "Condition has been updated (without postpone)"
+msgstr "Une condition a été mise à jour (sans report)"
 
 msgid "Conditions"
 msgstr "Conditions"
@@ -344,9 +347,6 @@ msgstr "Inscription aux cours"
 msgid "Create"
 msgstr "Créer"
 
-msgid "Create/Update contact"
-msgstr "Créer/Modifier un contact"
-
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
@@ -377,11 +377,11 @@ msgstr "Supprimer une condition"
 msgid "Delete achievement"
 msgstr "Supprimer un acquis"
 
+msgid "Delete and postpone"
+msgstr "Supprimer et reporter"
+
 msgid "Delete and postpone changes on next years"
 msgstr "Supprimer et reporter les changements sur les années futures"
-
-msgid "Delete and postpone."
-msgstr "Supprimer et reporter."
 
 msgid "Delete contact"
 msgstr "Supprimer un contact"
@@ -798,11 +798,15 @@ msgstr "Année académique de début"
 msgid "Status"
 msgstr "Statut"
 
-msgid "The additional informations has been updated"
-msgstr "Les informations supplémentaires ont été sauvegardées avec succès"
-
 msgid "The additional informations has been updated (with postpone)"
-msgstr "Les informations supplémentaires ont été sauvegardées avec succès (avec report)"
+msgstr ""
+"Les informations supplémentaires ont été sauvegardées avec succès (avec "
+"report)"
+
+msgid "The additional informations has been updated (without postpone)"
+msgstr ""
+"Les informations supplémentaires ont été sauvegardées avec succès (sans "
+"report)"
 
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
@@ -849,11 +853,11 @@ msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
 
-msgid "The program aim has been updated"
-msgstr "L’objectif du programme a été mis à jour avec succès"
-
 msgid "The program aim has been updated (with postpone)"
 msgstr "L’objectif du programme a été mis à jour avec succès (avec report)"
+
+msgid "The program aim has been updated (without postpone)"
+msgstr "L’objectif du programme a été mis à jour avec succès (sans report)"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"

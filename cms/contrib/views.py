@@ -57,7 +57,7 @@ class UpdateCmsView(FormView):
     def get_success_message(self, to_postpone: bool):
         if to_postpone:
             return _("%(label)s has been updated (with postpone)") % {"label": self.translated_label}
-        return _("%(label)s has been updated") % {"label": self.translated_label}
+        return _("%(label)s has been updated (without postpone)") % {"label": self.translated_label}
 
     @property
     def label(self):
