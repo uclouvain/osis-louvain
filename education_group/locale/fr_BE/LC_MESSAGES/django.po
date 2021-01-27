@@ -23,7 +23,7 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
 #, python-format
 msgid " Postpone will be apply on all section block \"%(section)s\" ! "
 msgstr ""
-"Le report va être appliqué sur l'entiéreté de la section \"%(section)s\" !"
+"Le report va être appliqué sur l'entièreté de la section \"%(section)s\" !"
 
 #, python-format
 msgid ""
@@ -706,10 +706,10 @@ msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
 
 msgid "Postpone will be apply on all achievement block !"
-msgstr "Le report va être appliqué sur l'entiéreté des acquis !"
+msgstr "Le report va être appliqué sur l'entièreté des acquis !"
 
 msgid "Postpone will be apply on all block contact !"
-msgstr "Le report va être appliqué sur l'entiéreté des contacts !"
+msgstr "Le report va être appliqué sur l'entièreté des contacts !"
 
 msgid "Primary language"
 msgstr "Langue principale"
