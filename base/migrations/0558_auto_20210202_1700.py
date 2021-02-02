@@ -8,6 +8,7 @@ from django.db.models import Q, F, Subquery, OuterRef
 
 from base.business.utils.model import model_to_dict_fk
 from base.models.academic_year import AcademicYear
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
@@ -62,7 +63,7 @@ def _create_cms(cms_qs: Iterable[TranslatedText], new_luy: LearningUnitYear):
 
 def create_missing_partims(apps, schema_editor):
     partims = LearningUnitYear.objects.filter(
-        subtype='PARTIM',
+        subtype=learning_unit_year_subtypes.PARTIM,
     ).annotate(
         max_anac=Subquery(
             LearningUnitYear.objects.filter(
@@ -77,8 +78,10 @@ def create_missing_partims(apps, schema_editor):
     )
     for partim in partims:
         last_full_ue = LearningUnitYear.objects.filter(
-            subtype='FULL',
-            learning_unit_id=partim.learning_container_year.learningunityear_set.get(subtype='FULL').learning_unit_id
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit_id=partim.learning_container_year.learningunityear_set.get(
+                subtype=learning_unit_year_subtypes.FULL
+            ).learning_unit_id
         ).order_by('academic_year__year').last()
         for year in range(partim.max_anac + 1, last_full_ue.academic_year.year + 1):
             anac = AcademicYear.objects.get(year=year)
