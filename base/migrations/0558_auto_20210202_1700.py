@@ -21,7 +21,7 @@ def _create_component(component: LearningComponentYear, new_learning_unit_year: 
         exclude=['id', 'external_id', 'uuid', 'learning_unit_year', 'type', 'changed']
     )
     LearningComponentYear.objects.get_or_create(
-        learning_unit_year=new_learning_unit_year,
+        learning_unit_year_id=new_learning_unit_year.id,
         type=component.type,
         defaults={
             'uuid': uuid.uuid4(),
@@ -33,9 +33,9 @@ def _create_component(component: LearningComponentYear, new_learning_unit_year: 
 def _create_learning_unit(ac_year: AcademicYear, luy: LearningUnitYear) -> LearningUnitYear:
     luy_dict = model_to_dict_fk(
         luy,
-        exclude=['id', 'uuid', 'academic_year_id', 'learning_container_year_id', 'acronym', 'external_id', 'changed']
+        exclude=['id', 'uuid', 'academic_year', 'learning_container_year', 'acronym', 'external_id', 'changed']
     )
-    new_learning_unit_year = LearningUnitYear.objects.get_or_create(
+    new_learning_unit_year, _ = LearningUnitYear.objects.get_or_create(
         academic_year=ac_year,
         acronym=luy.acronym,
         defaults={
