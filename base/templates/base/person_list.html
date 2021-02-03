@@ -76,18 +76,20 @@
                             {% endfor %}
                             </ul>
                         </td>
-                        <td>
-                            <ul>{% for entity in object.entitymanager_set.all %}
-                                <li>{{ entity.entity_recent_acronym }}</li>
-                            {% endfor %}
-                            </ul>
-                        </td>
+                        {% with entities_managed=entity_managers|get_item:object.pk %}
+                            <td>
+                                <ul>{% for row in entities_managed %}
+                                    <li>{{ row.entity_recent_acronym }}</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                        {% endwith %}
                         {% if 'learning_unit' in installed_apps %}
                             {% with entities_managed=central_managers_for_ue|get_item:object.pk %}
                                 <td>
                                     <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
+                                        {% for row in entities_managed %}
+                                            <li>{{ row.entity_recent_acronym }}</li>
                                         {% endfor %}
                                     </ul>
                                 </td>
@@ -95,8 +97,8 @@
                             {% with entities_managed=faculty_managers_for_ue|get_item:object.pk %}
                                 <td>
                                     <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
+                                        {% for row in entities_managed %}
+                                            <li>{{ row.entity_recent_acronym }}</li>
                                         {% endfor %}
                                     </ul>
                                 </td>
@@ -106,8 +108,8 @@
                              {% with entities_managed=central_managers_for_of|get_item:object.pk %}
                                 <td>
                                     <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
+                                        {% for row in entities_managed %}
+                                            <li>{{ row.entity_recent_acronym }} </li>
                                         {% endfor %}
                                     </ul>
                                 </td>
@@ -115,8 +117,8 @@
                             {% with entities_managed=faculty_managers_for_of|get_item:object.pk %}
                                 <td>
                                     <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
+                                        {% for row in entities_managed %}
+                                            <li>{{ row.entity_recent_acronym }}</li>
                                         {% endfor %}
                                     </ul>
                                 </td>
@@ -126,8 +128,8 @@
                             {% with entities_managed=partnership_entity_managers|get_item:object.pk %}
                                 <td>
                                     <ul>
-                                        {% for entity in entities_managed %}
-                                            <li>{{ entity }}</li>
+                                        {% for row in entities_managed %}
+                                            <li>{{ row.entity_recent_acronym }}</li>
                                         {% endfor %}
                                     </ul>
                                 </td>

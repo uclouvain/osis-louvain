@@ -23,13 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set
+import collections
+from typing import List, Set, Iterable
+
+from django.db.models import Subquery, OuterRef, Value, CharField
 
 from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
 from base.models.person import Person
 from education_group.auth.scope import Scope
 from osis_role import role
 from osis_role.contrib.models import EntityRoleModel
+
+Row = collections.namedtuple("Row", ['group_name', 'person_id', 'entity_id', 'entity_recent_acronym'])
 
 
 class EntityRoleHelper:
@@ -54,3 +60,31 @@ class EntityRoleHelper:
                 qs = qs.union(subqs)
 
         return qs.get_entities_ids() if qs else Entity.objects.none()
+
+    @staticmethod
+    def get_all_entities_for_persons(persons: Iterable[Person], group_names: Set[str]) -> Iterable[Row]:
+        role_mdls = [
+            r for r in role.role_manager.roles if issubclass(r, EntityRoleModel) and r.group_name in group_names
+        ]
+
+        qs = None
+        for role_mdl in role_mdls:
+            subqs = role_mdl.objects.filter(
+                person__in=persons
+            ).annotate(
+                group_name=Value(role_mdl.group_name, output_field=CharField()),
+                entity_recent_acronym=Subquery(
+                    EntityVersion.objects.filter(
+                        entity=OuterRef('entity__pk')
+                    ).order_by('-start_date').values('acronym')[:1]
+                )
+            )
+            if hasattr(role_mdl, 'scopes'):
+                subqs = subqs.filter(scopes=[Scope.ALL.value])
+            subqs = subqs.values_list(*Row._fields)
+            qs = subqs if qs is None else qs.union(subqs)
+
+        if qs is None:
+            return []
+
+        return (Row._make(row) for row in qs.order_by("person_id", "group_name"))
