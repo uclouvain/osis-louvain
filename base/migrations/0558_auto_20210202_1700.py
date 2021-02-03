@@ -88,8 +88,11 @@ def create_missing_partims(apps, schema_editor):
             new_partim = _create_learning_unit(anac, partim)
             for component in partim.learningcomponentyear_set.all():
                 _create_component(component, new_partim)
-                cms_qs = partim.translatedtext_set.all()
-                _create_cms(cms_qs, new_partim)
+            cms_qs = TranslatedText.objects.filter(
+                reference=partim.id,
+                entity=entity_name.LEARNING_UNIT_YEAR
+            )
+            _create_cms(cms_qs, new_partim)
 
 
 class Migration(migrations.Migration):
