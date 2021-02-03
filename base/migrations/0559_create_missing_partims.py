@@ -101,7 +101,7 @@ def create_missing_partims(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0557_learningunityear_other_remark_english'),
+        ('base', '0558_auto_20210202_1029'),
     ]
 
     operations = [
