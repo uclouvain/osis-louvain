@@ -35,9 +35,12 @@ from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
+from program_management.ddd.command import GetProgramTreeVersionFromNodeCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
+from program_management.ddd.service.read.get_program_tree_version_from_node_service import \
+    get_program_tree_version_from_node
 from program_management.models.enums.node_type import NodeType
 
 NodeViewContext = namedtuple('NodeViewContext', 'view_path root_node current_path')
@@ -209,6 +212,7 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
 
 
 def _format_node_group_text(node: 'NodeGroupYear') -> str:
+    program_tree_version = get_program_tree_version_from_node(GetProgramTreeVersionFromNodeCommand(node.code, node.year))
     if node.version_name:
-        return "{node.code} - {node.title}[{node.version_name}]".format(node=node)
+        return "{node.code} - {node.title}[{node.version_name} - {program_tree_version.transition_name}]".format(node=node, program_tree_version=program_tree_version)
     return "{node.code} - {node.title}".format(node=node)
