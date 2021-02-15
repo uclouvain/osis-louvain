@@ -38,7 +38,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class EntityCalendarAdmin(OsisModelAdmin):
     list_display = ('academic_calendar', 'entity', 'start_date', 'end_date', 'changed')
     raw_id_fields = ('entity',)
-    list_filter = ('academic_calendar__academic_year', 'academic_calendar__reference')
+    list_filter = ('academic_calendar__data_year', 'academic_calendar__reference')
 
 
 class EntityCalendar(AbstractCalendar):
@@ -61,13 +61,13 @@ class EntityCalendar(AbstractCalendar):
             })
 
 
-def find_by_entity_and_reference(entity_id, reference, academic_year=None):
+def find_by_entity_and_reference(entity_id, reference, targeted_academic_year=None):
     try:
         return EntityCalendar.objects.filter(
             entity_id=entity_id,
-            academic_calendar__academic_year=academic_year or starting_academic_year(),
+            academic_calendar__data_year=targeted_academic_year or starting_academic_year(),
             academic_calendar__reference=reference
-        ).select_related('entity', 'academic_calendar__academic_year').get()
+        ).select_related('entity', 'academic_calendar__data_year').get()
     except ObjectDoesNotExist:
         return None
 

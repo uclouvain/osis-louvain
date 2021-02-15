@@ -36,7 +36,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 class AcademicCalendarFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.AcademicCalendar'
-        django_get_or_create = ('academic_year', 'title')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
@@ -44,8 +43,8 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     academic_year = factory.SubFactory(AcademicYearFactory)
     data_year = factory.SubFactory(AcademicYearFactory)
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
-    start_date = factory.SelfAttribute("academic_year.start_date")
-    end_date = factory.SelfAttribute("academic_year.end_date")
+    start_date = factory.SelfAttribute("data_year.start_date")
+    end_date = factory.SelfAttribute("data_year.end_date")
     highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
     highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
     highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)

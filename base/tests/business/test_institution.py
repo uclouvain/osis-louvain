@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.test import TestCase
-from django.utils import timezone
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models.enums import academic_calendar_type
@@ -40,7 +38,6 @@ class FindSummaryCourseSubmissionDatesTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )

@@ -41,8 +41,10 @@ class TestEntityCalendar(TestCase):
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
 
-        cls.aca_calendar = AcademicCalendarFactory(academic_year=current_academic_year,
-                                                   reference=SUMMARY_COURSE_SUBMISSION)
+        cls.aca_calendar = AcademicCalendarFactory(
+            data_year=current_academic_year,
+            reference=SUMMARY_COURSE_SUBMISSION
+        )
         cls.entity_version = EntityVersionFactory()
 
     def test_raise_exception_create_entity_calendar_not_authorized(self):
@@ -56,11 +58,15 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
         current_academic_year = create_current_academic_year()
         previous_academic_year = AcademicYearFactory(year=current_academic_year.year-1)
 
-        cls.current_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=current_academic_year,
-                                                            academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
-        EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
-                                                         academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
-                                                         entity=cls.current_entity_calendar.entity)
+        cls.current_entity_calendar = EntityCalendarFactory(
+            academic_calendar__data_year=current_academic_year,
+            academic_calendar__reference=SUMMARY_COURSE_SUBMISSION
+        )
+        EntityCalendarFactory(
+            academic_calendar__data_year=previous_academic_year,
+            academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
+            entity=cls.current_entity_calendar.entity
+        )
 
     def test_when_no_data_match_criteria(self):
         entity_calendar_obj = find_by_entity_and_reference(
@@ -80,7 +86,6 @@ class TestBuildCalendarByEntity(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
         cls.ac_calendar = AcademicCalendarFactory(
-            academic_year=cls.academic_year,
             data_year=cls.academic_year,
             reference=SUMMARY_COURSE_SUBMISSION
         )

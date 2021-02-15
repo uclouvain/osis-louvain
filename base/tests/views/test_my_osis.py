@@ -54,7 +54,7 @@ class MyOsisViewTestCase(TestCase):
                                    language=LANGUAGE_CODE_FR)
         academic_year = create_current_academic_year()
         cls.summary_course_submission_calendar = AcademicCalendarFactory(
-            academic_year=academic_year,
+            data_year=academic_year,
             start_date=academic_year.start_date,
             end_date=academic_year.end_date,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)

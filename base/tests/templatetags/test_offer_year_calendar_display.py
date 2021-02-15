@@ -46,7 +46,7 @@ class OfferYearCalendarDisplayTagTest(TestCase):
         self.previous_academic_year = AcademicYearFactory(start_date=today.replace(year=today.year - 3),
                                                           end_date=today.replace(year=today.year - 2),
                                                           year=today.year - 3)
-        an_previous_academic_calendar = AcademicCalendarFactory(academic_year=self.previous_academic_year)
+        an_previous_academic_calendar = AcademicCalendarFactory(data_year=self.previous_academic_year)
         self.a_previous_offer_year = OfferYearFactory(academic_year=self.previous_academic_year)
         self.a_previous_offer_yr_calendar = OfferYearCalendarFactory(academic_calendar=an_previous_academic_calendar,
                                                                      offer_year=self.a_previous_offer_year)
@@ -55,10 +55,10 @@ class OfferYearCalendarDisplayTagTest(TestCase):
         self.current_academic_year = AcademicYearFactory(start_date=today,
                                                          end_date=today.replace(year=today.year + 1),
                                                          year=today.year)
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year)
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year)
         self.a_current_offer_year = OfferYearFactory(academic_year=self.current_academic_year)
         self.a_current_offer_yr_calendar = OfferYearCalendarFactory(academic_calendar=an_academic_calendar,
-                                                               offer_year=self.a_current_offer_year)
+                                                                    offer_year=self.a_current_offer_year)
 
     def test_current_offer_year_calendar_display_style(self):
         css_style = offer_year_calendar_display_tag\

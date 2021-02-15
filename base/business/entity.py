@@ -51,11 +51,11 @@ def get_entities_ids(entity_acronym, with_entity_subordinated):
     return []
 
 
-def get_entity_calendar(an_entity_version, academic_yr):
+def get_entity_calendar(an_entity_version, targeted_academic_year):
     entity_cal = entity_calendar.find_by_entity_and_reference(
         an_entity_version.entity.id,
         academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-        academic_yr
+        targeted_academic_year
     )
 
     if entity_cal:
@@ -65,7 +65,7 @@ def get_entity_calendar(an_entity_version, academic_yr):
             parent_entity_version = entity_version.find_latest_version_by_entity(an_entity_version.parent,
                                                                                  timezone.now())
             if parent_entity_version:
-                return get_entity_calendar(parent_entity_version, academic_yr)
+                return get_entity_calendar(parent_entity_version, targeted_academic_year)
         return None
 
 
