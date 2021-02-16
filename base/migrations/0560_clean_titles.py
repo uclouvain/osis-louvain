@@ -24,8 +24,8 @@ def clean_titles(apps, schema_editor):
     print("Problematic GroupYears: {}".format(len(problematic_gys)))
 
     for gy in problematic_gys:
-        gy.title = gy.title.replace('\n', '')
-        gy.title_english = gy.title_english.replace('\n', '')
+        gy.title_fr = gy.title_fr.replace('\n', '')
+        gy.title_en = gy.title_en.replace('\n', '')
         gy.changed = timezone.now()
         gy.save()
         print(str(gy.id))
