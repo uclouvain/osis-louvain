@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,12 +25,14 @@
 ##############################################################################
 
 from django.contrib.auth.models import Permission
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.tests.factories.user import UserFactory
-from base.views.common import home
+from base.views.common import home, _build_attention_message
 from osis_common.tests.factories.application_notice import ApplicationNoticeFactory
 
 
@@ -44,7 +46,7 @@ class ErrorViewTestCase(TestCase):
     @override_settings(DEBUG=False)
     def test_404_error(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse('academic_calendar_read', args=[46898]), follow=True)
+        response = self.client.get(reverse('entity_read', args=[46898]), follow=True)
         self.assertEqual(response.status_code, 404)
 
 
@@ -61,3 +63,30 @@ class TestCheckNotice(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.context['subject'], self.notice.subject)
         self.assertEqual(response.context['notice'], self.notice.notice)
+
+
+@override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
+class TestBuildAttentionMessage(SimpleTestCase):
+
+    def test_group(self):
+        self.assertEqual(_build_attention_message(GroupType.SUB_GROUP),
+                         "Attention ce groupement fait partie de plusieurs formations :"
+                         )
+
+    def test_training(self):
+        self.assertEqual(
+            _build_attention_message(TrainingType.BACHELOR),
+            "Attention cette formation fait partie de plusieurs formations :"
+        )
+
+    def test_mini_training(self):
+        self.assertEqual(
+            _build_attention_message(MiniTrainingType.OPEN_MINOR),
+            "Attention cette mini-formation fait partie de plusieurs formations :"
+        )
+
+    def test_ue(self):
+        self.assertEqual(
+            _build_attention_message(None),
+            "Attention cette unité d'enseignement fait partie de plusieurs formations :"
+        )

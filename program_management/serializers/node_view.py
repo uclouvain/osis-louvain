@@ -24,13 +24,12 @@
 #
 ##############################################################################
 from collections import namedtuple
-from typing import List, Dict
+from typing import List
 
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
@@ -209,6 +208,9 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
 
 
 def _format_node_group_text(node: 'NodeGroupYear') -> str:
+    transition_suffix = node.get_formatted_transition_name()
     if node.version_name:
-        return "{node.code} - {node.title}[{node.version_name}]".format(node=node)
-    return "{node.code} - {node.title}".format(node=node)
+        return "{node.code} - {node.title}[{node.version_name}{transition_name}]".format(
+            node=node, transition_name=transition_suffix
+        )
+    return "{node.code} - {node.title}{transition_name}".format(node=node, transition_name=transition_suffix)

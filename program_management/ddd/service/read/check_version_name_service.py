@@ -29,5 +29,6 @@ def check_version_name(cmd: command.CheckVersionNameCommand) -> None:
     validators_by_business_action.CheckVersionNameValidatorList(
         cmd.year,
         cmd.offer_acronym,
-        cmd.version_name
+        cmd.version_name,
+        cmd.transition_name
     ).validate()

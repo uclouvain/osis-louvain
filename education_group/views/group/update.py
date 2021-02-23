@@ -1,3 +1,27 @@
+#############################################################################
+#  OSIS stands for Open Student Information System. It's an application
+#  designed to manage the core business of higher education institutions,
+#  such as universities, faculties, institutes and professional schools.
+#  The core business involves the administration of students, teachers,
+#  courses, programs and so on.
+#
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of this license - GNU General Public License - is available
+#  at the root of the source code of this program.  If not,
+#  see http://www.gnu.org/licenses/.
+#############################################################################
+
 import functools
 from typing import List, Dict, Optional
 
@@ -10,7 +34,7 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version, academic_year, campus
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
@@ -59,6 +83,8 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_id = self.__send_update_group_cmd(group_form)
             if group_form.is_valid():
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                check_formations_impacted_by_update(self.get_group_obj().code,
+                                                    self.get_group_obj().year, request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url(group_id))
         else:
             msg = _("Error(s) in form: The modifications are not saved")

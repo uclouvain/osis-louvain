@@ -26,7 +26,7 @@
 import collections
 import copy
 from _decimal import Decimal
-from typing import List, Set, Optional, Iterator, Tuple, Generator
+from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
 import attr
 
@@ -96,24 +96,21 @@ class NodeFactory:
 
         return node_cls(**node_attrs)
 
-    def duplicate(
+    def create_and_fill_from_node(
             self,
-            duplicate_from: 'Node',
+            create_from: 'Node',
+            new_code: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
-        new_code = GenerateNodeCode().generate_from_parent_node(
-            parent_node=duplicate_from,
-            child_node_type=duplicate_from.node_type,
-        )
-        start_year = duplicate_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
+        start_year = create_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
-            duplicate_from,
-            entity_id=NodeIdentity(code=new_code, year=duplicate_from.entity_id.year),
+            create_from,
+            entity_id=NodeIdentity(code=new_code, year=create_from.entity_id.year),
             code=new_code,
-            end_year=duplicate_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            end_year=create_from.end_year if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
             # TODO: Replace end_date by end_year
-            end_date=duplicate_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
+            end_date=create_from.end_date if override_end_year_to == DO_NOT_OVERRIDE else override_end_year_to,
             start_year=start_year,
             children=[],
             node_id=None,
@@ -125,7 +122,7 @@ class NodeFactory:
             copied_node.remark_en = None
             copied_node.remark_fr = None
             if copied_node.node_type in GroupType:
-                default_credit = FieldValidationRule.get_initial_value_or_none(duplicate_from.node_type, 'credits')
+                default_credit = FieldValidationRule.get_initial_value_or_none(create_from.node_type, 'credits')
                 copied_node.credits = default_credit
         copied_node._has_changed = True
         return copied_node
@@ -140,7 +137,7 @@ class NodeFactory:
         child = self.get_node(
             type=NodeType.GROUP,
             node_type=child_type,
-            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type),
+            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type, False),
             title=GenerateNodeAbbreviatedTitle.generate(
                 parent_node=parent_node,
                 child_node_type=child_type,
@@ -155,13 +152,6 @@ class NodeFactory:
         )
         child._has_changed = True
         return child
-
-    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
-        original_children = original_node.children
-        original_node.children = []  # To avoid recursive deep copy of all children behind
-        copied_node = copy.deepcopy(original_node)
-        original_node.children = original_children
-        return copied_node
 
 
 factory = NodeFactory()
@@ -478,6 +468,25 @@ class Node(interface.Entity):
         self.children[index].order_down()
         self.children[index+1].order_up()
 
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum]) -> None:
+        if self.node_type in ignore_children_from:
+            self.children = []
+        for child_link in self.children:
+            child_link.child.prune(ignore_children_from=ignore_children_from)
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'Node':
+        if memodict is None:
+            memodict = {}
+
+        if self.entity_id in memodict:
+            return memodict[self.entity_id]
+
+        copy_node = attr.evolve(self, children=[])
+        memodict[copy_node.entity_id] = copy_node
+        copy_node.children = [l.__deepcopy__(memodict) for l in self.children]
+
+        return copy_node
+
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Generator[Tuple['Path', 'Node'], None, None]:
     if current_path is None:
@@ -510,6 +519,7 @@ class NodeGroupYear(Node):
     version_name = attr.ib(type=str, default=None)
     version_title_fr = attr.ib(type=str, default=None)
     version_title_en = attr.ib(type=str, default=None)
+    transition_name = attr.ib(type=str, default=None)
     category = attr.ib(type=GroupType, default=None)
     management_entity_acronym = attr.ib(type=str, default=None)
     teaching_campus = attr.ib(type=Campus, default=None)
@@ -519,13 +529,17 @@ class NodeGroupYear(Node):
 
     def __str__(self):
         if self.version_name:
-            return "{}[{}] - {} ({})".format(self.title, self.version_name, self.code, self.academic_year)
-        return "{} - {} ({})".format(self.title, self.code, self.academic_year)
+            return "{}[{}{}] - {} ({})".format(self.title,
+                                               self.version_name,
+                                               self.get_formatted_transition_name(),
+                                               self.code,
+                                               self.academic_year)
+        return "{}{} - {} ({})".format(self.title, self.get_formatted_transition_name(), self.code, self.academic_year)
 
     def full_acronym(self) -> str:
         if self.version_name:
-            return "{}[{}]".format(self.title, self.version_name)
-        return self.title
+            return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
+        return '{}{}'.format(self.title, self.get_formatted_transition_name())
 
     def full_title(self) -> str:
         title = self.offer_title_fr
@@ -536,6 +550,11 @@ class NodeGroupYear(Node):
         if self.version_title_fr:
             return "{}[{}]".format(title, self.version_title_fr)
         return title
+
+    def get_formatted_transition_name(self):
+        if self.transition_name:
+            return '-{}'.format(self.transition_name) if self.version_name else '[{}]'.format(self.transition_name)
+        return ''
 
 
 @attr.s(slots=True, hash=False, eq=False)

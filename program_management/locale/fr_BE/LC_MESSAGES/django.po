@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-02-12 08:10+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -143,6 +143,10 @@ msgstr "Concours"
 msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
+
+msgctxt "male plural"
+msgid "All"
+msgstr "Tous"
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
@@ -344,6 +348,9 @@ msgstr "Stage"
 msgid "Invalid name version"
 msgstr "Nom de version invalide"
 
+msgid "Invalid transition name"
+msgstr "Nom de transition invalide"
+
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
 
@@ -513,6 +520,9 @@ msgstr "Nouvelle version particulière"
 
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New transition version"
+msgstr "Nouvelle version de transition"
 
 msgid "No"
 msgstr "Non"
@@ -770,7 +780,9 @@ msgstr ""
 msgid ""
 "The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
 "inside %(training)s"
-msgstr "L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais pas dans %(training)s"
+msgstr ""
+"L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais "
+"pas dans %(training)s"
 
 msgid "The learning unit has prerequisites"
 msgstr "L'UE a des prérequis"
@@ -785,11 +797,13 @@ msgstr "L'UE est un prérequis"
 msgid "The link \"%(node)s\" has been updated."
 msgstr "Le lien \"%(node)s\" a été mis à jour."
 
+#, python-format
 msgid ""
 "The parent \"%(parent)s\" has reached the maximum number of children allowed "
 "for the type(s) : \"%(child_types)s\"."
 msgstr ""
-"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de type(s) : \"%(child_types)s\"."
+"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de "
+"type(s) : \"%(child_types)s\"."
 
 #, python-format
 msgid ""
@@ -811,9 +825,9 @@ msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
 
 msgid "The registration form is available at the Secretariat of"
@@ -836,6 +850,9 @@ msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This value is invalid."
+msgstr "Cette valeur semble non valide."
 
 msgid "This version exists until"
 msgstr "Dernière année d'organisation"
@@ -877,8 +894,8 @@ msgstr "Autres informations"
 msgid "Transformation and modification"
 msgstr "Transformation et modification"
 
-msgid "Transition"
-msgstr "Transition"
+msgid "Transition name"
+msgstr "Sigle de la transition"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
@@ -1090,6 +1107,15 @@ msgstr "remarque en anglais"
 
 msgid "secondary domains"
 msgstr "domaines secondaires"
+
+msgid "this group"
+msgstr "ce groupement"
+
+msgid "this mini-training"
+msgstr "cette mini-formation"
+
+msgid "this training"
+msgstr "cette formation"
 
 msgid "training"
 msgstr "formation"

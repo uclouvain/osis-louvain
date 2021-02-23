@@ -1,0 +1,58 @@
+{% load i18n %}
+{% load static bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="modal-content">
+    <form class="form osis-form" method="POST" id="TransitionVersionForm"
+    action="{{ request.path }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4>{% trans 'New transition version' %}</h4>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% bootstrap_field form.transition_name addon_before=training_identity.acronym|add:"["|add:version_name addon_after=']' %}
+                    {% bootstrap_field form.version_title_fr %}
+                    {% bootstrap_field form.version_title_en %}
+                    {% bootstrap_field form.end_year %}
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                {% trans "Cancel" %}
+            </button>
+            <button id="bt_submit_specific_version_form" type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}" value="new_version">
+                {% trans 'Save' %}
+            </button>
+        </div>
+    </form>
+</div>
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/osis-form.js' %}"></script>
+{% endblock %}

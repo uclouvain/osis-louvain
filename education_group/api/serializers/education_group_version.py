@@ -39,7 +39,7 @@ class VersionListSerializer(serializers.ModelSerializer):
             'url',
             'version_name',
             'code',
-            'is_transition'
+            'transition_name'
         )
 
 

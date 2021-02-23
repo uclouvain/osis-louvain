@@ -107,11 +107,13 @@ class TestDissertationSubmissionCalendarGetAcademicSessionEvent(TestCase):
         self.assertEqual(
             academic_session_event,
             AcademicSessionEvent(
+                id=self.academic_calendar.pk,
                 session=1,
                 authorized_target_year=2020,
                 title=self.academic_calendar.title,
                 start_date=self.academic_calendar.start_date,
-                end_date=self.academic_calendar.end_date
+                end_date=self.academic_calendar.end_date,
+                type=self.academic_calendar.reference
             )
         )
 

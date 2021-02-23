@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ class EducationGroupSerializer(serializers.Serializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    main_teaching_campus = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
@@ -63,5 +64,9 @@ class EducationGroupSerializer(serializers.Serializer):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'management_entity'
+            'management_entity',
+            'main_teaching_campus'
         )
+
+    def get_main_teaching_campus(self, obj):
+        return obj.main_teaching_campus.name if obj.main_teaching_campus else '-'

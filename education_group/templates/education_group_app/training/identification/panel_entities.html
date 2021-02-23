@@ -58,7 +58,7 @@
         <div class="row">
             <div id="end_year" class="col-md-12">
                 {% bootstrap_label _("Last year of organization") label_class='d-block'%}
-                {% if current_version.is_standard %}
+                {% if current_version.is_standard and not current_version.is_transition %}
                     <p>{% if training.end_year %}{{ training.end_year|format_to_academic_year }}{% else %}{% trans _("unspecified") %}{% endif %}</p>
                 {% else %}
                     <p>{% if group.end_year %}{{ group.end_year|format_to_academic_year }}{% else %}{% trans _("unspecified") %}{% endif %}</p>

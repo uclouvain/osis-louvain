@@ -23,13 +23,13 @@
 # ############################################################################
 from typing import List
 
-from program_management.ddd.business_types import *
+from education_group.ddd import command as education_group_command
 from education_group.ddd.domain.exception import GroupCopyConsistencyException, TrainingNotFoundException
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import copy_group_service, update_group_service
-from education_group.ddd import command as education_group_command
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.command import CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
@@ -84,7 +84,7 @@ def update_and_postpone_group_version(
                 from_offer_acronym=postpone_cmd.from_offer_acronym,
                 from_year=year,
                 from_version_name=postpone_cmd.from_version_name,
-                from_is_transition=postpone_cmd.from_is_transition,
+                from_transition_name=postpone_cmd.from_transition_name,
                 from_offer_code=postpone_cmd.code
             )
             identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)

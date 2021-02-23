@@ -37,7 +37,7 @@ from education_group.ddd.domain.exception import TrainingNotFoundException, Trai
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -55,7 +55,7 @@ class TestDeleteTrainingGetMethod(TestCase):
                 offer_acronym=cls.training.acronym,
                 year=cls.training.year,
                 version_name="",
-                is_transition=False
+                transition_name=NOT_A_TRANSITION
             ),
             tree=ProgramTreeFactory(root_node=cls.root_node)
         )
@@ -137,7 +137,7 @@ class TestDeleteTrainingPostMethod(TestCase):
                 offer_acronym=cls.training.acronym,
                 year=cls.training.year,
                 version_name="",
-                is_transition=False
+                transition_name=NOT_A_TRANSITION
             ),
             tree=ProgramTreeFactory(root_node=cls.root_node)
         )

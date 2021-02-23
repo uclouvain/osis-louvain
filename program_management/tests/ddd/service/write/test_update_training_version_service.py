@@ -33,7 +33,8 @@ from program_management.tests.ddd.factories.commands.update_training_version_com
 
 class TestUpdateTrainingVersion(TestCase):
 
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch(
+        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
     @mock.patch(
         "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
@@ -53,7 +54,7 @@ class TestUpdateTrainingVersion(TestCase):
             offer_acronym=cmd.offer_acronym,
             year=cmd.year,
             version_name=cmd.version_name,
-            is_transition=cmd.is_transition,
+            transition_name=cmd.transition_name,
         )
         mock_update_tree_version_service.return_value = identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()

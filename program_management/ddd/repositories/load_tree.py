@@ -28,11 +28,9 @@ from typing import List, Dict, Any
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 # Typing
@@ -185,20 +183,6 @@ def __build_children(
         )
         children.append(link_node)
     return children
-
-
-#  TODO :: to remove
-def find_all_versions_academic_year(acronym: str,
-                                    version_name: str,
-                                    is_transition: bool) -> List['EducationGroupVersionAcademicYear']:
-    qs = GroupYear.objects.filter(educationgroupversion__offer__acronym=acronym,
-                                  educationgroupversion__version_name=version_name,
-                                  educationgroupversion__is_transition=is_transition) \
-        .distinct('educationgroupversion__root_group__academic_year')
-    results = []
-    for elem in qs:
-        results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
-    return results
 
 
 def _get_root_ids(child_element_ids: list, link_type: LinkTypes = None) -> List[int]:

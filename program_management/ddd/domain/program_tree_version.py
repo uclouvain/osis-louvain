@@ -23,19 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand
-from program_management.ddd.command import CreateStandardVersionCommand
-from program_management.ddd.domain import exception, academic_year
-from program_management.ddd.domain import program_tree
+from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, \
+    CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
+from program_management.ddd.domain import exception, academic_year, program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
+NOT_A_TRANSITION = ""
+TRANSITION_PREFIX = "TRANSITION"
 
 
 @attr.s(frozen=True, slots=True)
@@ -43,14 +45,34 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default=NOT_A_TRANSITION)
 
-    def is_standard(self):
-        return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
+    @property
+    def is_standard(self) -> bool:
+        return self.version_name == STANDARD or self.version_name is None
+
+    @property
+    def is_official_standard(self) -> bool:
+        return self.is_standard and not self.is_transition
+
+    @property
+    def is_standard_transition(self) -> bool:
+        return self.is_standard and self.is_transition
+
+    @property
+    def is_specific_transition(self) -> bool:
+        return not self.is_standard and self.is_transition
+
+    @property
+    def is_specific_official(self) -> bool:
+        return not self.is_standard and not self.is_transition
+
+    @property
+    def is_transition(self) -> bool:
+        return bool(self.transition_name)
 
 
 class ProgramTreeVersionBuilder:
-
     _tree_version = None
 
     def copy_to_next_year(
@@ -91,7 +113,7 @@ class ProgramTreeVersionBuilder:
             offer_acronym=cmd.offer_acronym,
             year=cmd.start_year,
             version_name=STANDARD,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
         tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.start_year)
         return ProgramTreeVersion(
@@ -104,52 +126,53 @@ class ProgramTreeVersionBuilder:
             title_en=None,
         )
 
-    def create_from_standard_version(
+    def create_from_existing_version(
             self,
-            from_standard_version: 'ProgramTreeVersion',
+            from_existing_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',
-            command: 'CreateProgramTreeVersionCommand',
+            command: Union['CreateProgramTreeSpecificVersionCommand', 'CreateProgramTreeTransitionVersionCommand'],
     ) -> 'ProgramTreeVersion':
-        validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
-            command.start_year,
-            command.offer_acronym,
-            command.version_name
-        )
+        if command.transition_name:
+            validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.start_year,
+                command.offer_acronym,
+                command.version_name,
+                command.transition_name
+            )
+        else:
+            validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
+                command.start_year,
+                command.offer_acronym,
+                command.version_name,
+                command.transition_name
+            )
         if validator.is_valid():
-            assert isinstance(from_standard_version, ProgramTreeVersion)
-            assert from_standard_version.is_standard, "Forbidden to copy from a non Standard version"
-            if from_standard_version.is_transition:
-                self._tree_version = self._build_from_transition(from_standard_version, command)
-            else:
-                self._tree_version = self._build_from_standard(
-                    from_standard_version,
-                    new_tree_identity,
-                    command,
-                )
+            assert isinstance(from_existing_version, ProgramTreeVersion)
+            assert not from_existing_version.is_transition, "Forbidden to create a version from a transition"
+            assert not (from_existing_version.version_name and command.version_name and not command.transition_name), \
+                "Forbidden to create a specific version from an other specific version"
+            self._tree_version = self._build_from_existing(
+                from_existing_version,
+                new_tree_identity,
+                command,
+            )
             return self.program_tree_version
 
     @property
     def program_tree_version(self):
         return self._tree_version
 
-    def _build_from_transition(
-            self,
-            from_tree_version: 'ProgramTreeVersion',
-            command: 'CreateProgramTreeVersionCommand'
-    ) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-    def _build_from_standard(
+    def _build_from_existing(
             self,
             from_tree_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',
-            command: 'CreateProgramTreeVersionCommand',
+            command: Union['CreateProgramTreeSpecificVersionCommand', 'CreateProgramTreeTransitionVersionCommand'],
     ) -> 'ProgramTreeVersion':
         tree_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=from_tree_version.entity_id.offer_acronym,
             version_name=command.version_name,
             year=from_tree_version.entity_id.year,
-            is_transition=command.is_transition
+            transition_name=command.transition_name
         )
         return ProgramTreeVersion(
             program_tree_identity=new_tree_identity,
@@ -173,11 +196,11 @@ class UpdateProgramTreeVersiongData:
 # FIXME :: should be in a separate DDD domain
 @attr.s(slots=True)
 class ProgramTreeVersion(interface.RootEntity):
-
     entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
     program_tree_identity = attr.ib(type='ProgramTreeIdentity')
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
     start_year = attr.ib(type=int)
+    transition_name = attr.ib(type=str)
     version_name = attr.ib(type=str)
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
@@ -191,7 +214,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_standard(self):
-        return self.entity_id.version_name == STANDARD
+        return self.entity_id.is_standard
 
     @property
     def end_year(self):
@@ -201,22 +224,28 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_transition(self) -> bool:
         return self.entity_id.is_transition
 
+    @transition_name.default
+    def _transition_name(self) -> str:
+        return self.entity_id.transition_name
+
     @version_name.default
     def _version_name(self) -> str:
         return self.entity_id.version_name
 
     @property
-    def is_standard_version(self) -> bool:
-        return self.entity_id.version_name == STANDARD and not self.entity_id.is_transition
+    def is_official_standard(self) -> bool:
+        return self.entity_id.is_official_standard
 
+    # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
     @property
-    def version_label(self):  # TODO :: to remove
-        if self.is_standard:
-            return '[Transition]' if self.is_transition else ''
-        else:
-            return '[{}-Transition]'.format(
-                self.version_name
-            ) if self.is_transition else '[{}]'.format(self.version_name)
+    def version_label(self):
+        if self.entity_id.is_official_standard:
+            return ''
+        elif self.entity_id.is_standard_transition:
+            return '[{}]'.format(self.transition_name)
+        elif self.entity_id.is_specific_official:
+            return '[{}]'.format(self.version_name)
+        return '[{}-{}]'.format(self.version_name, self.transition_name)
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)

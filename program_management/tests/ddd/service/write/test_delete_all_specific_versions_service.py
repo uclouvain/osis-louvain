@@ -31,6 +31,7 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd import command
 from program_management.ddd.domain import program_tree_version, exception
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_all_specific_versions_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     MandatoryRelationshipObjectFactory
@@ -48,7 +49,7 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
         cls.cmd = command.DeletePermanentlyTreeVersionCommand(
             acronym="ROOT",
             version_name="VERSION",
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
 
     def setUp(self) -> None:

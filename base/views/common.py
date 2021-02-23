@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,12 +35,20 @@ from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 
 from base import models as mdl
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
 from osis_common.models import application_notice
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeIdentity, build_title
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
+
+MSG_SPECIAL_WARNING_LEVEL = 50
+MSG_SPECIAL_WARNING_TITLE_LEVEL = 60
 
 ITEMS_PER_PAGE = 25
 
@@ -270,3 +278,47 @@ def add_to_session(request, session_key, value):
 def show_error_message_for_form_invalid(request):
     msg = _("Error(s) in form: The modifications are not saved")
     display_error_messages(request, msg)
+
+
+def check_formations_impacted_by_update(code: str, year: int, request, type_of_training):
+    formations_using_element = _find_root_trainings_using_element(code, year)
+    if len(formations_using_element) > 1:
+        message_str = _build_attention_message(type_of_training)
+        messages.add_message(request,
+                             MSG_SPECIAL_WARNING_TITLE_LEVEL,
+                             message_str
+                             )
+
+        for formation in formations_using_element:
+            messages.add_message(request, MSG_SPECIAL_WARNING_LEVEL, formation)
+
+
+def _find_root_trainings_using_element(code: str, year: int) -> List['str']:
+    node_identity = NodeIdentity(code=code, year=year)
+    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+    formations_using_element = set()
+    for direct_link in direct_parents:
+        if direct_link.get('indirect_parents') == [] and (
+                direct_link['link'].parent.is_training() or
+                direct_link['link'].parent.is_mini_training()
+        ):
+            formations_using_element.add("{}{}".format(direct_link['link'].parent.full_acronym(),
+                                                       build_title(direct_link['link'].parent, get_language())))
+        else:
+            for indirect_parent in direct_link.get('indirect_parents'):
+                formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
+                                                           build_title(indirect_parent.get('node'), get_language())))
+    return list(sorted(formations_using_element))
+
+
+def _build_attention_message(training_type):
+    if training_type:
+        if training_type in TrainingType:
+            type_of_training_str = _('this training')
+        elif training_type in MiniTrainingType:
+            type_of_training_str = _('this mini-training')
+        else:
+            type_of_training_str = _('this group')
+        return "{} {} {} :".format(_('Pay attention'), type_of_training_str, _('is part of several trainings'))
+
+    return _('Pay attention! This learning unit is used in more than one formation')

@@ -26,6 +26,8 @@
 from django.utils.translation import gettext_lazy as _
 
 # TYPES_CATEGORIES
+from base.models.utils.utils import ChoiceEnum
+
 ACADEMIC_CATEGORY = "ACADEMIC"
 
 # ACADEMIC_CALENDAR_TYPES
@@ -74,6 +76,31 @@ ACADEMIC_CALENDAR_TYPES = (
     (MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS,
      _("Modification or transformation proposal by faculty managers")),
 )
+
+
+class AcademicCalendarTypes(ChoiceEnum):
+    DELIBERATION = _("Deliberation")
+    DISSERTATION_SUBMISSION = _("Dissertation submission")
+    EXAM_ENROLLMENTS = _("Exam enrollments")
+    SCORES_EXAM_DIFFUSION = _("Scores diffusion")
+    SCORES_EXAM_SUBMISSION = _("Scores exam submission")
+    TEACHING_CHARGE_APPLICATION = _("Application for vacant courses")
+    COURSE_ENROLLMENT = _("Course enrollment")
+    SUMMARY_COURSE_SUBMISSION = _("Summary course submission")
+    SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE = _("Summary course submission force majeure")
+    EDUCATION_GROUP_SWITCH = _("Education group switch")
+    EDUCATION_GROUP_EDITION = _("Education group edition")
+    EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT = _("Education group extended daily management")
+    EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = _("Education group limited daily management")
+    LEARNING_UNIT_EDITION_CENTRAL_MANAGERS = _("Learning unit edition by central managers")
+    LEARNING_UNIT_EDITION_FACULTY_MANAGERS = _("Learning unit edition by faculty managers")
+    CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS = _("Creation or end date proposal by central managers")
+    CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS = _("Creation or end date proposal by faculty managers")
+    MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS = \
+        _("Modification or transformation proposal by central managers")
+    MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS = \
+        _("Modification or transformation proposal by faculty managers")
+
 
 CALENDAR_TYPES_COLORS = {
     DELIBERATION: '#d9534f',

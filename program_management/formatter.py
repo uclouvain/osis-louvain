@@ -52,12 +52,19 @@ def format_program_tree_complete_title(program_tree_version: 'ProgramTreeVersion
                                        language: str) -> str:
     try:
         node = program_tree_version.get_tree().root_node
+        version_name = node.version_name
+        transition_name = program_tree_version.transition_name
+
+        if version_name:
+            version_transition_name = '[{}{}]'.format(version_name,
+                                                      '-{}'.format(transition_name) if transition_name else '')
+        else:
+            version_transition_name = '[{}]'.format(transition_name) if transition_name else ''
+
         return "%(offer_acronym)s%(version_name)s%(title)s" % {
             'offer_acronym': node.title,
-            'version_name': "[{}{}]".format(
-                node.version_name,
-                '-Transition' if program_tree_version.is_transition else '') if node.version_name else '',
+            'version_name': version_transition_name,
             'title': build_title(node, language),
-            }
+        }
     except ProgramTreeNotFoundException:
         raise Http404

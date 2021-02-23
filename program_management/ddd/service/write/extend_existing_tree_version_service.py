@@ -30,8 +30,8 @@ from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, postpone_program_tree_service, \
-    update_program_tree_version_service
+from program_management.ddd.service.write import postpone_tree_specific_version_service, \
+    postpone_program_tree_service, update_program_tree_version_service
 
 
 def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
@@ -40,7 +40,7 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
         offer_acronym=command.offer_acronym,
         year=command.year,
         version_name=command.version_name,
-        is_transition=command.is_transition,
+        transition_name=command.transition_name,
     )
     last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
 
@@ -50,7 +50,7 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
             offer_acronym=last_existing_tree_version.entity_identity.offer_acronym,
             version_name=last_existing_tree_version.entity_identity.version_name,
             year=last_existing_tree_version.entity_identity.year,
-            is_transition=last_existing_tree_version.entity_identity.is_transition,
+            transition_name=last_existing_tree_version.entity_identity.transition_name,
             title_en=last_existing_tree_version.title_en,
             title_fr=last_existing_tree_version.title_fr,
         )
@@ -64,11 +64,11 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
         )
     )
 
-    created_identities = postpone_tree_version_service.postpone_program_tree_version(
+    created_identities = postpone_tree_specific_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=identity.offer_acronym,
             from_year=identity.year,
-            from_is_transition=identity.is_transition,
+            from_transition_name=identity.transition_name,
             from_version_name=identity.version_name,
             from_code=GroupIdentitySearch().get_from_tree_version_identity(identity).code
         )

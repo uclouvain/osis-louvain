@@ -28,12 +28,13 @@ import json
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.organization_type import ACADEMIC_PARTNER, EMBASSY
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.autocomplete import EmployeeAutocomplete
 from reference.tests.factories.country import CountryFactory
 
@@ -260,6 +261,42 @@ class TestPersonAutoComplete(TestCase):
             EmployeeAutocomplete().get_result_label(self.henry),
             "ARKIN Henry"
         )
+
+
+class TestAcademicCalendarTypeAutocomplete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse("academic_calendar_type_autocomplete")
+
+    def setUp(self):
+        self.client.force_login(user=self.user)
+
+    def test_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_case_not_filtering_assert_all_result_provided(self):
+        response = self.client.get(self.url)
+
+        expected_results = [{'id': id, 'text': value} for id, value in AcademicCalendarTypes.choices()]
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, expected_results)
+
+    def test_case_filtering_assert_result_return_only_filtered_element(self):
+        response = self.client.get(self.url, data={'q': str(AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.value)})
+
+        expected_results = [
+            {
+                'id': AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name,
+                'text': AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.value
+            }
+        ]
+        self.assertEqual(response.status_code, 200)
+        results = _get_results_from_autocomplete_response(response)
+        self.assertListEqual(results, expected_results)
 
 
 def _get_results_from_autocomplete_response(response):

@@ -54,7 +54,7 @@ class TrainingReadIdentification(TrainingRead):
         }
 
     def get_fields_in_warning(self) -> List[str]:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             try:
                 cmd = GetTrainingEmptyFieldsOnWarningCommand(acronym=self.training.acronym, year=self.training.year)
                 check_training_empty_fields_on_warning(cmd)

@@ -28,24 +28,26 @@ from typing import List
 from django.db.models import F
 
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class ProgramTreeIdentitiesSearch(interface.DomainService):
 
     @classmethod
-    def search(cls, acronym: str, version_name: str, is_transition: bool = False) -> List[ProgramTreeVersionIdentity]:
+    def search(
+            cls, acronym: str, version_name: str, transition_name: str = NOT_A_TRANSITION
+    ) -> List[ProgramTreeVersionIdentity]:
         values = EducationGroupVersion.objects.filter(
             version_name=version_name,
             offer__acronym=acronym,
-            is_transition=is_transition,
+            transition_name=transition_name,
         ).annotate(
             year=F('offer__academic_year__year'),
         ).values(
             'version_name',
             'offer__acronym',
-            'is_transition',
+            'transition_name',
             'year',
         )
         if values:
@@ -54,7 +56,7 @@ class ProgramTreeIdentitiesSearch(interface.DomainService):
                     version_name=value['version_name'],
                     offer_acronym=value['offer__acronym'],
                     year=value['year'],
-                    is_transition=value['is_transition'],
+                    transition_name=value['transition_name'],
                 )
                 for value in values
             ]

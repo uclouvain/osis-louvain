@@ -37,7 +37,7 @@ def update_program_tree_version_end_date(
         offer_acronym=update_cmd.from_offer_acronym,
         year=update_cmd.from_year,
         version_name=update_cmd.from_version_name,
-        is_transition=update_cmd.from_is_transition,
+        transition_name=update_cmd.from_transition_name,
     )
     tree_version = tree_version_repository.ProgramTreeVersionRepository().get(entity_id=identity)
 
@@ -47,7 +47,7 @@ def update_program_tree_version_end_date(
             offer_acronym=update_cmd.from_offer_acronym,
             version_name=update_cmd.from_version_name,
             year=update_cmd.from_year,
-            is_transition=update_cmd.from_is_transition,
+            transition_name=update_cmd.from_transition_name,
             title_en=tree_version.title_en,
             title_fr=tree_version.title_fr
         )

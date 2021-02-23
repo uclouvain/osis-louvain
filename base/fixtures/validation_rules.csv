@@ -651,7 +651,7 @@ base.validationrule,TrainingForm.AGGREGATION.title_fr,REQUIRED,Agrégation de l'
 base.validationrule,TrainingForm.CERTIFICATE_OF_PARTICIPATION.title_fr,REQUIRED,Attestation de participation : ,^(Attestation de participation : )(.+)$,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_SUCCESS.title_fr,REQUIRED,Attestation de réussite : ,^(Attestation de réussite : )(.+)$,,,,
 base.validationrule,TrainingForm.CERTIFICATE_OF_HOLDING_CREDITS.title_fr,REQUIRED,Attestation d'obtention de crédits : ,^(Attestation d'obtention de crédits : )(.+)$,,,,
-base.validationrule,TrainingForm.BACHELOR.title_fr,REQUIRED,Bachelier en ,^(Bachelier en )(.+)$,,,,
+base.validationrule,TrainingForm.BACHELOR.title_fr,REQUIRED,Bachelier en ,^(Bachelier )(.+)$,,,,
 base.validationrule,TrainingForm.CAPAES.title_fr,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
 base.validationrule,TrainingForm.CERTIFICATE.title_fr,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
 base.validationrule,TrainingForm.RESEARCH_CERTIFICATE.title_fr,REQUIRED,Certificat de recherche en ,^(Certificat de recherche )(.+)$,,,,

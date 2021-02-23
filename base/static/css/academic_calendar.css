@@ -1,0 +1,57 @@
+.gantt_task_line {
+    border: 0!important;
+}
+.gantt_task_line.TEACHING_CHARGE_APPLICATION{
+    background-color: #0a6aa1;
+}
+.gantt_task_line.DELIBERATION {
+    background-color: #00bfbf;
+}
+.gantt_task_line.DISSERTATION_SUBMISSION {
+    background-color: #EAB543;
+}
+.gantt_task_line.EXAM_ENROLLMENTS {
+    background-color: #00bf00;
+}
+.gantt_task_line.SCORES_EXAM_DIFFUSION {
+    background-color: #1b6d85;
+}
+.gantt_task_line.SCORES_EXAM_SUBMISSION {
+    background-color: #0e2d7d;
+}
+.gantt_task_line.COURSE_ENROLLMENT {
+    background-color: #ff9f1a;
+}
+.gantt_task_line.SUMMARY_COURSE_SUBMISSION {
+    background-color: #2b542c;
+}
+.gantt_task_line.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE {
+    background-color: #6e2a7a;
+}
+.gantt_task_line.EDUCATION_GROUP_SWITCH {
+    background-color: #7d7d7d;
+}
+.gantt_task_line.EDUCATION_GROUP_EDITION {
+    background-color: #600000;
+}
+.gantt_task_line.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT {
+    background-color: #FEA47F;
+}
+.gantt_task_line.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT {
+    background-color: #D6A2E8;
+}
+.gantt_task_line.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS {
+    background-color: #BDC581;
+}
+.gantt_task_line.LEARNING_UNIT_EDITION_FACULTY_MANAGERS {
+    background-color: #FC427B;
+}
+.gantt_task_line.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS{
+    background-color: #2C3A47;
+}
+.gantt_task_line.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS {
+    background-color: #EAB543;
+}
+.gantt_task_line.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS {
+    background-color: #CAD3C8;
+}

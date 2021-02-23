@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 08:40+0100\n"
+"POT-Creation-Date: 2021-02-18 14:25+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -89,6 +89,9 @@ msgid ""
 msgstr ""
 "%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
+
+msgid "%(title)s has been updated"
+msgstr "%(title)s a été modifié(e)"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -324,9 +327,6 @@ msgstr ""
 msgid "Are you sure you want to delete the achievement?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
 
-msgid "Are you sure you want to delete the event"
-msgstr "Êtes-vous sûr·e de vouloir supprimer l'événement"
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 
@@ -347,9 +347,6 @@ msgstr "Aménagement Local spécifique"
 
 msgid "Artist"
 msgstr "Artiste"
-
-msgid "As displayed on the home page"
-msgstr "Comme présenté sur la page d'accueil"
 
 msgid "Assistants"
 msgstr "Assistants"
@@ -592,6 +589,9 @@ msgstr "Créer"
 
 msgid "Create specific version"
 msgstr "Créer une version particulière"
+
+msgid "Create transition version"
+msgstr "Créer une version de transition"
 
 msgid "Creation"
 msgstr "Création"
@@ -897,9 +897,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr "Évaluations"
 
-msgid "Event"
-msgstr "Événement"
-
 msgid "Exam board secretary"
 msgstr "Secrétaire du jury"
 
@@ -1068,9 +1065,6 @@ msgstr "Liste des UE qui ont des prérequis"
 msgid "Global ID"
 msgstr "Matricule FGS"
 
-msgid "Go"
-msgstr "Continuer"
-
 msgctxt "carousel"
 msgid "Go"
 msgstr "Accéder"
@@ -1092,15 +1086,6 @@ msgstr "Aide"
 
 msgid "High Level Promising athlete"
 msgstr "ESHN"
-
-msgid "Highlight description"
-msgstr "Description de l'événement"
-
-msgid "Highlight shortcut"
-msgstr "Titre raccourci de l'événement"
-
-msgid "Highlight title"
-msgstr "Titre de l'événement"
 
 msgid "Home"
 msgstr "Page d'accueil"
@@ -1820,9 +1805,12 @@ msgstr "Partenariats"
 msgid "Password"
 msgstr "Mot de passe"
 
+msgid "Pay attention"
+msgstr "Attention"
+
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
-"Attention cette unité d'enseignement fait partie de plusieurs formations:"
+"Attention cette unité d'enseignement fait partie de plusieurs formations :"
 
 msgid "Pending"
 msgstr "En attente"
@@ -2279,14 +2267,8 @@ msgstr "Année académique de début"
 msgid "Start date"
 msgstr "Date de début"
 
-msgid "Start date and end date are mandatory"
-msgstr "Les dates de début et de fin sont obligatoires"
-
 msgid "Start date is mandatory"
 msgstr "La date de début est obligatoire"
-
-msgid "Start date must be lower than end date"
-msgstr "La date de début doit être inférieure à la date de fin"
 
 msgid "State"
 msgstr "État"
@@ -2382,14 +2364,6 @@ msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
-#, python-format
-msgid ""
-"The closure's date of '%s' of the academic calendar can't be lower than %s "
-"(end date of '%s' of the program '%s')"
-msgstr ""
-"La date de fermeture de '%s' du calendrier académique ne peut pas être "
-"inférieure au %s (date de fin de '%s' du programme '%s')"
-
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
@@ -2415,10 +2389,6 @@ msgstr ""
 #, python-format
 msgid "The entity '%(acronym)s' doesn't exist anymore in %(year)s"
 msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
-
-#, python-format
-msgid "The event \"%(event)s\" has been deleted successfully"
-msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
@@ -2708,6 +2678,9 @@ msgstr "Intitulé compl. spéc. à l'UE"
 msgid "To complete"
 msgstr "A compléter"
 
+msgid "Today"
+msgstr "Aujourd'hui"
+
 msgid "Total"
 msgstr "Total"
 
@@ -2746,9 +2719,6 @@ msgstr "Enseignant·e·s"
 
 msgid "Type"
 msgstr "Type"
-
-msgid "Type of event"
-msgstr "Type d'événement"
 
 msgid "Type of training"
 msgstr "Type de formation"
@@ -2791,11 +2761,11 @@ msgstr "Certificat d’université 1er cycle"
 msgid "University second cycle certificate"
 msgstr "Certificat d’université 2ème cycle"
 
-msgid "Unscheduled events"
-msgstr "Événements non planifiés"
-
 msgid "Up"
 msgstr "Haut"
+
+msgid "Update"
+msgstr "Mise à jour"
 
 msgid "Update for teacher locked"
 msgstr "Mise-à-jour bloquée pour l'enseignant"
@@ -2888,9 +2858,6 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr "Accueil"
 
-msgid "Year of concerned data"
-msgstr "Anac des données impactées"
-
 msgid "Yes"
 msgstr "Oui"
 
@@ -2980,9 +2947,6 @@ msgstr ""
 "au moins une valeur de volume du partim est supérieure à la valeur du volume "
 "correspondant de l'UE complète"
 
-msgid "academic events"
-msgstr "événements académiques"
-
 msgid "acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3039,17 +3003,8 @@ msgstr "commentaire (interne)"
 msgid "credits"
 msgstr "crédits"
 
-msgid "date_format"
-msgstr "%d/%m/%Y"
-
 msgid "date_format_string"
 msgstr "d/m/Y"
-
-msgid "day"
-msgstr "jour"
-
-msgid "days"
-msgstr "jours"
 
 msgid "delete"
 msgstr "supprimer"
@@ -3086,9 +3041,6 @@ msgstr "niveau fac."
 msgid "field reference"
 msgstr "référence de champ"
 
-msgid "format_date"
-msgstr "jj/mm/aaaa"
-
 msgid "french help text"
 msgstr "texte d'aide en français"
 
@@ -3103,6 +3055,9 @@ msgstr "volume horaire total annuel"
 
 msgid "initial value"
 msgstr "valeur initiale"
+
+msgid "is part of several trainings"
+msgstr "fait partie de plusieurs formations"
 
 msgid "items per page"
 msgstr "éléments par page"
@@ -3229,6 +3184,15 @@ msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
+
+msgid "this group"
+msgstr "ce groupement"
+
+msgid "this mini-training"
+msgstr "cette mini-formation"
+
+msgid "this training"
+msgstr "cette formation"
 
 msgid "to"
 msgstr "à"

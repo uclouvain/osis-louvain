@@ -39,12 +39,12 @@ class GetLastExistingVersion(interface.DomainService):
             cls,
             version_name: str,
             offer_acronym: str,
-            is_transition: bool = False,
+            transition_name: str,
     ) -> Union[ProgramTreeVersionIdentity, None]:
         group_version = EducationGroupVersion.objects.filter(
             version_name=version_name,
             root_group__acronym=offer_acronym,
-            is_transition=is_transition,
+            transition_name=transition_name,
         ).annotate(
             year=F('offer__academic_year__year'),
             offer_acronym=F('offer__acronym'),
@@ -52,7 +52,7 @@ class GetLastExistingVersion(interface.DomainService):
             'version_name',
             'year',
             'offer_acronym',
-            'is_transition',
+            'transition_name',
         ).order_by(
             'offer__academic_year__year'
         ).last()
@@ -64,5 +64,5 @@ class GetLastExistingVersion(interface.DomainService):
             offer_acronym=group_version['offer_acronym'],
             year=group_version['year'],
             version_name=group_version['version_name'],
-            is_transition=group_version['is_transition'],
+            transition_name=group_version['transition_name'],
         )

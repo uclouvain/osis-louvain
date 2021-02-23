@@ -32,8 +32,9 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
-NodeCode = str
+TRANSITION_FIRST_LETTER = "T"
 
+NodeCode = str
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
 REGEX_COMMON_PARTIAL_ACRONYM = r"^(?P<sigle_ele>common(-\d[a-z]{1,2})?)$"
@@ -45,13 +46,23 @@ WIDTH_CNUM = 3
 class GenerateNodeCode(interface.DomainService):
 
     @classmethod
-    def generate_from_parent_node(cls, parent_node: 'Node', child_node_type: EducationGroupTypesEnum) -> NodeCode:
+    def generate_from_parent_node(
+            cls,
+            parent_node: 'Node',
+            child_node_type: EducationGroupTypesEnum,
+            duplicate_to_transition: bool
+    ) -> NodeCode:
+        code = TRANSITION_FIRST_LETTER + parent_node.code[1:] if duplicate_to_transition else parent_node.code
+        return cls.__generate_node_code(code=code, child_node_type=child_node_type)
+
+    @classmethod
+    def __generate_node_code(cls, code: str, child_node_type: EducationGroupTypesEnum) -> NodeCode:
         reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
         reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
         # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.
-        if not parent_node.code:
+        if not code:
             return ""
-        match_result = reg_parent_code.search(parent_node.code) or reg_common_partial_acronym.search(parent_node.code)
+        match_result = reg_parent_code.search(code) or reg_common_partial_acronym.search(code)
         sigle_ele = match_result.group("sigle_ele")
 
         reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-02-18 15:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,6 +124,10 @@ msgid "Admission exam"
 msgstr ""
 
 msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -320,6 +324,9 @@ msgstr ""
 msgid "Invalid name version"
 msgstr ""
 
+msgid "Invalid transition name"
+msgstr ""
+
 msgid "Invalid tree path"
 msgstr ""
 
@@ -475,6 +482,9 @@ msgid "New specific version"
 msgstr ""
 
 msgid "New training"
+msgstr ""
+
+msgid "New transition version"
 msgstr ""
 
 msgid "No"
@@ -760,7 +770,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -778,6 +788,9 @@ msgid ""
 msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
+msgstr ""
+
+msgid "This value is invalid"
 msgstr ""
 
 msgid "This version exists until"
@@ -816,7 +829,7 @@ msgstr ""
 msgid "Transformation and modification"
 msgstr ""
 
-msgid "Transition"
+msgid "Transition name"
 msgstr ""
 
 msgid "Tutors"
@@ -1013,6 +1026,15 @@ msgid "remark in english"
 msgstr ""
 
 msgid "secondary domains"
+msgstr ""
+
+msgid "this group"
+msgstr ""
+
+msgid "this mini-training"
+msgstr ""
+
+msgid "this training"
 msgstr ""
 
 msgid "training"

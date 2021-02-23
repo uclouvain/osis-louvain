@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,12 +30,10 @@ from base.ddd.utils.business_validator import BusinessListValidator, MultipleExc
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.validators._end_date_between_finalities_and_masters import \
-    CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
-    AuthorizedRelationshipLearningUnitValidator, PasteAuthorizedRelationshipValidator, \
-    DetachAuthorizedRelationshipValidator, UpdateLinkAuthorizedRelationshipValidator
+    AuthorizedRelationshipLearningUnitValidator, DetachAuthorizedRelationshipValidator, \
+    UpdateLinkAuthorizedRelationshipValidator
 from program_management.ddd.validators._authorized_relationship_for_all_trees import \
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
@@ -46,8 +44,9 @@ from program_management.ddd.validators._delete_check_versions_end_date import Ch
 from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
-from program_management.ddd.validators._has_or_is_prerequisite import _IsPrerequisiteValidator, \
-    IsHasPrerequisiteForAllTreesValidator
+from program_management.ddd.validators._end_date_between_finalities_and_masters import \
+    CheckEndDateBetweenFinalitiesAndMasters2M
+from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -56,6 +55,8 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
+from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator, \
+    FullTransitionNamePatternValidator
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
@@ -266,18 +267,35 @@ class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidat
 
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
-    def __init__(self, year: int, offer_acronym: str, version_name: str):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
-            VersionNameExistsValidator(year, offer_acronym, version_name),
+            VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
+        ]
+        super().__init__()
+
+
+class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
+        self.validators = [
+            VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
+            FullTransitionNamePatternValidator(transition_name=transition_name)
         ]
         super().__init__()
 
 
 class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNamePatternValidator(version_name),
-            VersionNameExistsValidator(year, offer_acronym, version_name),
-            VersionNameExistedValidator(year, offer_acronym, version_name),
+            VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
+            VersionNameExistedValidator(year, offer_acronym, version_name, transition_name),
+        ]
+        super().__init__()
+
+
+class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, transition_name: str):
+        self.validators = [
+            TransitionNamePatternValidator(transition_name=transition_name)
         ]
         super().__init__()

@@ -28,7 +28,7 @@ from django.db import transaction
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
-from program_management.ddd.service.write import delete_program_tree_service, delete_specific_version_service
+from program_management.ddd.service.write import delete_specific_version_service
 
 
 @transaction.atomic()
@@ -39,7 +39,7 @@ def delete_permanently_tree_version(
     tree_versions_to_delete = program_tree_version_repository.ProgramTreeVersionRepository().search(
         version_name=cmd.version_name,
         offer_acronym=cmd.acronym,
-        is_transition=cmd.is_transition,
+        transition_name=cmd.transition_name,
     )
     tree_versions_identities = []
     for tree_version in tree_versions_to_delete:
@@ -55,6 +55,6 @@ def _call_delete_specific_version_service(tree_version: 'ProgramTreeVersion') ->
             acronym=tree_version.entity_identity.offer_acronym,
             year=tree_version.entity_identity.year,
             version_name=tree_version.entity_identity.version_name,
-            is_transition=tree_version.entity_identity.is_transition,
+            transition_name=tree_version.entity_identity.transition_name,
         )
     )

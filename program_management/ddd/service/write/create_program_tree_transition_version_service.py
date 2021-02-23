@@ -23,39 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
-    DuplicateProgramTree, PostponeProgramTreeCommand
+from program_management.ddd.command import CreateProgramTreeTransitionVersionCommand, DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
-    STANDARD
+    NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_version_service, duplicate_program_tree_service, \
-    postpone_program_tree_service, create_program_tree_version_service
+from program_management.ddd.service.write import duplicate_program_tree_service
 
 
-def create_and_postpone(
-        command: 'CreateProgramTreeVersionCommand',
-) -> List[ProgramTreeVersionIdentity]:
+def create_program_tree_transition_version(
+        command: 'CreateProgramTreeTransitionVersionCommand'
+) -> ProgramTreeVersionIdentity:
 
-    identity = create_program_tree_version_service.create_program_tree_version(command)
-    tree_version = ProgramTreeVersionRepository().get(identity)
+    # GIVEN
+    tree_version_identity_from = ProgramTreeVersionIdentity(
+        offer_acronym=command.offer_acronym,
+        year=command.start_year,
+        version_name=command.version_name,
+        transition_name=NOT_A_TRANSITION
+    )
+    program_tree_version_from = ProgramTreeVersionRepository().get(entity_id=tree_version_identity_from)
 
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=tree_version.program_tree_identity.code,
-            from_year=tree_version.program_tree_identity.year,
-            offer_acronym=identity.offer_acronym,
+    # WHEN
+    new_program_tree_identity = duplicate_program_tree_service.create_and_fill_from_existing_tree(
+        DuplicateProgramTree(
+            from_root_code=program_tree_version_from.program_tree_identity.code,
+            from_root_year=program_tree_version_from.program_tree_identity.year,
+            duplicate_to_transition=command.transition_name,
+            override_end_year_to=command.end_year,
+            override_start_year_to=command.start_year,
         )
     )
-
-    created_identities = postpone_tree_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=identity.offer_acronym,
-            from_year=identity.year,
-            from_is_transition=identity.is_transition,
-            from_version_name=identity.version_name,
-        )
+    new_program_tree_version = ProgramTreeVersionBuilder().create_from_existing_version(
+        program_tree_version_from,
+        new_program_tree_identity,
+        command,
     )
 
-    return [identity] + created_identities
+    # THEN
+    identity = ProgramTreeVersionRepository.create(
+        program_tree_version=new_program_tree_version,
+    )
+
+    return identity

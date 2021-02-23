@@ -32,6 +32,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.program_tree_version import TRANSITION_PREFIX
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
@@ -75,6 +76,8 @@ class TestEducationGroupVersionModel(TestCase):
     def test_unique(self):
         particular_version = ParticularTransitionEducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1)
         with self.assertRaises(IntegrityError):
-            ParticularTransitionEducationGroupVersionFactory\
-                ._get_manager(EducationGroupVersion)\
-                .create(version_name=particular_version.version_name, is_transition=True, offer=self.offer_1)
+            ParticularTransitionEducationGroupVersionFactory._get_manager(EducationGroupVersion).create(
+                version_name=particular_version.version_name,
+                transition_name=TRANSITION_PREFIX,
+                offer=self.offer_1
+            )

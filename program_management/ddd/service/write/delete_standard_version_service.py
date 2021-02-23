@@ -24,7 +24,7 @@
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_specific_version_service
 
 
@@ -35,6 +35,6 @@ def delete_standard_version(cmd: command.DeleteStandardVersionCommand) -> Progra
             acronym=cmd.acronym,
             year=cmd.year,
             version_name=STANDARD,
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
     )

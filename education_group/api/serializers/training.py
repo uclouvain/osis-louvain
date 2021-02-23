@@ -34,6 +34,7 @@ from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
 from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from reference.models.language import Language
 
 
@@ -252,7 +253,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
         )
 
     def get_versions(self, version):
-        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        versions = version.offer.educationgroupversion_set.filter(transition_name=NOT_A_TRANSITION)
         return TrainingVersionListSerializer(versions, many=True, context=self.context).data
 
     def to_representation(self, obj):

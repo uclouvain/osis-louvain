@@ -38,7 +38,7 @@ class TestGenerateCodeFromParentNode(TestCase):
     def test_should_return_empty_string_when_parent_has_no_code(self):
         parent_node = NodeGroupYearFactory(code="")
         child_node_type = TrainingType.BACHELOR
-        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type, False)
         self.assertEqual("", result)
 
     @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
@@ -49,7 +49,7 @@ class TestGenerateCodeFromParentNode(TestCase):
         parent_node = NodeGroupYearFactory(code="LDROI100B")
         child_node_type = MiniTrainingType.DEEPENING
 
-        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type, False)
         self.assertEqual("LDROI200E", result)
 
     @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
@@ -61,5 +61,5 @@ class TestGenerateCodeFromParentNode(TestCase):
         parent_node = NodeGroupYearFactory(code="LDROI100B")
         child_node_type = MiniTrainingType.DEEPENING
 
-        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type)
+        result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type, False)
         self.assertEqual("LDROI201E", result)

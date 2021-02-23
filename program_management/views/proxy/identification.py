@@ -1,7 +1,6 @@
-from typing import List
-
-from urllib.parse import parse_qs
 from distutils.util import strtobool
+from typing import List
+from urllib.parse import parse_qs
 
 from django.urls import reverse
 from django.views.generic import RedirectView
@@ -9,8 +8,8 @@ from django.views.generic import RedirectView
 from education_group.views.proxy.read import SUFFIX_IDENTIFICATION, get_group_available_tabs, \
     get_mini_training_available_tabs, get_training_available_tabs
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
@@ -28,7 +27,7 @@ class IdentificationRedirectView(RedirectView):
                 root_node.entity_id))
             url_name = "training_{}".format(
                 get_url_name_suffix_from_referer(self.request.META.get('HTTP_REFERER'),
-                                                 get_training_available_tabs(version.is_standard_version),
+                                                 get_training_available_tabs(version.is_official_standard),
                                                  keep_tab)
             )
             url_kwargs = {'year': root_node.year, 'code': root_node.code}

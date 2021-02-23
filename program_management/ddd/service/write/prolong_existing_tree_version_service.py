@@ -32,7 +32,7 @@ from program_management.ddd.command import PostponeProgramTreeVersionCommand, Ex
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.service.write import extend_existing_tree_version_service, \
-    update_program_tree_version_service, postpone_tree_version_service
+    update_program_tree_version_service, postpone_tree_specific_version_service
 
 
 @transaction.atomic()
@@ -45,7 +45,7 @@ def prolong_existing_tree_version(
     update_program_tree_version_service.update_program_tree_version(
         __convert_to_update_command(command)
     )
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_specific_version_service.postpone_program_tree_version(
         __convert_to_postpone_command(command)
     )
     return identities
@@ -57,7 +57,7 @@ def __convert_to_extend_command(command: ProlongExistingProgramTreeVersionComman
         offer_acronym=command.offer_acronym,
         version_name=command.version_name,
         year=command.updated_year,
-        is_transition=command.is_transition
+        transition_name=command.transition_name
     )
 
 
@@ -66,7 +66,7 @@ def __convert_to_update_command(command: ProlongExistingProgramTreeVersionComman
         offer_acronym=command.offer_acronym,
         version_name=command.version_name,
         year=command.updated_year,
-        is_transition=command.is_transition,
+        transition_name=command.transition_name,
         title_en=command.title_en,
         title_fr=command.title_fr,
         end_year=command.end_year,
@@ -81,13 +81,13 @@ def __convert_to_postpone_command(
             offer_acronym=command.offer_acronym,
             year=command.updated_year,
             version_name=command.version_name,
-            is_transition=command.is_transition,
+            transition_name=command.transition_name,
         )
     )
     return PostponeProgramTreeVersionCommand(
         from_offer_acronym=command.offer_acronym,
         from_version_name=command.version_name,
         from_year=command.updated_year,
-        from_is_transition=command.is_transition,
+        from_transition_name=command.transition_name,
         from_code=group_identity.code,
     )

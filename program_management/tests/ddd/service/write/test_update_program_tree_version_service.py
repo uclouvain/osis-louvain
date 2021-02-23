@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from copy import copy
 
 import attr
 import mock
@@ -53,7 +52,7 @@ class TestUpdateTrainingVersion(TestCase, MockPatcherMixin):
             version_name=cls.tree_version.entity_id.version_name,
             year=cls.tree_version.entity_id.year,
             offer_acronym=cls.tree_version.entity_id.offer_acronym,
-            is_transition=cls.tree_version.entity_id.is_transition,
+            transition_name=cls.tree_version.entity_id.transition_name,
             end_year=cls.tree_version.end_year_of_existence,
             title_fr="another title",
             title_en="another title in english"
@@ -93,7 +92,7 @@ class TestUpdateTrainingVersion(TestCase, MockPatcherMixin):
                     acronym=self.tree_version.entity_id.offer_acronym,
                     year=self.current_year + 3,
                     version_name=self.tree_version.entity_id.version_name,
-                    is_transition=self.tree_version.entity_id.is_transition,
+                    transition_name=self.tree_version.entity_id.transition_name,
                 )
             ),
             mock.call(
@@ -101,7 +100,7 @@ class TestUpdateTrainingVersion(TestCase, MockPatcherMixin):
                     acronym=self.tree_version.entity_id.offer_acronym,
                     year=self.current_year + 4,
                     version_name=self.tree_version.entity_id.version_name,
-                    is_transition=self.tree_version.entity_id.is_transition,
+                    transition_name=self.tree_version.entity_id.transition_name,
                 )
             )
         ]

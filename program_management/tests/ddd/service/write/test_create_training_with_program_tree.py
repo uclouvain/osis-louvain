@@ -25,17 +25,20 @@ import mock
 from django.test import TestCase
 
 from education_group.ddd.domain import training
-from program_management.ddd.domain import program_tree, program_tree_version
-from program_management.ddd.service.write import create_training_with_program_tree
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
+from program_management.ddd.domain import program_tree, program_tree_version
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.ddd.service.write import create_training_with_program_tree
 
 
 class TestCreateAndReportTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service.postpone_program_tree_version")
+    @mock.patch(
+        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
-    @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")
+    @mock.patch(
+        "program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")
     @mock.patch("education_group.ddd.service.write.create_orphan_training_service.create_and_postpone_orphan_training")
     def test_should_create_trainings_until_postponement_limit(
             self,
@@ -58,7 +61,7 @@ class TestCreateAndReportTrainingWithProgramTree(TestCase):
             offer_acronym="Offer",
             year=2020,
             version_name="",
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
         mock_postpone_program_tree_version.return_value = None
 

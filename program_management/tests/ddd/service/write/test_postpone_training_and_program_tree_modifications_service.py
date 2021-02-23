@@ -61,7 +61,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
         self.postpone_pgrm_tree_version_patcher = mock.patch(
             "program_management.ddd.service.write."
             "postpone_training_and_program_tree_modifications_service."
-            "postpone_tree_version_service.postpone_program_tree_version",
+            "postpone_tree_specific_version_service.postpone_program_tree_version",
             return_value=[]
         )
         self.mocked_postpone_pgrm_tree_version = self.postpone_pgrm_tree_version_patcher.start()

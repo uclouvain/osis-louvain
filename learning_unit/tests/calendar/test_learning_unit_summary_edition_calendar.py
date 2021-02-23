@@ -87,10 +87,12 @@ class TestLearningUnitSummaryEditionCalendarGetOpenedAcademicEvents(TestCase):
             calendar.get_opened_academic_events(),
             [
                 AcademicEvent(
+                    id=academic_calendar_db.pk,
                     title=academic_calendar_db.title,
                     authorized_target_year=academic_calendar_db.data_year.year,
                     start_date=academic_calendar_db.start_date,
                     end_date=academic_calendar_db.end_date,
+                    type=academic_calendar_db.reference
                 )
             ]
         )
@@ -113,16 +115,20 @@ class TestLearningUnitSummaryEditionCalendarGetOpenedAcademicEvents(TestCase):
             calendar.get_opened_academic_events(),
             [
                 AcademicEvent(
+                    id=academic_calendar_db_2019.pk,
                     title=academic_calendar_db_2019.title,
                     authorized_target_year=academic_calendar_db_2019.data_year.year,
                     start_date=academic_calendar_db_2019.start_date,
                     end_date=academic_calendar_db_2019.end_date,
+                    type=academic_calendar_db_2019.reference
                 ),
                 AcademicEvent(
+                    id=academic_calendar_db_2020.pk,
                     title=academic_calendar_db_2020.title,
                     authorized_target_year=academic_calendar_db_2020.data_year.year,
                     start_date=academic_calendar_db_2020.start_date,
                     end_date=academic_calendar_db_2020.end_date,
+                    type=academic_calendar_db_2020.reference
                 )
             ]
         )
@@ -146,10 +152,12 @@ class TestLearningUnitSummaryEditionCalendarGetNextAcademicEvent(TestCase):
         self.assertEqual(
             calendar.get_next_academic_event(),
             AcademicEvent(
+                id=academic_calendar_db.pk,
                 title=academic_calendar_db.title,
                 authorized_target_year=academic_calendar_db.data_year.year,
                 start_date=academic_calendar_db.start_date,
                 end_date=academic_calendar_db.end_date,
+                type=academic_calendar_db.reference
             ),
         )
 
@@ -171,9 +179,11 @@ class TestLearningUnitSummaryEditionCalendarGetPreviousAcademicEvent(TestCase):
         self.assertEqual(
             calendar.get_previous_academic_event(),
             AcademicEvent(
+                id=academic_calendar_db.pk,
                 title=academic_calendar_db.title,
                 authorized_target_year=academic_calendar_db.data_year.year,
                 start_date=academic_calendar_db.start_date,
                 end_date=academic_calendar_db.end_date,
+                type=academic_calendar_db.reference
             ),
         )

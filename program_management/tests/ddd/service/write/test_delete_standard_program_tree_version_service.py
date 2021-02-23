@@ -35,6 +35,7 @@ from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd import command
 from program_management.ddd.domain import program_tree, exception
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     MandatoryRelationshipObjectFactory
@@ -52,7 +53,7 @@ class TestDeleteStandardProgramTreeService(TestCase, MockPatcherMixin):
         cls.cmd = command.DeleteProgramTreeVersionCommand(
             offer_acronym="ROOT",
             from_year=2018,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
             version_name=""
         )
 

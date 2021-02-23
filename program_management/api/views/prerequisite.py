@@ -29,7 +29,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -57,10 +57,13 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
         is_transition = self.kwargs['transition']
+        if is_transition:
+            qs = self.queryset.exclude(transition_name=NOT_A_TRANSITION)
+        else:
+            qs = self.queryset.filter(transition_name=NOT_A_TRANSITION)
         return get_object_or_404(
-            self.queryset,
+            qs,
             version_name__iexact=version_name,
-            is_transition=is_transition,
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year
         )
@@ -71,7 +74,7 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
             offer_acronym=version.offer.acronym,
             year=version.offer.academic_year.year,
             version_name=version.version_name,
-            is_transition=version.is_transition
+            transition_name=version.transition_name
         )
         tree_version = ProgramTreeVersionRepository.get(version_identity)
         self.tree = tree_version.get_tree()

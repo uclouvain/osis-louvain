@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import attr
 
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
-from education_group.ddd.command import AimCode, AimSection, DecreeName, DomainCode
+from education_group.ddd.command import DecreeName, DomainCode
 from osis_common.ddd import interface
 
 
@@ -51,12 +51,23 @@ class OrderLinkCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class CreateProgramTreeVersionCommand(interface.CommandRequest):
+class CreateProgramTreeSpecificVersionCommand(interface.CommandRequest):
     end_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     start_year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateProgramTreeTransitionVersionCommand(interface.CommandRequest):
+    end_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    transition_name = attr.ib(type=str)
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
 
@@ -67,7 +78,7 @@ class ExtendProgramTreeVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -76,7 +87,7 @@ class UpdateProgramTreeVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
 
@@ -87,7 +98,7 @@ class ProlongExistingProgramTreeVersionCommand(interface.CommandRequest):
     updated_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
 
@@ -97,7 +108,7 @@ class UpdateTrainingVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
@@ -118,7 +129,7 @@ class UpdateMiniTrainingVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
@@ -316,10 +327,18 @@ class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class GetLastExistingVersionNameCommand(interface.CommandRequest):
+class GetLastExistingVersionCommand(interface.CommandRequest):
     version_name = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
-    is_transition = attr.ib(type=str)
+    transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetLastExistingTransitionVersionNameCommand(interface.CommandRequest):
+    version_name = attr.ib(type=str)
+    offer_acronym = attr.ib(type=str)
+    transition_name = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
@@ -331,6 +350,7 @@ class GetEndPostponementYearCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetVersionMaxEndYear(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
     year = attr.ib(type=int)
 
 
@@ -409,7 +429,7 @@ class PostponeProgramTreeVersionCommand(interface.CommandRequest):
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
-    from_is_transition = attr.ib(type=bool)
+    from_transition_name = attr.ib(type=str)
 
     # FIXME :: to remove, the code can be found when converting ProgramTreeVersionIdentity to GroupIdentity
     from_code = attr.ib(type=str, default=None)
@@ -423,7 +443,7 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
     from_offer_code = attr.ib(type=str)
 
     from_version_name = attr.ib(type=str)
-    from_is_transition = attr.ib(type=bool)
+    from_transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -441,7 +461,7 @@ class DeleteStandardProgramTreeCommand(interface.CommandRequest):
 class DeleteProgramTreeVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -450,7 +470,7 @@ class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -471,7 +491,7 @@ class DeleteMiniWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -480,7 +500,7 @@ class DeleteMiniTrainingWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -505,7 +525,7 @@ class DeleteStandardVersionCommand(interface.CommandRequest):
 class DeletePermanentlyTreeVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -513,7 +533,7 @@ class DeleteSpecificVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -550,6 +570,7 @@ DO_NOT_OVERRIDE = -1
 class DuplicateProgramTree(interface.CommandRequest):
     from_root_code = attr.ib(type=str)
     from_root_year = attr.ib(type=int)
+    duplicate_to_transition = attr.ib(type=bool)
     override_end_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
 
@@ -661,7 +682,7 @@ class UpdateProgramTreeVersionEndDateCommand(interface.CommandRequest):
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
-    from_is_transition = attr.ib(type=bool)
+    from_transition_name = attr.ib(type=str)
     end_date = attr.ib(type=Optional[int])
 
 
@@ -686,7 +707,7 @@ class PostponeGroupVersionCommand(interface.CommandRequest):
 
     from_offer_acronym = attr.ib(type=str)
     from_version_name = attr.ib(type=str)
-    from_is_transition = attr.ib(type=bool)
+    from_transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -694,3 +715,11 @@ class CheckVersionNameCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
+    transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CheckTransitionNameCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    transition_name = attr.ib(type=str)

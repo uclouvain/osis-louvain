@@ -35,6 +35,7 @@ from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.serializers.training import TrainingListSerializer
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
@@ -70,7 +71,7 @@ class MiniTrainingFilter(filters.FilterSet):
         fields = [
             'acronym', 'code', 'education_group_type', 'title', 'title_english',
             'from_year', 'to_year',
-            'is_transition', 'version_name'
+            'transition_name', 'version_name'
         ]
 
 
@@ -81,7 +82,7 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     name = 'minitraining_list'
     queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.MINI_TRAINING,
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         version_name=''
     ).select_related(
         'offer__education_group_type',
@@ -128,7 +129,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
             version_name__iexact=version_name,
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
         return egv
 
@@ -155,7 +156,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
             offer__acronym__iexact=acronym,
             root_group__academic_year__year=year,
             version_name__iexact=version_name,
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
         return egv
 

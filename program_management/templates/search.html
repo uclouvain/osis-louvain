@@ -10,7 +10,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,9 +84,12 @@
                         {% bootstrap_label form.partial_acronym.label %}
                         {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         {% bootstrap_label form.full_title_fr.label %}
                         {% bootstrap_field form.full_title_fr show_label=False %}
+                    </div>
+                    <div class="col-md-3">
+                        {% bootstrap_field form.main_teaching_campus %}
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
@@ -171,15 +174,16 @@
                         </div>
                     </div>
 
-                    <table id="table_education_groups" class="table table-striped table-hover">
+                    <table id="table_education_groups" class="table table-striped table-hover" width="99.99%">
                         <thead>
                             <tr>
-                                <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
-                                <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                                <th id="th_0_academic_year.year" width="4%">{% trans 'Ac yr.' %}</th>
+                                <th id="th_1_acronym" width="10%">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
                                 <th id="th_2_title_fr">{% trans 'Title' %}</th>
-                                <th id="th_3_education_group_type.name">{% trans 'Type' %}</th>
-                                <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
-                                <th id="th_5_partial_acronym">{% trans 'Code' %}</th>
+                                <th id="th_3_education_group_type.name" width="15%">{% trans 'Type' %}</th>
+                                <th id="th_4_management_entity_version.acronym" width="4%">{% trans 'Entity' %}</th>
+                                <th id="th_5_main_teaching_campus_name" width="8%">{% trans 'Learning location' %}</th>
+                                <th id="th_6_partial_acronym" width="5%">{% trans 'Code' %}</th>
                             </tr>
                         </thead>
                     </table>
@@ -210,7 +214,8 @@
                 {"name": "full_title_fr", "targets": 2, "data": "full_title_fr"},
                 {"name": "type", "targets": 3,  "data": "education_group_type_text"},
                 {"name": "management_entity", "targets": 4, "data": "management_entity"},
-                {"name": "code", "targets": 5, "data": "code"}
+                {"name": "main_teaching_campus", "targets": 5, "data": "main_teaching_campus"},
+                {"name": "code", "targets": 6, "data": "code"},
             ];
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},

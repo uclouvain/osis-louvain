@@ -26,7 +26,7 @@ from typing import List
 from django.db import transaction
 
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import STANDARD, ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.ddd.domain.service import identity_search
 from program_management.ddd.service.write import delete_training_standard_version_service
 
@@ -39,7 +39,7 @@ def delete_permanently_training_standard_version(
         offer_acronym=cmd.acronym,
         year=cmd.year,
         version_name=STANDARD,
-        is_transition=False
+        transition_name=NOT_A_TRANSITION
     )
     program_tree_version_ids = identity_search.ProgramTreeVersionIdentitySearch.get_all_program_tree_version_identities(
         program_tree_standard_id

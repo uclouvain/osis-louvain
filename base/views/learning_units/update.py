@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
@@ -43,10 +42,10 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
-    show_error_message_for_form_invalid
+    show_error_message_for_form_invalid, check_formations_impacted_by_update
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units.common import get_learning_unit_identification_context, \
-    get_common_context_learning_unit_year, check_formations_impacted_by_update
+    get_common_context_learning_unit_year
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
 
@@ -189,7 +188,9 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
             display_success_messages(request, _('The learning unit has been updated (with report).'))
         else:
             display_success_messages(request, _('The learning unit has been updated (without report).'))
-        check_formations_impacted_by_update(learning_unit_year, request)
+        check_formations_impacted_by_update(learning_unit_year.acronym,
+                                            learning_unit_year.academic_year.year,
+                                            request, None)
 
     except ConsistencyError as e:
         error_list = e.error_list

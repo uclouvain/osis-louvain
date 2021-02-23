@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ from typing import Iterable, Dict, List, Set
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _, ngettext
 
-from osis_common.ddd.interface import BusinessException, BusinessExceptions
+from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
 
 BLOCK_MAX_AUTHORIZED_VALUE = 6
@@ -150,7 +150,7 @@ class ProgramTreeVersionMismatch(BusinessException):
         super().__init__(messages, **kwargs)
 
     def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
-        return str(_('Standard')) if version_identity.is_standard() else version_identity.version_name
+        return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
 
 
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
@@ -363,6 +363,12 @@ class CannotDetachOptionsException(BusinessException):
 class InvalidVersionNameException(BusinessException):
     def __init__(self):
         message = _("Invalid name version")
+        super().__init__(message)
+
+
+class InvalidTransitionNameException(BusinessException):
+    def __init__(self):
+        message = _("This value is invalid.")
         super().__init__(message)
 
 

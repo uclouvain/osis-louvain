@@ -85,7 +85,7 @@ class TestTrainingReadIdentification(TestCase):
             root_group__partial_acronym="LCRIM200M1",
             root_group__academic_year__year=cls.current_year,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            is_transition=True,
+            transition_name="TRANSITION",
             version_name=''
         )
         ElementGroupYearFactory(group_year=cls.training_version_standard_transition.root_group)

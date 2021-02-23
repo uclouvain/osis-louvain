@@ -27,6 +27,7 @@ from django.test import TestCase
 from education_group.ddd.domain import mini_training
 from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
 from program_management.ddd.domain import program_tree, program_tree_version
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.ddd.service.write import create_mini_training_with_program_tree
 
 
@@ -60,8 +61,8 @@ class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
         mock_create_standard_program_version.return_value = program_tree_version.ProgramTreeVersionIdentity(
             offer_acronym="Offer",
             year=2020,
-            version_name="",
-            is_transition=False,
+            version_name=STANDARD,
+            transition_name=NOT_A_TRANSITION,
         )
         mock_postpone_program_tree_version.return_value = None
 

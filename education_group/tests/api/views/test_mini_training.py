@@ -44,6 +44,7 @@ from education_group.api.serializers.mini_training import MiniTrainingDetailSeri
 from education_group.api.views.mini_training import MiniTrainingList
 from education_group.api.views.mini_training import OfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -54,7 +55,7 @@ class MiniTrainingTitleTestCase(APITestCase):
         anac = AcademicYearFactory()
 
         cls.egy = MiniTrainingFactory(academic_year=anac)
-        cls.version = StandardEducationGroupVersionFactory(offer=cls.egy, is_transition=False)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.egy, transition_name=NOT_A_TRANSITION)
         ElementFactory(group_year=cls.version.root_group)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={

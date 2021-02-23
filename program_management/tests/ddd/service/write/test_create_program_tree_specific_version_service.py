@@ -33,11 +33,11 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.validation_rule import ValidationRuleFactory
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
-from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_program_tree_version_service
+from program_management.ddd.service.write import create_program_tree_specific_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -53,12 +53,12 @@ class TestCreateProgramTreeVersion(TestCase):
             current_year=self.current_year,
             end_year=self.end_year_standard_version
         )
-        self.command = CreateProgramTreeVersionCommand(
+        self.command = CreateProgramTreeSpecificVersionCommand(
             end_year=self.end_year_standard_version,
             offer_acronym=self.offer_acronym,
             version_name='CEMS',
             start_year=self.standard_version.entity_identity.year,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
             title_en='Title in English',
             title_fr='Intitulé en français',
         )
@@ -148,19 +148,19 @@ class TestCreateProgramTreeVersion(TestCase):
             offer_acronym=cmd.abbreviated_title,
             year=cmd.year,
             version_name=STANDARD,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
 
         return training_identities, standard_version_identity
 
     def test_when_tree_version_standard_does_not_exist(self):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
-            create_program_tree_version_service.create_program_tree_version(self.command)
+            create_program_tree_specific_version_service.create_program_tree_specific_version(self.command)
 
     def test_assert_tree_version_correctly_created(self):
         self._create_standard_version()
 
-        identity = create_program_tree_version_service.create_program_tree_version(self.command)
+        identity = create_program_tree_specific_version_service.create_program_tree_specific_version(self.command)
 
         tree_version_created = ProgramTreeVersionRepository().get(identity)
         tree = tree_version_created.get_tree()
@@ -168,7 +168,7 @@ class TestCreateProgramTreeVersion(TestCase):
         self.assertEqual(tree_version_created.entity_id.offer_acronym, self.command.offer_acronym)
         self.assertEqual(tree_version_created.entity_id.year, self.command.start_year)
         self.assertEqual(tree_version_created.entity_id.version_name, self.command.version_name)
-        self.assertEqual(tree_version_created.entity_id.is_transition, self.command.is_transition)
+        self.assertEqual(tree_version_created.entity_id.transition_name, self.command.transition_name)
         self.assertEqual(tree_version_created.title_fr, self.command.title_fr)
         self.assertEqual(tree_version_created.title_en, self.command.title_en)
         self.assertEqual(tree_version_created.end_year_of_existence, self.command.end_year)

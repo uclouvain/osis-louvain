@@ -28,7 +28,7 @@ from mock import call
 
 from education_group.tests.ddd.factories.training import TrainingFactory
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_all_standard_versions_service
 
 
@@ -49,14 +49,17 @@ class TestDeleteAllStandardVersionsService(TestCase):
     def test_assert_delete_delete_standard_version_service_called(self, mock_get_all_program_tree_version):
         mock_get_all_program_tree_version.return_value = [
             ProgramTreeVersionIdentity(year=2017, offer_acronym=self.training.acronym, version_name=STANDARD,
-                                       is_transition=False),
+                                       transition_name=NOT_A_TRANSITION),
             ProgramTreeVersionIdentity(year=2018, offer_acronym=self.training.acronym, version_name=STANDARD,
-                                       is_transition=False),
+                                       transition_name=NOT_A_TRANSITION),
             ProgramTreeVersionIdentity(year=2019, offer_acronym="NEWONE", version_name=STANDARD,
-                                       is_transition=False),
+                                       transition_name=NOT_A_TRANSITION),
         ]
 
-        cmd = command.DeletePermanentlyTrainingStandardVersionCommand(acronym=self.training.acronym, year=self.training.year)
+        cmd = command.DeletePermanentlyTrainingStandardVersionCommand(
+            acronym=self.training.acronym,
+            year=self.training.year
+        )
         delete_all_standard_versions_service.delete_permanently_training_standard_version(cmd)
 
         expected_calls = [

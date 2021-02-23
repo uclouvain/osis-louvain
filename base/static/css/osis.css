@@ -259,9 +259,14 @@ div:target {
     content: "\f077";
 }
 
+/* Override select2 css */
 .select2-container {
     width: 100% !important;
     padding: 0;
+}
+.select2-selection--multiple{
+    overflow: hidden !important;
+    height: auto !important;
 }
 
 #loader {
@@ -696,4 +701,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 
 .btn-publish {
     margin-right: 20px;
+}
+
+/*
+Override default z-index of datepicker component in order to fix issue with datepicker in modal
+https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-behind-popover/51344669
+*/
+.bootstrap-datetimepicker-widget {
+    z-index: 1600;
 }

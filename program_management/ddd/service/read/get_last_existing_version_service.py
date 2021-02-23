@@ -29,10 +29,10 @@ from program_management.ddd.domain.service.get_last_existing_version_name import
 
 
 def get_last_existing_version_identity(
-        cmd: command.GetLastExistingVersionNameCommand
+        cmd: command.GetLastExistingVersionCommand
 ) -> Union[ProgramTreeVersionIdentity, None]:
     return GetLastExistingVersion().get_last_existing_version_identity(
         version_name=cmd.version_name,
         offer_acronym=cmd.offer_acronym,
-        is_transition=cmd.is_transition,
+        transition_name=cmd.transition_name,
     )

@@ -275,7 +275,9 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
                 partial_acronym,
                 leaf_credits,
                 nb_parents,
-                __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
+                __acronym_with_version_label(
+                    training['acronym'], training['transition_name'], training['version_name']
+                ),
                 __title_with_version_title(training['title_fr'], training['version_title_fr']),
             )
             concatenated_string += training_string
@@ -483,12 +485,13 @@ def volume_information(learning_unit_yr):
             learning_unit_yr.pp_classes or 0]
 
 
-def __acronym_with_version_label(acronym: str, is_transition: bool, version_name: str) -> str:
-    if version_name or is_transition:
+# FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
+def __acronym_with_version_label(acronym: str, transition_name: str, version_name: str) -> str:
+    if version_name or transition_name:
         if version_name == '':
-            version_label = '[Transition]' if is_transition else ''
-        elif is_transition:
-            version_label = '[{}-Transition]'.format(version_name)
+            version_label = '[{}]'.format(transition_name)
+        elif transition_name:
+            version_label = '[{}-{}]'.format(version_name, transition_name)
         else:
             version_label = '[{}]'.format(version_name)
         return "{}{}".format(acronym, version_label)

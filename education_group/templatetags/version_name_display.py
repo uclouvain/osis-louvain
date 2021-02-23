@@ -32,11 +32,12 @@ from program_management.ddd.business_types import *
 register = template.Library()
 
 
+# FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
 @register.filter()
 def display_version_name(tree_version_identity: 'ProgramTreeVersionIdentity'):
     version_name_display = ""
     if tree_version_identity:
         version_name_display = tree_version_identity.version_name or _('Standard')
         if tree_version_identity.is_transition:
-            version_name_display += " [transition]"
+            version_name_display += " [{}]".format(tree_version_identity.transition_name)
     return version_name_display

@@ -24,7 +24,7 @@
 from django.test import TestCase
 
 from education_group.ddd.domain import mini_training
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.domain.service import element_id_search
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
@@ -88,8 +88,12 @@ class TestGetAllProgramTreeVersionIdentity(TestCase):
 
     def test_assert_return_all_program_tree_identities_even_with_different_acronym(self):
         expected_ordered_results = [
-            ProgramTreeVersionIdentity(offer_acronym='DROI2M', year=2018, is_transition=False, version_name=STANDARD),
-            ProgramTreeVersionIdentity(offer_acronym='DROIT2M', year=2019, is_transition=False, version_name=STANDARD),
+            ProgramTreeVersionIdentity(
+                offer_acronym='DROI2M', year=2018, transition_name=NOT_A_TRANSITION, version_name=STANDARD
+            ),
+            ProgramTreeVersionIdentity(
+                offer_acronym='DROIT2M', year=2019, transition_name=NOT_A_TRANSITION, version_name=STANDARD
+            ),
         ]
 
         self.assertListEqual(

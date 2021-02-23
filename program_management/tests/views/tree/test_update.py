@@ -30,12 +30,12 @@ from django.urls import reverse
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.forms.content import LinkForm, ContentFormSet
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
-    ProgramTreeVersionIdentityFactory
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory
 
 
 def form_valid_effect(form: LinkForm):
@@ -133,8 +133,10 @@ class TestUpdateLinkView(TestCase):
             mock_form_save
     ):
         mock_get_tree.return_value = self.tree
-        mock_get_tree_version.return_value = ProgramTreeVersionIdentityFactory(is_transition=False, version_name='')
+        mock_get_tree_version.return_value = ProgramTreeVersionIdentityFactory(
+            transition_name=NOT_A_TRANSITION,
+            version_name=STANDARD
+        )
         mock_form_save.side_effect = form_save_effect
         self.client.post(self.url, data={})
         self.assertTrue(mock_form_save.called, msg="View must call form save method")
-

@@ -30,7 +30,7 @@ import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -137,6 +137,9 @@ class Group(interface.RootEntity):
 
     def is_training(self):
         return self.type in TrainingType
+
+    def is_mini_training(self):
+        return self.type in MiniTrainingType
 
     def update(
             self,

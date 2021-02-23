@@ -547,7 +547,7 @@ def _get_gathering_node_title(gathering_node: 'Node', language: str):
 
 
 def _get_gathering_node_version_title(pgm_tree_version: 'ProgramTreeVersion', language: str):
-    if pgm_tree_version and not pgm_tree_version.is_standard_version:
+    if pgm_tree_version and not pgm_tree_version.is_official_standard:
         if language == settings.LANGUAGE_CODE_EN and pgm_tree_version.title_en:
             return "[{}]".format(pgm_tree_version.title_en)
         elif language == settings.LANGUAGE_CODE_FR and pgm_tree_version.title_fr:

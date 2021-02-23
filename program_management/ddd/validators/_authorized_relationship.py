@@ -48,7 +48,7 @@ class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValid
 
 class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', parent_node: 'Node', link_type: LinkTypes = None):
-        self.tree = copy.copy(tree)
+        self.tree = copy.deepcopy(tree)
         self.parent_node = self.tree.get_node_by_code_and_year(parent_node.code, parent_node.year)
         self.link_created = self.parent_node.add_child(node_to_paste, link_type=link_type)
 

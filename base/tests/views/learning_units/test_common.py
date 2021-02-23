@@ -30,7 +30,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
-from base.views.learning_units.common import _find_root_trainings_using_ue
+from base.views.common import _find_root_trainings_using_element
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -54,7 +54,8 @@ class TestLearningUnitCommonView(TestCase):
     def test_ue_used_in_one_training(self):
         self.build_training_tree('DROI2M', 'Bachelier droit', self.element_learning_unit_year,
                                  TrainingType.BACHELOR, Categories.TRAINING)
-        res = _find_root_trainings_using_ue(self.element_learning_unit_year.learning_unit_year)
+        res = _find_root_trainings_using_element(self.element_learning_unit_year.learning_unit_year.acronym,
+                                                 self.academic_year.year)
         expected = ['DROI2M - Bachelier droit']
         self.assertListEqual(res, expected)
 
@@ -63,7 +64,8 @@ class TestLearningUnitCommonView(TestCase):
                                  TrainingType.BACHELOR, Categories.TRAINING)
         self.build_training_tree('ARK1BA', 'Bachelier archi', self.element_learning_unit_year,
                                  TrainingType.BACHELOR, Categories.TRAINING)
-        res = _find_root_trainings_using_ue(self.element_learning_unit_year.learning_unit_year)
+        res = _find_root_trainings_using_element(self.element_learning_unit_year.learning_unit_year.acronym,
+                                                 self.academic_year.year)
         expected = ['ARK1BA - Bachelier archi',
                     'DROI2M - Bachelier droit']
         self.assertListEqual(res, expected)

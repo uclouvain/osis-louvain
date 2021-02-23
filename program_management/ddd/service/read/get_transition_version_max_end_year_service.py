@@ -28,12 +28,12 @@ from program_management.ddd.repositories import program_tree_version as tree_ver
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
+def calculate_transition_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
     standard_tree_version_identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=cmd.offer_acronym,
         year=cmd.year,
-        version_name=program_tree_version.STANDARD,
-        is_transition=False
+        version_name=cmd.version_name,
+        transition_name=program_tree_version.NOT_A_TRANSITION
     )
 
     tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)

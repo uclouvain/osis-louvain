@@ -28,7 +28,7 @@ from rest_framework.response import Response
 
 from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
 from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
-from base.business.event_perms import AcademicEventFactory
+from base.business.event_perms import AcademicEventRepository
 
 
 class ApplicationCoursesCalendarListView(generics.ListAPIView):
@@ -38,6 +38,6 @@ class ApplicationCoursesCalendarListView(generics.ListAPIView):
     name = 'application-courses-calendars'
 
     def list(self, request, *args, **kwargs):
-        events = AcademicEventFactory().get_academic_events(ApplicationCoursesCalendar.event_reference)
+        events = AcademicEventRepository().get_academic_events(ApplicationCoursesCalendar.event_reference)
         serializer = ApplicationCourseCalendarSerializer(events, many=True)
         return Response(serializer.data)

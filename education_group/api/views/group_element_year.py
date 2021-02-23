@@ -32,7 +32,7 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link, exception
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.element import Element
@@ -70,7 +70,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             offer_acronym=self.kwargs.get('acronym').upper() or self.kwargs.get('partial_acronym').upper(),
             year=self.kwargs['year'],
             version_name=self.version_name.upper(),
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
 
         try:
@@ -105,7 +105,7 @@ class TrainingTreeView(EducationGroupTreeView):
     lookup_url_kwargs = ('year', 'acronym')
     queryset = Element.objects.filter(
         group_year__education_group_type__category=Categories.TRAINING.name,
-        group_year__educationgroupversion__is_transition=False
+        group_year__educationgroupversion__transition_name=NOT_A_TRANSITION
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('group_year')
@@ -122,7 +122,7 @@ class MiniTrainingTreeView(EducationGroupTreeView):
     lookup_url_kwargs = ('year', 'acronym',)
     queryset = Element.objects.filter(
         group_year__education_group_type__category=Categories.MINI_TRAINING.name,
-        group_year__educationgroupversion__is_transition=False
+        group_year__educationgroupversion__transition_name=NOT_A_TRANSITION
     ).annotate(
         education_group_year_obj=F('group_year__educationgroupversion__offer')
     ).select_related('group_year')

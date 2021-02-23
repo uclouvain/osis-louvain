@@ -35,6 +35,7 @@ from education_group.ddd.service.read import get_group_service
 from education_group.models.group_year import GroupYear
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from webservices.api.serializers.general_information import GeneralInformationSerializer
@@ -79,7 +80,7 @@ class GeneralInformation(generics.RetrieveAPIView):
             Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
             offer__academic_year__year=self.kwargs['year'],
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
 
     def get_group_db(self):

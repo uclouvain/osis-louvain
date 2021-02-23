@@ -26,7 +26,6 @@
 from typing import Dict
 
 import attr
-from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
@@ -34,14 +33,14 @@ from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.utils.fields import OsisRichTextFormField
-from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.fields import OsisRichTextFormField
 from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.forms import fields
 from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
@@ -50,10 +49,13 @@ from program_management.ddd.command import GetVersionMaxEndYear
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_version_max_end_year
+from program_management.ddd.service.read import get_specific_version_max_end_year_service, \
+    get_transition_version_max_end_year_service
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+
+TRANSITION = " - Transition"
 
 
 class SpecificVersionForm(forms.Form):
@@ -81,22 +83,23 @@ class SpecificVersionForm(forms.Form):
     def __init__(self, tree_version_identity: 'ProgramTreeVersionIdentity', *args, **kwargs):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
-
         self._init_academic_year_choices()
         self._set_remote_validation_on_version_name()
 
     def _set_remote_validation_on_version_name(self):
         set_remote_validation(
             self.fields["version_name"],
-            reverse("check_version_name", args=[self.tree_version_identity.year,
-                                                self.tree_version_identity.offer_acronym]
-                    )
+            reverse(
+                "check_version_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
+            )
         )
 
     def _init_academic_year_choices(self):
-        max_year = get_version_max_end_year.calculate_version_max_end_year(
+        max_year = get_specific_version_max_end_year_service.calculate_specific_version_max_end_year(
             GetVersionMaxEndYear(
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                version_name=self.tree_version_identity.version_name,
                 year=self.tree_version_identity.year
             )
         )
@@ -119,6 +122,79 @@ class SpecificVersionForm(forms.Form):
 
     def clean_version_name(self):
         return self.cleaned_data['version_name'].upper()
+
+
+class TransitionVersionForm(forms.Form):
+    version_name = forms.CharField(
+        max_length=28,
+        required=False,
+        label=_('Acronym/Short title'),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+    )
+    transition_name = forms.CharField(
+        max_length=14,
+        required=False,
+        label=_('Acronym/Short title'),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+    )
+    version_title_fr = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Full title of the french version'),
+    )
+    version_title_en = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Full title of the english version'),
+    )
+    end_year = forms.ChoiceField(
+        required=False,
+        label=_('This version exists until'),
+    )
+
+    def __init__(self, tree_version_identity: 'ProgramTreeVersionIdentity', *args, **kwargs):
+        self.tree_version_identity = tree_version_identity
+        super().__init__(*args, **kwargs)
+        self._init_academic_year_choices()
+        self._set_remote_validation_on_version_name()
+
+    def _init_academic_year_choices(self):
+        max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
+            GetVersionMaxEndYear(
+                offer_acronym=self.tree_version_identity.offer_acronym,
+                version_name=self.tree_version_identity.version_name,
+                year=self.tree_version_identity.year
+            )
+        )
+        choices_years = [
+            (year, display_as_academic_year(year))
+            for year in range(self.tree_version_identity.year, max_year + 1)
+        ]
+
+        self.fields["end_year"].choices = choices_years
+        if not self.fields["end_year"].initial:
+            self.fields["end_year"].initial = choices_years[0]
+
+    def _set_remote_validation_on_version_name(self):
+        set_remote_validation(
+            self.fields["transition_name"],
+            reverse(
+                "check_transition_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
+            )
+        )
+
+    def clean_end_year(self):
+        end_year = self.cleaned_data["end_year"]
+        return int(end_year) if end_year else None
+
+    def clean_version_name(self):
+        return self.tree_version_identity.version_name.upper()
+
+    def clean_transition_name(self):
+        prefix_transition_name = "Transition " if self.cleaned_data['transition_name'] else "Transition"
+        transition_name = prefix_transition_name + self.cleaned_data['transition_name']
+        return transition_name.upper()
 
 
 class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, SpecificVersionForm):

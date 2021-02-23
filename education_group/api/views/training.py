@@ -33,6 +33,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -66,7 +67,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     name = 'training-list'
     queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.TRAINING,
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         version_name=''
     ).select_related(
         'offer__education_group_type',
@@ -138,7 +139,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
             version_name__iexact=version_name,
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
         return egv
 
@@ -160,7 +161,7 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ),
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
-            is_transition=False,
+            transition_name__iexact=NOT_A_TRANSITION,
             version_name__iexact=version_name
         )
         return egv

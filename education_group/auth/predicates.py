@@ -5,19 +5,19 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType
+from education_group.auth.scope import Scope
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import TrainingType
-from education_group.auth.scope import Scope
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
 from osis_role.cache import predicate_cache
+from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.service import identity_search
 from program_management.ddd.repositories import load_tree_version, \
@@ -161,12 +161,12 @@ def is_element_only_inside_standard_program(
             )
             tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
             ).get(tree_version_identity)
-            if tree_version and not tree_version.is_standard_version:
+            if tree_version and not tree_version.is_official_standard:
                 return False
         except (interface.BusinessException, exception.ProgramTreeVersionNotFoundException):
             pass
         tree_versions = load_tree_version.load_tree_versions_from_children([element_id])
-        return all((version.is_standard_version for version in tree_versions))
+        return all((version.is_official_standard for version in tree_versions))
     return education_group_year
 
 

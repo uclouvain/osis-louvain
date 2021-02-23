@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
-{% load static %}
-{% load i18n %}
-{% load dictionnary %}
-{% load format %}
+
+{% load static i18n bootstrap3 %}
+
 {% get_current_language as LANGUAGE_CODE %}
 
 {% comment "License" %}
@@ -30,80 +29,50 @@
 {% endcomment %}
 
 {% block style %}
-    <link rel="stylesheet" href="{% static 'css/toggle-switch.css' %}">
+    {% include "education_group/blocks/datetimepicker_imports_css.html" %}
+    <link rel="stylesheet" href="{% static 'css/academic_calendar.css' %}">
 {% endblock %}
 
 {% block breadcrumb %}
   <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution'%}</a></li>
   <li class="active">{% trans 'Academic calendars'%}</li>
+{% endblock %}
 
-{% endblock %}
 {% block content %}
-<div class="page-header">
-  <h2>{% trans 'Academic calendar' %}</h2>
-</div>
-<div class="panel panel-default">
-  <div class="panel-body">
-    <div class="row">
-      <form  method="get" action="{% url 'academic_calendars' %}" >
-        <div class="col-md-2">
-          <label for="slt_academic_year" >{% trans 'Academic year'%}</label>
-          <select class="form-control" id="slt_academic_year"  name="academic_year" value="{{ academic_year }}" onchange='this.form.submit();'>
-            {% for v in academic_years %}
-              <option value="{{ v.id }}" {% if v.id == academic_year %}selected {% endif %} >
-                  {{ v }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2">
-            {% if request.user.is_superuser %}
-                <table>
-                    <tr>
-                        <td><label>{% trans "academic events" as academic_events %}{{ academic_events|title }}</label></td>
-                        <td style="padding-left: 0.5em; padding-top: 4px;">
-                            <label class="switch">
-                              <input type="checkbox" name="show_academic_events" title="{{ academic_events|title }}" onclick='this.form.submit();' {% if show_academic_events %}checked{% endif %} />
-                              <span class="slider round"></span>
-                            </label>
-                        </td>
-                    </tr>
-                </table>
-            {% else %}
-                <input type="hidden" name="show_academic_events" title="{{ academic_events|title }}" value="on" />
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            {% if request.user.is_superuser %}
-                <a href="{% url 'academic_calendar_form' %}" id="lnk_academic_calendar_create" class="btn btn-default" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
-            {% endif %}
-        </div>
-      </form>
+    <div class="page-header">
+      <h2>{% trans 'Academic calendar' %}</h2>
     </div>
-    <br>
-    <div id="gantt">
-      {% if show_gantt_diagram %}
-        <div id="gantt_div"></div>
-      {% else %}
-          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
-      {% endif %}
-    </div>
-    {% if undated_calendars_list|length > 0 %}
-      <div id="undated_calendars">
-        <br>{% trans 'Unscheduled events' %} :
-        <ul>
-          {% for calendar in undated_calendars_list %}
-            <li>
-              <a href="{% url 'academic_calendar_read' academic_calendar_id=calendar.id %}" id="lnk_academic_calendar_edit_{{calendar.id}}">{{ calendar.title }}</a>
-            </li>
-          {% endfor %}
-        </ul>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form id="search_form" method="GET" action="{{ request.path }}">
+            <div class="row">
+                {% bootstrap_field filter.form.from_date form_group_class="col-md-3" %}
+                {% bootstrap_field filter.form.to_date form_group_class="col-md-3" %}
+                <div class="col-md-4">
+                    <br>
+                    <div class="pull-right">
+                        {% bootstrap_button "" button_type="submit" button_class="btn-primary" icon="search" %}
+                        {% include 'blocks/button/button_filter_refresh.html' %}
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                {% bootstrap_field filter.form.event_type form_group_class="col-md-10" %}
+            </div>
+            {{ filter.form.media }}
+        </form>
+        {% include 'learning_unit/blocks/form/search_form_reset.html' %}
+        <br>
+        <div id="gantt">
+          <div id="gantt_container"></div>
+          <a id="updateAcademicEvent" class='d-none trigger_modal'>Update</a>
+        </div>
       </div>
-    {% endif %}
-  </div>
-</div>
+    </div>
 {% endblock %}
+
 {% block script %}
+    {% include "education_group/blocks/datetimepicker_imports_js.html" %}
     <script src="{% static 'dhtmlxGantt/dhtmlxgantt.js' %}"></script>
     <script src="{% static 'dhtmlxGantt/ext/dhtmlxgantt_tooltip.js' %}"></script>
     <script src="{% static 'dhtmlxGantt/ext/dhtmlxgantt_marker.js' %}"></script>
@@ -111,59 +80,97 @@
     {% if LANGUAGE_CODE == 'fr-be' %}
         <script src="{% static 'dhtmlxGantt/locale/locale_fr.js' %}" charset="utf-8"></script>
     {% endif %}
-
     <script type="text/javascript">
+        function openUpdateModal(url) {
+            $('#updateAcademicEvent').data('url', url);
+            $('#updateAcademicEvent').click();
+        }
+
         function formatDate(date){
             month = date.getMonth() + 1;
             return date.getDate() + "/" + month + "/" + date.getFullYear()
         }
 
-        gantt.config.scale_unit = "year";
-        gantt.config.date_scale = "%Y";
-        gantt.config.subscales = [
-            {unit:"month", step:1, date:"%F" }
-        ];
+        function getFromDate() {
+            return _getDateFromInput('id_from_date');
+        }
 
-        gantt.config.readonly = true;
-        gantt.config.columns = [
-            {name:"text", label:" ", width:"*", align: "left"},
-        ];
+        function getToDate() {
+            return _getDateFromInput('id_to_date');
+        }
 
-        gantt.templates.task_text=function(start,end,task){
-            return Math.round(task.progress * 100) + '%';
-        };
-
-        gantt.config.tooltip_offset_y = -20;
-        gantt.config.tooltip_hide_timeout = 2500;
-        gantt.templates.tooltip_text = function(start,end,task){
-            days = task.duration + 1; // include end_date in duration
-            if(days <= 1){
-                duration = days + " {% trans 'day'%}"
+        function _getDateFromInput(input_id) {
+            const dateElem = $('#' + input_id);
+            if (dateElem.length > 0 && dateElem.val()){
+                const dateObject = moment(dateElem.val(), dateElem.data('format'));
+                return dateObject.toDate();
             }
-            else{
-                duration = days + " {% trans 'days'%}"
+        }
+
+        function initGanttScale(){
+            gantt.config.scale_unit = "year";
+            gantt.config.date_scale = "%Y";
+
+            gantt.config.start_date = getFromDate();
+
+            const endDate = getToDate();
+            if (endDate) {
+                gantt.config.end_date = endDate;
+            } else {
+                const dateObj = moment(gantt.config.start_date);
+                gantt.config.end_date = dateObj.add(5, 'y').toDate();
             }
 
-            return "<b>" + task.text + "</b><br>"
-            + formatDate(task.start_date) + " - " + formatDate(task.end_date)
-            + " (" + duration +  ") <br>"
-            + "<a href=\"{% url 'academic_calendars' %}" + task.id + "\">"
-            + "{% trans 'Details'%}</a>";
-        };
+            gantt.config.subscales = [
+                {unit:"month", step:1, date:"%F" }
+            ];
+        }
 
-        gantt.addMarker({
-            start_date: new Date() // this is today
-        });
+        function initTooltips() {
+            gantt.config.readonly = true;
+            gantt.config.columns = [
+                {name:"text", label:" ", width:"*", align: "left", tree:true},
+            ];
+            gantt.config.tooltip_offset_y = -30;
+            gantt.config.tooltip_hide_timeout = 3000;
+            gantt.templates.tooltip_text = function(start,end,row){
+               let domElem = '';
+               if (row.type !== "project"){
+                   domElem = "<b>" + row.tooltip_text + "</b><br>"
+                    + formatDate(row.start_date) + " - " + formatDate(row.end_date)
+                    + "<a style='cursor:pointer;' onclick='openUpdateModal(\"" + row.update_url + "\")'>"
+                    + "<br>{% trans 'Details'%}</a>";
+               }
+               return domElem;
+            };
+            gantt.templates.task_text = function(start,end,row) {
+                return '';
+            };
+            gantt.templates.task_class  = function(start, end, task){
+                if(task.parent) {
+                    return task.parent;
+                }
+                return task.id;
+            };
+            gantt.config.scroll_on_click= true;
+        }
+
+        function initTodayMarker() {
+            gantt.addMarker({
+                start_date: new Date(),
+                text: "{% trans "Today" %}"
+            });
+        }
+
+        initGanttScale();
+        initTooltips();
+        initTodayMarker();
 
         gantt.config.autosize = "y";
-        gantt.init("gantt_div");
-        gantt.parse({{ academic_calendar_json|safe }},"json");
-
-        function get_release_title(d,m,y, id){
-            return "<b>" + gettext('Release') + " : " + d + "/" + m + "/" +  y + "</b>"
-                    + "<br>"
-                    + "<a href=\"{% url 'academic_calendars' %}" + id + "\">"
-                    + "{% trans 'Details'%}</a>";
-        }
+        gantt.config.open_split_tasks = true;
+        gantt.init("gantt_container");
+        gantt.parse({
+            'data': {{ gantt_rows|safe }}
+        }, "json");
     </script>
 {% endblock %}

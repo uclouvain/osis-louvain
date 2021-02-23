@@ -83,7 +83,7 @@ def create_and_report_mini_training_with_program_tree(
             from_offer_acronym=program_tree_version_identity.offer_acronym,
             from_version_name=program_tree_version_identity.version_name,
             from_year=program_tree_version_identity.year,
-            from_is_transition=program_tree_version_identity.is_transition,
+            from_transition_name=program_tree_version_identity.transition_name,
             from_code=create_mini_training_cmd.code
         )
     )

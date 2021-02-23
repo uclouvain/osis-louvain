@@ -49,6 +49,7 @@ from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -68,7 +69,6 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
-from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -540,13 +540,13 @@ class TestLearningUnitXls(TestCase):
         expected = "{} ({}) - {} - {}".format(
             self.a_group_year_parent_for_particular_version.partial_acronym,
             "{0:.2f}".format(self.group_element_particular.relative_credits),
-            "{}[{}-Transition]".format(self.a_group_year_parent_for_particular_version.acronym,
+            "{}[{}-TRANSITION]".format(self.a_group_year_parent_for_particular_version.acronym,
                                        self.particular_education_group_version.version_name),
             self.a_group_year_parent_for_particular_version.title_fr + ' [{}]'.format(
                 self.particular_education_group_version.title_fr
             )
         )
-        self.assertEqual(formations, expected)
+        self.assertEqual(expected, formations)
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):

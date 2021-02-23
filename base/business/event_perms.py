@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List
+from typing import List, Optional
 
 import attr
 from django.core.exceptions import PermissionDenied
@@ -42,10 +42,12 @@ from base.models.learning_unit_year import LearningUnitYear
 
 @attr.s(frozen=True, slots=True)
 class AcademicEvent:
+    id = attr.ib(type=int)
     title = attr.ib(type=str)
     authorized_target_year = attr.ib(type=int)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+    type = attr.ib(type=str)
 
     def is_open_now(self) -> bool:
         """
@@ -140,7 +142,7 @@ class AcademicEventCalendarHelper(ABC):
     @cached_property
     def _get_academic_events(self) -> List[AcademicEvent]:
         return sorted(
-            AcademicEventFactory().get_academic_events(self.event_reference),
+            AcademicEventRepository().get_academic_events(self.event_reference),
             key=lambda academic_event: academic_event.start_date
         )
 
@@ -153,14 +155,30 @@ class AcademicEventCalendarHelper(ABC):
         raise NotImplementedError()
 
 
-class AcademicEventFactory:
-    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
-        qs = AcademicCalendar.objects.filter(
-            reference=event_reference
-        ).annotate(
-            authorized_target_year=F('data_year__year')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
+class AcademicEventRepository:
+    def get_academic_events(self, event_reference: Optional[str] = None) -> List[AcademicEvent]:
+        qs = AcademicCalendar.objects.all()
+        if event_reference:
+            qs = qs.filter(reference=event_reference)
+        qs = qs.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')
         return [AcademicEvent(**obj) for obj in qs]
+
+    def get(self, academic_event_id: int) -> AcademicEvent:
+        obj = AcademicCalendar.objects.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')\
+         .get(pk=academic_event_id)
+        return AcademicEvent(**obj)
+
+    def update(self, academic_event: AcademicEvent):
+        academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
+        academic_event_db.start_date = academic_event.start_date
+        academic_event_db.end_date = academic_event.end_date
+        academic_event_db.save()
 
 
 @attr.s(frozen=True, slots=True)
@@ -184,12 +202,12 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(
-            AcademicEventSessionFactory().get_academic_session_events(self.event_reference),
+            AcademicEventSessionRepository().get_academic_session_events(self.event_reference),
             key=lambda academic_session_event: academic_session_event.start_date
         )
 
 
-class AcademicEventSessionFactory:
+class AcademicEventSessionRepository:
     def get_academic_session_events(self, event_reference: str) -> List[AcademicSessionEvent]:
         qs = AcademicCalendar.objects.filter(
             reference=event_reference
@@ -197,8 +215,9 @@ class AcademicEventSessionFactory:
             sessionexamcalendar__isnull=True
         ).annotate(
             authorized_target_year=F('data_year__year'),
+            type=F('reference'),
             session=F('sessionexamcalendar__number_session')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'session')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
         return [AcademicSessionEvent(**obj) for obj in qs]
 
 

@@ -128,4 +128,3 @@ class EntitiesHierarchyFactory:
             parent=self.faculty_2_1.entity,
             entity_type=SCHOOL
         )
-

@@ -30,6 +30,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
 from program_management.forms import version
+from base.views.common import check_formations_impacted_by_update
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -39,10 +40,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/mini_training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_program_tree_version_obj().is_standard_version:
+        if self.get_program_tree_version_obj().is_official_standard:
             redirect_url = reverse('mini_training_update', kwargs={
                 'year': self.get_group_obj().year,
-                'code':  self.get_group_obj().code,
+                'code': self.get_group_obj().code,
                 'acronym': self.get_mini_training_obj().acronym
             })
             return HttpResponseRedirect(redirect_url)
@@ -67,6 +68,9 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             if not self.mini_training_version_form.errors:
                 self.display_success_messages(version_identities)
                 self.display_delete_messages(version_identities)
+                check_formations_impacted_by_update(self.get_group_obj().code,
+                                                    self.get_group_obj().year,
+                                                    request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -160,7 +164,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                     offer_acronym=update_command.offer_acronym,
                     year=year,
                     version_name=update_command.version_name,
-                    is_transition=update_command.is_transition
+                    transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
         return []
@@ -271,7 +275,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,
-            is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
+            transition_name=self.get_program_tree_version_obj().entity_id.transition_name,
 
             title_en=form.cleaned_data["version_title_en"],
             title_fr=form.cleaned_data["version_title_fr"],

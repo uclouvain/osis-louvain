@@ -60,5 +60,5 @@ def _get_href(node_identity: 'NodeIdentity', active_view_name: str) -> str:
 
 def _get_ordered_version_choices(versions_choices):
     return sorted(versions_choices,
-                  key=lambda version_choice: (version_choice[1].version_name, version_choice[1].is_transition)
+                  key=lambda version_choice: (version_choice[1].version_name, version_choice[1].transition_name)
                   )

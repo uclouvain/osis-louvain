@@ -28,14 +28,10 @@ from typing import List
 from django.db import transaction
 
 from education_group.ddd.domain.exception import TrainingNotFoundException
-from education_group.ddd.repository.mini_training import MiniTrainingRepository
-from education_group.ddd.repository.training import TrainingRepository
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import copy_program_version_service
 
@@ -53,7 +49,7 @@ def postpone_program_tree_version(
         offer_acronym=postpone_cmd.from_offer_acronym,
         version_name=postpone_cmd.from_version_name,
         year=postpone_cmd.from_year,
-        is_transition=postpone_cmd.from_is_transition,
+        transition_name=postpone_cmd.from_transition_name,
     )
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_program_tree_version(
         identity=program_tree_version_identity,
@@ -67,7 +63,7 @@ def postpone_program_tree_version(
                 from_offer_acronym=postpone_cmd.from_offer_acronym,
                 from_year=from_year,
                 from_version_name=postpone_cmd.from_version_name,
-                from_is_transition=postpone_cmd.from_is_transition,
+                from_transition_name=postpone_cmd.from_transition_name,
                 from_offer_code=postpone_cmd.from_code
             )
             identity_next_year = copy_program_version_service.copy_tree_version_to_next_year(cmd_copy_from)

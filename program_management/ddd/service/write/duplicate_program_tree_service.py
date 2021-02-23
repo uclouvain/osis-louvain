@@ -34,23 +34,26 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 
 
 @transaction.atomic()
-def duplicate_program_tree(
-        cmd: command.DuplicateProgramTree
-) -> 'ProgramTreeIdentity':
+def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'ProgramTreeIdentity':
+
     # GIVEN
     program_tree_identity = ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
     existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
 
     # WHEN
-    program_tree = ProgramTreeBuilder().duplicate(
+    program_tree = ProgramTreeBuilder().create_and_fill_from_program_tree(
         duplicate_from=existing_tree,
+        duplicate_to_transition=cmd.duplicate_to_transition,
         override_end_year_to=cmd.override_end_year_to,
         override_start_year_to=cmd.override_start_year_to
     )
+
+    # TODO: Move validation_rule to initial credit Node
     validation_rule = FieldValidationRule.get(
         program_tree.root_node.node_type, 'credits', is_version=True
     )
     program_tree.root_node.credits = validation_rule.initial_value
+
     # THEN
     program_tree_identity = ProgramTreeRepository().create(
         program_tree=program_tree,

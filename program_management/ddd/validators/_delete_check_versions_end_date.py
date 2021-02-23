@@ -33,7 +33,7 @@ class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
         super().__init__()
 
     def validate(self, *args, **kwargs):
-        if not self.tree_version.is_standard:
+        if not self.tree_version.is_official_standard:
             return
 
         exists = has_version_with_greater_end_year.HasVersionWithGreaterEndYear.greater_than_standard_year(

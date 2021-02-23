@@ -29,11 +29,13 @@ from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Subquery, OuterRef, BooleanField, Q, Value
 from django.db.models.functions import Concat
+from django.http import JsonResponse
 from django.utils.html import format_html
 
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.models.campus import Campus
 from base.models.entity_version import find_pedagogical_entities_version
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
 from base.models.person import Person
@@ -174,3 +176,13 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
 
     def get_result_label(self, result):
         return "{last_name} {first_name}".format(last_name=result.last_name.upper(), first_name=result.first_name)
+
+
+class AcademicCalendarTypeAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        choices = AcademicCalendarTypes.choices()
+        if self.q:
+            choices = filter(lambda type_tuple: self.q in type_tuple[1], choices)
+
+        results = [{'id': id, 'text': value} for id, value in choices]
+        return JsonResponse({'results': results}, content_type='application/json')

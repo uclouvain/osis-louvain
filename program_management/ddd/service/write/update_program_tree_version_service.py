@@ -42,7 +42,7 @@ def update_program_tree_version(
         offer_acronym=command.offer_acronym,
         year=command.year,
         version_name=command.version_name,
-        is_transition=command.is_transition,
+        transition_name=command.transition_name,
     )
     repository = ProgramTreeVersionRepository()
     program_tree_version = repository.get(entity_id=identity)
@@ -83,7 +83,7 @@ def __call_delete_service(program_tree_version: 'ProgramTreeVersion', end_year_u
                         acronym=identity.offer_acronym,
                         year=year_to_delete,
                         version_name=identity.version_name,
-                        is_transition=identity.is_transition,
+                        transition_name=identity.transition_name,
                     )
                 )
             except exception.ProgramTreeVersionNotFoundException:

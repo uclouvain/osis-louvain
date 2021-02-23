@@ -29,16 +29,19 @@ from django.test import TestCase
 
 from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
 from base.business.event_perms import AcademicEvent
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 class ApplicationCourseCalendarSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.event_open = AcademicEvent(
+            id=10,
             title="Candidature en ligne",
             authorized_target_year=2020,
             start_date=datetime.date.today() - datetime.timedelta(days=2),
-            end_date=datetime.date.today() + datetime.timedelta(days=10)
+            end_date=datetime.date.today() + datetime.timedelta(days=10),
+            type=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
         )
         cls.serializer = ApplicationCourseCalendarSerializer(cls.event_open)
 

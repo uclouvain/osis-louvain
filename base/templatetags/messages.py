@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 from django import template
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
+from base.views.common import MSG_SPECIAL_WARNING_LEVEL, MSG_SPECIAL_WARNING_TITLE_LEVEL
 
 register = template.Library()
 
@@ -80,9 +80,16 @@ def as_messages_special_warning(context):
     request = context['request']
     all_messages = messages.get_messages(request)
 
-    messages_update_warning = [m.message for m in all_messages if m.tags == '']
+    messages_update_warning = [m.message for m in all_messages if m.tags == '' and m.level == MSG_SPECIAL_WARNING_LEVEL]
+    messages_update_warning_title = None
+    for m in all_messages:
+        if m.level == MSG_SPECIAL_WARNING_TITLE_LEVEL:
+            messages_update_warning_title = m.message
+            break
+    html = ''
     if messages_update_warning:
-        html = "<b>{}</b><ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
+        if messages_update_warning_title:
+            html = "<b>{}</b><ul>".format(messages_update_warning_title)
         for message in messages_update_warning:
             html += "<li>{}</li>".format(message)
         html += "</ul>"

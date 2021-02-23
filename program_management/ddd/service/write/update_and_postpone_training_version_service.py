@@ -32,7 +32,7 @@ from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateP
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.service.write import update_program_tree_version_service, \
     update_and_postpone_group_version_service, postpone_training_and_program_tree_modifications_service, \
-    postpone_program_tree_service, postpone_tree_version_service
+    postpone_program_tree_service, postpone_tree_specific_version_service
 
 
 def update_and_postpone_training_version(
@@ -56,12 +56,12 @@ def update_and_postpone_training_version(
         )
     )
 
-    postpone_tree_version_service.postpone_program_tree_version(
+    postpone_tree_specific_version_service.postpone_program_tree_version(
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=command.offer_acronym,
             from_version_name=command.version_name,
             from_year=command.year,
-            from_is_transition=command.is_transition,
+            from_transition_name=command.transition_name,
         )
     )
 
@@ -74,7 +74,7 @@ def __convert_to_update_tree_version_command(command: 'UpdateTrainingVersionComm
         offer_acronym=command.offer_acronym,
         version_name=command.version_name,
         year=command.year,
-        is_transition=command.is_transition,
+        transition_name=command.transition_name,
         title_en=command.title_en,
         title_fr=command.title_fr,
     )
@@ -102,5 +102,5 @@ def __convert_to_postpone_group_version(
         end_year=cmd.end_year,
         from_offer_acronym=cmd.offer_acronym,
         from_version_name=cmd.version_name,
-        from_is_transition=cmd.is_transition,
+        from_transition_name=cmd.transition_name,
     )

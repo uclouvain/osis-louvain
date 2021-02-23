@@ -10,7 +10,7 @@ from django.views import View
 
 from base.forms.exceptions import InvalidFormException
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -71,6 +71,9 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 self.content_formset.save()
                 success_messages = self.get_success_msg_updated_links()
                 display_success_messages(request, success_messages, extra_tags='safe')
+                check_formations_impacted_by_update(self.get_group_obj().code,
+                                                    self.get_group_obj().year, request,
+                                                    self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
             except InvalidFormException:
                 pass
