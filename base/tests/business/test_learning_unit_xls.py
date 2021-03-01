@@ -206,9 +206,11 @@ class TestLearningUnitXls(TestCase):
 
     @classmethod
     def create_version(cls, direct_parent_type):
-        cls.learning_unit_yr_version = LearningUnitYearFactory(academic_year=cls.academic_year,
-                                                               learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
-                                                               credits=10)
+        cls.learning_unit_yr_version = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
+            credits=10
+        )
         cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
         cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
             academic_year=cls.academic_year,
@@ -321,7 +323,7 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = get_data_part1(luy)
+        data = get_data_part1(luy, False)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -438,7 +440,7 @@ class TestLearningUnitXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = prepare_xls_content(qs, False, with_grp=True, with_attributions=True)
         self.assertEqual(len(result), 1)
 
         luy = annotate_qs(qs).get()
