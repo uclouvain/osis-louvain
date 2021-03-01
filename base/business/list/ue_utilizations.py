@@ -73,7 +73,7 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
 
 
 def _prepare_titles() -> List['str']:
-    titles_part1 = learning_unit_titles_part_1(False)
+    titles_part1 = learning_unit_titles_part_1(display_proposal=True)
     titles_part2 = learning_unit_titles_part2()
     titles_part2.extend(HEADER_PROGRAMS)
     titles_part1.append(str(HEADER_TEACHERS))

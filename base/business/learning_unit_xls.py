@@ -149,20 +149,9 @@ def annotate_qs(learning_unit_years: QuerySet) -> QuerySet:
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration, is_external_ue_list):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
-    titles_part1 = learning_unit_titles_part_1(is_external_ue_list)
-    titles_part2 = learning_unit_titles_part2()
-
-    if with_grp:
-        titles_part2.append(str(HEADER_PROGRAMS))
-
-    if with_attributions:
-        titles_part1.append(str(HEADER_TEACHERS))
+    titles_part1 = _prepare_titles(is_external_ue_list, with_attributions, with_grp)
 
     working_sheet_data = prepare_xls_content(learning_units, is_external_ue_list, with_grp, with_attributions)
-
-    titles_part1.extend(titles_part2)
-    if is_external_ue_list:
-        titles_part1.extend(_external_ue_titles())
     ws_data = xls_build.prepare_xls_parameters_list(working_sheet_data,
                                                     _get_parameters_configurable_list(learning_units,
                                                                                       titles_part1,
@@ -369,7 +358,7 @@ def learning_unit_titles_part2() -> List[str]:
     ]
 
 
-def learning_unit_titles_part_1(is_external_ue_list: bool) -> List[str]:
+def learning_unit_titles_part_1(display_proposal: bool) -> List[str]:
     common_titles_part1 = [
         str(_('Code')),
         str(_('Ac yr.')),
@@ -378,13 +367,13 @@ def learning_unit_titles_part_1(is_external_ue_list: bool) -> List[str]:
         str(_('Subtype')),
         str(_('Req. Entity')),
     ]
-    if is_external_ue_list:
-        proposal_titles = []
-    else:
+    if display_proposal:
         proposal_titles = [
             str(_('Proposal type')),
             str(_('Proposal status')),
             ]
+    else:
+        proposal_titles = []
     common_title_part2 = [
         str(_('Credits')),
         str(_('Alloc. Ent.')),
@@ -411,7 +400,7 @@ def extract_xls_data_from_learning_unit(learning_unit_yr: LearningUnitYear) -> L
 
 
 def create_xls(user, found_learning_units, filters):
-    titles = learning_unit_titles_part_1(False) + learning_unit_titles_part2()
+    titles = learning_unit_titles_part_1(display_proposal=True) + learning_unit_titles_part2()
     working_sheets_data = prepare_ue_xls_content(found_learning_units)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
                   xls_build.USER: get_name_or_username(user),
@@ -536,10 +525,24 @@ def _get_external_ue_data(learning_unit_yr: LearningUnitYear) -> List['str']:
     organization = learning_unit_yr.campus.organization
     external_learning_unit_yr = learning_unit_yr.externallearningunityear
     return [
-        organization.country,
-        organization.main_address.city,
+        organization.country if organization.country else '',
+        organization.main_address.city if organization.main_address else '',
         organization.name,
         external_learning_unit_yr.external_acronym,
-        external_learning_unit_yr.url,
-        external_learning_unit_yr.external_credits
+        external_learning_unit_yr.url if external_learning_unit_yr.url else '',
+        "{0:.2f}".format(external_learning_unit_yr.external_credits)
+        if external_learning_unit_yr.external_credits else ''
     ]
+
+
+def _prepare_titles(is_external_ue_list: bool, with_attributions: bool, with_grp: bool) -> List[str]:
+    titles = learning_unit_titles_part_1(not is_external_ue_list)
+    titles_part2 = learning_unit_titles_part2()
+    if with_grp:
+        titles_part2.append(str(HEADER_PROGRAMS))
+    if with_attributions:
+        titles.append(str(HEADER_TEACHERS))
+    titles.extend(titles_part2)
+    if is_external_ue_list:
+        titles.extend(_external_ue_titles())
+    return titles
