@@ -7,8 +7,11 @@ from base.models.entity_version_address import EntityVersionAddress
 from base.views.learning_units.search.common import BaseLearningUnitSearch, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 from osis_common.decorators.ajax import ajax_required
+from base.utils.search import RenderToExcel
+from base.views.learning_units.search.common import _create_xls_with_parameters
 
 
+@RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
 class ExternalLearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/external.html"
     search_type = SearchTypes.EXTERNAL_SEARCH

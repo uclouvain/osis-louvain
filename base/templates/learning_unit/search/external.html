@@ -9,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,20 @@
                     </div>
 
                     <div class="col-md-9">
+                       <div class="dropdown {{ dropdirection }} pull-right">
+                            <button id="dLabel" class="btn btn-default" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="margin-right:10px;"
+                                    title="{% trans 'Export' %}">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-large row pull-right">
+                                <li>
+                                    {% include 'learning_unit/blocks/list_button/with_parameters.html' %}
+                                </li>
+                            </ul>
+                        </div>
                         <div class="pull-right" style="margin-right: 10px">
                             {% base_pagination_size_select %}
                         </div>
@@ -63,6 +77,7 @@
                 </div>
             {% endif %}
         </div>
+        {% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endblock panel %}
 
 {% block script %}
@@ -135,4 +150,5 @@
                     {{ items_per_page }}, "{{ request.path }}", columnDefs);
     });
 </script>
+<script type="text/javascript" src="{% static "js/ue_xls_common.js" %}"></script>
 {% endblock script %}
