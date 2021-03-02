@@ -489,40 +489,47 @@ class TestLearningUnitXls(TestCase):
         titles = _prepare_titles(is_external_ue_list=False, with_grp=False, with_attributions=False)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_for_proposals() + _expected_titles_common_part2_a() + _expected_titles_common_part2_b())
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + _expected_titles_common_part2_b())
         # without grp/attribution
         # and external
         titles = _prepare_titles(is_external_ue_list=True, with_grp=False, with_attributions=False)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + _expected_titles_common_part2_b() + _expected_titles_for_external())
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() +
+                             _expected_titles_common_part2_b() + _expected_titles_for_external())
         # with grp and without attribution
         # no external
         titles = _prepare_titles(is_external_ue_list=False, with_grp=True, with_attributions=False)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_for_proposals() + _expected_titles_common_part2_a() + _expected_titles_common_part2_b() + [HEADER_PROGRAMS]
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + _expected_titles_common_part2_b() + [HEADER_PROGRAMS]
                              )
         # with grp and without attribution
         # and external
         titles = _prepare_titles(is_external_ue_list=True, with_grp=True, with_attributions=False)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() +
+                             _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
                              )
         # with grp/attribution
         # no external
         titles = _prepare_titles(is_external_ue_list=False, with_grp=True, with_attributions=True)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_for_proposals() + _expected_titles_common_part2_a() + [HEADER_TEACHERS]+ _expected_titles_common_part2_b() + [HEADER_PROGRAMS]
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + [HEADER_TEACHERS] + _expected_titles_common_part2_b() +
+                             [HEADER_PROGRAMS]
                              )
         # with grp/attribution
         # and external
         titles = _prepare_titles(is_external_ue_list=True, with_grp=True, with_attributions=True)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + [HEADER_TEACHERS] + _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + [HEADER_TEACHERS] +
+                             _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
                              )
 
     def _get_luy_expected_data(self, luy, is_external_ue: bool):
@@ -706,6 +713,7 @@ def _expected_titles_common_part2_b():
         str(_('Session derogation')),
         str(_('Language')),
     ]
+
 
 def _expected_titles_for_proposals():
     return [
