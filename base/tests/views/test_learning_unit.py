@@ -1080,7 +1080,7 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = learning_unit_titles_part_1()
+    titles = learning_unit_titles_part_1(display_proposal=True)
     titles.extend(learning_unit_titles_part2())
     return {
         xls_build.LIST_DESCRIPTION_KEY: _(base.business.learning_unit_xls.XLS_DESCRIPTION),

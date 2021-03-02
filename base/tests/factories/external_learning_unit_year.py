@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class ExternalLearningUnitYearFactory(DjangoModelFactory):
         
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+                                               datetime.datetime(2017, 3, 1))
     external_acronym = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     external_credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
 
@@ -49,3 +49,4 @@ class ExternalLearningUnitYearFactory(DjangoModelFactory):
     requesting_entity = factory.SubFactory(EntityFactory)
     author = factory.SubFactory(PersonFactory)
     co_graduation = True
+    url = factory.Faker('url')

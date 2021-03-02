@@ -73,7 +73,7 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
 
 
 def _prepare_titles() -> List['str']:
-    titles_part1 = learning_unit_titles_part_1()
+    titles_part1 = learning_unit_titles_part_1(display_proposal=True)
     titles_part2 = learning_unit_titles_part2()
     titles_part2.extend(HEADER_PROGRAMS)
     titles_part1.append(str(HEADER_TEACHERS))
@@ -103,7 +103,7 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
     cells_with_border_top = []
     cells_to_color = defaultdict(list)
     for learning_unit_yr in qs:
-        lu_data_part1 = get_data_part1(learning_unit_yr)
+        lu_data_part1 = get_data_part1(learning_unit_yr, False)
         lu_data_part2 = get_data_part2(learning_unit_yr, True)
 
         if hasattr(learning_unit_yr, "element") and learning_unit_yr.element.children_elements.all():

@@ -135,14 +135,7 @@ def _create_xls_comparison(view_obj, context, **response_kwargs):
 
 
 def _create_xls_with_parameters(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    other_params = {
-        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
-        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
-    }
-    return create_xls_with_parameters(user, luys, filters, other_params)
+    return _create_ue_list_with_parameters(context, view_obj)
 
 
 def _create_xls_attributions(view_obj, context, **response_kwargs):
@@ -168,3 +161,18 @@ def _create_xls_ue_utilizations_with_one_training_per_line(view_obj, context, **
                                                                  context["filter"].qs,
                                                                  filters
                                                                  )
+
+
+def _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=False):
+    user = view_obj.request.user
+    luys = context["filter"].qs
+    filters = _get_filter(context["form"], view_obj.search_type)
+    other_params = {
+        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
+        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
+    }
+    return create_xls_with_parameters(user, luys, filters, other_params, is_external_ue_list)
+
+
+def _create_xls_external_ue_with_parameters(view_obj, context, **response_kwargs):
+    return _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=True)
