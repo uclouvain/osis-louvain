@@ -2,11 +2,13 @@
 import datetime
 
 from django.db import migrations
+from django.db.models import Q
 from django.utils import timezone
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from education_group.models.group import Group
 
 EDUCATION_GROUP_START_YEARS = {
     '10378': 1984,
@@ -81,6 +83,7 @@ def clean_start_years(apps, schema_editor):
     problematic_egys = find_problematic_egys()
     print("Problematic EducationGroupYears: {}".format(len(problematic_egys)))
     education_group_to_update = []
+    group_to_update = []
     for egy in problematic_egys:
         education_group = egy.education_group
         start_year = EDUCATION_GROUP_START_YEARS[str(education_group.id)]
@@ -96,10 +99,19 @@ def clean_start_years(apps, schema_editor):
                 'end_date': datetime.datetime(start_year + 1, 10, 31)
             }
         )
-        education_group.start_year = anac
+        education_group.start_year_id = anac.id
         education_group.changed = timezone.now()
         education_group_to_update.append(education_group)
-    EducationGroup.objects.bulk_update(education_group_to_update, ['start_year', 'changed'], batch_size=1000)
+
+        group = egy.educationgroupversion_set.get(
+            Q(version_name='') | Q(version_name__isnull=True),
+            transition_name=''
+        ).root_group.group
+        group.start_year_id = anac.id
+        group.changed = timezone.now()
+        group_to_update.append(group)
+    EducationGroup.objects.bulk_update(education_group_to_update, ['start_year_id', 'changed'], batch_size=1000)
+    Group.objects.bulk_update(group_to_update, ['start_year_id', 'changed'], batch_size=1000)
 
 
 def find_problematic_egys():
