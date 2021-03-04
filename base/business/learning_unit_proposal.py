@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils import send_mail as send_mail_util
 from osis_role.errors import get_permission_error
 from reference.models import language
@@ -99,14 +101,14 @@ def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
         return ProposalType.MODIFICATION.name
 
 
-def reinitialize_data_before_proposal(learning_unit_proposal):
+def reinitialize_data_before_proposal(learning_unit_proposal: ProposalLearningUnit):
     learning_unit_year = learning_unit_proposal.learning_unit_year
     initial_data = learning_unit_proposal.initial_data
     _reinitialize_model_before_proposal(learning_unit_year, initial_data["learning_unit_year"])
     _reinitialize_model_before_proposal(learning_unit_year.learning_unit, initial_data["learning_unit"])
     _reinitialize_model_before_proposal(learning_unit_year.learning_container_year,
                                         initial_data["learning_container_year"])
-    _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {})
+    _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {}, learning_unit_year)
 
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
@@ -457,11 +459,12 @@ def update_or_create_learning_unit_component(obj_model, attribute_initial_values
     obj_model.save()
 
 
-def _reinitialize_components_before_proposal(initial_components):
+def _reinitialize_components_before_proposal(initial_components: dict, luy: LearningUnitYear):
     for initial_data_by_model in initial_components:
         an_id = initial_data_by_model.get('id')
         if an_id:
-            learning_component_year = mdl_base.learning_component_year.LearningComponentYear.objects.get(pk=an_id)
+            learning_component_year, created = mdl_base.learning_component_year.LearningComponentYear.objects.\
+                get_or_create(pk=an_id, defaults={'learning_unit_year': luy})
             update_or_create_learning_unit_component(learning_component_year, initial_data_by_model)
 
 
