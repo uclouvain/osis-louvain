@@ -42,7 +42,7 @@ def _get_or_create_group(egy, version):
         partial_acronym=egy.partial_acronym
     )
     if not existing_group:
-        print("Creating new group")
+        print("\tCreating new group")
         group = version.root_group
         group.pk = None
         group.external_id = None
@@ -50,7 +50,7 @@ def _get_or_create_group(egy, version):
         group.academic_year = egy.academic_year
         group.save()
     else:
-        print("Using existing group")
+        print("\tUsing existing group")
         group = existing_group.first()
     return group
 
