@@ -105,7 +105,7 @@ def clean_start_years(apps, schema_editor):
 
         group = egy.educationgroupversion_set.get(
             Q(version_name='') | Q(version_name__isnull=True),
-            transition_name=''
+            is_transition=False
         ).root_group.group
         group.start_year_id = anac.id
         group.changed = timezone.now()
