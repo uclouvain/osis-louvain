@@ -9,6 +9,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group import Group
+from education_group.models.group_year import GroupYear
 
 EDUCATION_GROUP_START_YEARS = {
     '10378': 1984,
@@ -82,6 +83,30 @@ EDUCATION_GROUP_START_YEARS = {
 def clean_start_years(apps, schema_editor):
     problematic_egys = find_problematic_egys()
     print("Problematic EducationGroupYears: {}".format(len(problematic_egys)))
+    clean_start_years_from_data_dict(problematic_egys)
+    problematic_gys = find_problematic_gys()
+    print("Problematic EducationGroupYears: {}".format(len(problematic_gys)))
+    clean_start_years_from_egys(problematic_gys)
+
+
+def clean_start_years_from_egys(problematic_gys):
+    groups_to_update = []
+    for gy in problematic_gys:
+        egy = EducationGroupYear.objects.filter(
+            partial_acronym=gy.partial_acronym
+        ).order_by('academic_year__year').last()
+        print("Changing start year of {} from {} to {}".format(
+            gy.partial_acronym,
+            gy.group.start_year.year,
+            egy.education_group.start_year.year
+        ))
+        gy.group.start_year_id = egy.education_group.start_year_id
+        gy.group.changed = timezone.now()
+        groups_to_update.append(gy.group)
+    Group.objects.bulk_update(groups_to_update, ['start_year_id', 'changed'], batch_size=1000)
+
+
+def clean_start_years_from_data_dict(problematic_egys):
     education_group_to_update = []
     group_to_update = []
     for egy in problematic_egys:
@@ -118,6 +143,12 @@ def find_problematic_egys():
     return EducationGroupYear.objects.filter(
         education_group__start_year__year=1900
     ).order_by('education_group').distinct('education_group')
+
+
+def find_problematic_gys():
+    return GroupYear.objects.filter(
+        group__start_year__year=1900
+    ).order_by('group').distinct('group')
 
 
 class Migration(migrations.Migration):
