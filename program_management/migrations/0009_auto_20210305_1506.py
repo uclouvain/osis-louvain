@@ -5,7 +5,9 @@ from django.db import migrations
 from django.db.models import Q
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.group_element_year import GroupElementYear
 from education_group.models.group_year import GroupYear
+from program_management.models.element import Element
 
 
 def clean_offers_without_version(apps, schema_editor):
@@ -21,10 +23,78 @@ def create_missing_version_and_group_after_2018(problematic_egys):
     print("Creating {} missing Versions & Groups (after 2018)".format(len(after_2018_egys)))
     for egy in after_2018_egys:
         print("\tCreating {} {}".format(egy.acronym, egy.academic_year.year))
-        previous_egy = egy.education_group.educationgroupyear_set.get(academic_year__year=egy.academic_year.year - 1)
-        version = previous_egy.educationgroupversion_set.get(version_name='', is_transition=False)
-        group = _get_or_create_group(egy, version)
-        _create_version(egy, group, version)
+        previous_egy = egy.education_group.educationgroupyear_set.prefetch_related(
+            'educationgroupversion_set'
+        ).get(academic_year__year=egy.academic_year.year - 1)
+        previous_version = previous_egy.educationgroupversion_set.prefetch_related(
+            'root_group__element__parent_elements'
+        ).get(version_name='', is_transition=False)
+        previous_geys = previous_version.root_group.element.parent_elements.all()
+
+        group = _get_or_create_group(egy, previous_version)
+
+        element = _get_or_create_element(group)
+
+        _copy_content_from_previous_year(egy, element, previous_geys)
+
+        _create_version(egy, group, previous_version)
+
+
+def _get_or_create_element(group):
+    element, e_created = Element.objects.get_or_create(
+        group_year_id=group.id
+    )
+    if e_created:
+        print("\t\tNew element created")
+    return element
+
+
+def _copy_content_from_previous_year(egy, element, previous_geys):
+    for previous_gey in previous_geys:
+        new_child = _get_or_create_child(egy, previous_gey)
+        child_element, _ = Element.objects.get_or_create(group_year=new_child)
+
+        new_gey, g_created = GroupElementYear.objects.get_or_create(
+            parent_element_id=element.pk,
+            child_element_id=child_element.pk,
+            defaults={
+                'relative_credits': previous_gey.relative_credits,
+                'min_credits': previous_gey.min_credits,
+                'max_credits': previous_gey.max_credits,
+                'is_mandatory': previous_gey.is_mandatory,
+                'block': previous_gey.block,
+                'access_condition': previous_gey.access_condition,
+                'comment': previous_gey.comment,
+                'comment_english': previous_gey.comment_english,
+                'own_comment': previous_gey.own_comment,
+                'quadrimester_derogation': previous_gey.quadrimester_derogation,
+                'link_type': previous_gey.link_type
+            }
+        )
+        if g_created:
+            print("\t\tGroupElementYear (parent={}, child={}) created".format(
+                egy.partial_acronym,
+                child_element.group_year.partial_acronym
+            ))
+
+
+def _get_or_create_child(egy, previous_gey):
+    previous_child = previous_gey.child_element.group_year
+    existing_child = GroupYear.objects.filter(
+        partial_acronym=previous_child.partial_acronym,
+        academic_year=egy.academic_year
+    )
+    if not existing_child:
+        new_child = previous_child
+        new_child.pk = None
+        new_child.external_id = None
+        new_child.academic_year = egy.academic_year
+        new_child.uuid = uuid.uuid4()
+        new_child.save()
+
+    else:
+        new_child = existing_child.first()
+    return new_child
 
 
 def _create_version(egy, group, version):
@@ -42,7 +112,7 @@ def _get_or_create_group(egy, version):
         partial_acronym=egy.partial_acronym
     )
     if not existing_group:
-        print("\tCreating new group")
+        print("\t\tCreating new group")
         group = version.root_group
         group.pk = None
         group.external_id = None
@@ -50,7 +120,7 @@ def _get_or_create_group(egy, version):
         group.academic_year = egy.academic_year
         group.save()
     else:
-        print("\tUsing existing group")
+        print("\t\tUsing existing group")
         group = existing_group.first()
     return group
 
@@ -76,8 +146,11 @@ def find_problematic_egys():
         educationgroupversion__isnull=True
     ).exclude(
         Q(acronym__icontains='11BA') | Q(acronym__icontains='common')
+    ).select_related(
+        'academic_year'
     ).prefetch_related(
         'offerenrollment_set',
+        'education_group__educationgroupyear_set'
     ).order_by('academic_year__year')
 
 
