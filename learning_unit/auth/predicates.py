@@ -28,8 +28,6 @@ FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
-DELETABLE_CONTAINER_TYPES = [LearningContainerYearType.DISSERTATION, LearningContainerYearType.INTERNSHIP]
-
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("You can only modify a learning unit when your are linked to its requirement entity"))
@@ -97,17 +95,14 @@ def has_learning_unit_prerequisite_dependencies(self, user, learning_unit_year):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=_(
-        "Learning unit type is not deletable because it is either a full course or it has the following type: %(types)s"
-    ) % {"types": [type.value for type in DELETABLE_CONTAINER_TYPES]}
+    message=_("Learning unit type is not deletable because it is a full course")
 )
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_container_type_deletable(self, user, learning_unit_year):
     if learning_unit_year:
         container_type = learning_unit_year.learning_container_year.container_type
         is_full_course = container_type == container_types.COURSE and learning_unit_year.is_full()
-        type_is_deletable = container_type not in [type.name for type in DELETABLE_CONTAINER_TYPES]
-        return not is_full_course and type_is_deletable
+        return not is_full_course
     return None
 
 

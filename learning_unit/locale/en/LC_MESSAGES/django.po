@@ -35,10 +35,8 @@ msgstr ""
 msgid "Learning unit type is not allowed for attributions"
 msgstr ""
 
-#, python-format
 msgid ""
-"Learning unit type is not deletable because it is either a full course or it "
-"has the following type: %(types)s"
+"Learning unit type is not deletable because it is a full course"
 msgstr ""
 
 msgid "Only letters are allowed."

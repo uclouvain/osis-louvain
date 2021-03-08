@@ -34,13 +34,10 @@ msgstr "L'unité d'enseignement n'est pas un cours complet"
 msgid "Learning unit type is not allowed for attributions"
 msgstr "L'unité d'enseignement ne peut pas être attribuée"
 
-#, python-format
 msgid ""
-"Learning unit type is not deletable because it is either a full course or it "
-"has the following type: %(types)s"
+"Learning unit type is not deletable because it is a full course"
 msgstr ""
-"L'unité d'enseignement ne peut pas être supprimée car il s'agit soit d'un "
-"cours complet, soit d'un des types suivants: %(types)s"
+"L'unité d'enseignement ne peut pas être supprimée car il s'agit d'un cours complet"
 
 msgid "Only letters are allowed."
 msgstr "Seulement des lettres sont acceptées."
