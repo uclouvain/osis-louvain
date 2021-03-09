@@ -4,14 +4,9 @@ from django.db import migrations
 from django.db.models import F
 from django.utils import timezone
 
-from base.models.education_group import EducationGroup
-from base.models.education_group_year import EducationGroupYear
-from education_group.models.group import Group
-from education_group.models.group_year import GroupYear
-
 
 def clean_end_years(apps, schema_editor):
-    problematic_gys = find_problematic_gys()
+    problematic_gys = find_problematic_gys(apps)
     print("Problematic GroupYears: {}".format(len(problematic_gys)))
     group_to_update = []
     for gy in problematic_gys:
@@ -25,9 +20,10 @@ def clean_end_years(apps, schema_editor):
         gy.group.end_year_id = gy.academic_year_id
         gy.group.changed = timezone.now()
         group_to_update.append(gy.group)
+    Group = apps.get_model('education_group', 'Group')
     Group.objects.bulk_update(group_to_update, ['end_year_id', 'changed'], batch_size=1000)
 
-    problematic_egys = find_problematic_egys()
+    problematic_egys = find_problematic_egys(apps)
     print("Problematic EducationGroupYears: {}".format(len(problematic_egys)))
     education_group_to_update = []
     for egy in problematic_egys:
@@ -41,10 +37,12 @@ def clean_end_years(apps, schema_editor):
         egy.education_group.end_year_id = egy.academic_year_id
         egy.education_group.changed = timezone.now()
         education_group_to_update.append(egy.education_group)
+    EducationGroup = apps.get_model('base', 'EducationGroup')
     EducationGroup.objects.bulk_update(education_group_to_update, ['end_year_id', 'changed'], batch_size=1000)
 
 
-def find_problematic_gys():
+def find_problematic_gys(apps):
+    GroupYear = apps.get_model('education_group', 'GroupYear')
     return GroupYear.objects.filter(
         group__end_year__year__lt=F('academic_year__year')
     ).exclude(
@@ -55,7 +53,8 @@ def find_problematic_gys():
     ).distinct('group_id')
 
 
-def find_problematic_egys():
+def find_problematic_egys(apps):
+    EducationGroupYear = apps.get_model('base', 'EducationGroupYear')
     return EducationGroupYear.objects.filter(
         education_group__end_year__year__lt=F('academic_year__year')
     ).order_by(
