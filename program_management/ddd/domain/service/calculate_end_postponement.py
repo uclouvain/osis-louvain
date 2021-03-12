@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from django.conf import settings
 
 from base.models import academic_year
 from education_group.ddd.business_types import *
@@ -31,9 +31,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.identity_search import TrainingOrMiniTrainingOrGroupIdentitySearch, \
-    ProgramTreeVersionIdentitySearch, ProgramTreeIdentitySearch
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 DEFAULT_YEARS_TO_POSTPONE = 6
@@ -92,6 +90,8 @@ class CalculateEndPostponement(interface.DomainService):
 
 
 def _calculate_end_postponement(identity, repository) -> int:
+    if identity.year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
+        return identity.year
     max_year = CalculateEndPostponement.calculate_end_postponement_limit()
     obj = repository.get(identity)
     if hasattr(obj, 'end_year_of_existence'):
