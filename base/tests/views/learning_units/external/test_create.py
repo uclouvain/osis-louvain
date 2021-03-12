@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.contrib.messages import get_messages, SUCCESS
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from waffle.testutils import override_flag
 
@@ -32,7 +32,7 @@ from base.models.enums.organization_type import MAIN
 from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity import EntityWithVersionFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
 from base.views.learning_units.external.create import get_external_learning_unit_creation_form
@@ -46,16 +46,17 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 class TestCreateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.entity = EntityWithVersionFactory(organization__type=MAIN)
+        cls.entity = MainEntityVersionFactory().entity
         cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
+
+        AcademicYearFactory.produce_in_future(current_year=YEAR_LIMIT_LUE_MODIFICATION-1)
 
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=get_current_year())
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
         cls.language = FrenchLanguageFactory()
-        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, entity=cls.entity)
         cls.url = reverse(get_external_learning_unit_creation_form, args=[cls.academic_year.pk])
         generate_learning_unit_edition_calendars(cls.academic_years)
 
@@ -72,8 +73,10 @@ class TestCreateExternalLearningUnitView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_create_post(self):
-        response = self.client.post(self.url, data=self.data)
+        data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.entity)
+        response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 302)
         messages = [m.level for m in get_messages(response.wsgi_request)]
         self.assertEqual(messages, [SUCCESS])

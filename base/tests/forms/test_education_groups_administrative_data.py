@@ -36,6 +36,7 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.offer_year_calendar import OfferYearCalendar
+from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -143,8 +144,10 @@ class TestAdministrativeDataForm(TestCase):
         self.assertEqual(result.get('session'), 1)
         self.assertEqual(result.get('education_group_year'), self.education_group_year)
 
-        from base.models import session_exam_calendar
-        session = session_exam_calendar.find_by_session_and_academic_year(1, self.education_group_year.academic_year)
+        session = SessionExamCalendar.objects.filter(
+            number_session=1,
+            academic_calendar__academic_year=self.education_group_year.academic_year
+        )
         acs = [s.academic_calendar for s in session]
         self.assertEqual(list(result.get('list_offer_year_calendar')),
                          list(OfferYearCalendar.objects.filter(education_group_year=self.education_group_year,
@@ -203,7 +206,6 @@ class TestAdministrativeDataForm(TestCase):
         oyc = formset_session.forms[0]._get_offer_year_calendar('scores_exam_diffusion')
         self.assertIsNone(oyc.id)
         self.assertEqual(oyc.education_group_year, education_group_yr)
-        self.assertIsNone(oyc.offer_year)
 
     def _search_offer_year_calendar(self, education_group_yr, a_reference):
         academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=1,
@@ -288,7 +290,7 @@ class TestCourseEnrollmentForm(TestCase):
 
 class TestAdditionalInfoForm(TestCase):
     def test_get_new_course_enrollment_calendar(self):
-        academic_year = AcademicYearFactory(year=2017)
+        academic_year = AcademicYearFactory(current=True)
         education_group_yr = EducationGroupYearFactory(
             academic_year=academic_year,
             weighting=True,

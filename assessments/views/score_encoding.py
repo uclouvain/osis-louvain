@@ -48,6 +48,7 @@ from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
+from base.models import session_exam_calendar
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.models.person import Person
 from base.utils import send_mail
@@ -59,7 +60,7 @@ queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
 
 def _is_inside_scores_encodings_period(user):
-    return mdl.session_exam_calendar.current_session_exam()
+    return bool(mdl.session_exam_calendar.current_session_exam())
 
 
 def _is_not_inside_scores_encodings_period(user):
@@ -81,15 +82,15 @@ def outside_period(request):
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 
     if latest_session_exam:
-        session_number = latest_session_exam.number_session
-        str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
+        session_number = latest_session_exam.session
+        str_date = latest_session_exam.end_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
                              % {'session_number': session_number, 'str_date': str_date})
 
     if closest_new_session_exam:
-        session_number = closest_new_session_exam.number_session
-        str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
+        session_number = closest_new_session_exam.session
+        str_date = closest_new_session_exam.start_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
                              % {'session_number': session_number, 'str_date': str_date})
@@ -104,16 +105,16 @@ def outside_period(request):
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def scores_encoding(request):
     template_name = "scores_encoding.html"
-    academic_yr = mdl.academic_year.current_academic_year()
+    academic_yr = session_exam_calendar.current_opened_academic_year()
     number_session = mdl.session_exam_calendar.find_session_exam_number()
     score_encoding_progress_list = None
     context = {'academic_year': academic_yr,
                'number_session': number_session,
                'active_tab': request.GET.get('active_tab')}
 
-    offer_year_id = request.GET.get('offer', None)
-    if offer_year_id:
-        offer_year_id = int(offer_year_id)
+    education_group_year_id = request.GET.get('offer', None)
+    if education_group_year_id:
+        education_group_year_id = int(education_group_year_id)
 
     if program_manager.is_program_manager(request.user):
         template_name = "scores_encoding_by_learning_unit.html"
@@ -131,9 +132,12 @@ def scores_encoding(request):
             learning_unit_year_acronym = learning_unit_year_acronym.strip() \
                 if isinstance(learning_unit_year_acronym, str) \
                 else learning_unit_year_acronym
-            learning_unit_year_ids = list(mdl.learning_unit_year.search(academic_year_id=academic_yr.id,
-                                                                        acronym=learning_unit_year_acronym) \
-                                          .values_list('id', flat=True))
+            learning_unit_year_ids = list(
+                mdl.learning_unit_year.search(
+                    academic_year_id=academic_yr.id,
+                    acronym=learning_unit_year_acronym
+                ).values_list('id', flat=True)
+            )
         if tutor_id and tutor_id != NOBODY:
             learning_unit_year_ids_filter_by_tutor = mdl_attr.attribution.search(
                 tutor=tutor_id, list_learning_unit_year=learning_unit_year_ids
@@ -143,7 +147,7 @@ def scores_encoding(request):
 
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=request.user,
-            offer_year_id=offer_year_id,
+            education_group_year_id=education_group_year_id,
             number_session=number_session,
             academic_year=academic_yr,
             learning_unit_year_ids=learning_unit_year_ids
@@ -163,14 +167,14 @@ def scores_encoding(request):
 
         all_tutors = score_encoding_progress.find_related_tutors(request.user, academic_yr, number_session)
 
-        all_offers = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
+        all_offers = mdl.education_group_year.find_by_user(request.user, academic_yr=academic_yr).order_by('acronym')
 
         if not score_encoding_progress_list:
             messages.add_message(request, messages.WARNING, _('No result!'))
 
         context.update({'offer_list': all_offers,
                         'tutor_list': all_tutors,
-                        'offer_year_id': offer_year_id,
+                        'education_group_year_id': education_group_year_id,
                         'tutor_id': tutor_id,
                         'learning_unit_year_acronym': learning_unit_year_acronym,
                         'incomplete_encodings_only': incomplete_encodings_only,
@@ -180,22 +184,24 @@ def scores_encoding(request):
         tutor = mdl.tutor.find_by_user(request.user)
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=request.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session,
             academic_year=academic_yr
         )
-        all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
-        if offer_year_id:
+        education_group_year_list = score_encoding_progress.find_related_education_group_years(
+            score_encoding_progress_list
+        )
+        if education_group_year_id:
             score_encoding_progress_list = [
                 score_encoding for score_encoding in score_encoding_progress_list
-                if score_encoding.offer_year_id == offer_year_id
+                if score_encoding.education_group_year_id == education_group_year_id
             ]
 
         score_encoding_progress_list = score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
-                        'offer_year_list': all_offers,
-                        'offer_year_id': offer_year_id})
+                        'education_group_year_list': education_group_year_list,
+                        'education_group_year_id': education_group_year_id})
 
     context.update({
         'notes_list': score_encoding_progress_list
@@ -395,8 +401,8 @@ def _update_enrollments(request, scores_list_encoded, updated_enrollments):
 
 @login_required
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-def notes_printing_all(request, tutor_id=None, offer_id=None):
-    return notes_printing(request, tutor_id=tutor_id, offer_id=offer_id)
+def notes_printing_all(request, tutor_id=None, education_group_year_id=None):
+    return notes_printing(request, tutor_id=tutor_id, education_group_year_id=education_group_year_id)
 
 
 @login_required
@@ -417,27 +423,27 @@ def export_xls(request, learning_unit_year_id):
 @login_required
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def notes_printing(request, learning_unit_year_id=None, tutor_id=None, offer_id=None):
+def notes_printing(request, learning_unit_year_id=None, tutor_id=None, education_group_year_id=None):
     is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
     scores_list_encoded = score_encoding_list.get_scores_encoding_list(
         user=request.user,
         learning_unit_year_id=learning_unit_year_id,
         tutor_id=tutor_id,
-        offer_year_id=offer_id
+        education_group_year_id=education_group_year_id
     )
     tutor = mdl.tutor.find_by_user(request.user) if not is_program_manager else None
     sheet_data = score_encoding_sheet.scores_sheet_data(scores_list_encoded.enrollments, tutor=tutor)
     return paper_sheet.print_notes(sheet_data)
 
 
-def __send_messages_for_each_offer_year(
+def __send_messages_for_each_education_group_year(
         all_enrollments,
         learning_unit_year,
         updated_enrollments,
         pgm_manager: mdl.person.Person
 ):
     """
-    Send a message for each offer year to all the tutors of a learning unit inside a program
+    Send a message for each education group year to all the tutors of a learning unit inside a program
     managed by the program manager if all the scores
     of this learning unit, inside this program, are encoded and at most one score is newly encoded.
     Th encoder is a program manager, so all the encoded scores are final.
@@ -448,20 +454,24 @@ def __send_messages_for_each_offer_year(
     :return: A list of error message if message cannot be sent
     """
     sent_error_messages = []
-    offer_years = get_offer_years_from_enrollments(updated_enrollments)
-    score_sheet_addresses = score_sheet_address_mdl.search_from_offer_years(offer_years)
-    for offer_year in offer_years:
+    education_group_years = [
+        enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
+        for enrollment in updated_enrollments
+    ]
+    education_group_ids = {education_group_year.education_group_id for education_group_year in education_group_years}
+    score_sheet_addresses = score_sheet_address_mdl.search_from_education_group_ids(education_group_ids)
+    for education_group_year in education_group_years:
         score_sheet_address = next(
             (
                 score_sheet_address for score_sheet_address in score_sheet_addresses
-                if score_sheet_address.offer_year_id == offer_year.pk
+                if score_sheet_address.education_group_id == education_group_year.education_group_id
             ),
             None
         )
-        sent_error_message = __send_message_for_offer_year(
+        sent_error_message = __send_message_for_education_group_year(
             all_enrollments,
             learning_unit_year,
-            offer_year,
+            education_group_year,
             pgm_manager=pgm_manager,
             score_sheet_address=score_sheet_address
         )
@@ -470,21 +480,16 @@ def __send_messages_for_each_offer_year(
     return sent_error_messages
 
 
-def get_offer_years_from_enrollments(enrollments):
-    list_offer_years = [enrollment.learning_unit_enrollment.offer_enrollment.offer_year for enrollment in enrollments]
-    return list(set(list_offer_years))
-
-
-def __send_message_for_offer_year(
+def __send_message_for_education_group_year(
         all_enrollments,
         learning_unit_year,
-        offer_year,
+        education_group_year,
         pgm_manager: mdl.person.Person,
         score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None
 ):
-    enrollments = filter_enrollments_by_offer_year(all_enrollments, offer_year)
+    enrollments = filter_enrollments_by_education_group_year(all_enrollments, education_group_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
-    offer_acronym = offer_year.acronym
+    offer_acronym = education_group_year.acronym
     sent_error_message = None
     if progress == 100:
         receivers = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
@@ -502,9 +507,9 @@ def __send_message_for_offer_year(
     return sent_error_message
 
 
-def filter_enrollments_by_offer_year(enrollments, offer_year):
+def filter_enrollments_by_education_group_year(enrollments, education_group_year):
     filtered_enrollments = filter(
-        lambda enrollment: enrollment.learning_unit_enrollment.offer_enrollment.offer_year == offer_year,
+        lambda enrol: enrol.learning_unit_enrollment.offer_enrollment.education_group_year == education_group_year,
         enrollments
     )
     return list(filtered_enrollments)
@@ -567,7 +572,12 @@ def send_messages_to_notify_encoding_progress(
         pgm_manager: mdl.person.Person
 ):
     if is_program_manager:
-        __send_messages_for_each_offer_year(all_enrollments, learning_unit_year, updated_enrollments, pgm_manager)
+        __send_messages_for_each_education_group_year(
+            all_enrollments,
+            learning_unit_year,
+            updated_enrollments,
+            pgm_manager
+        )
 
 
 def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):
@@ -612,24 +622,24 @@ def _get_specific_criteria_context(request):
     last_name = post_data.get('last_name')
     first_name = post_data.get('first_name')
     justification = post_data.get('justification')
-    offer_year_id = post_data.get('program')
-    current_academic_year = mdl.academic_year.current_academic_year()
-    offers_year_managed = mdl.offer_year.find_by_user(request.user, current_academic_year)
+    educ_group_year_id = post_data.get('education_group_year_id')
+    current_academic_year = session_exam_calendar.current_opened_academic_year()
+    educ_group_years_managed = mdl.education_group_year.find_by_user(request.user, current_academic_year)
     is_program_manager = program_manager.is_program_manager(request.user)
 
     context = {
-        'offer_year_id': int(offer_year_id) if offer_year_id else None,
+        'education_group_year_id': int(educ_group_year_id) if educ_group_year_id else None,
         'registration_id': registration_id,
         'last_name': last_name,
         'first_name': first_name,
         'justification': justification,
-        'offer_list': offers_year_managed,
+        'offer_list': educ_group_years_managed,
         'is_program_manager': is_program_manager
     }
 
     if request.method == 'POST':
         # Make a search
-        if not registration_id and not last_name and not first_name and not justification and not offer_year_id:
+        if not registration_id and not last_name and not first_name and not justification and not educ_group_year_id:
             messages.add_message(request, messages.WARNING, _("Please choose at least one criteria!"))
         else:
             _append_search_to_specific_criteria_context(request, context)
@@ -643,7 +653,7 @@ def _append_search_to_specific_criteria_context(request, context):
         student_last_name=context['last_name'],
         student_first_name=context['first_name'],
         justification=context['justification'],
-        offer_year_id=context['offer_year_id']
+        education_group_year_id=context['education_group_year_id']
     )
     context.update(scores_list.__dict__)
     if not scores_list.enrollments:
@@ -683,7 +693,7 @@ def get_json_data_scores_sheets(tutor_global_id):
         person = mdl.person.find_by_global_id(tutor_global_id)
         tutor = mdl.tutor.find_by_person(person)
         number_session = mdl.session_exam_calendar.find_session_exam_number()
-        academic_yr = mdl.academic_year.current_academic_year()
+        academic_yr = session_exam_calendar.current_opened_academic_year()
 
         if tutor:
             exam_enrollments = list(mdl.exam_enrollment.find_for_score_encodings(number_session,

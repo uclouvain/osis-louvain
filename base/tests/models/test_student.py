@@ -27,9 +27,6 @@ from django.test import TestCase
 
 from base.models import student
 from base.models.student import Student
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonWithoutUserFactory, PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.models import test_person

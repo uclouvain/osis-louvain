@@ -48,20 +48,19 @@ from base.models.enums import number_session, academic_calendar_type
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.mixin.academic_year import AcademicYearMockMixin
 from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
 from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
     test_session_exam
 
 
-class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMixin):
+class MixinSetupOnlineEncoding(SessionExamCalendarMockMixin):
     def setUp(self):
         Group.objects.get_or_create(name="tutors")
         Group.objects.get_or_create(name="program_managers")
@@ -70,14 +69,12 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
         self.enrollments = data["exam_enrollments"]
         self.tutor = data["attribution"].tutor
         add_permission(self.tutor.person.user, "can_access_scoreencoding")
-        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0, 2)]
+        self.program_managers = [
+            ProgramManagerFactory(education_group=data["education_group_years"][i].education_group)
+            for i in range(0, 2)
+        ]
         [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0, 2)]
 
-        # Mock academic_year / session_exam_calendar in order to be decouple test from system time
-        self.mock_academic_year(
-            current_academic_year=data["academic_year"],
-            starting_academic_year=data["academic_year"],
-        )
         self.mock_session_exam_calendar(current_session_exam=data["session_exam_calendar"])
 
     def assert_exam_enrollments(self, exam_enrollment, score_draft, score_final, justification_draft,
@@ -138,11 +135,11 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
 
     def get_form_for_specific_criteria(self):
         exam_enrollment = self.enrollments[0]
-        offer_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+        education_group_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
         return {"score_" + str(exam_enrollment.id): "15",
                 "justification_" + str(exam_enrollment.id): "",
                 "score_changed_" + str(exam_enrollment.id): "true",
-                "program": str(offer_year.id)
+                "education_group_year_id": str(education_group_year.id)
                 }
 
 
@@ -183,12 +180,12 @@ class TestOnlineEncodingTransaction(MixinSetupOnlineEncoding, TransactionTestCas
 
 
 class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
-    def test_filter_enrollments_by_offer_year(self):
+    def test_filter_enrollments_by_education_group_year(self):
         enrollments = self.enrollments
 
         expected = [self.enrollments[0]]
-        offer_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.offer_year
-        actual = score_encoding.filter_enrollments_by_offer_year(enrollments, offer_year)
+        education_group_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.education_group_year
+        actual = score_encoding.filter_enrollments_by_education_group_year(enrollments, education_group_year)
 
         self.assertListEqual(expected, actual, "Should only return enrollments for the first offer year")
 
@@ -284,7 +281,11 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
 
     @patch("assessments.views.score_encoding._extract_id_from_post_data")
     @patch("assessments.business.score_encoding_list.get_scores_encoding_list")
-    def test_encoding_by_specific_criteria_case_no_changes_in_form(self, mock_scores_encoding_list, mock_id_from_post_data):
+    def test_encoding_by_specific_criteria_case_no_changes_in_form(
+            self,
+            mock_scores_encoding_list,
+            mock_id_from_post_data
+    ):
         mock_scores_encoding_list.return_value = ScoresEncodingList()
         mock_id_from_post_data.return_value = []
         request = self.client.get(reverse('specific_criteria_submission'))
@@ -293,7 +294,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(scores_encoding_object.enrollments, [])
 
     @patch("base.utils.send_mail.send_message_after_all_encoded_by_manager")
-    def test_email_after_encoding_all_students_for_offer_year(self, mock_send_email):
+    def test_email_after_encoding_all_students_for_education_group_year(self, mock_send_email):
         self.client.force_login(self.program_managers[0].person.user)
         mock_send_email.return_value = None
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
@@ -304,11 +305,11 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[0]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
-        offer_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.offer_year
-        self.assertEqual(offer_acronym, offer_year.acronym)
+        education_group_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.education_group_year
+        self.assertEqual(offer_acronym, education_group_year.acronym)
 
     @patch("base.utils.send_mail.send_message_after_all_encoded_by_manager")
-    def test_email_after_encoding_all_students_for_offer_year_with_justification(self, mock_send_email):
+    def test_email_after_encoding_all_students_for_education_group_year_with_justification(self, mock_send_email):
         self.client.force_login(self.program_managers[1].person.user)
         mock_send_email.return_value = None
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
@@ -319,8 +320,8 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[1]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
-        offer_year = self.enrollments[1].learning_unit_enrollment.offer_enrollment.offer_year
-        self.assertEqual(offer_acronym, offer_year.acronym)
+        education_group_year = self.enrollments[1].learning_unit_enrollment.offer_enrollment.education_group_year
+        self.assertEqual(offer_acronym, education_group_year.acronym)
 
     @patch("base.utils.send_mail.send_mail_after_scores_submission")
     def test_online_encoding_submission_not_all_encoded(self, mock_send_mail_after_scores_submission):
@@ -348,7 +349,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):
+class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='score_encoding', password='score_encoding')
         add_permission(self.user, "can_access_scoreencoding")
@@ -361,23 +362,24 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
-        # Mock academic_year / session_exam_calendar in order to be decouple test from system time
-        self.mock_academic_year(
-            current_academic_year=self.academic_year,
-            starting_academic_year=self.academic_year,
-        )
         self.mock_session_exam_calendar(current_session_exam=None)
 
     def test_redirection_to_current_exam_session(self):
         self.mock_session_exam_calendar(current_session_exam=self.session_exam_calendar)
         url = reverse('outside_scores_encodings_period')
         response = self.client.get(url)
-        self.assertRedirects(response, "%s?next=%s" % (reverse('scores_encoding'), reverse('outside_scores_encodings_period')))  # Redirection
+        self.assertRedirects(
+            response,
+            "%s?next=%s" % (reverse('scores_encoding'), reverse('outside_scores_encodings_period'))
+        )
 
     def test_redirection_to_outside_encoding_period(self):
         url = reverse('scores_encoding')
         response = self.client.get(url)
-        self.assertRedirects(response, "%s?next=%s" % (reverse('outside_scores_encodings_period'), reverse('scores_encoding')))  # Redirection
+        self.assertRedirects(
+            response,
+            "%s?next=%s" % (reverse('outside_scores_encodings_period'), reverse('scores_encoding'))
+        )
 
     def test_message_score_encoding_not_open(self):
         self.session_exam_calendar.delete()
@@ -424,7 +426,7 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
                          % {'session_number': 2, 'str_date': start_date_str})
 
 
-class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):
+class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='score_encoding', password='score_encoding')
         self.person = PersonFactory(user=self.user)
@@ -433,48 +435,53 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
 
         # Set user as program manager of two offer
         academic_year = _get_academic_year(2017)
-        self.offer_year_bio2ma = OfferYearFactory(acronym="BIO2MA", title="Master en Biologie",
-                                                  academic_year=academic_year)
-        self.offer_year_bio2bac = OfferYearFactory(acronym="BIO2BAC", title="Bachelier en Biologie",
-                                                   academic_year=academic_year)
-        ProgramManagerFactory(offer_year=self.offer_year_bio2ma, person=self.person)
-        ProgramManagerFactory(offer_year=self.offer_year_bio2bac, person=self.person)
+        self.educ_group_year_bio2ma = EducationGroupYearFactory(
+            acronym="BIO2MA",
+            title="Master en Biologie",
+            academic_year=academic_year,
+        )
+        self.educ_group_year_bio2bac = EducationGroupYearFactory(
+            acronym="BIO2BAC",
+            title="Bachelier en Biologie", academic_year=academic_year,
+        )
+        ProgramManagerFactory(education_group=self.educ_group_year_bio2ma.education_group, person=self.person)
+        ProgramManagerFactory(education_group=self.educ_group_year_bio2bac.education_group, person=self.person)
 
         # Create an score submission event - with an session exam
         academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
                                                     academic_year=academic_year,
+                                                    data_year=academic_year,
                                                     reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         academic_calendar.save()
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=academic_calendar,
                                                                 number_session=number_session.ONE)
 
         # Offer : BIO2MA - 2 Learning unit with exam
-        self.offer_year_calendar_bio2ma = OfferYearCalendarFactory(offer_year=self.offer_year_bio2ma,
-                                                                   academic_calendar=academic_calendar)
+        self.educ_group_year_calendar_bio2ma = OfferYearCalendarFactory(
+            education_group_year=self.educ_group_year_bio2ma,
+            academic_calendar=academic_calendar,
+        )
 
         self.learning_unit_year = LearningUnitYearFactory(academic_year=academic_year)
         self.learning_unit_year_2 = LearningUnitYearFactory(academic_year=academic_year)
         self.first_session_exam = test_session_exam.create_session_exam(number_session.ONE,
                                                                         self.learning_unit_year,
-                                                                        self.offer_year_bio2ma)
+                                                                        self.educ_group_year_bio2ma)
         self.first_session_exam_2 = test_session_exam.create_session_exam(number_session.ONE,
                                                                           self.learning_unit_year_2,
-                                                                          self.offer_year_bio2ma)
+                                                                          self.educ_group_year_bio2ma)
 
         # Offer: BIO2BAC - 1 learning unit with exam
-        self.offer_year_calendar_bio2bac = OfferYearCalendarFactory(offer_year=self.offer_year_bio2ma,
-                                                                    academic_calendar=academic_calendar)
+        self.educ_group_year_calendar_bio2bac = OfferYearCalendarFactory(
+            education_group_year=self.educ_group_year_bio2ma,
+            academic_calendar=academic_calendar,
+        )
         self.learning_unit_year_3 = LearningUnitYearFactory(academic_year=academic_year)
         self.first_session_exam_3 = test_session_exam.create_session_exam(number_session.ONE,
                                                                           self.learning_unit_year_3,
-                                                                          self.offer_year_bio2bac)
+                                                                          self.educ_group_year_bio2bac)
 
         self._create_context_exam_enrollment()
-        # Mock academic_year / session_exam_calendar in order to be decouple from system time
-        self.mock_academic_year(
-            current_academic_year=academic_year,
-            starting_academic_year=academic_year,
-        )
         self.mock_session_exam_calendar(current_session_exam=self.session_exam_calendar)
 
     def test_get_score_encoding_list_empty(self):
@@ -492,11 +499,11 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
         context = response.context[-1]
         self.assertEqual(len(context['notes_list']), 3)
 
-    def test_get_score_encoding_check_offer_year_id_in_context(self):
-        response = self.client.get(reverse('scores_encoding'), data={'offer': str(self.offer_year_bio2ma.id)})
+    def test_get_score_encoding_check_education_group_year_id_in_context(self):
+        response = self.client.get(reverse('scores_encoding'), data={'offer': str(self.educ_group_year_bio2ma.id)})
         self.assertEqual(response.status_code, 200)
         context = response.context
-        self.assertEqual(context['offer_year_id'], self.offer_year_bio2ma.id)
+        self.assertEqual(context['education_group_year_id'], self.educ_group_year_bio2ma.id)
 
     def _create_context_exam_enrollment(self):
         self.students = []
@@ -505,7 +512,7 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
             if index < 5:
                 # For the 5 first students register to the BIO2MA
                 offer_enrollment = test_offer_enrollment.create_offer_enrollment(self.students[index],
-                                                                                 self.offer_year_bio2ma)
+                                                                                 self.educ_group_year_bio2ma)
                 learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(
                                                                               offer_enrollment=offer_enrollment,
                                                                               learning_unit_year=self.learning_unit_year)
@@ -516,7 +523,7 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
                 test_exam_enrollment.create_exam_enrollment(self.first_session_exam_2, learning_unit_enrollment_2)
             else:
                 # For the other register to the BIO2BAC
-                offer_enrollment = test_offer_enrollment.create_offer_enrollment(self.students[index], self.offer_year_bio2bac)
+                offer_enrollment = test_offer_enrollment.create_offer_enrollment(self.students[index], self.educ_group_year_bio2bac)
                 learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(offer_enrollment=offer_enrollment,
                                                                                                          learning_unit_year=self.learning_unit_year_3)
                 test_exam_enrollment.create_exam_enrollment(self.first_session_exam_3, learning_unit_enrollment)

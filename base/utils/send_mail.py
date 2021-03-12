@@ -79,7 +79,7 @@ def send_mail_after_scores_submission(persons: List[Person], learning_unit_name:
     justifications = dict(JUSTIFICATION_TYPES)
     submitted_enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
@@ -298,7 +298,7 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
     justifications = dict(JUSTIFICATION_TYPES)
     enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,

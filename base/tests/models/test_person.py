@@ -42,11 +42,9 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory, \
     ProgramManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
     FacultyManagerForUEFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -288,13 +286,3 @@ class PersonTest(PersonTestCase):
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
-
-    def test_managed_programs(self):
-        offer_year_1 = OfferYearFactory()
-        offer_year_2 = OfferYearFactory()
-        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_1)
-        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_2)
-        managed_programs = self.person_with_user.get_managed_programs()
-        self.assertTrue(len(managed_programs) == 2)
-        self.assertTrue(offer_year_1 in managed_programs)
-        self.assertTrue(offer_year_2 in managed_programs)

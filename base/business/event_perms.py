@@ -197,6 +197,15 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
             None
         )
 
+    def get_opened_academic_events(self, date=None) -> List[AcademicSessionEvent]:
+        return super().get_opened_academic_events(date=date)
+
+    def get_previous_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_previous_academic_event(date=date)
+
+    def get_next_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_next_academic_event(date=date)
+
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(

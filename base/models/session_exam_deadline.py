@@ -37,7 +37,7 @@ class SessionExamDeadlineAdmin(OsisModelAdmin):
     list_filter = ('number_session',)
     raw_id_fields = ('offer_enrollment',)
     search_fields = ['offer_enrollment__student__person__first_name', 'offer_enrollment__student__person__last_name',
-                     'offer_enrollment__student__registration_id', 'offer_enrollment__offer_year__acronym']
+                     'offer_enrollment__student__registration_id', 'offer_enrollment__education_group_year__acronym']
 
 
 class SessionExamDeadline(models.Model):

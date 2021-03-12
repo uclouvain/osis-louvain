@@ -33,8 +33,8 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
-from base.models.enums import structure_type
-from base.tests.factories import structure
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -45,6 +45,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 
@@ -59,10 +60,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.tutor = TutorFactory()
         cls.user = cls.tutor.person.user
         cls.academic_year = AcademicYearFactory(current=True)
-
-        # FIXME: Old structure model [To remove]
-        cls.structure = structure.StructureFactory()
-        cls.structure_children = structure.StructureFactory(part_of=cls.structure)
+        SessionExamCalendarFactory.create_academic_event(cls.academic_year)
 
         # New structure model
         entities_hierarchy = create_entities_hierarchy()
@@ -74,7 +72,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
 
         cls.entity_manager = EntityManagerFactory(
             person=cls.tutor.person,
-            structure=cls.structure,
             entity=cls.root_entity,
             with_child=True
         )
@@ -82,7 +79,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
-            structure=cls.structure,
             learning_unit__start_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
             learning_container_year__acronym="LBIR1210",
@@ -92,7 +88,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.learning_unit_year_children = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1211",
-            structure=cls.structure_children,
             learning_unit__start_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
             learning_container_year__acronym="LBIR1211",
@@ -241,14 +236,10 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
 
         cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
 
-        # FIXME: Old structure model [To remove]
-        cls.structure = structure.StructureFactory()
-
         entities_hierarchy = create_entities_hierarchy()
         cls.root_entity = entities_hierarchy.get('root_entity')
 
         cls.entity_manager = EntityManagerFactory(
-            structure=cls.structure,
             entity=cls.root_entity,
         )
         cls.entity_manager.person.user.groups.add(group)
@@ -256,7 +247,6 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
-            structure=cls.structure,
             learning_container_year__academic_year=cls.academic_year,
             learning_container_year__acronym="LBIR1210",
             learning_container_year__requirement_entity=cls.root_entity,
@@ -302,16 +292,12 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
 
-        # FIXME: Old structure model [To remove]
-        cls.structure = structure.StructureFactory(type=structure_type.FACULTY)
-
         entities_hierarchy = create_entities_hierarchy()
         cls.root_entity = entities_hierarchy.get('root_entity')
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
-            structure=cls.structure,
             learning_unit__start_year__year=2010,
             learning_container_year__acronym="LBIR1210",
             learning_container_year__requirement_entity=cls.root_entity,
@@ -325,12 +311,9 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         )
         cls.program_manager = ProgramManagerFactory(
             education_group=cls.education_group_year.education_group,
-            offer_year__academic_year=cls.academic_year,
-            offer_year__corresponding_education_group_year=None
         )
         offer_enrollment = OfferEnrollmentFactory(
             education_group_year=cls.education_group_year,
-            offer_year=cls.program_manager.offer_year
         )
         LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
@@ -366,22 +349,17 @@ class ScoresResponsibleAddTestCase(TestCase):
         cls.person = PersonFactory()
         cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
 
-        # FIXME: Old structure model [To remove]
-        cls.structure = structure.StructureFactory()
-
         entities_hierarchy = create_entities_hierarchy()
         cls.root_entity = entities_hierarchy.get('root_entity')
 
         cls.entity_manager = EntityManagerFactory(
             person=cls.person,
-            structure=cls.structure,
             entity=cls.root_entity,
         )
         cls.entity_manager.person.user.groups.add(group)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
-            structure=cls.structure,
             learning_container_year__academic_year=cls.academic_year,
             learning_container_year__acronym="LBIR1210",
             learning_container_year__requirement_entity=cls.root_entity,

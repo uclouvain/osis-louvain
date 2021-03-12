@@ -9,12 +9,11 @@ from osis_role.contrib import models as osis_role_models
 
 
 class EntityManagerAdmin(VersionAdmin, SerializableModelAdmin, osis_role_admin.EntityRoleModelAdmin):
-    list_display = ('person', 'structure', 'entity')
-    search_fields = ['person__first_name', 'person__last_name', 'structure__acronym']
+    list_display = ('person', 'entity')
+    search_fields = ['person__first_name', 'person__last_name', 'entity__entityversion__acronym']
 
 
 class EntityManager(osis_role_models.EntityRoleModel):
-    structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=True)
 
     class Meta:
