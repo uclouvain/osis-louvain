@@ -49,13 +49,11 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_training':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_program_edition_period_open,
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.change_minitraining':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_program_edition_period_open,
+                predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.change_group':
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
