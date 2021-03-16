@@ -30,7 +30,7 @@ import string
 import factory.fuzzy
 
 from assessments.models.enums import score_sheet_address_choices
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from reference.tests.factories.country import CountryFactory
 
 
@@ -41,7 +41,7 @@ class ScoreSheetAddressFactory(factory.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                           datetime.datetime(2017, 3, 1))
-    offer_year = factory.SubFactory(OfferYearFactory)
+    education_group = factory.SubFactory(EducationGroupFactory)
     entity_address_choice = factory.Iterator(score_sheet_address_choices.CHOICES, getter=operator.itemgetter(0))
     recipient = factory.Sequence(lambda n: 'Recipient - %d' % n)
     location = factory.Sequence(lambda n: 'Location - %d' % n)

@@ -30,7 +30,6 @@ import factory.fuzzy
 
 from base.models.enums import offer_enrollment_state
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.student import StudentFactory
 
 
@@ -43,7 +42,6 @@ class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                                        datetime.datetime(2017, 3, 1))
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    offer_year = factory.SubFactory(OfferYearFactory)
     student = factory.SubFactory(StudentFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     enrollment_state = offer_enrollment_state.SUBSCRIBED

@@ -28,15 +28,15 @@ import string
 
 import factory.fuzzy
 
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from osis_role.contrib.tests.factories import EducationGroupRoleModelFactory
 
 
 class ProgramManagerFactory(EducationGroupRoleModelFactory):
     class Meta:
         model = "base.ProgramManager"
-        django_get_or_create = ('person', 'offer_year')
+        django_get_or_create = ('person', 'education_group')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    offer_year = factory.SubFactory(OfferYearFactory)
+    education_group = factory.SubFactory(EducationGroupFactory)

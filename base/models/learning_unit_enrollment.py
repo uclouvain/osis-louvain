@@ -33,7 +33,7 @@ class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
     list_display = ('student', 'learning_unit_year', 'offer', 'date_enrollment', 'enrollment_state', 'changed')
     list_filter = ('learning_unit_year__academic_year', 'enrollment_state',)
     search_fields = ['learning_unit_year__acronym',
-                     'offer_enrollment__offer_year__acronym',
+                     'offer_enrollment__education_group_year__acronym',
                      'offer_enrollment__student__registration_id',
                      'offer_enrollment__student__person__first_name',
                      'offer_enrollment__student__person__last_name']
@@ -56,7 +56,7 @@ class LearningUnitEnrollment(SerializableModel):
 
     @property
     def offer(self):
-        return self.offer_enrollment.offer_year
+        return self.offer_enrollment.education_group_year
 
     def __str__(self):
         return u"%s - %s" % (self.learning_unit_year, self.offer_enrollment.student)

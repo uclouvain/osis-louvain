@@ -29,7 +29,7 @@ from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.education_group_year import find_with_enrollments_count
+from base.models.education_group_year import find_with_enrollments_count, find_by_user
 from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
 from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
@@ -42,7 +42,9 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import UserFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 
@@ -113,8 +115,6 @@ class EducationGroupYearTest(TestCase):
             start_date=self.education_group_year_2.academic_year.start_date,
             parent=None
         )
-
-        self.offer_year_3 = OfferYearFactory(academic_year=self.academic_year)
 
         self.entity_version_management = EntityVersionFactory(
             entity=self.education_group_year_3.management_entity,
@@ -401,3 +401,25 @@ class EducationGroupYearDeleteCms(TestCase):
         egy_id = self.education_group_year_no_cms.id
         self.education_group_year_no_cms.delete()
         self.assertCountEqual(list(TranslatedText.objects.filter(reference=egy_id)), [])
+
+
+class TestFindByUser(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.user_for_person = UserFactory(username="user_with_person")
+        cls.person_with_user = PersonFactory(
+            user=cls.user_for_person,
+            language="fr-be",
+            first_name="John",
+            last_name="Doe"
+        )
+
+    def test_when_user_has_2_programs(self):
+        educ_group_year_1 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        educ_group_year_2 = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_1.education_group)
+        ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_2.education_group)
+        managed_programs = find_by_user(self.person_with_user.user)
+        self.assertCountEqual(managed_programs, [educ_group_year_1, educ_group_year_2])

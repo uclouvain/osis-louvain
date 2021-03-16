@@ -171,10 +171,8 @@ msgstr ""
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
 
-#, fuzzy
-#| msgid "Prerequisite"
 msgid "Cannot copy prerequisite"
-msgstr "Prerequisite"
+msgstr ""
 
 #, python-format
 msgid ""

@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
 from base.models import offer_year_calendar
-from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_academic_year
+from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_data_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.offer_year_calendar import create_offer_year_calendar
@@ -78,8 +78,7 @@ class CourseEnrollmentForm(forms.Form):
 
 
 def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
-    cal = get_by_reference_and_academic_year(academic_calendar_type.COURSE_ENROLLMENT,
-                                             education_group_yr.academic_year)
+    cal = get_by_reference_and_data_year(academic_calendar_type.COURSE_ENROLLMENT, education_group_yr.academic_year)
     if cal:
         return create_offer_year_calendar(education_group_yr, cal)
 

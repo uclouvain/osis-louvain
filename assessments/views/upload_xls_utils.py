@@ -167,8 +167,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
     score_list = _get_score_list_filtered_by_enrolled_state(learning_unit_year_id, request.user)
 
-    offer_acronyms_managed_by_user = {offer_year.acronym for offer_year
-                                      in score_encoding_list.find_related_offer_years(score_list)}
+    offer_acronyms_managed_by_user = {educ_group_year.acronym for educ_group_year
+                                      in score_encoding_list.find_related_education_group_years(score_list)}
     learn_unit_acronyms_managed_by_user = {learning_unit_year.acronym for learning_unit_year
                                             in score_encoding_list.find_related_learning_unit_years(score_list)}
     registration_ids_managed_by_user = score_encoding_list.find_related_registration_ids(score_list)

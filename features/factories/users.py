@@ -28,6 +28,7 @@ from django.contrib.auth.models import Permission
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -45,7 +46,7 @@ class UsersGenerator:
         self.students = StudentFactory.create_batch(100)
         self.program_managers = ProgramManagerFactory.create_batch(
             5,
-            offer_year__academic_year__current=True,
+            education_group=EducationGroupYearFactory(academic_year__current=True),
             person__language=settings.LANGUAGE_CODE_FR
         )
 

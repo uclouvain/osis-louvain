@@ -53,7 +53,7 @@ urlpatterns = [
             score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
         url(r'^specific_criteria/search/$',
             score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
-        url(r'^notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<offer_id>[0-9]+))?/$',
+        url(r'^notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<education_group_year_id>[0-9]+))?/$',
             score_encoding.notes_printing_all, name='notes_printing_all'),
         url(r'^notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
             score_encoding.notes_printing, name='notes_printing'),
@@ -64,7 +64,7 @@ urlpatterns = [
     ])),
 
     url(r'^offers/', include([
-        url(r'^(?P<offer_year_id>[0-9]+)/', include([
+        url(r'^(?P<education_group_id>[0-9]+)/', include([
             url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
             url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
         ]))

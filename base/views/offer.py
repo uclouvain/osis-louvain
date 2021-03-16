@@ -26,8 +26,11 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 
-from base import models as mdl
+from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import EntityVersion
+from base.models.enums.education_group_categories import Categories
 
 
 @login_required
@@ -36,7 +39,7 @@ def offers(request):
     academic_yr = None
     academic_years = AcademicYear.objects.all()
 
-    academic_year_calendar = mdl.academic_year.current_academic_year()
+    academic_year_calendar = session_exam_calendar.current_opened_academic_year()
 
     if academic_year_calendar:
         academic_yr = academic_year_calendar.id
@@ -58,12 +61,25 @@ def offers_search(request):
 
     academic_years = AcademicYear.objects.all()
 
-    offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym) \
-        .select_related("entity_management", "academic_year")
+    cte = EntityVersion.objects.with_parents(acronym__icontains=entity)
+    entity_ids_with_children = cte.queryset().with_cte(cte).values_list('entity_id').distinct()
+
+    offer_years = EducationGroupYear.objects.filter(
+        management_entity_id__in=entity_ids_with_children,
+        academic_year=academic_yr,
+        acronym__icontains=acronym,
+        education_group_type__category=Categories.TRAINING.name,
+    ).exclude(
+        acronym__icontains="common-"
+    ).select_related(
+        'education_group',
+        'management_entity',
+        'academic_year',
+    ).order_by('acronym')
 
     return render(request, "offers.html", {'academic_year': academic_yr,
                                            'entity_acronym': entity,
                                            'code': acronym,
                                            'academic_years': academic_years,
-                                           'offer_years': offer_years,
+                                           'educ_group_years': offer_years,
                                            'init': "0"})

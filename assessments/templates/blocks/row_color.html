@@ -4,7 +4,7 @@
 {% if enrollement_status_color %}
 {{ enrollement_status_color }}
 {% else %}
-{% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym %}
+{% ifchanged enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym %}
 {% cycle 'white' '#E5F2FF' as rowcolors %}
 {% else %}
 {{ rowcolors }}

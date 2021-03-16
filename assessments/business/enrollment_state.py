@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from base import models as mdl
 from base.models.enums import exam_enrollment_state as enrollment_states
 
@@ -35,7 +34,7 @@ def get_line_color(enrollment):
     if enrollment.enrollment_state == enrollment_states.ENROLLED:
         current_session = mdl.session_exam_calendar.current_session_exam()
         if enrollment.date_enrollment \
-                and enrollment.date_enrollment > current_session.academic_calendar.start_date:
+                and enrollment.date_enrollment > current_session.start_date:
             return ENROLLED_LATE_COLOR
         return None
     else:

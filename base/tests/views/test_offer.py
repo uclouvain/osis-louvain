@@ -32,6 +32,7 @@ from django.urls import reverse
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -45,6 +46,7 @@ class OfferViewTestCase(TestCase):
 
     def test_offers(self):
         academic_year = AcademicYearFactory(current=True)
+        SessionExamCalendarFactory.create_academic_event(academic_year)
 
         response = self.client.get(reverse('offers'))
 
@@ -65,7 +67,7 @@ class OfferViewTestCase(TestCase):
         })
 
         self.assertTemplateUsed(response, 'offers.html')
-        self.assertEqual(response.context['offer_years'].count(), 0)
+        self.assertEqual(response.context['educ_group_years'].count(), 0)
 
     def test_cannot_access_any_offer_pages_if_not_program_manager(self):
         offer_year = OfferYearCalendarFactory()

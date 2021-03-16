@@ -36,7 +36,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 class AcademicCalendarFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.AcademicCalendar'
-        django_get_or_create = ('academic_year', 'title')
+        django_get_or_create = ('data_year', 'title')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))

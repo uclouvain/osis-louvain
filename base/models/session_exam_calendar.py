@@ -27,7 +27,9 @@ import datetime
 
 from django.db import models
 
-from base.models import offer_year_calendar, academic_year
+from base.business.event_perms import AcademicSessionEvent
+from base.models import offer_year_calendar
+from base.models.academic_year import AcademicYear
 from base.models.enums import number_session, academic_calendar_type
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -49,56 +51,40 @@ class SessionExamCalendar(models.Model):
         return u"%s - %s" % (self.academic_calendar, self.number_session)
 
 
-def current_session_exam(date=None):
-    try:
-        if date is None:
-            date = datetime.date.today()
-        return SessionExamCalendar.objects.get(
-            academic_calendar__start_date__lte=date,
-            academic_calendar__end_date__gte=date,
-            academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
-        )
-    except SessionExamCalendar.DoesNotExist:
-        return None
+def current_opened_academic_year() -> 'AcademicYear':
+    return AcademicYear.objects.get(
+        year=current_session_exam().authorized_target_year
+    )
 
 
-def find_session_exam_number(date=None):
+def current_session_exam(date=None) -> 'AcademicSessionEvent':
+    from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+    calendar = ScoresExamSubmissionCalendar()
+    events = calendar.get_opened_academic_events(date=date)
+    return events[0] if events else None
+
+
+def find_session_exam_number(date=None) -> int:
     if date is None:
         date = datetime.date.today()
     current_session = current_session_exam(date)
-    if current_session:
-        return current_session.number_session
-    return None
+    return current_session.session if current_session else None
 
 
-def get_latest_session_exam(date=None):
-    if date is None:
-        date = datetime.date.today()
-    current_academic_year = academic_year.current_academic_year()
-    return SessionExamCalendar.objects.exclude(academic_calendar__end_date__isnull=True) \
-        .filter(academic_calendar__end_date__lte=date,
-                academic_calendar__academic_year=current_academic_year,
-                academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION) \
-        .order_by('-academic_calendar__end_date') \
-        .first()
+def get_latest_session_exam(date=None) -> 'AcademicSessionEvent':
+    from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+    return ScoresExamSubmissionCalendar().get_previous_academic_event(date=date)
 
 
-def get_closest_new_session_exam(date=None):
-    if date is None:
-        date = datetime.date.today()
-    current_academic_year = academic_year.current_academic_year()
-    return SessionExamCalendar.objects.exclude(academic_calendar__start_date__isnull=True) \
-        .filter(academic_calendar__start_date__gte=date,
-                academic_calendar__academic_year=current_academic_year,
-                academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION) \
-        .order_by('academic_calendar__start_date') \
-        .first()
+def get_closest_new_session_exam(date=None) -> 'AcademicSessionEvent':
+    from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+    return ScoresExamSubmissionCalendar().get_next_academic_event(date=date)
 
 
-def find_deliberation_date(nb_session, offer_year):
+def find_deliberation_date(nb_session, educ_group_year):
     """"
     :param nb_session The number of session research
-    :param offer_year The offer year research
+    :param educ_group_year The EducationGroupYear research
     :return the deliberation date of the offer and session
     """
     session_exam_cals = SessionExamCalendar.objects.filter(
@@ -108,20 +94,13 @@ def find_deliberation_date(nb_session, offer_year):
     academic_cals_id = [session_exam.academic_calendar_id for session_exam in list(session_exam_cals)]
 
     if academic_cals_id:
-        offer_year_cal = offer_year_calendar.find_by_offer_year(offer_yr=offer_year) \
-            .filter(academic_calendar__in=academic_cals_id) \
-            .first()
+        offer_year_cal = offer_year_calendar.OfferYearCalendar.objects.filter(
+            education_group_year=educ_group_year,
+            academic_calendar__in=academic_cals_id,
+        ).first()
         return offer_year_cal.start_date
 
     return None
-
-
-# FIXME: Only used in tests
-def find_by_session_and_academic_year(nb_session, an_academic_year):
-    return SessionExamCalendar.objects.filter(
-        number_session=nb_session,
-        academic_calendar__academic_year=an_academic_year
-    )
 
 
 def get_number_session_by_academic_calendar(academic_calendar):

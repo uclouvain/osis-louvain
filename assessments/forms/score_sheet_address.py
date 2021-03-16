@@ -36,9 +36,9 @@ class ScoreSheetAddressForm(forms.ModelForm):
     location = forms.CharField(max_length=255, label=gettext_lazy('Locality'))
     postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
     city = forms.CharField(max_length=255, label=gettext_lazy('City'))
-    offer_year = forms.CharField()
+    offer_acronym = forms.CharField()
     email = forms.EmailField(required=False)
 
     class Meta:
         model = ScoreSheetAddress
-        exclude = ['external_id', 'changed']
+        exclude = ['external_id', 'education_group', 'changed']

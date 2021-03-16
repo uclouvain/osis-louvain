@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Dict
+
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -31,23 +33,26 @@ from assessments.business.score_encoding_list import sort_encodings
 from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
 from attribution.models import attribution
-from base.business import entity_version as entity_version_business
 from base.models import entity as entity_model, entity_version as entity_version, person_address, \
-    session_exam_calendar, \
-    offer_year_entity
+    session_exam_calendar
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import EntityVersion
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.exam_enrollment import justification_label_authorized, get_deadline
 
+OfferYearEntityType = str  # cf. offer_year_entity_type
+EntityId = int
 
-def get_score_sheet_address(off_year):
-    address = score_sheet_address.get_from_offer_year(off_year)
+
+def get_score_sheet_address(educ_group_year: 'EducationGroupYear'):
+    address = score_sheet_address.get_from_education_group_id(educ_group_year.education_group_id)
     entity_id = None
     if address is None:
-        address = off_year.id
+        address = educ_group_year.education_group_id
     else:
         if address and not address.customized:
-            map_offer_year_entity_type_with_entity_id = _get_map_offer_year_entity_type_with_entity(off_year)
+            map_offer_year_entity_type_with_entity_id = _get_map_entity_type_with_entity(educ_group_year)
             entity_id = map_offer_year_entity_type_with_entity_id[address.entity_address_choice]
             ent_version = entity_version.get_last_version(entity_id)
             entity = entity_model.get_by_internal_id(entity_id)
@@ -69,39 +74,45 @@ def _get_address_as_dict(address):
         return {f_name: None for f_name in field_names}
 
 
-def _get_map_offer_year_entity_type_with_entity(off_year):
-    off_year_entity_manag = offer_year_entity.get_from_offer_year_and_type(off_year, ENTITY_MANAGEMENT)
-    entity_version_management = entity_version.get_last_version(off_year_entity_manag.entity)
-    off_year_entity_admin = offer_year_entity.get_from_offer_year_and_type(off_year, ENTITY_ADMINISTRATION)
-    entity_version_admin = entity_version.get_last_version(off_year_entity_admin.entity)
+def _get_map_entity_type_with_entity(educ_group_year: 'EducationGroupYear') -> Dict[OfferYearEntityType, EntityId]:
+    management_entity = educ_group_year.management_entity
+    administration_entity = educ_group_year.administration_entity
+    administration_entity_parent_id = None
+    if administration_entity:
+        version = entity_version.get_last_version(administration_entity)
+        administration_entity_parent_id = version.parent_id if version else None
     return {
-        ENTITY_MANAGEMENT: entity_version_management.entity_id,
-        ENTITY_MANAGEMENT_PARENT: entity_version_management.parent_id,
-        ENTITY_ADMINISTRATION: entity_version_admin.entity_id,
-        ENTITY_ADMINISTRATION_PARENT: entity_version_admin.parent_id,
+        ENTITY_MANAGEMENT: management_entity.id,
+        ENTITY_MANAGEMENT_PARENT: entity_version.get_last_version(management_entity).parent_id,
+        ENTITY_ADMINISTRATION: administration_entity.id if administration_entity else None,
+        ENTITY_ADMINISTRATION_PARENT: administration_entity_parent_id,
     }
 
 
-def get_map_entity_with_offer_year_entity_type(off_year):
-    return {value: key for key, value in _get_map_offer_year_entity_type_with_entity(off_year).items()}
+def get_map_entity_with_entity_type(educ_group_year: 'EducationGroupYear') -> Dict[EntityId, OfferYearEntityType]:
+    return {value: key for key, value in _get_map_entity_type_with_entity(educ_group_year).items()}
 
 
-def save_address_from_entity(off_year, entity_version_id_selected, email):
+def _save_address_from_entity(educ_group_year: 'EducationGroupYear', entity_version_id_selected, email):
     entity_id = entity_version.find_by_id(entity_version_id_selected).entity_id
-    entity_id_mapped_with_type = get_map_entity_with_offer_year_entity_type(off_year)
+    entity_id_mapped_with_type = get_map_entity_with_entity_type(educ_group_year)
     entity_address_choice = entity_id_mapped_with_type.get(entity_id)
-    new_address = score_sheet_address.ScoreSheetAddress(offer_year=off_year,
-                                                        entity_address_choice=entity_address_choice,
-                                                        email=email)
-    address = score_sheet_address.get_from_offer_year(off_year)
+    new_address = score_sheet_address.ScoreSheetAddress(
+        education_group=educ_group_year.education_group,
+        entity_address_choice=entity_address_choice,
+        email=email,
+    )
+    address = score_sheet_address.get_from_education_group_id(educ_group_year.education_group_id)
     if address:
         new_address.id = address.id
     new_address.save()
 
 
-def get_entity_version_choices(offer_year):
-    entity_versions = entity_version_business.find_from_offer_year(offer_year)
-    return set(entity_versions + [entity_version.get_last_version(ent.parent) for ent in entity_versions])
+def get_entity_version_choices(education_group_year: 'EducationGroupYear') -> List['EntityVersion']:
+    entity_ids = [education_group_year.management_entity_id, education_group_year.administration_entity_id]
+    cte = EntityVersion.objects.with_children('acronym', 'title', entity_id__in=entity_ids)
+    qs = cte.queryset().with_cte(cte).exclude(acronym="UCL").distinct('acronym').order_by('acronym')
+    return list(qs)
 
 
 def scores_sheet_data(exam_enrollments, tutor=None):
@@ -157,25 +168,25 @@ def scores_sheet_data(exam_enrollments, tutor=None):
         # Will contain lists of examEnrollments by offerYear (=Program)
         enrollments_by_program = {}  # {<offer_year_id> : [<ExamEnrollment>]}
         for exam_enroll in exam_enrollments:
-            key = exam_enroll.learning_unit_enrollment.offer_enrollment.offer_year.id
+            key = exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year.id
             if key not in enrollments_by_program.keys():
                 enrollments_by_program[key] = [exam_enroll]
             else:
                 enrollments_by_program[key].append(exam_enroll)
 
-        for list_enrollments in enrollments_by_program.values():  # exam_enrollments by OfferYear
+        for list_enrollments in enrollments_by_program.values():  # exam_enrollments by EducationGroupYear
             exam_enrollment = list_enrollments[0]
-            off_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+            educ_group_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
             number_session = exam_enrollment.session_exam.number_session
-            deliberation_date = session_exam_calendar.find_deliberation_date(number_session, off_year)
+            deliberation_date = session_exam_calendar.find_deliberation_date(number_session, educ_group_year)
             if deliberation_date:
                 deliberation_date = deliberation_date.strftime(date_format)
             else:
                 deliberation_date = _('Not passed')
 
-            program = {'acronym': exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            program = {'acronym': educ_group_year.acronym,
                        'deliberation_date': deliberation_date,
-                       'address': _get_serialized_address(off_year)}
+                       'address': _get_serialized_address(educ_group_year)}
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
@@ -200,8 +211,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
     return data
 
 
-def _get_serialized_address(off_year):
-    address = get_score_sheet_address(off_year)['address']
+def _get_serialized_address(educ_group_year: 'EducationGroupYear'):
+    address = get_score_sheet_address(educ_group_year)['address']
     country = address.get('country')
     address['country'] = country.name if country else ''
     return address

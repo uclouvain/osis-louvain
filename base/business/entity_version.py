@@ -29,13 +29,7 @@ from typing import Iterable, Dict, Optional, List
 
 import attr
 
-from base.models import entity_version, offer_year_entity
 from base.models.entity_version import EntityVersion, find_latest_version
-
-
-def find_from_offer_year(offer_year):
-    return [entity_version.get_last_version(off_year_entity.entity)
-            for off_year_entity in offer_year_entity.search(offer_year=offer_year).distinct('entity')]
 
 
 @attr.s(frozen=True, slots=True)
