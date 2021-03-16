@@ -26,6 +26,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from base.models import education_group_year
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
@@ -84,5 +85,7 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         return entities_acronym
 
     def roles_for_program_managers(self, obj):
-        return [{'acronym': offer_year.acronym, 'year': offer_year.academic_year.year}
-                for offer_year in obj.get_managed_programs()]
+        return [
+            {'acronym': educ_group_year.acronym, 'year': educ_group_year.academic_year.year}
+            for educ_group_year in education_group_year.find_by_user(obj.user).select_related('academic_year')
+        ]

@@ -18,7 +18,7 @@
             <p>
                 {% for obj in other_programs %}
                     {% if not forloop.first %}, {% endif %}
-                    {{ obj.offer_year.acronym }}
+                    {{ obj.education_group_year.acronym }}
                 {% endfor %}
             </p>
         {% endif %}

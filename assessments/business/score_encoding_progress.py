@@ -23,28 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from collections import OrderedDict
-from typing import List
-
-import attr
-from django.db.models import OuterRef, Subquery, Q, Count, F
 
 from attribution.models import attribution
-from base.auth.roles import program_manager
-from base.models import offer_year, exam_enrollment, tutor
-from base.models.enums import exam_enrollment_state
-from base.models.exam_enrollment import ExamEnrollment
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.offer_year import OfferYear
-from base.models.session_exam_deadline import SessionExamDeadline, compute_deadline_tutor
-from base.models.tutor import Tutor
+from base.models import exam_enrollment, tutor, education_group_year
+from base.models.education_group_year import EducationGroupYear
+from base.models.session_exam_deadline import compute_deadline_tutor
 
 
-def get_scores_encoding_progress(user, offer_year_id, number_session, academic_year, learning_unit_year_ids=None):
+def get_scores_encoding_progress(
+        user,
+        education_group_year_id,
+        number_session,
+        academic_year,
+        learning_unit_year_ids=None
+):
     queryset = exam_enrollment.get_progress_by_learning_unit_years_and_offer_years(
         user=user,
-        offer_year_id=offer_year_id,
+        education_group_year_id=education_group_year_id,
         session_exam_number=number_session,
         academic_year=academic_year,
         learning_unit_year_ids=learning_unit_year_ids,
@@ -54,21 +49,30 @@ def get_scores_encoding_progress(user, offer_year_id, number_session, academic_y
     return _sort_by_acronym([ScoreEncodingProgress(obj) for obj in queryset])
 
 
-def find_related_offer_years(score_encoding_progress_list):
-    all_offers_ids = [score_encoding_progress.offer_year_id for score_encoding_progress in score_encoding_progress_list]
-    return OfferYear.objects.filter(pk__in=all_offers_ids).order_by('acronym')
+def find_related_education_group_years(score_encoding_progress_list):
+    educ_group_year_ids = [
+        score_encoding_progress.education_group_year_id for score_encoding_progress in score_encoding_progress_list
+    ]
+    return EducationGroupYear.objects.filter(pk__in=educ_group_year_ids).order_by('acronym')
 
 
 def find_related_tutors(user, academic_year, session_exam_number):
     # Find all offer managed by current user
-    offer_year_ids = list(offer_year.find_by_user(user).values_list('id', flat=True))
+    education_group_year_ids = list(education_group_year.find_by_user(user).values_list('id', flat=True))
 
-    learning_unit_year_ids = list(exam_enrollment.find_for_score_encodings(session_exam_number=session_exam_number,
-                                                                      academic_year=academic_year,
-                                                                      offers_year=offer_year_ids,
-                                                                      with_session_exam_deadline=False)\
-                                            .distinct('learning_unit_enrollment__learning_unit_year')\
-                                            .values_list('learning_unit_enrollment__learning_unit_year_id', flat=True))
+    learning_unit_year_ids = list(
+        exam_enrollment.find_for_score_encodings(
+            session_exam_number=session_exam_number,
+            academic_year=academic_year,
+            education_group_years=education_group_year_ids,
+            with_session_exam_deadline=False
+        ).distinct(
+            'learning_unit_enrollment__learning_unit_year'
+        ).values_list(
+            'learning_unit_enrollment__learning_unit_year_id',
+            flat=True
+        )
+    )
 
     tutors = tutor.find_by_learning_unit(learning_unit_year_ids)
     return sorted(tutors, key=_order_by_last_name_and_first_name)
@@ -160,7 +164,7 @@ class ScoreEncodingProgress:
                    )
         )
 
-        self.offer_year_id = exam_enrol.offer_year_id
+        self.education_group_year_id = exam_enrol.education_group_year_id
         self.exam_enrollments_encoded = exam_enrol.exam_enrollments_encoded
         self.draft_scores = exam_enrol.draft_scores
         self.scores_not_yet_submitted = exam_enrol.scores_not_yet_submitted

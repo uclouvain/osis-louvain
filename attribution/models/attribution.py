@@ -26,10 +26,10 @@
 from django.db import models
 
 from attribution.models.enums.function import Functions
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class AttributionAdmin(SerializableModelAdmin):
+class AttributionAdmin(OsisModelAdmin):
     list_display = ('tutor', 'function', 'score_responsible', 'summary_responsible', 'learning_unit_year', 'start_year',
                     'end_year', 'changed')
     list_filter = ('learning_unit_year__academic_year', 'function', 'score_responsible', 'summary_responsible')
@@ -40,7 +40,7 @@ class AttributionAdmin(SerializableModelAdmin):
                      'tutor__person__global_id']
 
 
-class Attribution(SerializableModel):
+class Attribution(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)

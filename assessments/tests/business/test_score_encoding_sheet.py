@@ -37,14 +37,11 @@ from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_address import PersonAddressFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
@@ -58,32 +55,32 @@ class ScoreSheetAddressTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
-        cls.entity_address_admin = create_data_for_entity_address(
-            cls.academic_year, cls.offer_year, score_sheet_address_choices.ENTITY_ADMINISTRATION
-        )
-        cls.entity_address_manag = create_data_for_entity_address(
-            cls.academic_year, cls.offer_year, score_sheet_address_choices.ENTITY_MANAGEMENT
+        cls.entity_address_admin = EntityWithVersionFactory()
+        cls.entity_address_manag = EntityWithVersionFactory()
+        cls.educ_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_address_manag,
+            administration_entity=cls.entity_address_admin,
         )
         cls.address_fields = ['location', 'postal_code', 'city', 'country', 'phone', 'fax']
 
     def test_case_address_from_entity_administration(self):
-        ScoreSheetAddressFactory(offer_year=self.offer_year,
+        ScoreSheetAddressFactory(education_group=self.educ_group_year.education_group,
                                  entity_address_choice=score_sheet_address_choices.ENTITY_ADMINISTRATION)
         self._assert_correct_address(self.entity_address_admin)
 
     def test_case_address_from_entity_management(self):
-        ScoreSheetAddressFactory(offer_year=self.offer_year,
+        ScoreSheetAddressFactory(education_group=self.educ_group_year.education_group,
                                  entity_address_choice=score_sheet_address_choices.ENTITY_MANAGEMENT)
         self._assert_correct_address(self.entity_address_manag)
 
     def test_case_customized_address(self):
-        address = ScoreSheetAddressFactory(offer_year=self.offer_year,
+        address = ScoreSheetAddressFactory(education_group=self.educ_group_year.education_group,
                                            entity_address_choice=None)
         self._assert_correct_address(address)
 
     def _assert_correct_address(self, correct_address):
-        dict = score_encoding_sheet.get_score_sheet_address(self.offer_year)
+        dict = score_encoding_sheet.get_score_sheet_address(self.educ_group_year)
         address = dict['address']
 
         for f in self.address_fields:
@@ -93,7 +90,7 @@ class ScoreSheetAddressTest(TestCase):
         self.assertIn('recipient', keys)
 
     def test_get_address_as_dict(self):
-        address1 = ScoreSheetAddressFactory(offer_year=self.offer_year)
+        address1 = ScoreSheetAddressFactory(education_group=self.educ_group_year.education_group)
         self._assert_address_fields_are_in_object(address1)
         country = CountryFactory()
         address2 = EntityFactory(country=country)
@@ -105,9 +102,9 @@ class ScoreSheetAddressTest(TestCase):
             self.assertIn(f, fields)
 
     def test_get_serialized_address(self):
-        score_sheet_addr = ScoreSheetAddressFactory(offer_year=self.offer_year,
+        score_sheet_addr = ScoreSheetAddressFactory(education_group=self.educ_group_year.education_group,
                                                     entity_address_choice=None)
-        address = score_encoding_sheet._get_serialized_address(self.offer_year)
+        address = score_encoding_sheet._get_serialized_address(self.educ_group_year)
         self.assertEqual(address.get('country'), score_sheet_addr.country.name)
         for f in self.address_fields:
             self.assertIn(f, address)
@@ -116,7 +113,6 @@ class ScoreSheetAddressTest(TestCase):
 class ScoreSheetDataTest(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.offer_year = OfferYearFactory(academic_year=self.academic_year)
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year, acronym="LBIR1100",
                                                           decimal_scores=False)
         # Create tutor and score responsible
@@ -139,7 +135,7 @@ class ScoreSheetDataTest(TestCase):
 
     def _build_enrollment(self, students, enrollment_state):
         for student in students:
-            offer_enrollment = OfferEnrollmentFactory(offer_year=self.offer_year, student=student)
+            offer_enrollment = OfferEnrollmentFactory(student=student)
 
             SessionExamDeadlineFactory(offer_enrollment=offer_enrollment,
                                        number_session=self.session_exam.number_session,
@@ -174,7 +170,12 @@ class ScoreSheetDataTest(TestCase):
         data_computed = score_encoding_sheet.scores_sheet_data(exam_enrollments)
         # Check the deadline for enrolled/not enrolled students
         for enrollment in data_computed['learning_unit_years'][0]['programs'][0]['enrollments']:
-            if enrollment['registration_id'] in (self.student_1.registration_id, self.student_2.registration_id, self.student_3.registration_id):
+            registration_ids = (
+                self.student_1.registration_id,
+                self.student_2.registration_id,
+                self.student_3.registration_id,
+            )
+            if enrollment['registration_id'] in registration_ids:
                 self.assertEqual(enrollment['deadline'], self.deadline.strftime(str(_('date_format'))))
             else:
                 self.assertEqual(enrollment['deadline'], '')
@@ -188,18 +189,3 @@ def _create_attribution(learning_unit_year, person, is_score_responsible=False):
         tutor=TutorFactory(person=person),
         score_responsible=is_score_responsible
     )
-
-
-def create_data_for_entity_address(academic_yr, offer_yr, entity_type):
-    past_date = datetime.datetime(year=2015, month=1, day=1)
-    education_group_year = EducationGroupYearFactory(academic_year=academic_yr)
-    country = CountryFactory()
-    entity = EntityFactory(country=country)
-    EntityVersionFactory(entity=entity,
-                         start_date=past_date,
-                         end_date=None)
-    OfferYearEntityFactory(offer_year=offer_yr,
-                           entity=entity,
-                           type=entity_type,
-                           education_group_year=education_group_year)
-    return entity

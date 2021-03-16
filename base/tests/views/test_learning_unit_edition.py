@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 import json
-from unittest import mock
 
 from django.contrib import messages
 from django.contrib.auth.models import Permission
@@ -96,9 +95,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-    @mock.patch('base.business.event_perms.EventPerm.get_academic_years_ids')
-    def test_view_learning_unit_edition_post(self, mock_get_academic_years_ids):
-        mock_get_academic_years_ids.return_value = [self.starting_academic_year.pk]
+    def test_view_learning_unit_edition_post(self):
         form_data = {"academic_year": self.starting_academic_year.pk}
         response = self.client.post(
             reverse("learning_unit_edition_end_date", args=[self.learning_unit_year.id]),

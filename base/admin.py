@@ -92,9 +92,6 @@ admin.site.register(exam_enrollment.ExamEnrollmentHistory,
 admin.site.register(external_learning_unit_year.ExternalLearningUnitYear,
                     external_learning_unit_year.ExternalLearningUnitYearAdmin)
 
-admin.site.register(external_offer.ExternalOffer,
-                    external_offer.ExternalOfferAdmin)
-
 admin.site.register(hops.Hops,
                     hops.HopsAdmin)
 
@@ -131,23 +128,8 @@ admin.site.register(mandate.Mandate,
 admin.site.register(offer_enrollment.OfferEnrollment,
                     offer_enrollment.OfferEnrollmentAdmin)
 
-admin.site.register(offer.Offer,
-                    offer.OfferAdmin)
-
-admin.site.register(offer_type.OfferType,
-                    offer_type.OfferTypeAdmin)
-
-admin.site.register(offer_year.OfferYear,
-                    offer_year.OfferYearAdmin)
-
 admin.site.register(offer_year_calendar.OfferYearCalendar,
                     offer_year_calendar.OfferYearCalendarAdmin)
-
-admin.site.register(offer_year_domain.OfferYearDomain,
-                    offer_year_domain.OfferYearDomainAdmin)
-
-admin.site.register(offer_year_entity.OfferYearEntity,
-                    offer_year_entity.OfferYearEntityAdmin)
 
 admin.site.register(organization.Organization,
                     organization.OrganizationAdmin)
@@ -181,12 +163,6 @@ admin.site.register(session_exam_calendar.SessionExamCalendar,
 
 admin.site.register(session_exam_deadline.SessionExamDeadline,
                     session_exam_deadline.SessionExamDeadlineAdmin)
-
-admin.site.register(structure_address.StructureAddress,
-                    structure_address.StructureAddressAdmin)
-
-admin.site.register(structure.Structure,
-                    structure.StructureAdmin)
 
 admin.site.register(student.Student,
                     student.StudentAdmin)

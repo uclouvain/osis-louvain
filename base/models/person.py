@@ -163,9 +163,6 @@ class Person(SerializableModel):
             entities.append(person_entity.entity)
         return entities
 
-    def get_managed_programs(self):
-        return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
-
     class Meta:
         permissions = (
             ("is_administrator", "Is administrator"),

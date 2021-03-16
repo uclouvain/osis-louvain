@@ -144,14 +144,15 @@ def _get_data(request):
         )
     ).order_by('education_group__educationgroupyear__acronym').distinct()
 
-    return {'person': person,
-            'addresses': mdl.person_address.find_by_person(person),
-            'tutor': tutor,
-            'learning_unit_years_attributed': _get_learning_unit_years_attributed(tutor),
-            'programs': programs,
-            'supported_languages': settings.LANGUAGES,
-            'default_language': settings.LANGUAGE_CODE,
-            'summary_submission_opened': base.business.learning_unit.is_summary_submission_opened()}
+    return {
+        'person': person,
+        'addresses': mdl.person_address.find_by_person(person),
+        'tutor': tutor,
+        'learning_unit_years_attributed': _get_learning_unit_years_attributed(tutor),
+        'programs': programs,
+        'supported_languages': settings.LANGUAGES,
+        'default_language': settings.LANGUAGE_CODE,
+    }
 
 
 def get_messages_formset(my_messages):

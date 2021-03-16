@@ -33,8 +33,8 @@ from attribution.tests.models import test_attribution
 from base.models.enums import number_session
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -54,19 +54,19 @@ class ScoreEncodingProgressTest(TestCase):
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar, number_session=number_session.ONE)
 
         # Offer year CHIM1BA
-        cls.offer_year = OfferYearFactory(acronym="CHIM1BA", academic_year=cls.academic_year)
+        cls.educ_group_year = EducationGroupYearFactory(acronym="CHIM1BA", academic_year=cls.academic_year)
 
         cls.learning_unit_year = LearningUnitYearFactory(acronym="LBIR1210", academic_year=cls.academic_year)
-        cls._create_context_exam_enrollments(cls.learning_unit_year, cls.offer_year, 10, 3)
+        cls._create_context_exam_enrollments(cls.learning_unit_year, cls.educ_group_year, 10, 3)
 
         cls.learning_unit_year_2 = LearningUnitYearFactory(acronym="LBIR1211", academic_year=cls.academic_year)
-        cls._create_context_exam_enrollments(cls.learning_unit_year_2, cls.offer_year, 5)
+        cls._create_context_exam_enrollments(cls.learning_unit_year_2, cls.educ_group_year, 5)
 
         # Offer year DIR2BA
-        cls.offer_year_2 = OfferYearFactory(acronym="DIR2BA", academic_year=cls.academic_year)
-        cls._create_context_exam_enrollments(cls.learning_unit_year, cls.offer_year_2, 8, 5)
-        cls.program_manager = ProgramManagerFactory(offer_year=cls.offer_year)
-        ProgramManagerFactory(offer_year=cls.offer_year_2, person=cls.program_manager.person)
+        cls.educ_group_year_2 = EducationGroupYearFactory(acronym="DIR2BA", academic_year=cls.academic_year)
+        cls._create_context_exam_enrollments(cls.learning_unit_year, cls.educ_group_year_2, 8, 5)
+        cls.program_manager = ProgramManagerFactory(education_group=cls.educ_group_year.education_group)
+        ProgramManagerFactory(education_group=cls.educ_group_year_2.education_group, person=cls.program_manager.person)
 
         # Tutor [Tom Dupont] have an attribution to LBIR1210
         cls.tutor = TutorFactory(person=PersonFactory(last_name="Dupont", first_name="Thierry"))
@@ -75,7 +75,7 @@ class ScoreEncodingProgressTest(TestCase):
     def test_get_scores_encoding_progress_program_manager(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -94,7 +94,7 @@ class ScoreEncodingProgressTest(TestCase):
     def test_get_scores_encoding_progress_program_manager_with_filter_offer_year(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=self.offer_year_2,
+            education_group_year_id=self.educ_group_year_2,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -110,7 +110,7 @@ class ScoreEncodingProgressTest(TestCase):
 
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=self.offer_year_2,
+            education_group_year_id=self.educ_group_year_2,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -123,7 +123,7 @@ class ScoreEncodingProgressTest(TestCase):
     def test_get_scores_encoding_progress_filter_only_incomplete(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -135,7 +135,7 @@ class ScoreEncodingProgressTest(TestCase):
     def test_get_scores_encoding_progress_filter_without_attribution(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -148,15 +148,15 @@ class ScoreEncodingProgressTest(TestCase):
     def test_find_related_offer_years(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
-        offer_years = list(score_encoding_progress.find_related_offer_years(progress_list))
+        offer_years = list(score_encoding_progress.find_related_education_group_years(progress_list))
         self.assertEqual(len(offer_years), 2)
         # Check sort by acronym
-        self.assertEqual(offer_years[0].acronym, self.offer_year.acronym)
-        self.assertEqual(offer_years[1].acronym, self.offer_year_2.acronym)
+        self.assertEqual(offer_years[0].acronym, self.educ_group_year.acronym)
+        self.assertEqual(offer_years[1].acronym, self.educ_group_year_2.acronym)
 
     def test_find_related_tutors(self):
         # Create tutors
@@ -196,7 +196,7 @@ class ScoreEncodingProgressTest(TestCase):
     def test_get_scores_encoding_progress_tutor(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.tutor.person.user,
-            offer_year_id=None,
+            education_group_year_id=None,
             number_session=number_session.ONE,
             academic_year=self.academic_year
         )
@@ -207,13 +207,16 @@ class ScoreEncodingProgressTest(TestCase):
         self.assertEqual(progress_list[0].total_exam_enrollments, 18)
 
     @classmethod
-    def _create_context_exam_enrollments(cls, learning_unit_year, offer_year, nb_enrollment=10, nb_filled=10):
+    def _create_context_exam_enrollments(cls, learning_unit_year, educ_group_year, nb_enrollment=10, nb_filled=10):
         counter_filled = nb_filled
         session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year)
-        OfferYearCalendarFactory(academic_calendar=cls.academic_calendar, offer_year=offer_year)
+        OfferYearCalendarFactory(
+            academic_calendar=cls.academic_calendar,
+            education_group_year=educ_group_year
+        )
 
         for _ in range(0, nb_enrollment):
-            offer_enrollment = test_offer_enrollment.create_offer_enrollment(StudentFactory(), offer_year)
+            offer_enrollment = test_offer_enrollment.create_offer_enrollment(StudentFactory(), educ_group_year)
             learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(
                 offer_enrollment=offer_enrollment,
                 learning_unit_year=learning_unit_year)

@@ -25,17 +25,29 @@
 ##############################################################################
 from unittest.mock import patch
 
+from base.business.event_perms import AcademicSessionEvent
 from base.models import session_exam_calendar
 
-
+# TODO :: to remove
 class SessionExamCalendarMockMixin:
     """
         This mixin allow mocking function current_session_exam() in order to decouple test from system time
     """
     def mock_session_exam_calendar(self, current_session_exam=None):
+        return_value = None
+        if current_session_exam:
+            return_value = AcademicSessionEvent(
+                session=current_session_exam.number_session,
+                start_date=current_session_exam.academic_calendar.start_date,
+                end_date=current_session_exam.academic_calendar.end_date,
+                id=current_session_exam.id,
+                title=current_session_exam.academic_calendar.title,
+                authorized_target_year=current_session_exam.academic_calendar.data_year.year,
+                type=current_session_exam.academic_calendar.reference,
+            )
         self.patch_session_exam_calendar = patch.multiple(
             session_exam_calendar,
-            current_session_exam=lambda *args, **kwargs: current_session_exam
+            current_session_exam=lambda *args, **kwargs: return_value
         )
         self.patch_session_exam_calendar.start()
         self.addCleanup(self.patch_session_exam_calendar.stop)

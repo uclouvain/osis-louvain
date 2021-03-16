@@ -153,13 +153,6 @@ def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
-def is_summary_submission_opened():
-    current_academic_year = mdl_base.academic_year.starting_academic_year()
-    return mdl_base.academic_calendar. \
-        is_academic_calendar_opened_for_specific_academic_year(current_academic_year,
-                                                               academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-
-
 def compose_components_dict(components, additional_entities):
     data_components = {'components': components}
     data_components.update(additional_entities)

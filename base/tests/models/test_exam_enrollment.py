@@ -31,11 +31,12 @@ from base.models import exam_enrollment, exceptions
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
 from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
-    test_session_exam, test_offer_year
+    test_session_exam
 
 
 def create_exam_enrollment(session_exam, learning_unit_enrollment):
@@ -49,12 +50,12 @@ def create_exam_enrollment(session_exam, learning_unit_enrollment):
     return an_exam_enrollment
 
 
-def create_exam_enrollment_with_student(num_id, registration_id, offer_year, learning_unit_year):
+def create_exam_enrollment_with_student(num_id, registration_id, educ_group_year, learning_unit_year):
     student = test_student.create_student("Student" + str(num_id), "Etudiant" + str(num_id), registration_id)
-    offer_enrollment = test_offer_enrollment.create_offer_enrollment(student, offer_year)
+    offer_enrollment = test_offer_enrollment.create_offer_enrollment(student, educ_group_year)
     learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(learning_unit_year,
                                                                                              offer_enrollment)
-    session_exam = test_session_exam.create_session_exam(1, learning_unit_year, offer_year)
+    session_exam = test_session_exam.create_session_exam(1, learning_unit_year, educ_group_year)
     return create_exam_enrollment(session_exam, learning_unit_enrollment)
 
 
@@ -62,13 +63,17 @@ class ExamEnrollmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.offer_year = test_offer_year.create_offer_year('SINF1BA', 'Bachelor in informatica', cls.academic_year)
+        cls.educ_group_yaer = EducationGroupYearFactory(
+            acronym='SINF1BA',
+            title='Bachelor in informatica',
+            academic_year=cls.academic_year,
+        )
         cls.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
                                                       specific_title='Introduction to algorithmic',
                                                       academic_year=cls.academic_year)
-        cls.session_exam = test_session_exam.create_session_exam(1, cls.learn_unit_year, cls.offer_year)
+        cls.session_exam = test_session_exam.create_session_exam(1, cls.learn_unit_year, cls.educ_group_yaer)
         cls.student = test_student.create_student('Pierre', 'Lacazette', '12345678')
-        cls.offer_enrollment = test_offer_enrollment.create_offer_enrollment(cls.student, cls.offer_year)
+        cls.offer_enrollment = test_offer_enrollment.create_offer_enrollment(cls.student, cls.educ_group_yaer)
         cls.learn_unit_enrol = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,
                                                                                              cls.offer_enrollment)
         cls.exam_enrollment = ExamEnrollmentFactory(session_exam=cls.session_exam,
@@ -76,7 +81,7 @@ class ExamEnrollmentTest(TestCase):
                                                     score_final=12.6,
                                                     enrollment_state=enrollment_states.ENROLLED)
         student_unsuscribed = test_student.create_student('Marco', 'Dubois', '12345679')
-        offer_enrollment_2 = test_offer_enrollment.create_offer_enrollment(student_unsuscribed, cls.offer_year)
+        offer_enrollment_2 = test_offer_enrollment.create_offer_enrollment(student_unsuscribed, cls.educ_group_yaer)
         learn_unit_enrol_2 = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,
                                                                                            offer_enrollment_2)
         cls.exam_enrollment_2 = ExamEnrollmentFactory(session_exam=cls.session_exam,

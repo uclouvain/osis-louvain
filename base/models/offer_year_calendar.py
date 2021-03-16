@@ -35,15 +35,13 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class OfferYearCalendarAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('academic_calendar', 'offer_year', 'start_date', 'end_date', 'changed', 'education_group_year')
-    raw_id_fields = ('offer_year', 'education_group_year')
-    search_fields = ['offer_year__acronym']
+    list_display = ('academic_calendar', 'education_group_year', 'start_date', 'end_date', 'changed',)
+    search_fields = ['education_group_year__acronym']
     list_filter = ('academic_calendar__academic_year', 'academic_calendar__reference',)
 
 
 class OfferYearCalendar(AbstractCalendar):
-    offer_year = models.ForeignKey('OfferYear', blank=True, null=True, on_delete=models.CASCADE)
-    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True, on_delete=models.CASCADE)
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('academic_calendar', 'education_group_year')
@@ -72,14 +70,7 @@ class OfferYearCalendar(AbstractCalendar):
         return bool(self.start_date and self.end_date)
 
     def __str__(self):
-        return u"%s - %s" % (self.academic_calendar, self.offer_year)
-
-
-def find_by_offer_year(offer_yr, academic_calendar_type=None):
-    queryset = OfferYearCalendar.objects.filter(offer_year=offer_yr)
-    if academic_calendar_type:
-        queryset = queryset.filter(academic_calendar__reference=academic_calendar_type)
-    return queryset
+        return u"%s - %s" % (self.academic_calendar, self.education_group_year)
 
 
 def find_latest_end_date_by_academic_calendar(academic_calendar_id):
@@ -107,9 +98,6 @@ def search(**kwargs):
 
     if 'number_session' in kwargs:
         queryset = queryset.filter(academic_calendar__sessionexamcalendar__number_session=kwargs['number_session'])
-
-    if 'offer_year' in kwargs:
-        queryset = queryset.filter(offer_year=kwargs['offer_year'])
 
     return queryset
 

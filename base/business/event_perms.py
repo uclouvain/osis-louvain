@@ -197,6 +197,15 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
             None
         )
 
+    def get_opened_academic_events(self, date=None) -> List[AcademicSessionEvent]:
+        return super().get_opened_academic_events(date=date)
+
+    def get_previous_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_previous_academic_event(date=date)
+
+    def get_next_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_next_academic_event(date=date)
+
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(
@@ -217,77 +226,3 @@ class AcademicEventSessionRepository:
             session=F('sessionexamcalendar__number_session')
         ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
         return [AcademicSessionEvent(**obj) for obj in qs]
-
-
-class EventPerm(ABC):
-    academic_year_field = 'academic_year'
-    model = None  # To instantiate == ex : EducationGroupYear
-    event_reference = None  # To instantiate == ex : academic_calendar_type.EDUCATION_GROUP_EDITION
-    obj = None  # To instantiate
-    raise_exception = True
-    error_msg = ""  # To instantiate == ex : _("This education group is not editable during this period.")
-
-    def __init__(self, obj=None, raise_exception=True):
-        if self.model and obj and not isinstance(obj, self.model):
-            raise AttributeError("The provided obj must be a {}".format(self.model.__name__))
-        self.obj = obj
-        self.raise_exception = raise_exception
-
-    def is_open(self):
-        if self.obj:
-            return self._is_open_for_specific_object()
-        return self._is_calendar_opened()
-
-    @classmethod
-    def get_open_academic_calendars_queryset(cls) -> QuerySet:
-        qs = AcademicCalendar.objects.open_calendars()
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-        return qs
-
-    @classmethod
-    def get_academic_calendars_queryset(cls, data_year) -> QuerySet:
-        qs = AcademicCalendar.objects.filter(data_year=data_year)
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-        return qs
-
-    @cached_property
-    def open_academic_calendars_for_specific_object(self) -> list:
-        obj_ac_year = getattr(self.obj, self.academic_year_field)
-        return list(self.get_open_academic_calendars_queryset().filter(data_year=obj_ac_year))
-
-    def _is_open_for_specific_object(self) -> bool:
-        if not self.open_academic_calendars_for_specific_object:
-            if self.raise_exception:
-                raise PermissionDenied(_(self.error_msg).capitalize())
-            return False
-        return True
-
-    @classmethod
-    def _is_calendar_opened(cls) -> bool:
-        return cls.get_open_academic_calendars_queryset().exists()
-
-    @classmethod
-    def get_academic_years(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
-        return AcademicYear.objects.filter(
-            pk__in=cls.get_academic_years_ids(min_academic_y=min_academic_y, max_academic_y=max_academic_y)
-        )
-
-    @classmethod
-    def get_academic_years_ids(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
-        qs = cls.get_open_academic_calendars_queryset()
-        if min_academic_y:
-            qs = qs.filter(data_year__year__gte=min_academic_y)
-        if max_academic_y:
-            qs = qs.filter(data_year__year__lte=max_academic_y)
-        return qs.values_list('data_year', flat=True)
-
-
-class EventPermClosed(EventPerm):
-    def is_open(self):
-        return False
-
-    @classmethod
-    def get_open_academic_calendars_queryset(cls) -> QuerySet:
-        return AcademicCalendar.objects.none()

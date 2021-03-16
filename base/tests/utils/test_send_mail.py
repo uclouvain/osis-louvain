@@ -29,10 +29,10 @@ from django.test import TestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.models import test_person, test_academic_year, test_offer_year, \
-    test_exam_enrollment
+from base.tests.models import test_person, test_academic_year, test_exam_enrollment
 from base.utils import send_mail
 from osis_common.models import message_template
 
@@ -61,19 +61,30 @@ class TestSendMessage(TestCase):
         cls.academic_year = test_academic_year.create_academic_year()
         test_academic_year.create_academic_year(year=cls.academic_year.year - 1)
 
-        cls.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
-                                                         specific_title="Cours de test",
-                                                         academic_year=cls.academic_year)
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="TEST",
+            specific_title="Cours de test",
+            academic_year=cls.academic_year,
+        )
 
-        cls.offer_year = test_offer_year.create_offer_year("SINF2MA", "Master en Sciences Informatique",
-                                                           cls.academic_year)
+        cls.educ_group_year = EducationGroupYearFactory(
+            acronym="SINF2MA",
+            title="Master en Sciences Informatique",
+            academic_year=cls.academic_year,
+        )
 
-        cls.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(1, "64641200",
-                                                                                         cls.offer_year,
-                                                                                         cls.learning_unit_year)
-        cls.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(2, "60601200",
-                                                                                         cls.offer_year,
-                                                                                         cls.learning_unit_year)
+        cls.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(
+            1,
+            "64641200",
+            cls.educ_group_year,
+            cls.learning_unit_year,
+        )
+        cls.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(
+            2,
+            "60601200",
+            cls.educ_group_year,
+            cls.learning_unit_year,
+        )
 
         cls.msg_list = [
             'The partim TEST_A has been deleted for the year ' + str(cls.academic_year.year),
@@ -146,14 +157,14 @@ class TestSendMessage(TestCase):
             [self.person_1, self.person_without_language],
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
-            self.offer_year.acronym
+            self.educ_group_year.acronym
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
 
         self.assertListEqual(
             list(args[2][0]),
-            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
              self.exam_enrollment_1.session_exam.number_session,
              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
@@ -163,7 +174,7 @@ class TestSendMessage(TestCase):
              ])
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
-        self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
+        self.assertEqual(self.educ_group_year.acronym, args.get('subject_data').get('offer_acronym'))
         receivers = list(args.get('receivers'))
         self.assertEqual(len(receivers), 2)
         self.assertEqual(receivers[0].get('receiver_lang'), LANGUAGE_CODE_FR)
@@ -198,7 +209,7 @@ class TestSendMessage(TestCase):
             self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers(person.language))
             self.assertListEqual(
                 list(args[2][0]),
-                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                  self.exam_enrollment_1.session_exam.number_session,
                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,

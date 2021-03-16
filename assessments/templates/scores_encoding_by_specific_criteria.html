@@ -69,10 +69,10 @@
                 </div>
                 <div class="col-md-2">
                     <label>{% trans 'Training' %}</label><br>
-                    <select id="slt_program" name="program" class="form-control">
+                    <select id="slt_program" name="education_group_year_id" class="form-control">
                         <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}
-                            <option value="{{o.id}}" {%if offer_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
+                            <option value="{{o.id}}" {%if education_group_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -124,7 +124,7 @@
                                     <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                                 {% endif %}
                             </td>
-                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                            <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym }}</td>
                             <td data-container="body" data-toggle="tooltip" title="{{ enrollment.learning_unit_enrollment.learning_unit_year.complete_title}}" >
                                 {{ enrollment.learning_unit_enrollment.learning_unit_year.acronym |add:" - " |add:enrollment.learning_unit_enrollment.learning_unit_year.complete_title| truncatechars:22}}
                             </td>

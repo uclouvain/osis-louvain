@@ -30,18 +30,21 @@ from decimal import Decimal, Context, Inexact
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, offer_year, \
-    learning_unit_year
+from base.models import exam_enrollment, tutor, learning_unit_year, education_group_year
 from base.auth.roles import program_manager
+from base.models.academic_year import AcademicYear
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
+from base.models import session_exam_calendar
 
 
 def get_scores_encoding_list(user, **kwargs):
-    current_academic_year = academic_year.current_academic_year()
-    current_number_session = session_exam_calendar.find_session_exam_number()
+    current_event = session_exam_calendar.current_session_exam()
+    current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
+    current_number_session = current_event.session
     is_program_manager = program_manager.is_program_manager(user)
     learning_unit_year_id = kwargs.get('learning_unit_year_id')
-    offer_year_id = kwargs.get('offer_year_id')
+    educ_group_year_id = kwargs.get('education_group_year_id')
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
     justification = kwargs.get('justification')
@@ -49,15 +52,17 @@ def get_scores_encoding_list(user, **kwargs):
 
     if is_program_manager:
         professor = tutor.find_by_id(tutor_id) if tutor_id else None
-        offers_year = [offer_year.find_by_id(offer_year_id)] if offer_year_id else \
-                       list(offer_year.find_by_user(user, academic_yr=current_academic_year))
+        if educ_group_year_id:
+            education_group_years = [EducationGroupYear.objects.filter(pk=educ_group_year_id).first()]
+        else:
+            education_group_years = education_group_year.find_by_user(user, academic_yr=current_academic_year)
 
         enrollments = exam_enrollment.find_for_score_encodings(
             academic_year=current_academic_year,
             session_exam_number=current_number_session,
             learning_unit_year_id=learning_unit_year_id,
             tutor=professor,
-            offers_year=offers_year,
+            education_group_years=education_group_years,
             registration_id=kwargs.get('registration_id'),
             student_last_name=kwargs.get('student_last_name'),
             student_first_name=kwargs.get('student_first_name'),
@@ -113,8 +118,8 @@ def find_related_registration_ids(scores_encoding_list):
             for enrollment in scores_encoding_list.enrollments}
 
 
-def find_related_offer_years(scores_encoding_list):
-    return {enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+def find_related_education_group_years(scores_encoding_list):
+    return {enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
             for enrollment in scores_encoding_list.enrollments}
 
 
@@ -283,7 +288,7 @@ def sort_encodings(exam_enrollments):
     """
     Sort the list by
      0. LearningUnitYear.acronym
-     1. offerYear.acronym
+     1. EducationGroupYear.acronym
      2. student.lastname
      3. sutdent.firstname
     :param exam_enrollments: List of examEnrollments to sort
@@ -292,7 +297,7 @@ def sort_encodings(exam_enrollments):
     def _sort(key):
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment
-        acronym = off_enroll.offer_year.acronym
+        acronym = off_enroll.education_group_year.acronym
         last_name = off_enroll.student.person.last_name
         first_name = off_enroll.student.person.first_name
         last_name = _normalize_string(last_name) if last_name else None

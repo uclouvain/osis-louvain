@@ -149,7 +149,7 @@
                                 <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
-                        <td headers="program">{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                        <td headers="program">{{ enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym }}</td>
                         <td headers="registration_number">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td headers="lastname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
                         <td headers="firstname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>

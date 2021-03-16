@@ -26,9 +26,9 @@
 from base.models import session_exam
 
 
-def create_session_exam(number_session, learning_unit_year, offer_year):
+def create_session_exam(number_session, learning_unit_year, education_group_year):
     a_session_exam = session_exam.SessionExam(number_session=number_session,
                                               learning_unit_year=learning_unit_year,
-                                              offer_year=offer_year)
+                                              education_group_year=education_group_year)
     a_session_exam.save()
     return a_session_exam

@@ -45,14 +45,14 @@
                             <label for="slt_entity">{% trans 'Entity' %}</label>
                             <select class="form-control" id="slt_entity" name="entity">
                                 {% for e in entities_managed_root %}
-                                    <option value="all_{{ e.root.id }}"
-                                            {% if e.root.id|slugify == entity_root_selected %}
+                                    <option value="all_{{ e.root.entity_id }}"
+                                            {% if e.root.entity_id|slugify == entity_root_selected %}
                                             selected {% endif %}>{% trans 'All hierarchy of ' %} {{ e.root.acronym }}</option>
                                     {% for e in e.structures %}
-                                        {% if e.id|slugify == entity_selected %}
-                                            <option selected value="{{ e.id }}">{{ e.acronym }}</option>
+                                        {% if e.entity_id|slugify == entity_selected %}
+                                            <option selected value="{{ e.entity_id }}">{{ e.acronym }}</option>
                                         {% else %}
-                                            <option value="{{ e.id }}">{{ e.acronym }}</option>
+                                            <option value="{{ e.entity_id }}">{{ e.acronym }}</option>
                                         {% endif %}
                                     {% endfor %}
                                 {% endfor %}
@@ -64,9 +64,9 @@
                                 <option value="-">{% trans 'All' %}</option>
                                 {% for p in offer_types %}
                                     {% if p.id|slugify == offer_type %}
-                                        <option selected value="{{ p.id }}">{{ p.name }}</option>
+                                        <option selected value="{{ p.id }}">{{ p.get_name_display }}</option>
                                     {% else %}
-                                        <option value="{{ p.id }}">{{ p.name }}</option>
+                                        <option value="{{ p.id }}">{{ p.get_name_display }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -125,12 +125,12 @@
                                         {% for pgm in pgms %}
                                             <tr>
                                                 <td>
-                                                    <input name="offer_year" type="checkbox" value="{{ pgm.pk }}"
+                                                    <input name="education_groups" type="checkbox" value="{{ pgm.education_group_id }}"
                                                            onclick="load_managers()">
                                                 </td>
                                                 <td>{{ pgm.acronym }}</td>
-                                                <td>{{ pgm.offer_type.name | default_if_none:'' }}</td>
-                                                <td>{{ pgm.entity_management.acronym }}</td>
+                                                <td>{{ pgm.education_group_type.get_name_verbose | default_if_none:'' }}</td>
+                                                <td>{{ pgm.management_entity.acronym }}</td>
                                             </tr>
                                         {% endfor %}
                                     </table>
@@ -153,7 +153,7 @@
             let form = $("#form_offer_year");
             $("#pnl_managers").load(form.attr('action'), form.serialize());
 
-            let choices = $('input[name=offer_year]:checked');
+            let choices = $('input[name=education_groups]:checked');
             $('#nb_selected').text(choices.length);
         }
 
@@ -171,7 +171,7 @@
         });
 
         $("input[id='chb_pgm_all_id']").click(function () {
-            $("input[name='offer_year']").each(function () {
+            $("input[name='education_groups']").each(function () {
                 $(this).prop("checked", $("#chb_pgm_all_id").prop("checked"))
             });
             load_managers();

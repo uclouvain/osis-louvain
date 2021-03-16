@@ -30,8 +30,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from attribution.tests.factories.attribution_new import AttributionNewFactory, AttributionNewWithDecisionFactory
-from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -53,12 +51,6 @@ class MyOsisViewTestCase(TestCase):
         cls.person = PersonFactory(user=cls.a_superuser,
                                    language=LANGUAGE_CODE_FR)
         academic_year = create_current_academic_year()
-        cls.summary_course_submission_calendar = AcademicCalendarFactory(
-            academic_year=academic_year,
-            start_date=academic_year.start_date,
-            end_date=academic_year.end_date,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-
         cls.tutor = TutorFactory(person=cls.person)
         # FIXME CHANGE LEARNINGUNITYEARFACTORY FOR AVOID MULTI ACADEMIC YEAR
         cls.learning_container_year = LearningContainerYearFactory(academic_year=academic_year)
@@ -167,4 +159,3 @@ class MyOsisViewTestCase(TestCase):
         # LUY with decision_making != '' should not appear in learning_unit_years_attributed
         self.assertCountEqual(context['learning_unit_years_attributed'], [self.learning_unit_year])
         self.assertCountEqual(context['programs'], [])
-        self.assertTrue(context['summary_submission_opened'])
