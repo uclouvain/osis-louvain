@@ -101,7 +101,6 @@ def get_charge_repartition_warning_messages(learning_container_year):
         full_total_charges = full_total_charges or 0
         if partim_total_charges > full_total_charges:
             tutor_name = Person.get_str(charges[0]["attribution__tutor__person__first_name"],
-                                        charges[0]["attribution__tutor__person__middle_name"],
                                         charges[0]["attribution__tutor__person__last_name"])
             tutor_name_with_function = "{} ({})".format(tutor_name,
                                                         getattr(Functions, charges[0]["attribution__function"]).value)
