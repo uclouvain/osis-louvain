@@ -37,7 +37,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class OfferYearCalendarAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('academic_calendar', 'education_group_year', 'start_date', 'end_date', 'changed',)
     search_fields = ['education_group_year__acronym']
-    list_filter = ('academic_calendar__academic_year', 'academic_calendar__reference',)
+    list_filter = ('academic_calendar__data_year', 'academic_calendar__reference',)
 
 
 class OfferYearCalendar(AbstractCalendar):

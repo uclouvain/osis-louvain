@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 import django_filters
 from django_filters.views import FilterView
 
-from base.business.event_perms import AcademicEventRepository
+from base.business.academic_calendar import AcademicEventRepository
 from base.forms.utils.datefield import DatePickerInput
 from base.models import academic_year
 from base.models.academic_calendar import AcademicCalendar

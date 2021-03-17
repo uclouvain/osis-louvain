@@ -53,7 +53,7 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
 
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.academic_calendar_deliberation = AcademicCalendarFactory(
-            academic_year=cls.academic_year,
+            data_year=cls.academic_year,
             reference=academic_calendar_type.DELIBERATION,
             start_date=cls.academic_year.start_date,
             end_date=cls.academic_year.end_date,
@@ -82,7 +82,7 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
             number_session=self.nb_session,
         )
         self.ac_score_exam_submission = AcademicCalendarFactory(
-            academic_year=self.academic_year,
+            data_year=self.academic_year,
             reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
             start_date=self.academic_year.start_date,
             end_date=self.academic_year.end_date,

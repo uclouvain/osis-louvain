@@ -27,7 +27,7 @@ import datetime
 
 from django.db import models
 
-from base.business.event_perms import AcademicSessionEvent
+from base.business.academic_calendar import AcademicSessionEvent
 from base.models import offer_year_calendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import number_session, academic_calendar_type
@@ -36,7 +36,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class SessionExamCalendarAdmin(OsisModelAdmin):
     list_display = ('academic_calendar', 'number_session', 'changed')
-    list_filter = ('academic_calendar__academic_year', 'number_session', 'academic_calendar__reference')
+    list_filter = ('academic_calendar__data_year', 'number_session', 'academic_calendar__reference')
     raw_id_fields = ('academic_calendar',)
     search_fields = ['academic_calendar__title']
 

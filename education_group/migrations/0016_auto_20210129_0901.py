@@ -16,7 +16,7 @@ def change_exam_enrollment_calendar(apps, shema_editor):
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
         SessionExamCalendar.objects.filter(
-            academic_calendar__academic_year__year__gte=2021,
+            academic_calendar__data_year__year__gte=2021,
             academic_calendar__reference=academic_calendar_type.EXAM_ENROLLMENTS,
         ).delete()
         AcademicCalendar.objects.filter(

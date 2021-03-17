@@ -46,7 +46,6 @@ class SessionExamCalendarFactory(factory.DjangoModelFactory):
     def create_academic_event(academic_year):
         return SessionExamCalendarFactory(
             academic_calendar=AcademicCalendarFactory(
-                academic_year=academic_year,
                 data_year=academic_year,
                 start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
                 end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),

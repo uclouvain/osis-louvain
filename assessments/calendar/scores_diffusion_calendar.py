@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventSessionCalendarHelper
+from base.business.academic_calendar import AcademicEventSessionCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
@@ -60,7 +60,6 @@ class ScoresDiffusionCalendar(AcademicEventSessionCalendarHelper):
                 title="Diffusion des notes - Session 1",
                 start_date=datetime.date(academic_year.year + 1, 1, 5),
                 end_date=datetime.date(academic_year.year + 1, 2, 28),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=1, academic_calendar=academic_calendar)
 
@@ -79,8 +78,6 @@ class ScoresDiffusionCalendar(AcademicEventSessionCalendarHelper):
                 title="Diffusion des notes - Session 2",
                 start_date=datetime.date(academic_year.year + 1, 6, 15),
                 end_date=datetime.date(academic_year.year + 1, 7, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=2, academic_calendar=academic_calendar)
 
@@ -98,7 +95,5 @@ class ScoresDiffusionCalendar(AcademicEventSessionCalendarHelper):
                 title="Diffusion des notes - Session 3",
                 start_date=datetime.date(academic_year.year + 1, 8, 15),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=3, academic_calendar=academic_calendar)

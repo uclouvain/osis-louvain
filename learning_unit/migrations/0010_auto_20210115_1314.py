@@ -27,7 +27,6 @@ def create_proposal_limited_calendar(apps, schema_editor):
                     "title": "Gestion des propositions limitée",
                     "start_date": datetime.date(ac_year.year - 2,  9, 14),
                     "end_date": datetime.date(ac_year.year, 9, 13),
-                    "academic_year": ac_year
                 }
             )
 
@@ -48,7 +47,6 @@ def create_proposal_extended_calendar(apps, schema_editor):
                     "title": "Gestion des propositions étendue",
                     "start_date": datetime.date(ac_year.year - 6,  9, 14),
                     "end_date": datetime.date(ac_year.year + 1, 9, 13),
-                    "academic_year": ac_year
                 }
             )
 

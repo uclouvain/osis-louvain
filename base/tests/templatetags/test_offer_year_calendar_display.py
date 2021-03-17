@@ -43,10 +43,12 @@ class OfferYearCalendarDisplayTagTest(TestCase):
         self.build_old_offer_yr_calendar()
 
     def build_old_offer_yr_calendar(self):
-        previous_academic_year = AcademicYearFactory(start_date=today.replace(year=today.year - 3),
-                                                          end_date=today.replace(year=today.year - 2),
-                                                          year=today.year - 3)
-        an_previous_academic_calendar = AcademicCalendarFactory(academic_year=previous_academic_year)
+        previous_academic_year = AcademicYearFactory(
+            start_date=today.replace(year=today.year - 3),
+            end_date=today.replace(year=today.year - 2),
+            year=today.year - 3
+        )
+        an_previous_academic_calendar = AcademicCalendarFactory(data_year=previous_academic_year)
         a_previous_educ_group_year = EducationGroupYearFactory(academic_year=previous_academic_year)
         self.a_previous_offer_yr_calendar = OfferYearCalendarFactory(
             academic_calendar=an_previous_academic_calendar,
@@ -57,7 +59,7 @@ class OfferYearCalendarDisplayTagTest(TestCase):
         self.current_academic_year = AcademicYearFactory(start_date=today,
                                                          end_date=today.replace(year=today.year + 1),
                                                          year=today.year)
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year)
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year)
         current_educ_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
         self.a_current_offer_yr_calendar = OfferYearCalendarFactory(
             academic_calendar=an_academic_calendar,

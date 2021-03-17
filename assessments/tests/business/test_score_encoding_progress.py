@@ -50,7 +50,7 @@ class ScoreEncodingProgressTest(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = AcademicCalendarExamSubmissionFactory(title="Submission of score encoding - 1",
-                                                                      academic_year=cls.academic_year)
+                                                                      data_year=cls.academic_year)
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar, number_session=number_session.ONE)
 
         # Offer year CHIM1BA

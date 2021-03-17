@@ -33,7 +33,7 @@ from django.test import TestCase, override_settings
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.enums.function import Functions
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 

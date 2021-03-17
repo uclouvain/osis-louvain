@@ -42,7 +42,7 @@ class EnrollmentStateTests(TestCase):
     def setUpTestData(cls):
         cls.academic_calendar = AcademicCalendarExamSubmissionFactory(
             title="Submission of score encoding - 1",
-            academic_year__current=True
+            data_year__current=True
         )
         cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                                                number_session=number_session.ONE)

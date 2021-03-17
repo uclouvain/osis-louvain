@@ -31,7 +31,7 @@ from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory

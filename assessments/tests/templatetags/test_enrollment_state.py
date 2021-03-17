@@ -39,7 +39,7 @@ class EnrollmentTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar__academic_year=cls.academic_year,
+        cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar__data_year=cls.academic_year,
                                                                number_session=number_session.ONE)
         cls.session_exam = SessionExamFactory(number_session=number_session.ONE,
                                               learning_unit_year__academic_year=cls.academic_year)

@@ -25,7 +25,7 @@
 ##############################################################################
 from unittest.mock import patch
 
-from base.business.event_perms import AcademicSessionEvent
+from base.business.academic_calendar import AcademicSessionEvent
 from base.models import session_exam_calendar
 
 # TODO :: to remove

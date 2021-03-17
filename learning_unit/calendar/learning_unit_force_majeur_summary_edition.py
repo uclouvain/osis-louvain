@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventCalendarHelper
+from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
@@ -47,6 +47,5 @@ class LearningUnitForceMajeurSummaryEditionCalendar(AcademicEventCalendarHelper)
                     "title": "Edition fiches descriptives (cas de force majeure)",
                     "start_date": datetime.date(ac_year.year + 1, 6, 15),
                     "end_date": datetime.date(ac_year.year + 1, 6, 20),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

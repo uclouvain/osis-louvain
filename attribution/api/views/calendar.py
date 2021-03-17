@@ -28,7 +28,7 @@ from rest_framework.response import Response
 
 from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
 from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
-from base.business.event_perms import AcademicEventRepository
+from base.business.academic_calendar import AcademicEventRepository
 
 
 class ApplicationCoursesCalendarListView(generics.ListAPIView):

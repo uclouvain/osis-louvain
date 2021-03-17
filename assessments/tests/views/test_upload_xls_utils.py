@@ -66,7 +66,6 @@ def generate_exam_enrollments(year, with_different_offer=False):
     academic_year = AcademicYearFactory(year=year)
 
     an_academic_calendar = AcademicCalendarFactory(
-        academic_year=academic_year,
         data_year=academic_year,
         start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
         end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),

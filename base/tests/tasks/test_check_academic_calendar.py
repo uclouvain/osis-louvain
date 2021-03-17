@@ -45,7 +45,7 @@ class TestCheckAcademicCalendar(TestCase):
         AcademicCalendarFactory(
             start_date=now, end_date=now,
             reference=EDUCATION_GROUP_EDITION,
-            academic_year=current_egy.academic_year
+            data_year=current_egy.academic_year
         )
 
         result = check_academic_calendar.run()

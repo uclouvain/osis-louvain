@@ -119,7 +119,7 @@ class AdministrativeDataSessionForm(forms.Form):
             return self.list_offer_year_calendar.get(academic_calendar__reference=ac_type)
         except ObjectDoesNotExist:
             academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=self.session,
-                                                             academic_year=self.education_group_year.academic_year,
+                                                             data_year=self.education_group_year.academic_year,
                                                              reference=ac_type)
             return create_offer_year_calendar(self.education_group_year,
                                               academic_calendar)
@@ -202,7 +202,7 @@ class AdministrativeDataFormSet(forms.BaseFormSet):
 
         q = offer_year_calendar.find_by_education_group_year(education_group_year)
         q = q.filter(academic_calendar__sessionexamcalendar__number_session=index + 1,
-                     academic_calendar__academic_year=education_group_year.academic_year)
+                     academic_calendar__data_year=education_group_year.academic_year)
         kwargs['list_offer_year_calendar'] = q.select_related('academic_calendar')
 
         return kwargs

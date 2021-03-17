@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _
 
-from base.business.event_perms import AcademicEventRepository
+from base.business.academic_calendar import AcademicEventRepository
 from base.forms.academic_calendar.update import AcademicCalendarUpdateForm
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin

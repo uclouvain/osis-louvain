@@ -53,19 +53,16 @@ class SessionExamCalendarTest(TestCase):
                                                           start_date=datetime.date(next_year, 3, 15),
                                                           end_date=datetime.date(next_year, 6, 28),
                                                           data_year=cls.current_academic_yr,
-                                                          academic_year=cls.current_academic_yr,
                                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         cls.academic_calendar_3 = AcademicCalendarFactory(title="Submission of score encoding - 3",
                                                           start_date=datetime.date(next_year, 8, 1),
                                                           end_date=datetime.date(next_year, 9, 29),
                                                           data_year=cls.current_academic_yr,
-                                                          academic_year=cls.current_academic_yr,
                                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         cls.academic_calendar_4 = AcademicCalendarFactory(title="Deliberation session 1",
                                                           start_date=datetime.date(next_year, 1, 1),
                                                           end_date=datetime.date(next_year, 1, 2),
                                                           data_year=cls.current_academic_yr,
-                                                          academic_year=cls.current_academic_yr,
                                                           reference=academic_calendar_type.DELIBERATION)
 
     def setUp(self):
@@ -75,7 +72,6 @@ class SessionExamCalendarTest(TestCase):
                                                            end_date=datetime.date(self.current_academic_yr.year + 1, 1,
                                                                                   1),
                                                            data_year=self.current_academic_yr,
-                                                           academic_year=self.current_academic_yr,
                                                            reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
 
     def test_number_exam_session_out_of_range(self):
@@ -213,7 +209,7 @@ class DeliberationDateTest(TestCase):
                                                                                  1),
                                                         end_date=datetime.date(cls.current_academic_yr.year + 1, 1,
                                                                                2),
-                                                        academic_year=cls.current_academic_yr,
+                                                        data_year=cls.current_academic_yr,
                                                         reference=academic_calendar_type.DELIBERATION)
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                    number_session=number_session.ONE)

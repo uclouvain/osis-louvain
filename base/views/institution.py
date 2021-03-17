@@ -32,7 +32,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
-from base.business import event_perms
+from base.business import academic_calendar
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter

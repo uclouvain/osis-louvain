@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventCalendarHelper
+from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
@@ -47,6 +47,5 @@ class AccessScheduleCalendar(AcademicEventCalendarHelper):
                     "title": "Accès horaire ADE",
                     "start_date": datetime.date(ac_year.year, 7, 1),
                     "end_date": datetime.date(ac_year.year + 1, 9, 14),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

@@ -40,10 +40,8 @@ class TestEducationGroupPreparationCalendarOpened(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
-                                    academic_year=cls.current_academic_year,
                                     data_year=cls.current_academic_year)
         OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
-                                    academic_year__year=cls.current_academic_year.year + 1,
                                     data_year__year=cls.current_academic_year.year + 1)
 
     def test_is_open_for_spec_egy(self):

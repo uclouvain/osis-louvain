@@ -25,7 +25,7 @@
 ##############################################################################
 from rest_framework import serializers
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 
 
 class ApplicationCourseCalendarSerializer(serializers.Serializer):

@@ -50,7 +50,7 @@ class TestAdministrativeDataForm(TestCase):
         cls.academic_year = AcademicYearFactory(year=2007)
 
         cls.academic_calendars = [
-            AcademicCalendarFactory(reference=i[0], academic_year=cls.academic_year)
+            AcademicCalendarFactory(reference=i[0], data_year=cls.academic_year)
             for i in academic_calendar_type.ACADEMIC_CALENDAR_TYPES
         ]
 
@@ -146,7 +146,7 @@ class TestAdministrativeDataForm(TestCase):
 
         session = SessionExamCalendar.objects.filter(
             number_session=1,
-            academic_calendar__academic_year=self.education_group_year.academic_year
+            academic_calendar__data_year=self.education_group_year.academic_year
         )
         acs = [s.academic_calendar for s in session]
         self.assertEqual(list(result.get('list_offer_year_calendar')),
@@ -209,7 +209,7 @@ class TestAdministrativeDataForm(TestCase):
 
     def _search_offer_year_calendar(self, education_group_yr, a_reference):
         academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=1,
-                                                         academic_year=education_group_yr.academic_year,
+                                                         data_year=education_group_yr.academic_year,
                                                          reference=a_reference)
         return OfferYearCalendar.objects.filter(education_group_year=education_group_yr,
                                                 academic_calendar=academic_calendar)
@@ -276,7 +276,7 @@ class TestCourseEnrollmentForm(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
     def test_clean_with_validation_error_in_date(self):
         AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
-                                academic_year=self.academic_year)
+                                data_year=self.academic_year)
 
         exam_enrollment_start = '20/12/{}'.format(self.academic_year.year)
         exam_enrollment_end = '15/01/{}'.format(self.academic_year.year)

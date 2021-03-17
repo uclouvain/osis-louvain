@@ -74,7 +74,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             cls.old_academic_year
         ).academic_years[0]
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
@@ -188,7 +188,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         cls.next_academic_year = cls.academic_years[5]
         cls.previous_academic_year = cls.academic_years[4]
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
@@ -329,7 +329,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION

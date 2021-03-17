@@ -23,17 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.test import TestCase
 from faker import Faker
 
-from base.models import academic_calendar
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.signals.publisher import compute_all_scores_encodings_deadlines
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
-    CloseAcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 
 
 class AcademicCalendarTest(TestCase):
@@ -46,18 +43,6 @@ class AcademicCalendarTest(TestCase):
     def test_start_date_higher_than_end_date(self):
         with self.assertRaises(StartDateHigherThanEndDateException):
             AcademicCalendarFactory(start_date=self.future_date, end_date=self.past_date)
-
-    def test_find_highlight_academic_calendar(self):
-        open_academic_calendar = OpenAcademicCalendarFactory()
-        CloseAcademicCalendarFactory()
-        OpenAcademicCalendarFactory(highlight_description=None)
-        OpenAcademicCalendarFactory(highlight_title="")
-
-        self.assertQuerysetEqual(
-            academic_calendar.find_highlight_academic_calendar(),
-            [open_academic_calendar],
-            transform=lambda rec: rec
-        )
 
     def test_compute_deadline_is_called_case_academic_calendar_save(self):
         with mock.patch.object(compute_all_scores_encodings_deadlines, 'send') as mock_method:

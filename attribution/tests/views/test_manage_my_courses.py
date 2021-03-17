@@ -68,12 +68,10 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
         )
@@ -131,7 +129,6 @@ class ManageMyCoursesViewTestCase(TestCase):
         next_calendar = AcademicCalendarFactory(
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
-            academic_year=self.ac_year_in_future[1],
             data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
@@ -172,7 +169,6 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.academic_calendar.save()
 
         AcademicCalendarFactory(
-            academic_year=self.ac_year_in_future[1],
             data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
         )
@@ -354,13 +350,11 @@ class ManageMyCoursesMixin(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.academic_year_in_future,
             data_year=cls.academic_year_in_future,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         )

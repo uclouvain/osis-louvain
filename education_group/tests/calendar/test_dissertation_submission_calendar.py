@@ -28,7 +28,7 @@ import datetime
 from django.forms import model_to_dict
 from django.test import TestCase
 
-from base.business.event_perms import AcademicSessionEvent
+from base.business.academic_calendar import AcademicSessionEvent
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.session_exam_calendar import SessionExamCalendar

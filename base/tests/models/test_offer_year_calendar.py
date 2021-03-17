@@ -45,7 +45,7 @@ class OfferYearCalendarsAttributesValidation(TestCase):
         cls.academic_year = AcademicYearFactory(year=YEAR_CALENDAR,
                                                 start_date=datetime.date(YEAR_CALENDAR, 9, 1),
                                                 end_date=datetime.date(YEAR_CALENDAR + 1, 10, 30))
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.academic_year,
+        cls.academic_calendar = AcademicCalendarFactory(data_year=cls.academic_year,
                                                         start_date=datetime.date(YEAR_CALENDAR, 9, 1),
                                                         end_date=datetime.date(YEAR_CALENDAR + 1, 10, 30))
         cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)

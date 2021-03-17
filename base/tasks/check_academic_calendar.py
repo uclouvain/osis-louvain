@@ -13,7 +13,7 @@ def run() -> dict:
     if open_calendar and open_calendar.reference == EDUCATION_GROUP_EDITION:
         # Copy the education group data of the open academic year.
         process = ReddotEducationGroupAutomaticPostponement(
-            EducationGroupYear.objects.filter(academic_year=open_calendar.academic_year)
+            EducationGroupYear.objects.filter(academic_year=open_calendar.data_year)
         )
         process.postpone()
         return {"Copy of Reddot data": process.serialize_postponement_results()}

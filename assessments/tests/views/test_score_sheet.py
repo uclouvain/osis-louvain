@@ -31,8 +31,6 @@ from django.urls import reverse
 
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.views import score_sheet
-from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory

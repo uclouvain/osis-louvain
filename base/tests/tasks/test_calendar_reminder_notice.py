@@ -29,7 +29,7 @@ import numpy as np
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, SimpleTestCase, override_settings
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tasks import calendar_reminder_notice
 

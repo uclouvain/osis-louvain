@@ -58,7 +58,7 @@ class XlsTests(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                        academic_year__current=True,
+                                                        data_year__current=True,
                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                                                number_session=number_session.ONE)

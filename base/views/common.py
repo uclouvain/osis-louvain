@@ -27,6 +27,7 @@ import logging
 import subprocess
 from typing import List
 
+import attr
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout
@@ -34,9 +35,11 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _, get_language
 
+from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base import models as mdl
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
@@ -135,8 +138,15 @@ def login(request):
 @login_required
 def home(request):
     return render(request, "home.html", {
-        'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
+        'highlights': _get_highlight_events()
     })
+
+
+def _get_highlight_events():
+    return [
+        {**attr.asdict(event), 'url': reverse('scores_encoding')}
+        for event in ScoresExamSubmissionCalendar().get_opened_academic_events()
+    ]
 
 
 def log_out(request):

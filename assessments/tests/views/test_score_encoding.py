@@ -358,7 +358,7 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
         # Create context out of range
         self.academic_year = _get_academic_year(2017)
         self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         academic_year=self.academic_year,
+                                                         data_year=self.academic_year,
                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
@@ -383,6 +383,8 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
 
     def test_message_score_encoding_not_open(self):
         self.session_exam_calendar.delete()
+        self.academic_calendar.delete()
+
         url = reverse('outside_scores_encodings_period')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -401,7 +403,6 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
 
         # Create submission of score encoding - 2 [Start in 100 days]
         ac = AcademicCalendarFactory.build(title="Submission of score encoding - 2",
-                                           academic_year=self.academic_year,
                                            data_year=self.academic_year,
                                            start_date=self.academic_calendar.end_date + timedelta(days=100),
                                            end_date=self.academic_calendar.end_date + timedelta(days=130),
@@ -449,7 +450,6 @@ class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestC
 
         # Create an score submission event - with an session exam
         academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                    academic_year=academic_year,
                                                     data_year=academic_year,
                                                     reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         academic_calendar.save()

@@ -118,7 +118,7 @@ def step_impl(context: Context, group):
 
 @step("La période de modification des programmes est en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendarFactory(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar = AcademicCalendarFactory(data_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
     calendar.save()
 
@@ -126,14 +126,12 @@ def step_impl(context: Context):
 @step("La période de modification des unités d'enseignement est en cours")
 def step_impl(context: Context):
     calendar = AcademicCalendarFactory(
-        academic_year=current_academic_year(),
         data_year=current_academic_year(),
         reference=EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
 
     calendar.save()
     calendar = AcademicCalendarFactory(
-        academic_year=current_academic_year(),
         data_year=current_academic_year(),
         reference=EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()

@@ -42,15 +42,14 @@
 
         <div class="carousel-inner" role="listbox" >
             {% for highlight in highlights %}
-            <div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
-              <div class="jumbotron"  style="margin-bottom: 0px; text-align: center;">
-                <h3>{{ highlight.highlight_title }}</h3>
-                <small style="margin-bottom: 10px;">{{ highlight.highlight_description }}</small>
-                <p style="margin-top: 10px;"><a class="btn btn-primary btn-sm" href="/{{ highlight.highlight_shortcut }}"
-                      role="button">{% trans 'Go' context "carousel" %}</a>
-                </p>
-              </div>
-            </div>
+                <div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
+                  <div class="jumbotron"  style="margin-bottom: 0px; text-align: center;">
+                    <h3>{{ highlight.title }}</h3>
+                    <p style="margin-top: 10px;"><a class="btn btn-primary btn-sm" href="{{ highlight.url }}"
+                          role="button">{% trans 'Go' context "carousel" %}</a>
+                    </p>
+                  </div>
+                </div>
             {% endfor %}
         </div>
         <a class="left carousel-control" href="#carousel_academic_event" role="button" data-slide="prev" style="width: 10%;">
