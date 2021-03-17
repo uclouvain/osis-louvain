@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-03 11:02+0100\n"
+"POT-Creation-Date: 2021-03-16 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,9 +124,6 @@ msgstr "Ville"
 msgid "Code"
 msgstr "Code"
 
-msgid "Comment"
-msgstr "Commentaire"
-
 msgid "Compare"
 msgstr "Comparer"
 
@@ -165,6 +162,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
 
 msgid "Display all deadlines for this learning unit"
 msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"

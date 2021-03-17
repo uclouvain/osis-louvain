@@ -68,7 +68,12 @@ class StudentSpecificProfile(SerializableModel):
     arrangement_appropriate_copy = models.BooleanField(default=False, verbose_name=_('Arrangement appropriate copy'))
     arrangement_other = models.BooleanField(default=False, verbose_name=_('Arrangement other'))
     arrangement_specific_locale = models.BooleanField(default=False, verbose_name=_('Arrangement specific locale'))
-    arrangement_comment = models.CharField(max_length=2000, blank=True, null=True, verbose_name=_('Comment'))
+    arrangement_comment = models.CharField(
+        max_length=2000,
+        blank=True,
+        null=True,
+        verbose_name=_('Details other educational facilities')
+    )
 
     class Meta:
         ordering = ("student", "guide__last_name", "guide__first_name")

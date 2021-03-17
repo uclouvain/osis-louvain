@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-09 13:20+0100\n"
+"POT-Creation-Date: 2021-03-16 13:18+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -545,9 +545,6 @@ msgstr "Code"
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
 
-msgid "Comment"
-msgstr "Commentaire"
-
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
@@ -627,27 +624,6 @@ msgstr "Créer une version de transition"
 msgid "Creation"
 msgstr "Création"
 
-msgid ""
-"Creation or end date modification proposal not allowed for central managers "
-"during this period."
-msgstr ""
-"Les propositions de création ou de date de fin sont interdites pour les "
-"gestionnaires centraux durant cette période."
-
-msgid ""
-"Creation or end date modification proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-"Les propositions de création ou de date de fin sont interdites pour les "
-"gestionnaires facultaires durant cette période."
-
-msgid "Creation or end date proposal by central managers"
-msgstr "Proposition de création ou de date de fin par gestionnaires centraux"
-
-msgid "Creation or end date proposal by faculty managers"
-msgstr ""
-"Proposition de création ou de date de fin par gestionnaires facultaires"
-
 msgid "Credits"
 msgstr "Crédits"
 
@@ -726,6 +702,9 @@ msgstr "Programme détaillé"
 
 msgid "Details"
 msgstr "Détails"
+
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
@@ -972,8 +951,8 @@ msgstr "Sigle déjà existant"
 msgid "Export"
 msgstr "Exporter"
 
-msgid "Proposal management"
-msgstr "Gestion de la proposition"
+msgid "Extended proposal management"
+msgstr "Gestion des propositions étendue"
 
 msgid "External"
 msgstr "Externe"
@@ -1309,12 +1288,6 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
-msgid "Learning unit edition by central managers"
-msgstr "Modification UE par gestionnaires centraux"
-
-msgid "Learning unit edition by faculty managers"
-msgstr "Modification UE par gestionnaires facultaires"
-
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
@@ -1368,9 +1341,6 @@ msgstr "Légende"
 
 msgid "Limited proposal management"
 msgstr "Gestion des propositions limitée"
-
-msgid "Extended proposal management"
-msgstr "Gestion des propositions étendue"
 
 msgid "Link type"
 msgstr "Type de lien"
@@ -1602,28 +1572,6 @@ msgstr "Liste au choix Partenariat mobilité"
 
 msgid "Modification"
 msgstr "Modification"
-
-msgid "Modification or transformation proposal by central managers"
-msgstr ""
-"Proposition de modification ou de transformation par gestionnaire central"
-
-msgid "Modification or transformation proposal by faculty managers"
-msgstr ""
-"Proposition de modification ou de transformation par gestionnaire facultaire"
-
-msgid ""
-"Modification or transformation proposal not allowed for central managers "
-"during this period."
-msgstr ""
-"Les propositions de modification ou de transformation sont interdites pour "
-"les gestionnaires centraux durant cette période."
-
-msgid ""
-"Modification or transformation proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-"Les propositions de modification ou de transformation sont interdites pour "
-"les gestionnaires facultaires durant cette période."
 
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
@@ -2102,6 +2050,9 @@ msgid ""
 msgstr ""
 "Proposition d'unité d'enseignement <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> créée avec succès."
+
+msgid "Proposal management"
+msgstr "Gestion de la proposition"
 
 msgid "Proposal of creation"
 msgstr "Proposition de création"
@@ -2740,18 +2691,6 @@ msgstr "Ce champ est obligatoire."
 
 msgid "This learning unit has application"
 msgstr "L'unité d'enseignement a au moins une candidature"
-
-msgid ""
-"This learning unit is not editable by central managers during this period."
-msgstr ""
-"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
-"centraux durant cette période."
-
-msgid ""
-"This learning unit is not editable by faculty managers during this period."
-msgstr ""
-"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
-"facultaires durant cette période."
 
 #, python-format
 msgid ""

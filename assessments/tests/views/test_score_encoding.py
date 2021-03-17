@@ -551,7 +551,7 @@ class UploadXLSTest(TestCase):
                                 _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
                                 _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
                                 _('Specific room of examination'), _('Other educational facilities'),
-                                _('Comment'), _('Educational tutor'),
+                                _('Details other educational facilities'), _('Educational tutor'),
                                 ]
         self.assertListEqual(HEADER, header_expected_list)
 

@@ -46,8 +46,8 @@ from osis_common.decorators.download import set_download_cookie
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
           _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
           _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
-          _('Large print'), _('Specific room of examination'), _('Other educational facilities'), _('Comment'),
-          _('Educational tutor'),
+          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
+          _('Details other educational facilities'), _('Educational tutor'),
           ]
 
 JUSTIFICATION_ALIASES = {
