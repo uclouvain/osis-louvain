@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.10'
+  version: '1.11'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -170,6 +170,7 @@ components:
         credits:
           type: string
           example: '60.00'
+          nullable: true
         total_learning_unit_charge:
           type: string
           description: 'Total charge for learning unit year'
@@ -179,6 +180,7 @@ components:
           type: integer
           example: 2018
           description: 'Start year of attribution'
+          nullable: true
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
         function_text:

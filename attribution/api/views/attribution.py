@@ -140,7 +140,8 @@ class AttributionListView(generics.ListAPIView):
             )
             response = requests.get(url, auth=(settings.EPC_API_USER, settings.EPC_API_PASSWORD,), timeout=100)
             response.raise_for_status()
-            attribution_charges = response.json().get("tutorAllocations", [])
+            response_data = response.json() or {}
+            attribution_charges = response_data.get("tutorAllocations", [])
             # Fix when the webservice return a dictionnary in place of a list.
             # Occur when the tutor has a single attribution.
             if type(attribution_charges) is dict:

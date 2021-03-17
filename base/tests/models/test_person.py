@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ class PersonTest(PersonTestCase):
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"
         self.person_with_user.save()
-        self.assertEqual(self.person_with_user.__str__(), "DOE, John Junior")
+        self.assertEqual(self.person_with_user.__str__(), "DOE, John")
 
     def test_change_language_with_user_with_person(self):
         change_language(self.user_for_person, "en")
