@@ -1365,6 +1365,9 @@ msgstr ""
 msgid "List of teachers"
 msgstr ""
 
+msgid "List of teachers (email)"
+msgstr ""
+
 msgid "List of trainings with administrative data"
 msgstr ""
 

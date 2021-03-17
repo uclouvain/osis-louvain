@@ -42,6 +42,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
+from base.models.person import Person
 from osis_common.document import xls_build
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
 
@@ -63,7 +64,10 @@ DEFAULT_LEGEND_FILLS = {
 }
 BOLD_FONT = Font(bold=True)
 SPACES = '  '
-HEADER_TEACHERS = _('List of teachers')
+HEADER_TEACHERS = [
+    str(_('List of teachers')),
+    str(_('List of teachers (email)'))
+]
 HEADER_PROGRAMS = _('Trainings')
 PROPOSAL_LINE_STYLES = {
     ProposalType.CREATION.name: Font(color=CREATION_COLOR),
@@ -209,12 +213,13 @@ def prepare_proposal_legend_ws_data() -> dict:
     }
 
 
-def _get_wrapped_cells(learning_units, teachers_col_letter, programs_col_letter):
+def _get_wrapped_cells(learning_units, programs_col_letter, teachers_col_letter):
     dict_wrapped_styled_cells = []
 
     for idx, luy in enumerate(learning_units, start=2):
         if teachers_col_letter:
-            dict_wrapped_styled_cells.append("{}{}".format(teachers_col_letter, idx))
+            for teacher_col_letter in teachers_col_letter:
+                dict_wrapped_styled_cells.append("{}{}".format(teacher_col_letter, idx))
         if programs_col_letter:
             dict_wrapped_styled_cells.append("{}{}".format(programs_col_letter, idx))
 
@@ -296,15 +301,10 @@ def title_with_version_title(title_fr: str, version_title_fr: str) -> str:
 def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
     lu_data_part2 = []
     if with_attributions:
-        lu_data_part2.append(
-            " \n".join(
-                [_get_attribution_line(value)
-                 for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                    learning_unit_yr
-                ).values()
-                ]
-            )
-        )
+        teachers = _get_teachers(learning_unit_yr)
+        lu_data_part2.append(';'.join(_build_complete_name(person) for person in teachers))
+        lu_data_part2.append(';'.join(person.email if person.email else '-' for person in teachers))
+
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
     lu_data_part2.append(yesno(learning_unit_yr.status))
     lu_data_part2.extend(volume_information(learning_unit_yr))
@@ -496,14 +496,16 @@ def _get_attribution_detail(an_attribution):
 
 
 def volume_information(learning_unit_yr):
-    return [get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
-            get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
-            get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
-            learning_unit_yr.pm_classes or 0,
-            get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
-            get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
-            get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
-            learning_unit_yr.pp_classes or 0]
+    return [
+        get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+        get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+        get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+        learning_unit_yr.pm_classes or 0,
+        get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+        get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+        get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+        learning_unit_yr.pp_classes or 0
+    ]
 
 
 # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
@@ -546,8 +548,25 @@ def _prepare_titles(is_external_ue_list: bool, with_attributions: bool, with_grp
     if with_grp:
         titles_part2.append(str(HEADER_PROGRAMS))
     if with_attributions:
-        titles.append(str(HEADER_TEACHERS))
+        titles.extend(HEADER_TEACHERS)
     titles.extend(titles_part2)
     if is_external_ue_list:
         titles.extend(_external_ue_titles())
     return titles
+
+
+def _build_complete_name(person: Person) -> str:
+    return " ".join([
+        ("{}".format(person.last_name) if person.last_name else "").upper(),
+        person.first_name or ""
+    ]).strip()
+
+
+def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
+    attributions = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+        learning_unit_yr)
+    teachers = set()
+    for k, attribution in attributions.items():
+        if attribution.get('person'):
+            teachers.add(attribution.get('person'))
+    return teachers
