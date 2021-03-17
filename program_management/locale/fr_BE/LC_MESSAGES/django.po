@@ -372,7 +372,7 @@ msgstr ""
 
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
-msgstr "Impossible de mettre la fin à %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la dernière année d'organisation à %(end_year)s : %(msg)s"
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"

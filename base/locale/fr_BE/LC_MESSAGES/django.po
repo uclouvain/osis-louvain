@@ -1402,6 +1402,9 @@ msgstr "Liste des UE avec une formation par ligne"
 msgid "List of teachers"
 msgstr "Liste des enseignants"
 
+msgid "List of teachers (email)"
+msgstr "Liste des enseignants (email)"
+
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
 
