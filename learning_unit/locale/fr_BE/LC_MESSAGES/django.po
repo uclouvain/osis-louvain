@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-04 14:37+0100\n"
+"POT-Creation-Date: 2021-03-18 15:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,6 +53,12 @@ msgstr "La proposition est une proposition de modification"
 
 msgid "Proposal not in eligible state for consolidation"
 msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+msgid "Student worker"
+msgstr "Etudiant jobiste"
+
+msgid "Student workers"
+msgstr "Etudiants jobistes"
 
 #, python-format
 msgid ""
