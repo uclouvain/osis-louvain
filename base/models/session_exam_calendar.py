@@ -30,7 +30,8 @@ from django.db import models
 from base.business.academic_calendar import AcademicSessionEvent
 from base.models import offer_year_calendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -89,7 +90,7 @@ def find_deliberation_date(nb_session, educ_group_year):
     """
     session_exam_cals = SessionExamCalendar.objects.filter(
         number_session=nb_session,
-        academic_calendar__reference=academic_calendar_type.DELIBERATION
+        academic_calendar__reference=AcademicCalendarTypes.DELIBERATION.name
     )
     academic_cals_id = [session_exam.academic_calendar_id for session_exam in list(session_exam_cals)]
 

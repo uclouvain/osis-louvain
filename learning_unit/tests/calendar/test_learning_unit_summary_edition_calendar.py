@@ -30,7 +30,7 @@ from django.test import TestCase
 
 from base.business.academic_calendar import AcademicEvent
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory, \
     AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -46,14 +46,14 @@ class TestLearningUnitSummaryEditionCalendarEnsureConsistencyUntilNPlus6(TestCas
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         LearningUnitSummaryEditionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
 
         self.assertEqual(qs.count(), 7)
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
                 "title": "Edition fiches descriptives",
-                "reference": academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+                "reference": AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 7, 1),
                 "end_date": datetime.date(self.current_academic_year.year, 9, 13),
@@ -66,7 +66,7 @@ class TestLearningUnitSummaryEditionCalendarEnsureConsistencyUntilNPlus6(TestCas
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+                reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
             ).count(),
             7
         )
@@ -74,13 +74,15 @@ class TestLearningUnitSummaryEditionCalendarEnsureConsistencyUntilNPlus6(TestCas
 
 class TestLearningUnitSummaryEditionCalendarGetOpenedAcademicEvents(TestCase):
     def test_get_opened_academic_events_case_no_academic_events_opened(self):
-        CloseAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        CloseAcademicCalendarFactory(reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
 
         calendar = LearningUnitSummaryEditionCalendar()
         self.assertListEqual(calendar.get_opened_academic_events(), [])
 
     def test_get_opened_academic_events_case_one_academic_events_opened(self):
-        academic_calendar_db = OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        academic_calendar_db = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
 
         calendar = LearningUnitSummaryEditionCalendar()
         self.assertListEqual(
@@ -99,12 +101,12 @@ class TestLearningUnitSummaryEditionCalendarGetOpenedAcademicEvents(TestCase):
 
     def test_get_opened_academic_events_case_multiple_academic_events_opened(self):
         academic_calendar_db_2020 = OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
             data_year__year=2020,
             start_date=datetime.date(2020, 1, 12)
         )
         academic_calendar_db_2019 = OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
             data_year__year=2019,
             start_date=datetime.date(2019, 1, 12)
         )
@@ -136,14 +138,14 @@ class TestLearningUnitSummaryEditionCalendarGetOpenedAcademicEvents(TestCase):
 
 class TestLearningUnitSummaryEditionCalendarGetNextAcademicEvent(TestCase):
     def test_get_next_academic_event_case_no_next_academic_event(self):
-        CloseAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        CloseAcademicCalendarFactory(reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
 
         calendar = LearningUnitSummaryEditionCalendar()
         self.assertIsNone(calendar.get_next_academic_event())
 
     def test_get_next_academic_event_case_next_academic_event(self):
         academic_calendar_db = AcademicCalendarFactory(
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
             start_date=datetime.date.today() + datetime.timedelta(days=5),
             end_date=datetime.date.today() + datetime.timedelta(days=10),
         )
@@ -168,9 +170,9 @@ class TestLearningUnitSummaryEditionCalendarGetPreviousAcademicEvent(TestCase):
         self.assertIsNone(calendar.get_previous_academic_event())
 
     def test_get_previous_academic_event_case_one_previous_academic_event(self):
-        OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        OpenAcademicCalendarFactory(reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
         academic_calendar_db = AcademicCalendarFactory(
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
             start_date=datetime.date.today() - datetime.timedelta(days=15),
             end_date=datetime.date.today() - datetime.timedelta(days=10),
         )

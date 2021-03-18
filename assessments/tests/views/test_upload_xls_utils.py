@@ -35,7 +35,8 @@ from django.utils.translation import gettext_lazy as _
 from assessments.views.upload_xls_utils import _get_score_list_filtered_by_enrolled_state
 from attribution.tests.factories.attribution import AttributionFactory
 from base.models.enums import exam_enrollment_state
-from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
+from base.models.enums import number_session, exam_enrollment_justification_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -69,7 +70,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
         data_year=academic_year,
         start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
         end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
-        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+        reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
     )
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
                                                        academic_calendar=an_academic_calendar)

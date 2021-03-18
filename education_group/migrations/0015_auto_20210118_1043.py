@@ -4,7 +4,7 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def change_education_group_preparation_calendar(apps, shema_editor):
@@ -15,13 +15,13 @@ def change_education_group_preparation_calendar(apps, shema_editor):
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
         AcademicCalendar.objects.filter(
-            academic_year__year__gte=2021, reference=academic_calendar_type.EDUCATION_GROUP_EDITION
+            academic_year__year__gte=2021, reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name
         ).delete()
 
         qs = AcademicYear.objects.filter(year__gte=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
-                reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+                reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
                 data_year=ac_year,
                 defaults={
                     "title": "Préparation des formations",

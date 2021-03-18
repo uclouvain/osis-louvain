@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
@@ -51,11 +51,11 @@ class TestGetCreateProgramTreeSpecificVersion(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.current_academic_year
         )
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
             data_year=cls.current_academic_year
         )
         cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)
@@ -160,11 +160,11 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.current_academic_year
         )
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
             data_year=cls.current_academic_year
         )
         cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)

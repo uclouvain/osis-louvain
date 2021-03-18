@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
@@ -33,7 +32,8 @@ from django.test.utils import override_settings
 
 from base.models import academic_year
 from base.models import session_exam_calendar
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import get_number_session_by_academic_calendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -53,17 +53,17 @@ class SessionExamCalendarTest(TestCase):
                                                           start_date=datetime.date(next_year, 3, 15),
                                                           end_date=datetime.date(next_year, 6, 28),
                                                           data_year=cls.current_academic_yr,
-                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                          reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
         cls.academic_calendar_3 = AcademicCalendarFactory(title="Submission of score encoding - 3",
                                                           start_date=datetime.date(next_year, 8, 1),
                                                           end_date=datetime.date(next_year, 9, 29),
                                                           data_year=cls.current_academic_yr,
-                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                          reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
         cls.academic_calendar_4 = AcademicCalendarFactory(title="Deliberation session 1",
                                                           start_date=datetime.date(next_year, 1, 1),
                                                           end_date=datetime.date(next_year, 1, 2),
                                                           data_year=cls.current_academic_yr,
-                                                          reference=academic_calendar_type.DELIBERATION)
+                                                          reference=AcademicCalendarTypes.DELIBERATION.name)
 
     def setUp(self):
         self.academic_calendar_1 = AcademicCalendarFactory(title="Submission of score encoding - 1",
@@ -72,7 +72,7 @@ class SessionExamCalendarTest(TestCase):
                                                            end_date=datetime.date(self.current_academic_yr.year + 1, 1,
                                                                                   1),
                                                            data_year=self.current_academic_yr,
-                                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                           reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
 
     def test_number_exam_session_out_of_range(self):
         session_exam_calendar = SessionExamCalendarFactory.build(academic_calendar=self.academic_calendar_1,
@@ -210,7 +210,7 @@ class DeliberationDateTest(TestCase):
                                                         end_date=datetime.date(cls.current_academic_yr.year + 1, 1,
                                                                                2),
                                                         data_year=cls.current_academic_yr,
-                                                        reference=academic_calendar_type.DELIBERATION)
+                                                        reference=AcademicCalendarTypes.DELIBERATION.name)
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                    number_session=number_session.ONE)
         cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_yr)

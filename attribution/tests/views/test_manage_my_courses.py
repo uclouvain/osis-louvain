@@ -40,7 +40,7 @@ from waffle.testutils import override_flag
 from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information, \
     _fetch_achievements_by_language
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
@@ -69,11 +69,11 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
             data_year=cls.current_ac_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
         cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
             data_year=cls.current_ac_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name
         )
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
@@ -130,7 +130,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
             data_year=self.ac_year_in_future[1],
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
         response = self.client.get(self.url)
 
@@ -170,7 +170,7 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         AcademicCalendarFactory(
             data_year=self.ac_year_in_future[1],
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name
         )
 
         response = self.client.get(self.url)
@@ -351,12 +351,12 @@ class ManageMyCoursesMixin(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(
             data_year=cls.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
         )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         cls.academic_calendar = OpenAcademicCalendarFactory(
             data_year=cls.academic_year_in_future,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
         )
         a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         cls.learning_unit_year = LearningUnitYearFactory(

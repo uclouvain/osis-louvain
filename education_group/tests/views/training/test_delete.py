@@ -30,7 +30,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC
@@ -62,7 +62,7 @@ class TestDeleteTrainingGetMethod(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.root_node.year
         )
         cls.url = reverse('training_delete', kwargs={'year': cls.root_node.year, 'code': cls.root_node.code})
@@ -144,7 +144,7 @@ class TestDeleteTrainingPostMethod(TestCase):
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.root_node.year
         )
 

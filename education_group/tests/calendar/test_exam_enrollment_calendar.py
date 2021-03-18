@@ -29,7 +29,7 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from education_group.calendar.exam_enrollment_calendar import ExamEnrollmentSubmissionCalendar
@@ -44,7 +44,7 @@ class TestExamEnrollmentCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         ExamEnrollmentSubmissionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EXAM_ENROLLMENTS)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name)
 
         self.assertEqual(qs.count(), 21)  # There are 3 sessions (7*3 = 21)
 
@@ -56,7 +56,7 @@ class TestExamEnrollmentCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ),
             {
                 "title": "Inscriptions aux examens - Session d'examens n°1",
-                "reference": academic_calendar_type.EXAM_ENROLLMENTS,
+                "reference": AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 11, 1),
                 "end_date": datetime.date(self.current_academic_year.year, 11, 30),
@@ -72,14 +72,14 @@ class TestExamEnrollmentCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.EXAM_ENROLLMENTS
+                reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name
             ).count(),
             21
         )
 
         self.assertEqual(
             SessionExamCalendar.objects.filter(
-                academic_calendar__reference=academic_calendar_type.EXAM_ENROLLMENTS
+                academic_calendar__reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name
             ).count(),
             21
         )

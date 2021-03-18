@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def fix_title_academic_calendar(apps, shema_editor):
@@ -10,7 +10,7 @@ def fix_title_academic_calendar(apps, shema_editor):
     We will fix title of older academic calendar
     """
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
-    AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).update(
+    AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name).update(
         title="Préparation des formations"
     )
 

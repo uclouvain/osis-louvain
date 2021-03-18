@@ -26,13 +26,12 @@ from datetime import datetime, timedelta
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
-from django.utils.text import slugify
 from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.entity_version import EntityVersion
-from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.learning_unit_year import LearningUnitYear
 from features.forms.learning_units import update_form, create_form
 from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, SearchLearningUnitPage, \
@@ -170,8 +169,10 @@ def step_impl(context):
 
 @given("La période de modification des programmes n’est pas en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendar.objects.filter(academic_year=current_academic_year(),
-                                               reference=EDUCATION_GROUP_EDITION).first()
+    calendar = AcademicCalendar.objects.filter(
+        academic_year=current_academic_year(),
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name
+    ).first()
     if calendar:
         calendar.end_date = (datetime.now() - timedelta(days=1)).date()
         calendar.save()

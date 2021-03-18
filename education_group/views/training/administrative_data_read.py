@@ -28,7 +28,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.mandate_type import MandateTypes
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -62,7 +62,7 @@ class TrainingReadAdministrativeData(TrainingRead):
         return OfferYearCalendar.objects.filter(
             education_group_year__acronym=self.training_identity.acronym,
             education_group_year__academic_year__year=self.training_identity.year,
-            academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
+            academic_calendar__reference=AcademicCalendarTypes.COURSE_ENROLLMENT.name,
         ).first()
 
     def __get_complementary_informations(self):

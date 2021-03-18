@@ -30,7 +30,7 @@ from django.test import TestCase
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 
@@ -44,7 +44,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         ScoresExamSubmissionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
 
         self.assertEqual(qs.count(), 21)  # There are 3 sessions (7*3 = 21)
 
@@ -56,7 +56,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ),
             {
                 "title": "Encodage de notes - Session 1",
-                "reference": academic_calendar_type.SCORES_EXAM_SUBMISSION,
+                "reference": AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 12, 15),
                 "end_date": datetime.date(self.current_academic_year.year + 1, 2, 28),
@@ -72,14 +72,14 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+                reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
             ).count(),
             21
         )
 
         self.assertEqual(
             SessionExamCalendar.objects.filter(
-                academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+                academic_calendar__reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
             ).count(),
             21
         )

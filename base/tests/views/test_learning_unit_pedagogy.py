@@ -38,8 +38,9 @@ from openpyxl import load_workbook
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
-from base.models.enums import academic_calendar_type, entity_type
+from base.models.enums import entity_type
 from base.models.enums import organization_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -77,7 +78,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -191,7 +192,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -332,7 +333,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(

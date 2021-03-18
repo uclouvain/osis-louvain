@@ -2,14 +2,14 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def populate_data_year(apps, schema_editor):
     calendar_references_data_next_year = [
-        academic_calendar_type.TEACHING_CHARGE_APPLICATION,
-        academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-        academic_calendar_type.EDUCATION_GROUP_EDITION
+        AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name,
+        AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+        AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name
     ]
     academic_calendar_mdl = apps.get_model("base", "AcademicCalendar")
     academic_year_mdl = apps.get_model("base", "AcademicYear")

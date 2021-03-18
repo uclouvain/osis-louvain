@@ -29,7 +29,7 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
@@ -45,7 +45,7 @@ class TestLearningUnitExtendedProposalManagementCalendarEnsureConsistencyUntilNP
         LearningUnitExtendedProposalManagementCalendar.ensure_consistency_until_n_plus_6()
 
         qs = AcademicCalendar.objects.filter(
-            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT
+            reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name
         )
 
         self.assertEqual(qs.count(), 7)
@@ -53,7 +53,7 @@ class TestLearningUnitExtendedProposalManagementCalendarEnsureConsistencyUntilNP
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
                 "title": "Gestion des propositions étendue",
-                "reference": academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+                "reference": AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name,
                 "data_year": self.current_academic_year.pk,
                 # The first time that we can edit an 2020's object is in 2014 (=2020-6)
                 "start_date": datetime.date(self.current_academic_year.year - 6, 9, 14),
@@ -67,7 +67,7 @@ class TestLearningUnitExtendedProposalManagementCalendarEnsureConsistencyUntilNP
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT
+                reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name
             ).count(),
             7
         )

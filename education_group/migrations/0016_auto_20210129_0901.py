@@ -4,7 +4,7 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def change_exam_enrollment_calendar(apps, shema_editor):
@@ -17,17 +17,17 @@ def change_exam_enrollment_calendar(apps, shema_editor):
     if current_academic_year:
         SessionExamCalendar.objects.filter(
             academic_calendar__data_year__year__gte=2021,
-            academic_calendar__reference=academic_calendar_type.EXAM_ENROLLMENTS,
+            academic_calendar__reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
         ).delete()
         AcademicCalendar.objects.filter(
-            academic_year__year__gte=2021, reference=academic_calendar_type.EXAM_ENROLLMENTS
+            academic_year__year__gte=2021, reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name
         ).delete()
 
         qs = AcademicYear.objects.filter(year__gte=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             # Create session 1
             academic_calendar_1 = AcademicCalendar.objects.create(
-                reference=academic_calendar_type.EXAM_ENROLLMENTS,
+                reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
                 data_year=ac_year,
                 title="Inscriptions aux examens - Session d'examens n°1",
                 start_date=datetime.date(ac_year.year, 11, 1),
@@ -38,7 +38,7 @@ def change_exam_enrollment_calendar(apps, shema_editor):
 
             # Create session 2
             academic_calendar_2 = AcademicCalendar.objects.create(
-                reference=academic_calendar_type.EXAM_ENROLLMENTS,
+                reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
                 data_year=ac_year,
                 title="Inscriptions aux examens - Session d'examens n°2",
                 start_date=datetime.date(ac_year.year + 1, 3, 1),
@@ -50,7 +50,7 @@ def change_exam_enrollment_calendar(apps, shema_editor):
 
             # Create session 3
             academic_calendar_3 = AcademicCalendar.objects.create(
-                reference=academic_calendar_type.EXAM_ENROLLMENTS,
+                reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
                 data_year=ac_year,
                 title="Inscriptions aux examens - Session d'examens n°3",
                 start_date=datetime.date(ac_year.year + 1, 6, 15),

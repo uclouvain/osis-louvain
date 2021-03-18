@@ -33,7 +33,7 @@ from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import tutor, entity_calendar
 from base.models.entity_version import EntityVersion
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import BasePerm
@@ -175,7 +175,7 @@ def find_educational_information_force_majeure_submission_dates_of_learning_unit
 
     return entity_calendar.find_interval_dates_for_entity(
         ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year,
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
         entity=requirement_entity_version.entity
     )
 

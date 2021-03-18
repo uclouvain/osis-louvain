@@ -29,7 +29,7 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -39,9 +39,9 @@ class TestEducationGroupPreparationCalendarOpened(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+        OpenAcademicCalendarFactory(reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
                                     data_year=cls.current_academic_year)
-        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+        OpenAcademicCalendarFactory(reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
                                     data_year__year=cls.current_academic_year.year + 1)
 
     def test_is_open_for_spec_egy(self):
@@ -75,14 +75,14 @@ class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         EducationGroupPreparationCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name)
 
         self.assertEqual(qs.count(), 7)
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
                 "title": "Préparation des formations",
-                "reference": academic_calendar_type.EDUCATION_GROUP_EDITION,
+                "reference": AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(2019, 7, 1),
                 "end_date": datetime.date(2020, 6, 1),
@@ -94,6 +94,6 @@ class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase
             EducationGroupPreparationCalendar.ensure_consistency_until_n_plus_6()
 
         self.assertEqual(
-            AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).count(),
+            AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name).count(),
             7
         )

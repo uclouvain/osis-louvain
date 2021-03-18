@@ -28,12 +28,12 @@ import datetime
 from base.business.academic_calendar import AcademicEventSessionCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 
 
 class DissertationSubmissionCalendar(AcademicEventSessionCalendarHelper):
-    event_reference = academic_calendar_type.DISSERTATION_SUBMISSION
+    event_reference = AcademicCalendarTypes.DISSERTATION_SUBMISSION.name
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
