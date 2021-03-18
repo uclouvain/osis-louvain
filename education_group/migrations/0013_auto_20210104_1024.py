@@ -4,16 +4,16 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def remove_education_group_academic_calendar(apps, shema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
     AcademicCalendar.objects.filter(
         reference__in=[
-            academic_calendar_type.EDUCATION_GROUP_EDITION,
-            academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-            academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
+            AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
+            AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
         ]
     ).delete()
 
@@ -38,7 +38,7 @@ def create_education_group_academic_calendar(apps, shema_editor):
 
 def _create_education_group_preparation_calendar(academic_calendar_cls, targeted_academic_year):
     academic_calendar_cls.objects.update_or_create(
-        reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
         data_year=targeted_academic_year,
         defaults={
             "title": "Préparation des formations",
@@ -51,7 +51,7 @@ def _create_education_group_preparation_calendar(academic_calendar_cls, targeted
 
 def _create_education_group_extended_daily_management_calendar(academic_calendar_cls, targeted_academic_year):
     academic_calendar_cls.objects.update_or_create(
-        reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
         data_year=targeted_academic_year,
         defaults={
             "title": "Gestion journalière étendue - catalogue",
@@ -64,7 +64,7 @@ def _create_education_group_extended_daily_management_calendar(academic_calendar
 
 def _create_education_group_limited_daily_management_calendar(academic_calendar_cls, targeted_academic_year):
     academic_calendar_cls.objects.update_or_create(
-        reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
         data_year=targeted_academic_year,
         defaults={
             "title": "Gestion journalière limitée - catalogue",

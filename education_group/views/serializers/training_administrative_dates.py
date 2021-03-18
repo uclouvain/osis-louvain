@@ -28,7 +28,7 @@ from typing import Dict, List
 
 from django.db.models import F
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.offer_year_calendar import OfferYearCalendar
 
 DomainTitle = str
@@ -47,11 +47,17 @@ class AdministrativeDateBySession:
 def get_session_dates(offer_acronym: str, year: int) -> Dict[DomainTitle, Dict[SessionNumber, Dates]]:
     dates = __get_queryset_values(offer_acronym, year)
     return {
-        'exam_enrollments_dates': __get_dates_by_session(academic_calendar_type.EXAM_ENROLLMENTS, dates),
-        'scores_exam_submission_dates': __get_dates_by_session(academic_calendar_type.SCORES_EXAM_SUBMISSION, dates),
-        'dissertations_submission_dates': __get_dates_by_session(academic_calendar_type.DISSERTATION_SUBMISSION, dates),
-        'deliberations_dates': __get_dates_by_session(academic_calendar_type.DELIBERATION, dates),
-        'scores_exam_diffusion_dates': __get_dates_by_session(academic_calendar_type.SCORES_EXAM_DIFFUSION, dates),
+        'exam_enrollments_dates': __get_dates_by_session(AcademicCalendarTypes.EXAM_ENROLLMENTS.name, dates),
+        'scores_exam_submission_dates': __get_dates_by_session(
+            AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name, dates
+        ),
+        'dissertations_submission_dates': __get_dates_by_session(
+            AcademicCalendarTypes.DISSERTATION_SUBMISSION.name, dates
+        ),
+        'deliberations_dates': __get_dates_by_session(
+            AcademicCalendarTypes.DELIBERATION.name, dates
+        ),
+        'scores_exam_diffusion_dates': __get_dates_by_session(AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name, dates),
     }
 
 
@@ -76,11 +82,11 @@ def __get_session_dates(session_number: int, dates: List[AdministrativeDateBySes
 
 def __get_queryset_values(offer_acronym: str, year: int) -> List[AdministrativeDateBySession]:
     calendar_types_to_fetch = (
-        academic_calendar_type.EXAM_ENROLLMENTS,
-        academic_calendar_type.SCORES_EXAM_SUBMISSION,
-        academic_calendar_type.DISSERTATION_SUBMISSION,
-        academic_calendar_type.DELIBERATION,
-        academic_calendar_type.SCORES_EXAM_DIFFUSION
+        AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
+        AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+        AcademicCalendarTypes.DISSERTATION_SUBMISSION.name,
+        AcademicCalendarTypes.DELIBERATION.name,
+        AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name
     )
     qs = OfferYearCalendar.objects.filter(
         education_group_year__acronym=offer_acronym,

@@ -29,7 +29,7 @@ from django.utils import timezone
 from base.models import entity_calendar, entity_version
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 
@@ -54,7 +54,7 @@ def get_entities_ids(entity_acronym, with_entity_subordinated):
 def get_entity_calendar(an_entity_version, academic_yr):
     entity_cal = entity_calendar.find_by_entity_and_reference(
         an_entity_version.entity.id,
-        academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
         academic_yr
     )
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,45 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-# TYPES_CATEGORIES
 from base.models.utils.utils import ChoiceEnum
-
-ACADEMIC_CATEGORY = "ACADEMIC"
-
-# ACADEMIC_CALENDAR_TYPES
-DELIBERATION = "DELIBERATION"
-DISSERTATION_SUBMISSION = "DISSERTATION_SUBMISSION"
-EXAM_ENROLLMENTS = "EXAM_ENROLLMENTS"
-SCORES_EXAM_DIFFUSION = "SCORES_EXAM_DIFFUSION"
-SCORES_EXAM_SUBMISSION = "SCORES_EXAM_SUBMISSION"
-TEACHING_CHARGE_APPLICATION = "TEACHING_CHARGE_APPLICATION"
-COURSE_ENROLLMENT = "COURSE_ENROLLMENT"
-SUMMARY_COURSE_SUBMISSION = "SUMMARY_COURSE_SUBMISSION"
-SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE = "SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE"
-EDUCATION_GROUP_EDITION = "EDUCATION_GROUP_EDITION"
-EDUCATION_GROUP_SWITCH = "EDUCATION_GROUP_SWITCH"
-EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT = "EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT"
-EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = "EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT"
-LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT = "LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT"
-LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT = "LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT"
-
-ACADEMIC_CALENDAR_TYPES = (
-    (DELIBERATION, _("Deliberation")),
-    (DISSERTATION_SUBMISSION, _("Dissertation submission")),
-    (EXAM_ENROLLMENTS, _("Exam enrollments")),
-    (SCORES_EXAM_DIFFUSION, _("Scores diffusion")),
-    (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
-    (TEACHING_CHARGE_APPLICATION, _("Application for vacant courses")),
-    (COURSE_ENROLLMENT, _("Course enrollment")),
-    (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
-    (SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE, _("Summary course submission force majeure")),
-    (EDUCATION_GROUP_SWITCH, _("Education group switch")),
-    (EDUCATION_GROUP_EDITION, _("Education group edition")),
-    (EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT, _("Education group extended daily management")),
-    (EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT, _("Education group limited daily management")),
-    (LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT, _("Extended proposal management")),
-    (LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT, _("Limited proposal management")),
-)
 
 
 class AcademicCalendarTypes(ChoiceEnum):
@@ -83,13 +45,3 @@ class AcademicCalendarTypes(ChoiceEnum):
     EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = _("Education group limited daily management")
     LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT = _("Extended proposal management")
     LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT = _("Limited proposal management")
-
-
-CALENDAR_TYPES_COLORS = {
-    DELIBERATION: '#d9534f',
-    DISSERTATION_SUBMISSION: '#5bc0de',
-    EXAM_ENROLLMENTS: '#5bc0de',
-    SCORES_EXAM_DIFFUSION: '#5cb85c',
-    SCORES_EXAM_SUBMISSION: '#f0ad4e',
-    TEACHING_CHARGE_APPLICATION: '#337ab7'
-}

@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory
 from education_group.forms.training import CreateTrainingForm
@@ -39,15 +39,15 @@ class TestCreateTrainingForm(TestCase):
         for year in range(2020, 2025):
             OpenAcademicCalendarFactory(
                 data_year__year=year,
-                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+                reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
             )
         CloseAcademicCalendarFactory(
             data_year__year=2026,
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
         )
 
-        OpenAcademicCalendarFactory(data_year__year=2021, reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
-        CloseAcademicCalendarFactory(data_year__year=2022, reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+        OpenAcademicCalendarFactory(data_year__year=2021, reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name)
+        CloseAcademicCalendarFactory(data_year__year=2022, reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name)
 
         FrenchLanguageFactory()
 

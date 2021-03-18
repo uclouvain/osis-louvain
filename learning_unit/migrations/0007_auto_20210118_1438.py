@@ -4,7 +4,7 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def create_learning_unit_force_majeur_summary_edition_calendar(apps, shema_editor):
@@ -19,13 +19,13 @@ def create_learning_unit_force_majeur_summary_edition_calendar(apps, shema_edito
     if current_academic_year:
         AcademicCalendar.objects.filter(
             academic_year__year__gte=2021,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name
         ).delete()
 
         qs = AcademicYear.objects.filter(year__gte=2021, year__lte=current_academic_year.year + 6)
         for targeted_academic_year in qs:
             AcademicCalendar.objects.update_or_create(
-                reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+                reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
                 data_year=targeted_academic_year,
                 defaults={
                     "title": "Edition fiches descriptives (cas de force majeure)",

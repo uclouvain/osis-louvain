@@ -8,7 +8,8 @@ from django.urls import reverse, exceptions
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums import education_group_types, academic_calendar_type
+from base.models.enums import education_group_types
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
@@ -24,7 +25,7 @@ from testing import mocks
 class TestCreateOrphanGroupGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
+        OpenAcademicCalendarFactory(reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name)
         cls.type = GroupEducationGroupTypeFactory()
 
         cls.central_manager = CentralManagerFactory()
@@ -83,7 +84,7 @@ class TestCreateOrphanGroupGetMethod(TestCase):
 class TestCreateOrphanGroupPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
+        OpenAcademicCalendarFactory(reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name)
         cls.type = GroupEducationGroupTypeFactory()
         cls.central_manager = CentralManagerFactory()
         cls.url = reverse('group_create', kwargs={'type': cls.type.name})
@@ -172,7 +173,7 @@ class TestCreateNonOrphanGroupGetMethod(TestCase):
             group_year__management_entity=cls.central_manager.entity
         )
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.parent_element.group_year.academic_year.year
         )
 
@@ -212,7 +213,7 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
             group_year__management_entity=cls.central_manager.entity
         )
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.parent_element.group_year.academic_year.year
         )
         AuthorizedRelationshipFactory(

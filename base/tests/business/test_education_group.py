@@ -37,9 +37,9 @@ from base.business.education_group import ORDER_COL, ORDER_DIRECTION, \
     CHAIR_OF_THE_EXAM_BOARD_COL, EXAM_BOARD_SECRETARY_COL, EXAM_BOARD_SIGNATORY_COL, SIGNATORY_QUALIFICATION_COL, \
     START_EXAM_REGISTRATION_COL, END_EXAM_REGISTRATION_COL, MARKS_PRESENTATION_COL, DISSERTATION_PRESENTATION_COL, \
     DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles, _extract_main_data
-from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -84,7 +84,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         # Course enrollment event
         self.offer_yr_cal_course_enrollment = OfferYearCalendarFactory(
             academic_calendar__data_year=self.academic_year,
-            academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
+            academic_calendar__reference=AcademicCalendarTypes.COURSE_ENROLLMENT.name,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 9, 11, hour=4),
             end_date=datetime.datetime(2017, 9, 22, hour=6)
@@ -92,7 +92,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         # Score submission event (session 1)
         self.offer_yr_cal_score_exam_submission_1 = OfferYearCalendarFactory(
             academic_calendar__data_year=self.academic_year,
-            academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
+            academic_calendar__reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 5, 11, hour=4),
             end_date=datetime.datetime(2017, 5, 22, hour=6)
@@ -104,7 +104,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         # Score submission event (session 2)
         self.offer_yr_cal_score_exam_submission_2 = OfferYearCalendarFactory(
             academic_calendar__data_year=self.academic_year,
-            academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
+            academic_calendar__reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 9, 1, hour=4)
         )

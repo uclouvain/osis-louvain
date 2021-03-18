@@ -4,12 +4,14 @@ import datetime
 
 from django.db import migrations
 
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def update_summary_submission_calendars(apps, schema_editor):
     academic_calendar_mdl = apps.get_model("base", "AcademicCalendar")
-    academic_calendar_items = academic_calendar_mdl.objects.filter(reference=SUMMARY_COURSE_SUBMISSION)
+    academic_calendar_items = academic_calendar_mdl.objects.filter(
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+    )
 
     for item in academic_calendar_items:
         item.data_year = item.academic_year
@@ -21,7 +23,9 @@ def update_summary_submission_calendars(apps, schema_editor):
 def reverse_migration(apps, schema_editor):
     academic_year_mdl = apps.get_model("base", "AcademicYear")
     academic_calendar_mdl = apps.get_model("base", "AcademicCalendar")
-    academic_calendar_items = academic_calendar_mdl.objects.filter(reference=SUMMARY_COURSE_SUBMISSION)
+    academic_calendar_items = academic_calendar_mdl.objects.filter(
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+    )
 
     for item in academic_calendar_items:
         next_academic_year = academic_year_mdl.objects.get(year=item.academic_year.year + 1)

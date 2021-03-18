@@ -29,7 +29,7 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 
 
@@ -44,7 +44,7 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
     start_date = factory.SelfAttribute("data_year.start_date")
     end_date = factory.SelfAttribute("data_year.end_date")
-    reference = factory.Iterator(academic_calendar_type.ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
+    reference = factory.Iterator(AcademicCalendarTypes.choices(), getter=operator.itemgetter(0))
 
 
 class OpenAcademicCalendarFactory(AcademicCalendarFactory):
@@ -58,13 +58,13 @@ class CloseAcademicCalendarFactory(AcademicCalendarFactory):
 
 
 class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.SCORES_EXAM_SUBMISSION
+    reference = AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
 
 
 def generate_proposal_calendars(academic_years):
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+            reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name,
             data_year=academic_year,
             start_date=datetime.datetime(academic_year.year - 6,  9, 14),
             end_date=datetime.datetime(academic_year.year + 1, 9, 13),
@@ -73,7 +73,7 @@ def generate_proposal_calendars(academic_years):
     ]
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+            reference=AcademicCalendarTypes.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT.name,
             data_year=academic_year,
             start_date=datetime.datetime(academic_year.year - 2,  9, 14),
             end_date=datetime.datetime(academic_year.year, 9, 13),
@@ -85,14 +85,14 @@ def generate_proposal_calendars(academic_years):
 def generate_proposal_calendars_without_start_and_end_date(academic_years):
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+            reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name,
             data_year=academic_year
         )
         for academic_year in academic_years
     ]
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+            reference=AcademicCalendarTypes.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT.name,
             data_year=academic_year
         )
         for academic_year in academic_years
@@ -102,7 +102,7 @@ def generate_proposal_calendars_without_start_and_end_date(academic_years):
 def generate_learning_unit_edition_calendars(academic_years):
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=academic_year,
             start_date=datetime.datetime(academic_year.year - 6, 9, 14),
             end_date=None,
@@ -111,7 +111,7 @@ def generate_learning_unit_edition_calendars(academic_years):
     ]
     [
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
             data_year=academic_year,
             start_date=datetime.datetime(academic_year.year - 2, 9, 14),
             end_date=None

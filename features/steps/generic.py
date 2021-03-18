@@ -30,8 +30,7 @@ from django.contrib.auth.models import Group
 
 from base.models.academic_year import current_academic_year
 from base.models.entity import Entity
-from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION, \
-    EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT, EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.models.learning_unit import LearningUnit
 from base.models.person_entity import PersonEntity
@@ -118,7 +117,10 @@ def step_impl(context: Context, group):
 
 @step("La période de modification des programmes est en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendarFactory(data_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar = AcademicCalendarFactory(
+        data_year=current_academic_year(),
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name
+    )
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
     calendar.save()
 
@@ -127,13 +129,15 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     calendar = AcademicCalendarFactory(
         data_year=current_academic_year(),
-        reference=EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT)
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name
+    )
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
 
     calendar.save()
     calendar = AcademicCalendarFactory(
         data_year=current_academic_year(),
-        reference=EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
+        reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
+    )
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
 
     calendar.save()

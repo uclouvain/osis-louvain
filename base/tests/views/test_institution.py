@@ -32,11 +32,10 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
@@ -49,7 +48,7 @@ class EntityViewTestCase(APITestCase):
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = OpenAcademicCalendarFactory(
             data_year=cls.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
         cls.start_date = datetime.date.today() - datetime.timedelta(weeks=48)
         cls.end_date = None

@@ -39,7 +39,7 @@ from base.business.learning_units.perms import is_eligible_to_update_learning_un
     is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, CanUserEditEducationalInformationForceMajeure
 from base.models import entity_calendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
 from base.views import teaching_material
@@ -114,7 +114,7 @@ def list_my_attributions_summary_editable(request):
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
         ac_year=academic_year,
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
     )
     errors = (CanUserEditEducationalInformation(
         user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years_qs)

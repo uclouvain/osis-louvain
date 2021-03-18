@@ -25,7 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.enums import academic_calendar_type, education_group_categories
+from base.models.enums import education_group_categories
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.forms.education_groups import GroupFilter
@@ -42,7 +43,7 @@ class TestGroupFilter(TestCase):
 
     def test_ensure_academic_year_initial_value_case_one_education_group_switch_calendar_opened(self):
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_SWITCH,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_SWITCH.name,
             data_year=self.academic_years[2]
         )
 
@@ -52,7 +53,7 @@ class TestGroupFilter(TestCase):
     def test_ensure_academic_year_initial_value_case_multiple_education_group_switch_calendar_opened(self):
         for academic_year in self.academic_years[:2]:
             OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.EDUCATION_GROUP_SWITCH,
+                reference=AcademicCalendarTypes.EDUCATION_GROUP_SWITCH.name,
                 data_year=academic_year
             )
 

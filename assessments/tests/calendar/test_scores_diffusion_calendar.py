@@ -30,7 +30,7 @@ from django.test import TestCase
 
 from assessments.calendar.scores_diffusion_calendar import ScoresDiffusionCalendar
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 
@@ -44,7 +44,7 @@ class TestScoresDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         ScoresDiffusionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.SCORES_EXAM_DIFFUSION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name)
 
         self.assertEqual(qs.count(), 21)  # There are 3 sessions (7*3 = 21)
 
@@ -56,7 +56,7 @@ class TestScoresDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ),
             {
                 "title": "Diffusion des notes - Session 1",
-                "reference": academic_calendar_type.SCORES_EXAM_DIFFUSION,
+                "reference": AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year + 1, 1, 5),
                 "end_date": datetime.date(self.current_academic_year.year + 1, 2, 28),
@@ -72,14 +72,14 @@ class TestScoresDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.SCORES_EXAM_DIFFUSION
+                reference=AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name
             ).count(),
             21
         )
 
         self.assertEqual(
             SessionExamCalendar.objects.filter(
-                academic_calendar__reference=academic_calendar_type.SCORES_EXAM_DIFFUSION
+                academic_calendar__reference=AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name
             ).count(),
             21
         )

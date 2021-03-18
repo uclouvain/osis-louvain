@@ -32,9 +32,9 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.xls import get_name_or_username, convert_boolean
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.education_group_types import TrainingType
 from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -239,7 +239,7 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
 def _extract_administrative_data(an_education_group_year: EducationGroupYear) -> Dict:
     course_enrollment_calendar = _get_offer_year_calendar_from_prefetched_data(
         an_education_group_year,
-        academic_calendar_type.COURSE_ENROLLMENT
+        AcademicCalendarTypes.COURSE_ENROLLMENT.name
     )
     administrative_data = {
         START_COURSE_REGISTRATION_COL: _format_date(course_enrollment_calendar, 'start_date', DATE_FORMAT),
@@ -254,11 +254,11 @@ def _extract_administrative_data(an_education_group_year: EducationGroupYear) ->
 
 def _extract_session_data(education_group_year: EducationGroupYear, session_number: int) -> Dict:
     session_academic_cal_type = [
-        academic_calendar_type.EXAM_ENROLLMENTS,
-        academic_calendar_type.SCORES_EXAM_SUBMISSION,
-        academic_calendar_type.DISSERTATION_SUBMISSION,
-        academic_calendar_type.DELIBERATION,
-        academic_calendar_type.SCORES_EXAM_DIFFUSION
+        AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
+        AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+        AcademicCalendarTypes.DISSERTATION_SUBMISSION.name,
+        AcademicCalendarTypes.DELIBERATION.name,
+        AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name
     ]
     offer_year_cals = {}
     for academic_cal_type in session_academic_cal_type:
@@ -269,18 +269,24 @@ def _extract_session_data(education_group_year: EducationGroupYear, session_numb
         )
 
     return {
-        START_EXAM_REGISTRATION_COL: _format_date(offer_year_cals[academic_calendar_type.EXAM_ENROLLMENTS],
-                                                  'start_date', DATE_FORMAT),
-        END_EXAM_REGISTRATION_COL: _format_date(offer_year_cals[academic_calendar_type.EXAM_ENROLLMENTS], 'end_date',
-                                                DATE_FORMAT),
-        MARKS_PRESENTATION_COL: _format_date(offer_year_cals[academic_calendar_type.SCORES_EXAM_SUBMISSION],
-                                             'start_date', DATE_FORMAT),
-        DISSERTATION_PRESENTATION_COL: _format_date(offer_year_cals[academic_calendar_type.DISSERTATION_SUBMISSION],
-                                                    'start_date', DATE_FORMAT),
-        DELIBERATION_COL: _format_date(offer_year_cals[academic_calendar_type.DELIBERATION], 'start_date',
-                                       DATE_TIME_FORMAT),
-        SCORES_DIFFUSION_COL: _format_date(offer_year_cals[academic_calendar_type.SCORES_EXAM_DIFFUSION], 'start_date',
-                                           DATE_TIME_FORMAT),
+        START_EXAM_REGISTRATION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.EXAM_ENROLLMENTS.name], 'start_date', DATE_FORMAT
+        ),
+        END_EXAM_REGISTRATION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.EXAM_ENROLLMENTS.name], 'end_date', DATE_FORMAT
+        ),
+        MARKS_PRESENTATION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name], 'start_date', DATE_FORMAT
+        ),
+        DISSERTATION_PRESENTATION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.DISSERTATION_SUBMISSION.name], 'start_date', DATE_FORMAT
+        ),
+        DELIBERATION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.DELIBERATION.name], 'start_date', DATE_TIME_FORMAT
+        ),
+        SCORES_DIFFUSION_COL: _format_date(
+            offer_year_cals[AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name], 'start_date', DATE_TIME_FORMAT
+        ),
     }
 
 

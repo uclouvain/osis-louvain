@@ -31,7 +31,7 @@ from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
 from base.models.academic_year import starting_academic_year
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -55,7 +55,7 @@ class EntityCalendar(AbstractCalendar):
         self._check_not_summary_course_submission()
 
     def _check_not_summary_course_submission(self):
-        if self.academic_calendar.reference == academic_calendar_type.SUMMARY_COURSE_SUBMISSION:
+        if self.academic_calendar.reference == AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name:
             raise ValidationError({
                 "academic_calendar": _('You cannot have a specific summary course submission event.')
             })

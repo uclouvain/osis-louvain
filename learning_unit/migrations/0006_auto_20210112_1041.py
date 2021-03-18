@@ -4,15 +4,15 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def remove_learning_unit_academic_calendar(apps, shema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
     AcademicCalendar.objects.filter(
         reference__in=[
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
         ]
     ).delete()
 
@@ -35,7 +35,7 @@ def create_learning_unit_academic_calendar(apps, shema_editor):
 
 def _create_learning_unit_summary_edition_calendar(academic_calendar_cls, targeted_academic_year):
     academic_calendar_cls.objects.update_or_create(
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
         data_year=targeted_academic_year,
         defaults={
             "title": "Edition fiches descriptives",
@@ -48,7 +48,7 @@ def _create_learning_unit_summary_edition_calendar(academic_calendar_cls, target
 
 def _create_learning_unit_force_majeur_summary_edition_calendar(academic_calendar_cls, targeted_academic_year):
     academic_calendar_cls.objects.update_or_create(
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
         data_year=targeted_academic_year,
         defaults={
             "title": "Edition fiches descriptives (cas de force majeure)",

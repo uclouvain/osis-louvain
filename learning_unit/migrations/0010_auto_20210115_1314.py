@@ -6,7 +6,7 @@ from django.db import migrations
 from django.db.models import F
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 START_YEAR = 2020
 
@@ -21,7 +21,7 @@ def create_proposal_limited_calendar(apps, schema_editor):
         qs = AcademicYear.objects.filter(year__gte=START_YEAR, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
-                reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+                reference=AcademicCalendarTypes.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT.name,
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion des propositions limitée",
@@ -41,7 +41,7 @@ def create_proposal_extended_calendar(apps, schema_editor):
         qs = AcademicYear.objects.filter(year__gte=START_YEAR, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
-                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+                reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name,
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion des propositions étendue",
@@ -54,14 +54,14 @@ def create_proposal_extended_calendar(apps, schema_editor):
 def remove_proposal_limited_calendar(apps, schema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
     AcademicCalendar.objects.filter(
-        reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT
+        reference=AcademicCalendarTypes.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT.name
     ).delete()
 
 
 def remove_proposal_extended_calendar(apps, schema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
     AcademicCalendar.objects.filter(
-        reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT
+        reference=AcademicCalendarTypes.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT.name
     ).delete()
 
 
@@ -81,8 +81,8 @@ def remove_old_calendars(apps, schema_editor):
 def update_start_date_of_daily_management_calendars(apps, schema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
     references_to_update = [
-        academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
-        academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+        AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
+        AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
     ]
     AcademicCalendar.objects.filter(
         reference__in=references_to_update,

@@ -4,7 +4,7 @@ import datetime
 from django.db import migrations
 from django.utils import timezone
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def create_application_courses_calendar(apps, shema_editor):
@@ -17,7 +17,7 @@ def create_application_courses_calendar(apps, shema_editor):
         qs = AcademicYear.objects.filter(year__gt=2021, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
-                reference=academic_calendar_type.TEACHING_CHARGE_APPLICATION,
+                reference=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name,
                 data_year=ac_year,
                 defaults={
                     "title": "Candidature aux cours vacants",
@@ -30,7 +30,7 @@ def create_application_courses_calendar(apps, shema_editor):
 
 def remove_application_courses_calendar(apps, shema_editor):
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
-    AcademicCalendar.objects.filter(reference=academic_calendar_type.TEACHING_CHARGE_APPLICATION).delete()
+    AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name).delete()
 
 
 class Migration(migrations.Migration):

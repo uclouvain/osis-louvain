@@ -30,7 +30,7 @@ from django_filters import filters, OrderingFilter
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import academic_calendar
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.views.learning_units.search.common import SearchTypes
 from base.forms.learning_unit.search.simple import COMMON_ORDERING_FIELDS
 
@@ -75,7 +75,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
 
     def _compute_summary_status(self, queryset):
         ac_calendar = academic_calendar.get_by_reference_and_data_year(
-            SUMMARY_COURSE_SUBMISSION,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
             self.form.cleaned_data['academic_year']
         )
 

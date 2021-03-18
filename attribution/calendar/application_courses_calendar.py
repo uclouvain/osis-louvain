@@ -28,11 +28,11 @@ import datetime
 from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 class ApplicationCoursesCalendar(AcademicEventCalendarHelper):
-    event_reference = academic_calendar_type.TEACHING_CHARGE_APPLICATION
+    event_reference = AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):

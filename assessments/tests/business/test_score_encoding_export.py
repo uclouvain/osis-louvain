@@ -39,7 +39,8 @@ from assessments.models.enums import score_sheet_address_choices
 from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
 from base import models as mdl
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -57,9 +58,11 @@ class XlsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                        data_year__current=True,
-                                                        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        cls.academic_calendar = AcademicCalendarFactory(
+            title="Submission of score encoding - 1",
+            data_year__current=True,
+            reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+        )
         cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                                                number_session=number_session.ONE)
         learning_unit_yr = LearningUnitYearFactory(learning_container_year__academic_year__current=True)

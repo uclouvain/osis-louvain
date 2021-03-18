@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from base.models import entity_calendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 def find_summary_course_submission_dates_for_entity_version(entity_version, ac_year):
     return entity_calendar.find_interval_dates_for_entity(
         ac_year=ac_year,
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
         entity=entity_version.entity
     )

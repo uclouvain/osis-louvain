@@ -30,7 +30,7 @@ from django.test import TestCase
 
 from base.business.academic_calendar import AcademicSessionEvent
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -47,7 +47,7 @@ class TestDissertationSubmissionCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         DissertationSubmissionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.DISSERTATION_SUBMISSION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.DISSERTATION_SUBMISSION.name)
 
         self.assertEqual(qs.count(), 21)  # There are 3 sessions (7*3 = 21)
 
@@ -59,7 +59,7 @@ class TestDissertationSubmissionCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ),
             {
                 "title": "Remise du mémoire - Session 1",
-                "reference": academic_calendar_type.DISSERTATION_SUBMISSION,
+                "reference": AcademicCalendarTypes.DISSERTATION_SUBMISSION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 12, 1),
                 "end_date": datetime.date(self.current_academic_year.year + 1, 1, 31),
@@ -75,14 +75,14 @@ class TestDissertationSubmissionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.DISSERTATION_SUBMISSION
+                reference=AcademicCalendarTypes.DISSERTATION_SUBMISSION.name
             ).count(),
             21
         )
 
         self.assertEqual(
             SessionExamCalendar.objects.filter(
-                academic_calendar__reference=academic_calendar_type.DISSERTATION_SUBMISSION
+                academic_calendar__reference=AcademicCalendarTypes.DISSERTATION_SUBMISSION.name
             ).count(),
             21
         )
@@ -94,7 +94,7 @@ class TestDissertationSubmissionCalendarGetAcademicSessionEvent(TestCase):
         cls.current_academic_year = create_current_academic_year()
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.DISSERTATION_SUBMISSION,
+            reference=AcademicCalendarTypes.DISSERTATION_SUBMISSION.name,
             data_year__year=2020
         )
         SessionExamCalendarFactory(number_session=1, academic_calendar=cls.academic_calendar)

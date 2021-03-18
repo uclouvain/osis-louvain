@@ -29,7 +29,7 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from learning_unit.calendar.learning_unit_enrollment_calendar import LearningUnitEnrollmentCalendar
 
@@ -43,14 +43,14 @@ class TestLearningUnitEnrollmentCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         LearningUnitEnrollmentCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.COURSE_ENROLLMENT)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.COURSE_ENROLLMENT.name)
 
         self.assertEqual(qs.count(), 7)
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
                 "title": "Inscription aux cours",
-                "reference": academic_calendar_type.COURSE_ENROLLMENT,
+                "reference": AcademicCalendarTypes.COURSE_ENROLLMENT.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date":  datetime.date(self.current_academic_year.year, 9, 1),
                 "end_date": datetime.date(self.current_academic_year.year, 10, 31),
@@ -63,7 +63,7 @@ class TestLearningUnitEnrollmentCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.COURSE_ENROLLMENT
+                reference=AcademicCalendarTypes.COURSE_ENROLLMENT.name
             ).count(),
             7
         )

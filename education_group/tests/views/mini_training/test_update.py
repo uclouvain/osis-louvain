@@ -25,14 +25,12 @@
 import mock
 from django.test import TestCase
 
-from base.models.enums import academic_calendar_type
-from base.models.enums.entity_type import INSTITUTE
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityWithVersionFactory
-from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.organization import MainOrganizationFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
@@ -69,7 +67,7 @@ class TestMiniTrainingUpdateView(TestCase):
             management_entity=MainEntityVersionFactory(entity__organization=cls.organization).entity
         )
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.egy.academic_year
         )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
@@ -130,7 +128,7 @@ class TestMiniTrainingUpdateView(TestCase):
             *mocks
     ):
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=self.egy.academic_year.year + 1
         )
 

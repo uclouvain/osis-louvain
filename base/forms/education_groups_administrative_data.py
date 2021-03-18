@@ -32,7 +32,7 @@ from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FOR
 from base.models import offer_year_calendar
 from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_data_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.offer_year_calendar import create_offer_year_calendar
 from osis_common.utils.datetime import convert_datetime_to_date, convert_date_to_datetime
 
@@ -78,7 +78,7 @@ class CourseEnrollmentForm(forms.Form):
 
 
 def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
-    cal = get_by_reference_and_data_year(academic_calendar_type.COURSE_ENROLLMENT, education_group_yr.academic_year)
+    cal = get_by_reference_and_data_year(AcademicCalendarTypes.COURSE_ENROLLMENT.name, education_group_yr.academic_year)
     if cal:
         return create_offer_year_calendar(education_group_yr, cal)
 
@@ -175,15 +175,15 @@ def _set_values_in_offer_year_calendar(oyc, value):
 
 def _get_academic_calendar_type(name):
     if name == 'exam_enrollment_range':
-        ac_type = academic_calendar_type.EXAM_ENROLLMENTS
+        ac_type = AcademicCalendarTypes.EXAM_ENROLLMENTS.name
     elif name == 'scores_exam_submission':
-        ac_type = academic_calendar_type.SCORES_EXAM_SUBMISSION
+        ac_type = AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
     elif name == 'dissertation_submission':
-        ac_type = academic_calendar_type.DISSERTATION_SUBMISSION
+        ac_type = AcademicCalendarTypes.DISSERTATION_SUBMISSION.name
     elif name == 'deliberation':
-        ac_type = academic_calendar_type.DELIBERATION
+        ac_type = AcademicCalendarTypes.DELIBERATION.name
     elif name == 'scores_exam_diffusion':
-        ac_type = academic_calendar_type.SCORES_EXAM_DIFFUSION
+        ac_type = AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name
     else:
         ac_type = None
 

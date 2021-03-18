@@ -29,7 +29,7 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -44,14 +44,16 @@ class TestEducationGroupExtendedDailyManagementCalendarEnsureConsistencyUntilNPl
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         EducationGroupExtendedDailyManagementCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
+        qs = AcademicCalendar.objects.filter(
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
+        )
 
         self.assertEqual(qs.count(), 7)
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
                 "title": "Gestion journalière étendue - catalogue",
-                "reference": academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+                "reference": AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
                 "data_year": self.current_academic_year.pk,
                 # The first time that we can edit an 2020's object is in 2014 (=2020-6)
                 "start_date": datetime.date(2014, 9, 15),
@@ -65,7 +67,7 @@ class TestEducationGroupExtendedDailyManagementCalendarEnsureConsistencyUntilNPl
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+                reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name
             ).count(),
             7
         )

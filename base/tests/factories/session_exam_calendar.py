@@ -29,8 +29,9 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
 from .academic_calendar import AcademicCalendarExamSubmissionFactory, AcademicCalendarFactory
+from ...models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 class SessionExamCalendarFactory(factory.DjangoModelFactory):
@@ -49,6 +50,6 @@ class SessionExamCalendarFactory(factory.DjangoModelFactory):
                 data_year=academic_year,
                 start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
                 end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
-                reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+                reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
             )
         )

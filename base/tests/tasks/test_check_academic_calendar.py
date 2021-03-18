@@ -26,7 +26,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.utils.translation import gettext
 
-from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tasks import check_academic_calendar
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -44,7 +44,7 @@ class TestCheckAcademicCalendar(TestCase):
         now = datetime.now().date()
         AcademicCalendarFactory(
             start_date=now, end_date=now,
-            reference=EDUCATION_GROUP_EDITION,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
             data_year=current_egy.academic_year
         )
 

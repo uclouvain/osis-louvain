@@ -28,7 +28,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -62,7 +62,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         GroupElementYearChildLeafFactory(parent_element=root_element, child_element=cls.element_learning_unit_year)
         cls.central_manager = CentralManagerFactory(entity=offer.management_entity)
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.academic_year
         )
         cls.url = reverse(

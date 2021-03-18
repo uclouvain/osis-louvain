@@ -26,7 +26,7 @@ import mock
 from django.http import HttpResponse
 from django.test import TestCase
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -55,7 +55,7 @@ class TestTrainingUpdateView(TestCase):
         cls.training = TrainingFactory()
         cls.egy = EducationGroupYearFactory(partial_acronym=cls.training.code, academic_year__year=cls.training.year)
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.egy.academic_year
         )
         cls.central_manager = CentralManagerFactory(entity=cls.egy.management_entity)
@@ -114,7 +114,7 @@ class TestTrainingUpdateView(TestCase):
     def test_should_disable_or_enable_certificate_aim_according_to_role(self):
         # For faculty manager, we must have an opened calendar for creation of training
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
             data_year=self.egy.academic_year
         )
 
