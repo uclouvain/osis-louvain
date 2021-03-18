@@ -41,7 +41,7 @@
             {% for label_key, label_translated in cms_specification_labels_translated.items %}
                 <div class="row" style="margin-top:10px;">
                     <div class="col-md-2">
-                        {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                        {% if can_update_learning_achievement %}
                             <a class="trigger_modal pull-right" href="#"
                                data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?label={{ label_key }}"
                                data-modal_class="modal-lg"
@@ -105,7 +105,7 @@
                     <div class="col-md-2">
                         <label>{% trans 'Learning achievements' %}</label>
                         <br>
-                        {% if perms.base.can_edit_learningunit_specification and not achievements_FR and can_update_learning_achievement %}
+                        {% if not achievements_FR and can_update_learning_achievement %}
                             <a class="btn btn-primary trigger_modal"
                                data-url="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}"
                                data-modal_class="modal-lg" title="{% trans 'Create' %}">
@@ -133,7 +133,7 @@
                 {% for achievement, achievement_en in achievements %}
                     <a id="anchor_{{ achievement.id }}"></a>
                     <div class="row" style="margin-top:10px;">
-                        {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                        {% if can_update_learning_achievement %}
                             <div class="col-md-1">
                                 <div class="btn-group">
                                     <button type="submit" title="{% trans 'Up' %}" class="btn btn-default btn-sm"
@@ -160,7 +160,7 @@
                                 <span style="display: inline-block; width: 70%; overflow: hidden; text-overflow: ellipsis;">
                                     {{ achievement.code_name|default:""}}
                                 </span>
-                                {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                                {% if can_update_learning_achievement %}
                                     <a class="trigger_modal pull-right" href="#"
                                        data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
                                        data-modal_class="modal-lg"
@@ -216,7 +216,7 @@
                         </div>
                     </div>
 
-                    {% if forloop.last and perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
+                    {% if forloop.last and can_update_learning_achievement %}
 
                         <a class="btn btn-primary btn-sm trigger_modal"
                            data-url="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
