@@ -52,8 +52,8 @@ class TestApplicationCoursesCalendarEnsureConsistencyUntilNPlus6(TestCase):
                 "title": "Candidature aux cours vacants",
                 "reference": academic_calendar_type.TEACHING_CHARGE_APPLICATION,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year, 2, 15),
-                "end_date": datetime.date(self.current_academic_year.year, 2, 28),
+                "start_date": datetime.date(self.current_academic_year.year, 2, 1),
+                "end_date": datetime.date(self.current_academic_year.year, 2, 14),
             }
         )
 

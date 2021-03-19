@@ -74,7 +74,8 @@ class AcademicEventFactory:
             'authorized_target_year': authorized_target_year, 'type': type
         }
         if type in (AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name, AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
-                    AcademicCalendarTypes.DISSERTATION_SUBMISSION.name, AcademicCalendarTypes.EXAM_ENROLLMENTS.name,):
+                    AcademicCalendarTypes.DISSERTATION_SUBMISSION.name, AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
+                    AcademicCalendarTypes.DELIBERATION.name,):
             return AcademicSessionEvent(**kwargs, session=session)
         return AcademicEvent(**kwargs)
 

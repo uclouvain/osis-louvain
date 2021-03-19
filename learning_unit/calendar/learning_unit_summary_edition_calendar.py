@@ -44,7 +44,7 @@ class LearningUnitSummaryEditionCalendar(AcademicEventCalendarHelper):
                 reference=cls.event_reference,
                 data_year=ac_year,
                 defaults={
-                    "title": "Edition fiches descriptives",
+                    "title": "Modification fiches descriptives",
                     "start_date": datetime.date(ac_year.year, 7, 1),
                     "end_date": datetime.date(ac_year.year, 9, 13),
                 }

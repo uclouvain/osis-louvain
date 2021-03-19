@@ -50,11 +50,11 @@ class TestLearningUnitForceMajeurSummaryEditionCalendarEnsureConsistencyUntilNPl
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
-                "title": "Edition fiches descriptives (cas de force majeure)",
+                "title": "Modification fiches descriptives (cas de force majeure)",
                 "reference": academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year + 1, 6, 15),
-                "end_date": datetime.date(self.current_academic_year.year + 1, 6, 20),
+                "start_date": datetime.date(2020, 1, 1),
+                "end_date": datetime.date(2020, 1, 1),
             }
         )
 

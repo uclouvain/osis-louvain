@@ -67,7 +67,7 @@ class AcademicCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     data_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT, related_name="+")
-    title = models.CharField(max_length=50, blank=True)
+    title = models.CharField(max_length=255, blank=True)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
     reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70, db_index=True)

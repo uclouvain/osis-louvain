@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-16 13:18+0100\n"
+"POT-Creation-Date: 2021-03-18 08:39+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -162,9 +162,6 @@ msgstr "Calendrier académique"
 
 msgid "Academic calendar management"
 msgstr "Gestion du calendrier académique"
-
-msgid "Academic calendars"
-msgstr "Calendriers académique"
 
 msgid "Academic partner"
 msgstr "Partenaire académique"
@@ -1396,9 +1393,6 @@ msgstr "Bloquer"
 msgid "Login"
 msgstr "Login"
 
-msgid "Logistic"
-msgstr "Logistique"
-
 msgid "Logistics entity"
 msgstr "Entité logistique"
 
@@ -1491,9 +1485,6 @@ msgstr "Marquer les messages sélectionnés comme lus"
 
 msgid "Marks presentation"
 msgstr "Remise des notes"
-
-msgid "Master"
-msgstr "Master"
 
 msgid "Master MA 120"
 msgstr "Master en 120 crédits à finalité approfondie"
@@ -1851,9 +1842,6 @@ msgstr "Périodicité"
 msgid "Person with reduced mobility"
 msgstr "PMR"
 
-msgid "Ph.D"
-msgstr "Ph.D"
-
 msgctxt "Ph.D for education group"
 msgid "Ph.D"
 msgstr "Doctorat"
@@ -1982,9 +1970,6 @@ msgstr "Sigle"
 
 msgid "Program Managers"
 msgstr "Gestionnaires de parcours étudiant"
-
-msgid "Program commission"
-msgstr "Commission du programme"
 
 msgid "Program manager"
 msgstr "Gestionnaire de parcours étudiant"
@@ -2360,10 +2345,10 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Edition fiches descriptives"
+msgstr "Modification fiches descriptives"
 
 msgid "Summary course submission force majeure"
-msgstr "Edition fiches descriptives (cas de force majeure)"
+msgstr "Modification fiches descriptives (cas de force majeure)"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2388,9 +2373,6 @@ msgstr "Profil d'enseignement"
 
 msgid "Team management"
 msgstr "Gestion par équipe"
-
-msgid "Technologic platform"
-msgstr "Plate-forme technologique"
 
 msgid "Termination"
 msgstr "Clôturé"
@@ -2803,9 +2785,6 @@ msgstr ""
 "Impossible de publier les informations relatives à la fiche descriptive pour "
 "l'unité d'enseignement %(code)s - %(year)s"
 
-msgid "Undefined"
-msgstr "Indéfini"
-
 msgid "Unique"
 msgstr "Unique"
 
@@ -3032,9 +3011,6 @@ msgstr "et reportée jusque %(year)s"
 
 msgid "author"
 msgstr "auteur"
-
-msgid "bachelor"
-msgstr "bachelier"
 
 msgid "bibliography"
 msgstr "bibliographie"
