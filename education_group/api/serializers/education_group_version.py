@@ -32,6 +32,7 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class VersionListSerializer(serializers.ModelSerializer):
     code = serializers.CharField(source='root_group.partial_acronym', read_only=True)
+    is_transition = serializers.BooleanField()
 
     class Meta:
         model = EducationGroupVersion
@@ -39,7 +40,8 @@ class VersionListSerializer(serializers.ModelSerializer):
             'url',
             'version_name',
             'code',
-            'transition_name'
+            'transition_name',
+            'is_transition'
         )
 
 
