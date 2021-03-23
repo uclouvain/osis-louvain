@@ -73,7 +73,7 @@ def pdf_content(request, year, code, language):
         title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN and tree.root_node.group_title_en \
             else tree.root_node.group_title_fr
 
-    version_str = version_label(program_tree_version) if program_tree_version else ''
+    version_str = version_label(program_tree_version.entity_identity) if program_tree_version else ''
     if version_str:
         version_title = program_tree_version.title_en \
             if language == LANGUAGE_CODE_EN and program_tree_version.title_en else program_tree_version.title_fr

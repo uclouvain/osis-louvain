@@ -89,7 +89,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -110,7 +110,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     language = translation.get_language()
     content = _first_line_content(
         HeaderLine(
-            egy_acronym=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            egy_acronym=tree.root_node.title + formatter.format_version_label(tree.root_node),
             egy_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
@@ -265,7 +265,7 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -306,7 +306,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
     language = translation.get_language()
     content = _first_line_content(
         HeaderLinePrerequisiteOf(
-            node_title=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            node_title=tree.root_node.title + formatter.format_version_label(tree.root_node),
             tree_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)

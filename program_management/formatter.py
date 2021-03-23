@@ -35,12 +35,13 @@ def format_version_title(node: 'NodeGroupYear', language: str) -> str:
     return "[{}]".format(node.version_title_fr) if node.version_title_fr else ''
 
 
-def format_version_name(node: 'NodeGroupYear') -> str:
-    return "[{}]".format(node.version_name) if node.version_name else ""
+def format_version_label(node: 'NodeGroupYear') -> str:
+    version_label = node.version_label()
+    return "[{}]".format(version_label) if version_label else ""
 
 
 def format_version_complete_name(node: 'NodeGroupYear', language: str) -> str:
-    version_name = format_version_name(node)
+    version_name = format_version_label(node)
     if language == LANGUAGE_CODE_EN:
         return " - {} {}".format(node.version_title_en, version_name) if node.version_title_en \
             else " {}".format(version_name)
