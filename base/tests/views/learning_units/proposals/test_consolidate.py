@@ -46,7 +46,6 @@ from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
@@ -79,10 +78,6 @@ class TestConsolidate(TestCase):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
-
-        person_entity = PersonEntityFactory(person=cls.person,
-                                            entity=cls.learning_unit_year.learning_container_year.requirement_entity)
-        EntityVersionFactory(entity=person_entity.entity)
         cls.url = reverse("learning_unit_consolidate_proposal",
                           kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
         cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}
@@ -172,11 +167,6 @@ class TestConsolidateDelete(TestCase):
             learning_unit_year__learning_container_year__requirement_entity=self.requirement_entity,
         )
         self.learning_unit_year = self.proposal.learning_unit_year
-
-        person_entity = PersonEntityFactory(person=self.person,
-                                            entity=self.learning_unit_year.learning_container_year.requirement_entity)
-        EntityVersionFactory(entity=person_entity.entity)
-
         self.url = reverse("learning_unit_consolidate_proposal",
                            kwargs={'learning_unit_year_id': self.learning_unit_year.id})
         self.post_data = {"learning_unit_year_id": self.learning_unit_year.id}

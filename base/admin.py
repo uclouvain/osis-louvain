@@ -140,9 +140,6 @@ admin.site.register(person.Person,
 admin.site.register(person_address.PersonAddress,
                     person_address.PersonAddressAdmin)
 
-admin.site.register(person_entity.PersonEntity,
-                    person_entity.PersonEntityAdmin)
-
 admin.site.register(prerequisite.Prerequisite,
                     prerequisite.PrerequisiteAdmin)
 

@@ -68,7 +68,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
@@ -414,12 +413,9 @@ class TestLearningUnitProposalSearch(TestCase):
         cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.SCHOOL,
                                                   start_date=ac_years[0].start_date,
                                                   end_date=ac_years[1].end_date)
-        cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.an_entity, with_child=True)
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
                          _create_proposal_learning_unit("LOSIS1212"),
                          _create_proposal_learning_unit("LOSIS1213")]
-        for proposal in cls.proposals:
-            PersonEntityFactory(person=cls.person, entity=proposal.entity)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -805,7 +801,6 @@ class TestEditProposal(TestCase):
 
     def test_edit_proposal_get_as_central_manager_with_instance(self):
         central_manager = person_factory.CentralManagerForUEFactory("can_edit_learning_unit_proposal")
-        PersonEntityFactory(person=central_manager, entity=self.requirement_entity_of_luy)
         self.client.logout()
         self.client.force_login(central_manager.user)
         response = self.client.get(self.url)

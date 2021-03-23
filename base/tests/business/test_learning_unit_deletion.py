@@ -53,7 +53,6 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
@@ -381,8 +380,6 @@ class LearningUnitYearDeletion(TestCase):
         entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                               start_date=datetime.date(year=1990, month=1, day=1),
                                               end_date=None)
-        PersonEntityFactory(person=manager, entity=entity_version.entity, with_child=True)
-
         # Cannot remove FULL COURSE
         self.assertFalse(manager.user.has_perm('base.can_delete_learningunit', self.luy1))
 

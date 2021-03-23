@@ -44,8 +44,9 @@ from base.tests.factories.group import CentralManagerGroupFactory, FacultyManage
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
     FacultyManagerForUEFactory, AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
 def create_person(first_name, last_name, email="", language=None):
@@ -257,14 +258,14 @@ class PersonTest(PersonTestCase):
         self.assertFalse(change_language(self.an_user, "en"))
 
     def test_is_linked_to_entity_in_charge_of_learning_unit_year(self):
-        person_entity = PersonEntityFactory(person=self.person_with_user)
+        central_manager = CentralManagerFactory(person=self.person_with_user)
         luy = LearningUnitYearFactory()
 
         self.assertFalse(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.requirement_entity = central_manager.entity
         luy.learning_container_year.save()
 
         self.assertTrue(
@@ -272,7 +273,7 @@ class PersonTest(PersonTestCase):
         )
 
     def test_is_linked_to_entity_in_charge_of_external_learning_unit_year(self):
-        person_entity = PersonEntityFactory(person=self.person_with_user)
+        faculty_manager = FacultyManagerFactory(person=self.person_with_user)
         luy = LearningUnitYearFactory()
         ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
@@ -280,7 +281,7 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.requirement_entity = faculty_manager.entity
         luy.learning_container_year.save()
 
         self.assertTrue(

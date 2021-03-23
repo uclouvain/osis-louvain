@@ -36,7 +36,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -98,7 +97,6 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             group_year__academic_year=self.academic_year,
             group_year__education_group_type__group=True
         )
-        PersonEntityFactory(person=self.person, entity=group_element.group_year.management_entity)
         url = reverse(
             "learning_unit_prerequisite_update",
             args=[group_element.id, self.element_child.id]

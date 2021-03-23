@@ -51,7 +51,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
@@ -437,7 +436,6 @@ class TestLearningUnitVolumesManagement(TestCase):
             'form_type': 'full'
         })
 
-        PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
         cls.data = get_valid_formset_data(cls.learning_unit_year.acronym)
         cls.partim_formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym, is_partim=True)
         cls.formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym)

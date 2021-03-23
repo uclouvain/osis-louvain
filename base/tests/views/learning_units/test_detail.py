@@ -42,7 +42,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.learning_units.detail import SEARCH_URL_PART
 
@@ -144,11 +143,6 @@ class TestLearningUnitDetailView(TestCase):
             'can_access_learningunit',
             'can_edit_learningunit_date'
         )
-
-        PersonEntityFactory(
-            entity=learning_container_year.requirement_entity,
-            person=ue_manager
-        )
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(ue_manager.user)
 
@@ -179,7 +173,6 @@ class TestLearningUnitDetailView(TestCase):
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 
@@ -202,7 +195,6 @@ class TestLearningUnitDetailView(TestCase):
             FacultyManagerForUEFactory('can_access_learningunit'),
         ]
         for manager in managers:
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 

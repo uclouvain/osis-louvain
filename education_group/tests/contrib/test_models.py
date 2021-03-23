@@ -33,7 +33,7 @@ class TestEducationGroupRoleModel(TestCase):
         instance = EducationGroupRoleModel()
         self.assertTrue(instance._meta.abstract)
 
-    def test_unique_together_person_entity(self):
+    def test_unique_together_person_education_group(self):
         instance = EducationGroupRoleModel()
         self.assertEqual(instance._meta.unique_together, (('person', 'education_group'),))
 
@@ -43,6 +43,6 @@ class TestEducationGroupYearRoleModel(TestCase):
         instance = EducationGroupYearRoleModel()
         self.assertTrue(instance._meta.abstract)
 
-    def test_unique_together_person_entity(self):
+    def test_unique_together_education_group_year(self):
         instance = EducationGroupYearRoleModel()
         self.assertEqual(instance._meta.unique_together, (('person', 'education_group_year'),))
