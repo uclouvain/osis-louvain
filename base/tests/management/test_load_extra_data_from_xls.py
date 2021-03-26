@@ -28,22 +28,22 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from education_group.auth.roles.central_manager import CentralManager
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from osis_common.management.commands import load_extra_data_from_xls
 from base.models.entity import Entity
 from base.models.person import Person
-from base.models.person_entity import PersonEntity
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 
 
 class TestGetModelClassFromWorksheetTitle(TestCase):
     """Unit tests on _get_model_class_from_worksheet_title()"""
 
     def test_without_alias(self):
-        worksheet = Mock(title='base.PersonEntity')
+        worksheet = Mock(title='education_group.CentralManager')
         result = load_extra_data_from_xls.Command._get_model_class_from_worksheet_title(worksheet)
-        self.assertEqual(result, PersonEntity)
+        self.assertEqual(result, CentralManager)
 
     def test_when_app_does_not_exist(self):
         worksheet = Mock(title='inexisting_app.InexistingModel')
@@ -59,16 +59,18 @@ class TestSaveInDatabase(TestCase):
         cls.headers = [
             (0, 'entity__entityversion__acronym',),
             (1, 'person__user__username',),
+            (2, 'scopes',),
         ]
         cls.entity_version = EntityVersionFactory(acronym='ESPO')
         cls.person = PersonFactory(user__username='toto')
         cls.xls_row = [
             Mock(value=cls.entity_version.acronym),
             Mock(value=cls.person.user.username),
+            Mock(value=["ALL"]),
         ]
 
     def test_when_entity_manager_obj_does_not_exist(self):
-        obj, created = self.command_instance._save_in_database(self.xls_row, PersonEntity, self.headers)
+        obj, created = self.command_instance._save_in_database(self.xls_row, CentralManager, self.headers)
         self.assertTrue(created)
         self.assertTrue(obj.entity.entityversion_set.filter(acronym=self.entity_version.acronym).exists())
         self.assertEqual(obj.person.user.username, self.person.user.username)
@@ -76,26 +78,26 @@ class TestSaveInDatabase(TestCase):
     def test_when_entity_does_not_exist(self):
         self.entity_version.delete()
         with self.assertRaises(Entity.DoesNotExist):
-            obj, created = self.command_instance._save_in_database(self.xls_row, PersonEntity, self.headers)
+            obj, created = self.command_instance._save_in_database(self.xls_row, CentralManager, self.headers)
 
     def test_when_person_does_not_exist(self):
         """Test on get() into foreign key"""
         self.person.delete()
         with self.assertRaises(Person.DoesNotExist):
-            obj, created = self.command_instance._save_in_database(self.xls_row, PersonEntity, self.headers)
+            obj, created = self.command_instance._save_in_database(self.xls_row, CentralManager, self.headers)
 
     def test_when_user_does_not_exists(self):
         """Test on get() into foreign key of foreign key"""
         User.objects.filter(id=self.person.user_id).delete()
         with self.assertRaises(User.DoesNotExist):
-            obj, created = self.command_instance._save_in_database(self.xls_row, PersonEntity, self.headers)
+            obj, created = self.command_instance._save_in_database(self.xls_row, CentralManager, self.headers)
 
     def test_when_entity_manager_obj_exists(self):
-        PersonEntityFactory(
+        CentralManagerFactory(
             entity=self.entity_version.entity,
             person=self.person,
         )
-        obj, created = self.command_instance._save_in_database(self.xls_row, PersonEntity, self.headers)
+        obj, created = self.command_instance._save_in_database(self.xls_row, CentralManager, self.headers)
         self.assertFalse(created)
 
 
@@ -108,13 +110,14 @@ class TestFindObjectTroughForeignKeys(TestSaveInDatabase):
         cls.value = cls.person.user.username
 
     def test_classic_usage(self):
-        result = self.command_instance._find_object_through_foreign_keys(PersonEntity, self.field, self.value)
+        result = self.command_instance._find_object_through_foreign_keys(CentralManager, self.field, self.value)
         expected_result = ('person', self.person)
         self.assertEqual(result, expected_result)
 
     def test_when_field_is_natural_key(self):
         field_as_natural_key = self.field + load_extra_data_from_xls.NATURAL_KEY_IDENTIFIER
-        result = self.command_instance._find_object_through_foreign_keys(PersonEntity, field_as_natural_key, self.value)
+        result = self.command_instance._find_object_through_foreign_keys(CentralManager, field_as_natural_key,
+                                                                         self.value)
         expected_result = ('person**', self.person)
         self.assertEqual(result, expected_result)
 

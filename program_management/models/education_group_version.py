@@ -23,18 +23,81 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.utils.constants import YES, NO
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+
+def fill_from_past_year(modeladmin, request, queryset):
+    from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+    from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
+    cmds = []
+    qs = queryset.select_related("offer", "root_group")
+    for obj in qs:
+        cmd = FillTreeVersionContentFromPastYearCommand(
+            to_year=obj.offer.academic_year.year,
+            to_offer_acronym=obj.offer.acronym,
+            to_version_name=obj.version_name,
+            to_transition_name=obj.transition_name
+        )
+        cmds.append(cmd)
+    result = bulk_fill_program_tree_version_content_service_from_past_year.\
+        bulk_fill_program_tree_version_content_from_past_year(cmds)
+    modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
+
+
+fill_from_past_year.short_description = _("Fill program tree content from last year")
+
+
+class StandardListFilter(admin.SimpleListFilter):
+    title = _('Version')
+
+    parameter_name = 'standard'
+
+    def lookups(self, request, model_admin):
+        return (
+            (YES, _("Standard")),
+            (NO, _("Particular"))
+        )
+
+    def queryset(self, request, queryset):
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.filter(version_name=program_tree_version.STANDARD)
+        if self.value() == NO:
+            return queryset.exclude(version_name=program_tree_version.STANDARD)
+        return queryset
+
+
+class TransitionListFilter(admin.SimpleListFilter):
+    title = _('Transition')
+
+    parameter_name = 'transition'
+
+    def lookups(self, request, model_admin):
+        return (
+            (YES, _("Yes")),
+            (NO, _("No"))
+        )
+
+    def queryset(self, request, queryset):
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.exclude(transition_name=program_tree_version.NOT_A_TRANSITION)
+        if self.value() == NO:
+            return queryset.filter(transition_name=program_tree_version.NOT_A_TRANSITION)
+        return queryset
 
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'transition_name')
-    list_filter = ('offer__academic_year',)
+    list_filter = (StandardListFilter, TransitionListFilter, 'offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
+    actions = [fill_from_past_year]
 
 
 class StandardEducationGroupVersionManager(models.Manager):

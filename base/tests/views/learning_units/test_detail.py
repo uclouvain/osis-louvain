@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import datetime
 
 import reversion
 from django.contrib.auth.models import Permission
@@ -32,10 +31,9 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.groups import UE_FACULTY_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.business.test_perms import create_person_with_permission_and_group
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -44,7 +42,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.learning_units.detail import SEARCH_URL_PART
 
@@ -53,13 +50,8 @@ class TestLearningUnitDetailView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
-        AcademicCalendarFactory(
-            data_year=cls.current_academic_year,
-            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
         cls.a_superuser = SuperUserFactory()
         cls.person = PersonFactory(user=cls.a_superuser)
 
@@ -151,11 +143,6 @@ class TestLearningUnitDetailView(TestCase):
             'can_access_learningunit',
             'can_edit_learningunit_date'
         )
-
-        PersonEntityFactory(
-            entity=learning_container_year.requirement_entity,
-            person=ue_manager
-        )
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(ue_manager.user)
 
@@ -186,7 +173,6 @@ class TestLearningUnitDetailView(TestCase):
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 
@@ -209,7 +195,6 @@ class TestLearningUnitDetailView(TestCase):
             FacultyManagerForUEFactory('can_access_learningunit'),
         ]
         for manager in managers:
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
 

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import datetime
 
 from django.contrib.messages import get_messages, SUCCESS
 from django.test import TestCase
@@ -34,7 +33,7 @@ from waffle.testutils import override_flag
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.organization_type import MAIN
-from base.tests.factories.academic_calendar import AcademicCalendarLearningUnitCentralEditionFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -54,11 +53,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
         cls.person = cls.manager.person
 
         cls.academic_year = create_current_academic_year()
-        AcademicCalendarLearningUnitCentralEditionFactory(
-            data_year=cls.academic_year,
-            start_date=datetime.datetime(cls.academic_year.year - 6, 9, 15),
-            end_date=datetime.datetime(cls.academic_year.year + 1, 9, 14)
-        )
+        generate_learning_unit_edition_calendars([cls.academic_year])
 
         cls.luy = LearningUnitYearFullFactory(
             academic_year=cls.academic_year,

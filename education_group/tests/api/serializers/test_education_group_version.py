@@ -31,6 +31,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
 from education_group.api.serializers.education_group_version import TrainingVersionListSerializer
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
@@ -44,6 +45,7 @@ class TrainingVersionListSerializerTestCase(TestCase):
         )
         cls.group = GroupYearFactory(academic_year=cls.academic_year, partial_acronym='LBIR100B')
         cls.version = EducationGroupVersionFactory(offer=cls.training, root_group=cls.group)
+        cls.version.is_transition = cls.version.transition_name != NOT_A_TRANSITION
         url = reverse('education_group_api_v1:training-list')
         cls.serializer = TrainingVersionListSerializer(cls.version, context={
             'request': RequestFactory().get(url),
@@ -55,6 +57,7 @@ class TrainingVersionListSerializerTestCase(TestCase):
             'url',
             'version_name',
             'code',
-            'transition_name'
+            'transition_name',
+            'is_transition'
         ]
         self.assertListEqual(list(self.serializer.data), expected_fields)

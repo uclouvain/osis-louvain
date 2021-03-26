@@ -1,3 +1,26 @@
+#############################################################################
+#  OSIS stands for Open Student Information System. It's an application
+#  designed to manage the core business of higher education institutions,
+#  such as universities, faculties, institutes and professional schools.
+#  The core business involves the administration of students, teachers,
+#  courses, programs and so on.
+#
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of this license - GNU General Public License - is available
+#  at the root of the source code of this program.  If not,
+#  see http://www.gnu.org/licenses/.
+#############################################################################
 import functools
 from typing import List, Dict, Union, Optional
 
@@ -22,7 +45,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYearException, \
-    ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid
+    ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid, HopsFields2OrNoneForFormationPhd
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -143,7 +166,8 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('end_year', e.message)
                         training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \
-                            isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                            isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
+                            isinstance(e, HopsFields2OrNoneForFormationPhd):
                         training_form.add_error('ares_code', e.message)
                     elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_graca', e.message)

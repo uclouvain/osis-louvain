@@ -30,21 +30,27 @@ from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import WRAP_TEXT_ALIGNMENT, annotate_qs, PROPOSAL_LINE_STYLES, \
     get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_BORDER_TOP, \
     WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, CELLS_TO_COLOR, XLS_DESCRIPTION, _check_cell_to_color
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
+from base.models.enums import learning_component_year_type
 from base.models.enums import proposal_type
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.tutor import Tutor
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.document import xls_build
@@ -52,9 +58,9 @@ from program_management.tests.factories.education_group_version import \
     StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
-TRAINING_TITLE_COLUMN = 27
-TRAINING_CODE_COLUMN = 26
-GATHERING_COLUMN = 25
+TRAINING_TITLE_COLUMN = 28
+TRAINING_CODE_COLUMN = 27
+GATHERING_COLUMN = 26
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -122,6 +128,8 @@ class TestUeUtilization(TestCase):
             learning_unit_year=cls.learning_unit_yr_with_proposal,
             type=proposal_type.ProposalType.MODIFICATION.name,
         )
+        
+        cls.a_tutor = _create_tutor_and_attributions(cls.learning_unit_yr_1)
 
     def test_headers(self):
         self.assertListEqual(_prepare_titles(),
@@ -138,7 +146,7 @@ class TestUeUtilization(TestCase):
                                  str(_('Alloc. Ent.')),
                                  str(_('Title in English')),
                                  str(_('List of teachers')),
-
+                                 str(_('List of teachers (email)')),
                                  str(_('Periodicity')),
                                  str(_('Active')),
                                  "{} - {}".format(_('Lecturing vol.'), _('Annual')),
@@ -184,7 +192,7 @@ class TestUeUtilization(TestCase):
         luy = annotate_qs(qs).get()
         self.assertListEqual(
             result.get("working_sheets_data")[0],
-            self._get_luy_expected_data(luy)
+            self._get_luy_expected_data(luy, self.a_tutor)
         )
 
     def test_prepare_xls_content_ue_used_in_2_trainings(self):
@@ -290,7 +298,7 @@ class TestUeUtilization(TestCase):
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
 
-    def _get_luy_expected_data(self, luy):
+    def _get_luy_expected_data(self, luy, a_tutor):
         return [
             luy.acronym,
             luy.academic_year.__str__(),
@@ -303,7 +311,8 @@ class TestUeUtilization(TestCase):
             luy.credits,
             luy.entity_allocation,
             luy.complete_title_english,
-            '',
+            '{} {}'.format(a_tutor.person.last_name.upper(), a_tutor.person.first_name),
+            a_tutor.person.email,
             luy.get_periodicity_display(),
             yesno(luy.status),
             get_significant_volume(luy.pm_vol_tot or 0),
@@ -323,3 +332,30 @@ class TestUeUtilization(TestCase):
             self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr),
             '-'
         ]
+
+
+def _create_tutor_and_attributions(learning_unit_yr_1: LearningUnitYear) -> Tutor:
+    component_lecturing = LearningComponentYearFactory(
+        learning_unit_year=learning_unit_yr_1,
+        type=learning_component_year_type.LECTURING
+    )
+    component_practical = LearningComponentYearFactory(
+        learning_unit_year=learning_unit_yr_1,
+        type=learning_component_year_type.PRACTICAL_EXERCISES
+    )
+
+    a_tutor_1 = TutorFactory()
+
+    an_attribution_1 = AttributionNewFactory(
+        tutor=a_tutor_1,
+        start_year=learning_unit_yr_1.academic_year.year
+    )
+    AttributionChargeNewFactory(
+        learning_component_year=component_lecturing,
+        attribution=an_attribution_1,
+        allocation_charge=15.0)
+    AttributionChargeNewFactory(
+        learning_component_year=component_practical,
+        attribution=an_attribution_1,
+        allocation_charge=5.0)
+    return a_tutor_1

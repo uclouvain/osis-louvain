@@ -23,9 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-
-from base.tests.factories.structure import StructureFactory
 from osis_role.contrib.tests.factories import EntityRoleModelFactory
 
 
@@ -33,5 +30,3 @@ class EntityManagerFactory(EntityRoleModelFactory):
     class Meta:
         model = "base.EntityManager"
         django_get_or_create = ('person', 'entity',)
-
-    structure = factory.SubFactory(StructureFactory)

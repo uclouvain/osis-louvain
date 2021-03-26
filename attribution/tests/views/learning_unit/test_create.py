@@ -32,6 +32,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import COORDINATOR
 from base.models.enums.learning_container_year_types import MASTER_THESIS
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
@@ -52,6 +53,7 @@ class TestAddAttribution(TestCase):
         cls.tutor = TutorFactory(person=cls.person)
 
         cls.url = reverse("add_attribution", args=[cls.learning_unit_year.id])
+        generate_learning_unit_edition_calendars([cls.learning_unit_year.academic_year])
 
     def setUp(self):
         self.client.force_login(self.person.user)

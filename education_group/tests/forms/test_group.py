@@ -73,7 +73,11 @@ class TestGroupForm(TestCase):
 class TestGroupUpdateForm(TestCase):
     def setUp(self) -> None:
         self.person = PersonFactory()
-        self.form = GroupUpdateForm(user=self.person.user, group_type=GroupType.COMMON_CORE.name)
+        self.form = GroupUpdateForm(
+            user=self.person.user,
+            group_type=GroupType.COMMON_CORE.name,
+            initial={'code': 'CODE'}
+        )
 
     def test_assert_code_is_disabled(self):
         self.assertTrue(self.form.fields['code'].disabled)

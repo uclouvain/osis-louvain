@@ -4,8 +4,6 @@ from datetime import date
 
 from django.db import migrations
 
-from base.models.enums import academic_calendar_type
-
 
 def create_events_lu_edition_fac_mgr(apps, schema_editor):
     data_years_to_create = [2019, 2020, 2021]
@@ -23,7 +21,7 @@ def create_events_lu_edition_fac_mgr(apps, schema_editor):
                 start_date=date(year - 2, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Modification UE par gestionnaires facultaires",
-                reference=academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+                reference='LEARNING_UNIT_EDITION_FACULTY_MANAGERS'
             )
         except academic_year_mdl.DoesNotExist:
             pass
@@ -44,7 +42,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 2, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Modification UE par gestionnaires facultaires",
-                reference=academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+                reference='LEARNING_UNIT_EDITION_FACULTY_MANAGERS'
             ).delete()
         except academic_year_mdl.DoesNotExist:
             pass

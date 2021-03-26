@@ -26,6 +26,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -175,6 +176,14 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                     transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
+        except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
+            self.mini_training_version_form.add_error('end_year', "")
+            self.mini_training_version_form.add_error(
+                None, _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": display_as_academic_year(update_command.end_year)
+                }
+            )
         return []
 
     @cached_property

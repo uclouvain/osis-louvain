@@ -1378,7 +1378,7 @@ base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.title_fr,REQUIRED
 base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.management_entity,REQUIRED,,,,,,
-base.validationrule,GroupForm.SUB_GROUP.code,REQUIRED,R,"^([LWMBTlwmbt])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
+base.validationrule,GroupForm.SUB_GROUP.code,REQUIRED,100R,"^([LWMBTlwmbt])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>

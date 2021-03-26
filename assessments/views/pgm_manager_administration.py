@@ -25,50 +25,73 @@
 ##############################################################################
 import json
 from collections import OrderedDict
+from typing import Dict, Union, List
 
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
-from base import models as mdl
 from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
-from base.models.offer_type import OfferType
-from base.models.offer_year import OfferYear
-from base.models.person import Person
 from base.auth.roles.program_manager import ProgramManager
+from base.models import session_exam_calendar
+from base.models.education_group import EducationGroup
+from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory, \
+    find_all_current_entities_version
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType
+from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
 
-EXCLUDE_OFFER_TYPE_SEARCH = ('Master approfondi', "Master didactique", "Master spécialisé")
+EXCLUDE_OFFER_TYPE_SEARCH = TrainingType.finality_types()
 
 
 class ProgramManagerListView(ListView):
     model = ProgramManager
     template_name = "admin/programmanager_list.html"
 
+    @cached_property
+    def education_group_ids(self) -> List[int]:
+        return self.request.GET.getlist('education_groups')
+
     def get_queryset(self):
         qs = super().get_queryset()
-        offer_years = self.request.GET.getlist('offer_year')
-        if not offer_years:
+        education_group_ids = self.education_group_ids
+        if not education_group_ids:
             return qs.none()
 
-        return qs.filter(offer_year__in=offer_years).order_by(
-            'person__last_name', 'person__first_name', 'pk'
-        ).select_related('person', 'offer_year__academic_year')
+        result = qs.filter(education_group_id__in=education_group_ids).annotate(
+            offer_acronym=Subquery(
+                EducationGroupYear.objects.filter(
+                    education_group_id=OuterRef('education_group_id'),
+                    academic_year__year=session_exam_calendar.current_session_exam().authorized_target_year,
+                ).values('acronym')[:1]
+            ),
+        ).select_related(
+            'person'
+        ).order_by(
+            'person__last_name',
+            'person__first_name',
+            'pk'
+        )
+        return result
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['offer_years'] = self.request.GET.getlist('offer_year')
+        context['education_groups'] = self.education_group_ids
 
         result = OrderedDict()
         for i in self.object_list:
@@ -85,13 +108,13 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     permission_required = 'base.change_programmanager'
 
     @property
-    def offer_years(self) -> list:
-        return self.request.GET['offer_year'].split(',')
+    def education_group_ids(self) -> list:
+        return self.request.GET['education_groups'].split(',')
 
     def get_success_url(self):
         url = reverse_lazy('manager_list') + "?"
-        for oy in self.offer_years:
-            url += "offer_year={}&".format(oy)
+        for education_group_id in self.education_group_ids:
+            url += "education_groups={}&".format(education_group_id)
         return url
 
 
@@ -111,7 +134,7 @@ class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
     def get_object(self, queryset=None):
         return self.model.objects.filter(
             person__pk=self.kwargs['pk'],
-            offer_year__in=self.offer_years
+            education_group_id__in=self.education_group_ids
         )
 
     def delete(self, request, *args, **kwargs):
@@ -124,7 +147,7 @@ class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         manager = Person.objects.get(pk=self.kwargs['pk'])
         context['manager'] = manager
-        context['other_programs'] = manager.programmanager_set.exclude(offer_year__in=self.offer_years)
+        context['other_programs'] = manager.programmanager_set.exclude(education_group_id__in=self.education_group_ids)
         return context
 
 
@@ -136,11 +159,11 @@ class MainProgramManagerPersonUpdateView(ProgramManagerMixin, ListView):
     def get_queryset(self):
         return self.model.objects.filter(
             person=self.kwargs["pk"],
-            offer_year__in=self.offer_years
+            education_group_id__in=self.education_group_ids
         )
 
     def post(self, *args, **kwargs):
-        """ Update column is_main for selected offer_years"""
+        """ Update column is_main for selected education_groups"""
         val = json.loads(self.request.POST.get('is_main'))
         self.get_queryset().update(is_main=val)
         return super()._ajax_response() or HttpResponseRedirect(self.get_success_url())
@@ -170,15 +193,15 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['offer_years'] = self.request.GET['offer_year']
+        context['education_groups'] = self.request.GET['education_groups']
         return context
 
     def form_valid(self, form):
-        offer_years = OfferYear.objects.filter(pk__in=self.offer_years)
+        education_groups = EducationGroup.objects.filter(pk__in=self.education_group_ids).distinct()
 
         person = form.cleaned_data['person']
-        for oy in offer_years:
-            ProgramManager.objects.get_or_create(person=person, offer_year=oy)
+        for education_group in education_groups:
+            ProgramManager.objects.get_or_create(person=person, education_group=education_group)
 
         return super().form_valid(form)
 
@@ -187,15 +210,21 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    current_academic_yr = mdl.academic_year.current_academic_year()
+    current_academic_yr = session_exam_calendar.current_opened_academic_year()
     return render(request, "admin/pgm_manager.html", {
         'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
-        'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
-        'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
+        'offer_types': __search_offer_types(),
+        'managers': _get_entity_program_managers(administrator_entities),
         'init': '1'
     })
+
+
+def __search_offer_types():
+    return EducationGroupType.objects.filter(
+        category=Categories.TRAINING.name
+    )
 
 
 @login_required
@@ -215,7 +244,7 @@ def pgm_manager_search(request):
 
     administrator_entities = get_administrator_entities(request.user)
 
-    current_academic_yr = mdl.academic_year.current_academic_year()
+    current_academic_yr = session_exam_calendar.current_opened_academic_year()
 
     data = {
         'academic_year': current_academic_yr,
@@ -224,21 +253,19 @@ def pgm_manager_search(request):
         'entities_managed_root': administrator_entities,
         'entity_selected': entity_selected,
         'entity_root_selected': entity_root_selected,
-        'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
+        'offer_types': __search_offer_types(),
         'pgms': _get_programs(current_academic_yr,
                               get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
                               manager_person,
                               pgm_offer_type),
-        'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
+        'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
     return render(request, "admin/pgm_manager.html", data)
 
 
-def get_entity_root(entity_selected):
-    if entity_selected:
-        return mdl.structure.find_by_id(entity_selected)
-    return None
+def get_entity_root(entity_id: int):
+    return find_all_current_entities_version().filter(entity_id=entity_id).first()
 
 
 def get_entity_root_selected(request):
@@ -248,26 +275,26 @@ def get_entity_root_selected(request):
     return entity_root_selected
 
 
-def get_managed_entities(entity_managed_list):
+def get_managed_entities(
+        entity_managed_list: List[Dict[str, Union['EntityVersion', List['EntityVersion']]]]
+) -> List['EntityVersion']:
     if entity_managed_list:
         structures = []
         for entity_managed in entity_managed_list:
-            children_acronyms = find_values('acronym', json.dumps(entity_managed['root'].serializable_object()))
-            structures.extend(mdl.structure.find_by_acronyms(children_acronyms))
-        return sorted(structures, key=lambda a_structure: a_structure.acronym)
+            structures += entity_managed['structures']
+        return list(sorted(set(structures), key=lambda entity_version: entity_version.acronym))
 
     return None
 
 
-def get_entity_list(entity, entity_managed_structure):
-    if entity:
-        entity_found = mdl.structure.find_by_id(entity)
+def get_entity_list(entity_id: int, entity_managed_structure: 'EntityVersion'):
+    if entity_id:
+        entity_found = get_entity_root(entity_id)
         if entity_found:
             return [entity_found]
-    else:
-        children_acronyms = find_values('acronym', json.dumps(entity_managed_structure.serializable_object()))
-        return mdl.structure.find_by_acronyms(children_acronyms)
-
+    elif entity_managed_structure:
+        structure = build_current_entity_version_structure_in_memory()  # TODO :: reuse CTE
+        return [entity_managed_structure] + structure[entity_managed_structure.entity_id]['all_children']
     return None
 
 
@@ -280,37 +307,47 @@ def get_filter_value(request, value_name):
     return value
 
 
-def get_administrator_entities(a_user):
-    structures = []
-    entity_managers = EntityManager.objects.filter(
+def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', List['EntityVersion']]]]:
+    root_entity_ids = EntityManager.objects.filter(
         person__user=a_user
-    ).select_related('structure').order_by('structure__acronym')
-    for entity_manager in entity_managers:
-        children_acronyms = find_values('acronym', json.dumps(entity_manager.structure.serializable_object()))
+    ).values_list(
+        'entity_id',
+        flat=True
+    ).distinct().order_by('entity__entityversion__acronym')
+
+    structure = build_current_entity_version_structure_in_memory()
+
+    structures = []
+
+    for root_entity_id in root_entity_ids:
+        root_entity = structure[root_entity_id]['entity_version']
         structures.append({
-            'root': entity_manager.structure,
-            'structures': mdl.structure.find_by_acronyms(children_acronyms)
+            'root': root_entity,
+            'structures': sorted(
+                [root_entity] + structure[root_entity_id]['all_children'],
+                key=lambda entity_version: entity_version.acronym
+            )
         })
     return structures
 
 
-def _get_programs(academic_yr, entity_list, manager_person, an_offer_type):
-    qs = OfferYear.objects.filter(
+def _get_programs(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
+    qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
-        entity_management__in=entity_list,
+        management_entity__in={ev.entity_id for ev in entity_list},
     )
 
-    if an_offer_type:
-        qs = qs.filter(offer_type=an_offer_type)
+    if education_group_type:
+        qs = qs.filter(education_group_type=education_group_type)
 
     if manager_person:
-        qs = qs.filter(programmanager__person=manager_person)
-    return qs.distinct()
+        qs = qs.filter(education_group__programmanager__person=manager_person)
+    return qs.distinct().select_related('management_entity', 'education_group_type').order_by('acronym')
 
 
-def _get_entity_program_managers(entity, academic_yr):
+def _get_entity_program_managers(entity):
     entities = get_managed_entities(entity)
-    return program_manager.find_by_management_entity(entities, academic_yr)
+    return program_manager.find_by_management_entity(entities)
 
 
 def find_values(key_value, json_repr):

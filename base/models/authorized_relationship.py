@@ -117,6 +117,9 @@ class AuthorizedRelationshipList:
         ]
         return [child_type for child_type, order in sorted(types_with_order_value, key=lambda tuple: tuple[1])]
 
+    def is_mandatory_child(self, parent_type: 'EducationGroupTypesEnum', child_type: 'EducationGroupType') -> bool:
+        return child_type in self.get_ordered_mandatory_children_types(parent_type)
+
     def _get_mandatory_children_types(
             self,
             parent_type: EducationGroupTypesEnum

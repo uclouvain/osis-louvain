@@ -28,7 +28,7 @@ import datetime
 from django.forms import model_to_dict
 from django.test import TestCase
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory, \
@@ -52,7 +52,7 @@ class TestLearningUnitSummaryEditionCalendarEnsureConsistencyUntilNPlus6(TestCas
         self.assertDictEqual(
             model_to_dict(qs.first(), fields=('title', 'reference', 'data_year', 'start_date', 'end_date')),
             {
-                "title": "Edition fiches descriptives",
+                "title": "Modification fiches descriptives",
                 "reference": academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 7, 1),

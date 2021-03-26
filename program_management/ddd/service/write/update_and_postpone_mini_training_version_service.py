@@ -26,7 +26,6 @@
 from typing import List
 
 from education_group.ddd.business_types import *
-from education_group.ddd.command import PostponeGroupModificationCommand
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateProgramTreeVersionCommand, UpdateMiniTrainingVersionCommand, \
     PostponeGroupVersionCommand, UpdateProgramTreeVersionEndDateCommand, PostponeProgramTreeCommand, \
@@ -68,30 +67,6 @@ def update_and_postpone_mini_training_version(
     )
 
     return [tree_version_identity] + postponed_tree_version_identities
-
-
-def __convert_to_postpone_group_modification_command(
-        cmd: 'UpdateMiniTrainingVersionCommand',
-        group_identity: 'GroupIdentity'
-) -> 'PostponeGroupModificationCommand':
-    return PostponeGroupModificationCommand(
-        code=group_identity.code,
-
-        postpone_from_year=cmd.year,
-        abbreviated_title=cmd.offer_acronym,
-        title_fr=cmd.title_fr,
-        title_en=cmd.title_en,
-        credits=cmd.credits,
-        constraint_type=cmd.constraint_type,
-        min_constraint=cmd.min_constraint,
-        max_constraint=cmd.max_constraint,
-        management_entity_acronym=cmd.management_entity_acronym,
-        teaching_campus_name=cmd.teaching_campus_name,
-        organization_name=cmd.teaching_campus_organization_name,
-        remark_fr=cmd.remark_fr,
-        remark_en=cmd.remark_en,
-        end_year=cmd.end_year,
-    )
 
 
 def __convert_to_update_tree_version_command(command: 'UpdateMiniTrainingVersionCommand'):

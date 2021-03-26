@@ -25,16 +25,17 @@
 ##############################################################################
 import datetime
 
+import attr
 import mock
 from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent, AcademicSessionEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.views.academic_calendar.read import AcademicCalendarFilter
+from base.views.academic_calendar.read import AcademicCalendarFilter, AcademicCalendarsView
 from education_group.templatetags.academic_year_display import display_as_academic_year
 
 
@@ -138,3 +139,46 @@ class TestAcademicCalendarsView(TestCase):
             'update_url': reverse('academic_calendar_update', kwargs={'academic_calendar_id': self.open_event.id})
         }
         self.assertEqual(response.context['gantt_rows'][1], expected_subrow)
+
+    def test_assert_get_gantt_row_case_unspecified_end_date(self):
+        self.mock_get_academic_events.return_value = [
+            attr.evolve(self.open_event, end_date=None)
+        ]
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context['gantt_rows']), 2)
+
+        # Subrow - validation
+        expected_subrow = {
+            'text': display_as_academic_year(self.open_event.authorized_target_year),
+            'tooltip_text': "{} ({})".format(
+                self.open_event.title, display_as_academic_year(self.open_event.authorized_target_year)
+            ),
+            'start_date': self.open_event.start_date.strftime('%d-%m-%Y'),
+            'end_date': AcademicCalendarsView.indefinitely_date_value,
+            'parent': AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name,
+            'update_url': reverse('academic_calendar_update', kwargs={'academic_calendar_id': self.open_event.id})
+        }
+        self.assertEqual(response.context['gantt_rows'][1], expected_subrow)
+
+    def test_assert_get_gantt_row_case_academic_event_with_session(self):
+        academic_event_with_session = AcademicSessionEvent(
+            id=1,
+            title="Encodage de notes",
+            authorized_target_year=2021,
+            start_date=datetime.date.today() - datetime.timedelta(days=5),
+            end_date=datetime.date.today() + datetime.timedelta(days=5),
+            type=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+            session=2
+        )
+
+        self.mock_get_academic_events.return_value = [
+            academic_event_with_session
+        ]
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context['gantt_rows']), 2)
+        # Subrow - validation
+        expected_text = display_as_academic_year(academic_event_with_session.authorized_target_year) + \
+            " (S{})".format(str(academic_event_with_session.session))
+        self.assertEqual(response.context['gantt_rows'][1]['text'], expected_text)

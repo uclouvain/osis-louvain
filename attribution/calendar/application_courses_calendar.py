@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventCalendarHelper
+from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
@@ -45,8 +45,7 @@ class ApplicationCoursesCalendar(AcademicEventCalendarHelper):
                 data_year=ac_year,
                 defaults={
                     "title": "Candidature aux cours vacants",
-                    "start_date": datetime.date(ac_year.year, 2, 15),
-                    "end_date": datetime.date(ac_year.year, 2, 28),
-                    "academic_year": ac_year  # To remove after refactoring
+                    "start_date": datetime.date(ac_year.year, 2, 1),
+                    "end_date": datetime.date(ac_year.year, 2, 14),
                 }
             )

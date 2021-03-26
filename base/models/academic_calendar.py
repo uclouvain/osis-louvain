@@ -23,25 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
-from base.models import academic_year
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.models.utils.admin_extentions import remove_delete_action
 from base.signals.publisher import compute_all_scores_encodings_deadlines
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models import osis_model_admin
 from osis_common.utils.models import get_object_or_none
 
 
-class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
+class AcademicCalendarAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
+    list_display = ('title', 'data_year', 'start_date', 'end_date',)
     list_display_links = ('title', 'data_year')
-    readonly_fields = ('academic_year', 'title')
-    list_filter = ('academic_year', 'reference', 'data_year')
+    readonly_fields = ('title', )
+    list_filter = ('reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
     actions = ['send_calendar_reminder_notice']
@@ -61,40 +62,15 @@ class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     send_calendar_reminder_notice.short_description = _("Send calendar reminder notice")
 
 
-class AcademicCalendarQuerySet(models.QuerySet):
-    def current_academic_year(self):
-        return self.filter(academic_year=academic_year.current_academic_year())
-
-    def open_calendars(self, date=None):
-        """ return only open calendars """
-        if not date:
-            date = timezone.now()
-
-        return self.filter(start_date__lte=date, end_date__gt=date)
-
-    def starting_within(self, days=0, weeks=0):
-        today = timezone.now()
-        today_with_range = today + timezone.timedelta(days=days, weeks=weeks)
-        return self.filter(start_date__range=(today, today_with_range))
-
-
-class AcademicCalendar(SerializableModel):
+class AcademicCalendar(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
-    data_year = models.ForeignKey(
-        'AcademicYear', on_delete=models.PROTECT, related_name='related_academic_calendar_data', blank=True, null=True
-    )
-    title = models.CharField(max_length=50, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    end_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    highlight_title = models.CharField(max_length=50, blank=True, null=True)
-    highlight_description = models.CharField(max_length=255, blank=True, null=True)
-    highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=academic_calendar_type.ACADEMIC_CALENDAR_TYPES, max_length=70)
-
-    objects = AcademicCalendarQuerySet.as_manager()
+    data_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT, related_name="+")
+    title = models.CharField(max_length=255, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+    reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70, db_index=True)
 
     def save(self, *args, **kwargs):
         self.validation_mandatory_dates()
@@ -110,42 +86,15 @@ class AcademicCalendar(SerializableModel):
         if self.start_date is None:
             raise AttributeError(_('Start date is mandatory'))
 
-    def get_category(self):
-        if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):
-            return academic_calendar_type.ACADEMIC_CATEGORY
-        return ''
-
     def __str__(self):
-        return "{} {}".format(self.academic_year, self.title)
+        return "{} {}".format(self.data_year, self.title)
 
     class Meta:
         permissions = (
             ("can_access_academic_calendar", "Can access academic calendar"),
         )
-        unique_together = ("academic_year", "title")
-
-
-def find_highlight_academic_calendar():
-    return AcademicCalendar.objects.open_calendars() \
-        .exclude(highlight_title__isnull=True).exclude(highlight_title__exact='') \
-        .exclude(highlight_description__isnull=True).exclude(highlight_description__exact='') \
-        .exclude(highlight_shortcut__isnull=True).exclude(highlight_shortcut__exact='') \
-        .order_by('end_date')
-
-
-def get_by_reference_and_academic_year(a_reference, an_academic_year):
-    return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
+        unique_together = ("data_year", "title")
 
 
 def get_by_reference_and_data_year(a_reference, data_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, data_year=data_year)
-
-
-def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):
-    return AcademicCalendar.objects.open_calendars().filter(
-        academic_year=an_academic_year_id, reference=a_reference
-    ).exists()
-
-
-def _list_types(calendar_types):
-    return [calendar_type[0] for calendar_type in calendar_types]

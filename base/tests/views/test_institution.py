@@ -48,7 +48,6 @@ class EntityViewTestCase(APITestCase):
         cls.user = PersonFactory().user
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )

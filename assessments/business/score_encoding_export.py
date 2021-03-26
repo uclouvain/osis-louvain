@@ -46,8 +46,8 @@ from osis_common.decorators.download import set_download_cookie
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
           _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
           _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
-          _('Large print'), _('Specific room of examination'), _('Other educational facilities'), _('Comment'),
-          _('Educational tutor'),
+          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
+          _('Details other educational facilities'), _('Educational tutor'),
           ]
 
 JUSTIFICATION_ALIASES = {
@@ -79,7 +79,7 @@ def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool)
     row_number = 12
     for exam_enroll in exam_enrollments:
         student = exam_enroll.learning_unit_enrollment.student
-        offer = exam_enroll.learning_unit_enrollment.offer
+        offer = exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year
         person = mdl.person.find_by_id(student.person.id)
         end_date = __get_session_exam_deadline(exam_enroll)
 
@@ -349,7 +349,9 @@ def _update_border_for_first_peps_column(cell):
 
 
 def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -> str:
-    addresses = score_sheet_address.search_from_offer_years(
-        {exam_enroll.learning_unit_enrollment.offer for exam_enroll in exam_enrollments}
-    )
+    education_group_ids = {
+        exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year.education_group_id
+        for exam_enroll in exam_enrollments
+    }
+    addresses = score_sheet_address.search_from_education_group_ids(education_group_ids)
     return ';'.join({address.email for address in addresses if address.email})

@@ -115,15 +115,13 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-            return postpone_mini_training_and_program_tree_modifications_service.\
-                postpone_mini_training_and_program_tree_modifications(
-                    update_command
-                )
+            return postpone_mini_training_and_program_tree_modifications_service. \
+                postpone_mini_training_and_program_tree_modifications(update_command)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, exception.ContentConstraintTypeMissing):
                     self.mini_training_form.add_error("constraint_type", e.message)
-                elif isinstance(e, exception.ContentConstraintMinimumMaximumMissing) or\
+                elif isinstance(e, exception.ContentConstraintMinimumMaximumMissing) or \
                         isinstance(e, exception.ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
                     self.mini_training_form.add_error("min_constraint", e.message)
                     self.mini_training_form.add_error("max_constraint", "")
@@ -149,16 +147,20 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_command = self._convert_form_to_delete_mini_trainings_command(self.mini_training_form)
             return delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(delete_command)
         except (
-            program_management_exception.ProgramTreeNonEmpty,
-            exception.MiniTrainingHaveLinkWithEPC,
-            exception.MiniTrainingHaveEnrollments,
-            program_management_exception.NodeHaveLinkException,
-            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+                program_management_exception.ProgramTreeNonEmpty,
+                exception.MiniTrainingHaveLinkWithEPC,
+                exception.MiniTrainingHaveEnrollments,
+                program_management_exception.NodeHaveLinkException,
+                program_management_exception.CannotDeleteStandardDueToTransitionVersionEndDate,
+                program_management_exception.CannotDeleteStandardDueToSpecificVersionEndDate
         ) as e:
             self.mini_training_form.add_error("end_year", "")
             self.mini_training_form.add_error(
                 None,
-                _("Impossible to put end date to %(end_year)s: %(msg)s") % {"msg": e.message, "end_year": end_year.year}
+                _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": end_year
+                }
             )
         return []
 
@@ -216,9 +218,10 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_message = _(
                 "Mini-Training %(acronym)s successfully deleted from %(academic_year)s."
             ) % {
-                "acronym": last_identity.acronym,
-                "academic_year": display_as_academic_year(self.mini_training_form.cleaned_data["end_year"].year + 1)
-            }
+                                 "acronym": last_identity.acronym,
+                                 "academic_year": display_as_academic_year(
+                                     self.mini_training_form.cleaned_data["end_year"].year + 1)
+                             }
             return [delete_message]
         return []
 
@@ -305,5 +308,5 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             offer_acronym=cleaned_data["abbreviated_title"],
             version_name='',
             transition_name=NOT_A_TRANSITION,
-            from_year=cleaned_data["end_year"].year+1
+            from_year=cleaned_data["end_year"].year + 1
         )

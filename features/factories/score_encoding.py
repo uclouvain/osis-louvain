@@ -28,7 +28,7 @@ class ScoreEncodingFactory:
         self.program_managers = ProgramManager.objects.all().select_related("offer_year")
         self.offers = [manager.offer_year for manager in self.program_managers]
 
-        academic_calendar = AcademicCalendarExamSubmissionFactory(academic_year__current=True)
+        academic_calendar = AcademicCalendarExamSubmissionFactory(data_year__current=True)
         session_exam_calendar = SessionExamCalendarFactory(academic_calendar=academic_calendar)
 
         for offer in self.offers:

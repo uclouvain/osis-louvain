@@ -33,6 +33,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -65,6 +66,7 @@ class TestEditAttributionGet(TestCase):
             learning_component_year=cls.practical_component
         )
         cls.person = FacultyManagerFactory(entity=cls.learning_container_year.requirement_entity).person
+        generate_learning_unit_edition_calendars([cls.learning_unit_year.academic_year])
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -108,6 +110,7 @@ class TestEditAttributionPost(TestCase):
             learning_component_year=cls.practical_component
         )
         cls.person = FacultyManagerFactory(entity=cls.learning_container_year.requirement_entity).person
+        generate_learning_unit_edition_calendars([cls.learning_unit_year.academic_year])
 
     def setUp(self):
         self.client.force_login(self.person.user)

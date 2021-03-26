@@ -26,19 +26,15 @@ from datetime import datetime, timedelta
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
-from django.utils.text import slugify
 from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year, AcademicYear
-from base.models.entity_version import EntityVersion
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.learning_unit_year import LearningUnitYear
 from features.forms.learning_units import update_form, create_form
 from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, SearchLearningUnitPage, \
     NewPartimPage, NewLearningUnitPage
-from features.steps.utils.query import get_random_learning_unit_outside_of_person_entities, \
-    get_random_learning_unit_inside_of_person_entities
 
 use_step_matcher("parse")
 
@@ -59,37 +55,6 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     page = LearningUnitPage(driver=context.browser)
     context.test.assertTrue(page.is_li_edit_link_disabled())
-
-
-@given("Aller sur la page de detail d'une UE ne faisant pas partie de la faculté")
-def step_impl(context: Context):
-    luy = get_random_learning_unit_outside_of_person_entities(context.user.person)
-    url = reverse('learning_unit', args=[luy.pk])
-
-    LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
-
-
-@given("Aller sur la page de detail d'une UE faisant partie de la faculté")
-def step_impl(context: Context):
-    luy = get_random_learning_unit_inside_of_person_entities(context.user.person)
-    context.learning_unit_year = luy
-    url = reverse('learning_unit', args=[luy.pk])
-
-    LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
-
-
-@given("Aller sur la page de detail d'une UE faisant partie de la faculté l'année suivante")
-def step_impl(context: Context):
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    entities = [ev.entity for ev in entities_version]
-    luy = LearningUnitYear.objects.filter(
-        learning_container_year__requirement_entity__in=entities,
-        academic_year__year=current_academic_year().year + 1
-    ).order_by("?")[0]
-    context.learning_unit_year = luy
-    url = reverse('learning_unit', args=[luy.pk])
-
-    LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
 
 
 @then("L’action « Modifier » est activée.")

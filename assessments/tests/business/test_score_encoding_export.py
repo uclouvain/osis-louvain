@@ -35,19 +35,19 @@ from assessments.business.enrollment_state import ENROLLED_LATE_COLOR, NOT_ENROL
 from assessments.business.score_encoding_export import _coloring_enrollment_state, FIRST_COL_LEGEND_ENROLLMENT_STATUS, \
     _color_legend, FIRST_ROW_LEGEND_ENROLLMENT_STATUS, _add_header_and_legend_to_file, \
     justification_other_values
+from assessments.models.enums import score_sheet_address_choices
+from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
 from base import models as mdl
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums import number_session, academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
-from assessments.models.enums import score_sheet_address_choices
-from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from assessments.tests.business.test_score_encoding_sheet import create_data_for_entity_address
 
 WHITE_RGB = '00000000'
 ROW_NUMBER = 1
@@ -58,7 +58,7 @@ class XlsTests(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                        academic_year__current=True,
+                                                        data_year__current=True,
                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                                                number_session=number_session.ONE)
@@ -192,21 +192,20 @@ class XlsTests(TestCase):
         )
 
     def test_add_header_for_tutor(self):
-        offer_year_current_year = OfferYearFactory(academic_year=self.academic_year)
-        create_data_for_entity_address(
-            self.academic_year, offer_year_current_year, score_sheet_address_choices.ENTITY_MANAGEMENT
-        )
-        create_data_for_entity_address(
-            self.academic_year, offer_year_current_year, score_sheet_address_choices.ENTITY_ADMINISTRATION
+        educ_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            management_entity=EntityWithVersionFactory(),
+            administration_entity=EntityWithVersionFactory(),
         )
         exam_enrollment = ExamEnrollmentFactory(
             session_exam=self.session_exam,
             enrollment_state=enrollment_states.ENROLLED,
             date_enrollment=self.academic_calendar.start_date,
-            learning_unit_enrollment__offer_enrollment__offer_year=offer_year_current_year)
+            learning_unit_enrollment__offer_enrollment__education_group_year=educ_group_year)
 
+        education_group = educ_group_year.education_group
         score_sheet_adress = ScoreSheetAddressFactory(
-            offer_year=exam_enrollment.learning_unit_enrollment.offer,
+            education_group=education_group,
             entity_address_choice=score_sheet_address_choices.ENTITY_MANAGEMENT,
             email='dd@fa.com'
         )

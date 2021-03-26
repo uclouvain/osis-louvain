@@ -115,10 +115,23 @@ def academic_year_validator(value):
 
 
 class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
-                    'status')
+    list_display = (
+        'external_id',
+        'acronym',
+        'specific_title',
+        'academic_year',
+        'credits',
+        'requirement_entity',
+        'status',
+        'changed',
+    )
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
+    search_fields = [
+        'acronym',
+        'learning_container_year__requirement_entity__entityversion__acronym',
+        'external_id',
+        'id'
+    ]
     actions = [
         'resend_messages_to_queue',
     ]
@@ -222,7 +235,6 @@ class LearningUnitYear(SerializableModel):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)

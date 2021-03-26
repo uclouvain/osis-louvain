@@ -80,9 +80,9 @@ class ProgramTreeRepository(interface.AbstractRepository):
             cls,
             program_tree: 'ProgramTree',
             create_orphan_group_service: interface.ApplicationService = None,
-            copy_group_service: interface.ApplicationService = None
+            copy_group_service: interface.ApplicationService = None,
     ) -> 'ProgramTreeIdentity':
-        for node in [n for n in program_tree.get_all_nodes() if n._has_changed is True]:
+        for node in [n for n in program_tree.get_all_nodes() if n._has_changed and not n.is_learning_unit()]:
             if create_orphan_group_service:
                 create_orphan_group_service(
                     CreateOrphanGroupCommand(

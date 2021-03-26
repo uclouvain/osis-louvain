@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.00'
+  version: '1.11'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -37,6 +37,68 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - application
+  /{year}/me:
+    get:
+      description: Return all attributions of connected user in a specific year.
+      operationId: myattributions_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attribution'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - attribution
+  /{year}/{global_id}/:
+    get:
+      description: Return all attributions of specific user in a specific year.
+      operationId: attributions_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: global_id
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attribution'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - attribution
 components:
   securitySchemes:
     Token:
@@ -83,6 +145,89 @@ components:
           example: 2022
         is_open:
           type: boolean
+    Attribution:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 'LDROI1001'
+        title_fr:
+          type: string
+          example: 'Introduction au droit - Partie I'
+        title_en:
+          type: string
+          example: 'Introduction to Law - Part I'
+          nullable: true
+        year:
+          type: integer
+          example: 2020
+          description: 'Year of learning unit'
+        type:
+          $ref: '#/components/schemas/LearningUnitTypeEnum'
+        type_text:
+          type: string
+          example: 'Cours'
+        credits:
+          type: string
+          example: '60.00'
+          nullable: true
+        total_learning_unit_charge:
+          type: string
+          description: 'Total charge for learning unit year'
+          example: '55.5'
+          nullable: true
+        start_year:
+          type: integer
+          example: 2018
+          description: 'Start year of attribution'
+          nullable: true
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        lecturing_charge:
+          type: string
+          example: '15.0'
+          nullable: true
+        practical_charge:
+          type: string
+          example: '10.5'
+          nullable: true
+        links:
+          $ref: '#/components/schemas/AttributionLinks'
+    AttributionFunctionEnum:
+      type: string
+      enum:
+        - 'COORDINATOR'
+        - 'HOLDER'
+        - 'CO_HOLDER'
+        - 'DEPUTY'
+        - 'DEPUTY_AUTHORITY'
+        - 'DEPUTY_SABBATICAL'
+        - 'DEPUTY_TEMPORARY'
+        - 'PROFESSOR'
+        - 'INTERNSHIP_SUPERVISOR'
+        - 'INTERNSHIP_CO_SUPERVISOR'
+    AttributionLinks:
+      type: object
+      properties:
+        catalog:
+          type: string
+          nullable: true
+        schedule:
+          type: string
+          nullable: true
+    LearningUnitTypeEnum:
+      type: string
+      enum:
+        - 'COURSE'
+        - 'INTERNSHIP'
+        - 'DISSERTATION'
+        - 'OTHER_COLLECTIVE'
+        - 'OTHER_INDIVIDUAL'
+        - 'MASTER_THESIS'
+        - 'EXTERNAL'
     Error:
       type: object
       properties:

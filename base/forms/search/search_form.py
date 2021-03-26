@@ -44,7 +44,7 @@ def get_research_criteria(search_form):
     # TODO : find what is it and what is it use
     tuples_label_value = []
     for field_name, field in search_form.fields.items():
-        if not search_form.cleaned_data[field_name]:
+        if not search_form.cleaned_data.get(field_name):
             continue
         tuple_to_append = (str(field.label), search_form.cleaned_data[field_name])
         if type(field) == forms.ChoiceField or type(field) == django_filter_fields.ChoiceField:

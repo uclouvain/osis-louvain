@@ -43,13 +43,17 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import CentralManagerForUEFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
@@ -72,7 +76,7 @@ class LearningUnitViewTestCase(TestCase):
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.current_academic_year = cls.academic_years[0]
         cls.next_academic_year = cls.academic_years[1]
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars_without_start_and_end_date(cls.academic_years)
         cls.language = FrenchLanguageFactory()
 
     def setUp(self):
@@ -121,7 +125,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_get_proposal_learning_unit_creation_form_with_central_user(self):
-        central_manager_person = CentralManagerForUEFactory()
+        central_manager_person = CentralManagerFactory(entity=self.entity).person
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
         self.client.force_login(central_manager_person.user)
@@ -131,9 +135,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
-            self.academic_years[:-1]  # Exclude last one because central manager cannot propose luy in n+7
+            AcademicYear.objects.filter(year__in=target_years_opened)
         )
 
     def test_get_proposal_learning_unit_creation_form_with_faculty_user(self):
@@ -144,9 +149,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
-            self.academic_years[1:-1]  # Exclude first and last one because fac manager cannot propose luy in n and n+7
+            AcademicYear.objects.filter(year__in=target_years_opened)
         )
 
     def test_post_proposal_learning_unit_creation_form(self):

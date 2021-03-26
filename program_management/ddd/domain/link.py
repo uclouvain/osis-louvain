@@ -149,6 +149,13 @@ class LinkWithChildBranch(Link):
         super(LinkWithChildBranch, self).__init__(*args, **kwargs)
 
 
+class LinkBuilder:
+    def from_link(self, from_link: 'Link', parent: 'Node', child: 'Node'):
+        new_link = attr.evolve(from_link, parent=parent, child=child)
+        new_link._has_changed = True
+        return new_link
+
+
 class LinkFactory:
 
     def copy_to_next_year(self, copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':

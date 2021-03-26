@@ -38,6 +38,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
@@ -70,7 +71,7 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
         ).values('offer_acronym', 'year', 'version_name', 'transition_name')
         if values:
             return [ProgramTreeVersionIdentity(**value) for value in values]
-        raise interface.BusinessException("Program tree version identity not found")
+        raise ProgramTreeVersionNotFoundException("Program tree version identity not found")
 
     @classmethod
     def get_from_program_tree_identity(cls, identity: 'ProgramTreeIdentity') -> 'ProgramTreeVersionIdentity':

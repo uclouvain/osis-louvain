@@ -35,6 +35,10 @@ class TestCheckAcademicCalendar(TestCase):
                 "LearningUnitForceMajeurSummaryEditionCalendar.ensure_consistency_until_n_plus_6")
     @mock.patch("learning_unit.tasks.check_academic_calendar."
                 "LearningUnitEnrollmentCalendar.ensure_consistency_until_n_plus_6")
+    @mock.patch("learning_unit.tasks.check_academic_calendar."
+                "LearningUnitExtendedProposalManagementCalendar.ensure_consistency_until_n_plus_6")
+    @mock.patch("learning_unit.tasks.check_academic_calendar."
+                "LearningUnitLimitedProposalManagementCalendar.ensure_consistency_until_n_plus_6")
     def test_check_academic_calendar_ensure_call_all_academic_calendar(self, *mocks_calendar):
         check_academic_calendar.run()
         self.assertTrue(all(mock.called for mock in mocks_calendar))

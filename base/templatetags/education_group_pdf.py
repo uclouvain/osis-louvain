@@ -282,4 +282,4 @@ def get_case_picture(node: 'NodeLearningUnitYear'):
 
 
 def check_block(item, value):
-    return "X" if item.block and value == item.block else ""
+    return "X" if item.block and str(value) in str(item.block) else ""

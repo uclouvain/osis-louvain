@@ -50,8 +50,15 @@ class CheckVersionEndDateValidatorForStandardTest(TestCase, TestValidatorValidat
 
         self.assertValidatorNotRaises(validator)
 
-    def test_should_not_be_valid_when_version_exists_during_the_standard_year(self):
+    def test_should_not_be_valid_when_specific_version_exists_during_the_standard_year(self):
         self._create_version_with_superior_end_date()
+
+        validator = _delete_check_versions_end_date.CheckVersionsEndDateValidator(self.standard_version)
+
+        self.assertValidatorRaises(validator, None)
+
+    def test_should_not_be_valid_when_transition_version_exists_during_the_standard_year(self):
+        self._create_transition_version_with_superior_end_date()
 
         validator = _delete_check_versions_end_date.CheckVersionsEndDateValidator(self.standard_version)
 
@@ -85,4 +92,13 @@ class CheckVersionEndDateValidatorForStandardTest(TestCase, TestValidatorValidat
             offer__academic_year__year=self.standard_version.entity_id.year + 1,
             offer__education_group__end_year=None,
             root_group__group__end_year=None,
+        )
+
+    def _create_transition_version_with_superior_end_date(self):
+        EducationGroupVersionFactory(
+            offer__acronym=self.standard_version.entity_id.offer_acronym,
+            offer__academic_year__year=self.standard_version.entity_id.year + 1,
+            offer__education_group__end_year=None,
+            root_group__group__end_year=None,
+            transition_name="TRANSITION"
         )

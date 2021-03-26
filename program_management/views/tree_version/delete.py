@@ -41,7 +41,7 @@ from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, NodeHaveLinkException, \
-    ProgramTreeVersionNotFoundException
+    ProgramTreeVersionNotFoundException, CannotDeleteSpecificVersionDueToTransitionVersionEndDate
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -81,6 +81,7 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
                 NodeHaveLinkException,
                 TrainingHaveLinkWithEPC,
                 TrainingHaveEnrollments,
+                CannotDeleteSpecificVersionDueToTransitionVersionEndDate
         ) as e:
             display_error_messages(request, e.message)
             return render(request, self.template_name, {})

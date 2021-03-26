@@ -23,27 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy
 
 from assessments.models.enums import score_sheet_address_choices
-from base.models.offer_year import OfferYear
+from base.models.education_group_year import EducationGroupYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class ScoreSheetAddressAdmin(OsisModelAdmin):
-    list_display = ('offer_year', 'entity_address_choice', 'location', 'postal_code', 'city', 'phone', 'fax', 'email')
-    search_fields = ['offer_year__acronym', 'location']
-    list_filter = ('entity_address_choice',)
-    raw_id_fields = ('offer_year',)
+    list_display = (
+        'offer_acronym',
+        'entity_address_choice',
+        'location',
+        'postal_code',
+        'city',
+        'phone',
+        'fax',
+        'email',
+    )
+    search_fields = ['location', 'education_group__educationgroupyear__acronym']
+    list_filter = ('entity_address_choice', )
 
 
 class ScoreSheetAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.OneToOneField('base.OfferYear', on_delete=models.CASCADE)
+    education_group = models.OneToOneField(
+        'base.EducationGroup',
+        on_delete=models.CASCADE,
+    )
     # Info to find the address
     entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
                                              choices=score_sheet_address_choices.CHOICES)
@@ -62,6 +73,10 @@ class ScoreSheetAddress(models.Model):
     email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
 
     @property
+    def offer_acronym(self):
+        return self.education_group.most_recent_acronym
+
+    @property
     def customized(self):
         return self.location and self.postal_code and self.city and not self.entity_address_choice
 
@@ -73,15 +88,15 @@ class ScoreSheetAddress(models.Model):
                 "Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
 
     def __str__(self):
-        return "{0} - {1}".format(self.offer_year, self.entity_address_choice)
+        return "{0} - {1}".format(self.education_group, self.entity_address_choice)
 
 
-def get_from_offer_year(off_year) -> ScoreSheetAddress:
+def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:
+    return ScoreSheetAddress.objects.filter(education_group_id__in=education_group_ids)
+
+
+def get_from_education_group_id(education_group_id: int) -> Optional[ScoreSheetAddress]:
     try:
-        return ScoreSheetAddress.objects.get(offer_year=off_year)
+        return ScoreSheetAddress.objects.get(education_group_id=education_group_id)
     except ObjectDoesNotExist:
         return None
-
-
-def search_from_offer_years(off_years: List[OfferYear]) -> List[ScoreSheetAddress]:
-    return ScoreSheetAddress.objects.filter(offer_year__in=off_years)

@@ -330,8 +330,9 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
 
     # PermissionFieldMixin
     def get_context(self) -> str:
+        is_transition = self.initial.get('code').upper().startswith('T')
         is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
-        return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
+        return TRAINING_PGRM_ENCODING_PERIOD if is_transition or is_edition_period_opened else TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
@@ -414,8 +415,10 @@ class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFie
 
     # PermissionFieldMixin
     def get_context(self) -> str:
+        is_transition = self.initial.get('code').upper().startswith('T')
         is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
-        return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
+        return MINI_TRAINING_PGRM_ENCODING_PERIOD \
+            if is_transition or is_edition_period_opened else MINI_TRAINING_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:

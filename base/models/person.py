@@ -27,7 +27,6 @@ from datetime import date
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import Q
 from django.db.models import Value
@@ -35,7 +34,6 @@ from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from base.models.entity import Entity
 from base.models.enums import person_source_type
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
@@ -139,33 +137,14 @@ class Person(SerializableModel):
         return " ".join([self.last_name or "", self.first_name or ""]).strip()
 
     def __str__(self):
-        return self.get_str(self.first_name, self.middle_name, self.last_name)
+        return self.get_str(self.first_name, self.last_name)
 
     @staticmethod
-    def get_str(first_name, middle_name, last_name):
+    def get_str(first_name, last_name):
         return " ".join([
             ("{},".format(last_name) if last_name else "").upper(),
-            first_name or "",
-            middle_name or ""
+            first_name or ""
         ]).strip()
-
-    @cached_property
-    def linked_entities(self):
-        entities_id = set()
-        for person_entity in self.personentity_set.all():
-            entities_id |= person_entity.descendants
-
-        return entities_id
-
-    @cached_property
-    def directly_linked_entities(self):
-        entities = []
-        for person_entity in self.personentity_set.all().select_related('entity'):
-            entities.append(person_entity.entity)
-        return entities
-
-    def get_managed_programs(self):
-        return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
 
     class Meta:
         permissions = (
@@ -177,19 +156,21 @@ class Person(SerializableModel):
             ('can_read_persons_roles', 'Can read persons roles'),
         )
 
+    # TODO: Remove this property in dissertation app
+    @cached_property
+    def linked_entities(self):
+        from learning_unit.auth.roles.central_manager import CentralManager
+        from learning_unit.auth.roles.faculty_manager import FacultyManager
+        from osis_role.contrib.helper import EntityRoleHelper
+
+        return EntityRoleHelper.get_all_entities(self, {CentralManager.group_name, FacultyManager.group_name})
+
+    # TODO: Remove this method in dissertation app
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
-        requirement_entity = learning_unit_year.learning_container_year.requirement_entity
-        if not requirement_entity:
+        requirement_entity_id = learning_unit_year.learning_container_year.requirement_entity_id
+        if not requirement_entity_id:
             return False
-        return self.is_attached_entities([requirement_entity])
-
-    def is_attached_entities(self, entities):
-        return any(self.is_attached_entity(entity) for entity in entities)
-
-    def is_attached_entity(self, entity):
-        if not isinstance(entity, Entity):
-            raise ImproperlyConfigured("entity must be an instance of Entity.")
-        return entity.id in self.linked_entities
+        return requirement_entity_id in self.linked_entities
 
 
 def find_by_id(person_id):

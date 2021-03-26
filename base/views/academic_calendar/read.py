@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 import django_filters
 from django_filters.views import FilterView
 
-from base.business.event_perms import AcademicEventRepository
+from base.business.academic_calendar import AcademicEventRepository, AcademicSessionEvent
 from base.forms.utils.datefield import DatePickerInput
 from base.models import academic_year
 from base.models.academic_calendar import AcademicCalendar
@@ -89,6 +89,7 @@ class AcademicCalendarFilter(django_filters.FilterSet):
 
 
 class AcademicCalendarsView(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+    indefinitely_date_value = '01-01-2099'
     permission_required = 'base.can_access_academic_calendar'
     raise_exception = True
 
@@ -141,11 +142,17 @@ class AcademicCalendarsView(PermissionRequiredMixin, CacheFilterMixin, FilterVie
 
             events = sorted(events, key=lambda row: row.start_date)
             gantt_rows += [{
-                'text': display_as_academic_year(event.authorized_target_year),
+                'text': self.__get_gantt_row_title_text(event),
                 'tooltip_text': "{} ({})".format(event.title, display_as_academic_year(event.authorized_target_year)),
                 'start_date': event.start_date.strftime('%d-%m-%Y'),
-                'end_date': event.end_date.strftime('%d-%m-%Y') if event.end_date else '',
+                'end_date': event.end_date.strftime('%d-%m-%Y') if event.end_date else self.indefinitely_date_value,
                 'parent': type,
                 'update_url': reverse('academic_calendar_update', kwargs={'academic_calendar_id': event.id})
             } for event in events]
         return gantt_rows
+
+    def __get_gantt_row_title_text(self, event) -> str:
+        text = display_as_academic_year(event.authorized_target_year)
+        if (isinstance(event, AcademicSessionEvent)) and event.session is not None:
+            text += ' (S{})'.format(str(event.session))
+        return text

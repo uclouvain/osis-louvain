@@ -46,7 +46,6 @@ from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.mixin.academic_year import AcademicYearMockMixin
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -66,14 +65,12 @@ def generate_exam_enrollments(year, with_different_offer=False):
     number_enrollments = 2
     academic_year = AcademicYearFactory(year=year)
 
-    an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
-                                                   start_date=(
-                                                           datetime.datetime.today() - datetime.timedelta(
-                                                       days=20)).date(),
-                                                   end_date=(
-                                                           datetime.datetime.today() + datetime.timedelta(
-                                                       days=20)).date(),
-                                                   reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+    an_academic_calendar = AcademicCalendarFactory(
+        data_year=academic_year,
+        start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+        end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+    )
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
                                                        academic_calendar=an_academic_calendar)
 
@@ -84,17 +81,17 @@ def generate_exam_enrollments(year, with_different_offer=False):
 
     if with_different_offer:
         session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
-                                            offer_year__academic_year=academic_year)
+                                            education_group_year__academic_year=academic_year)
                          for _ in range(0, number_enrollments)]
     else:
         session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
-                                            offer_year__academic_year=academic_year)] * number_enrollments
-    offer_years = [session_exam.offer_year for session_exam in session_exams]
+                                            education_group_year__academic_year=academic_year)] * number_enrollments
+    education_group_years = [session_exam.education_group_year for session_exam in session_exams]
 
     exam_enrollments = list()
     for i in range(0, number_enrollments):
         student = StudentFactory()
-        offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
+        offer_enrollment = OfferEnrollmentFactory(education_group_year=education_group_years[i], student=student)
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
                                                                  offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
@@ -104,7 +101,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
     return locals()
 
 
-class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
+class MixinTestUploadScoresFile(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -114,7 +111,7 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
         cls.exam_enrollments = data["exam_enrollments"]
         cls.attribution = data["attribution"]
         cls.learning_unit_year = data["learning_unit_year"]
-        cls.offer_year = data["offer_years"][0]
+        cls.offer_year = data["education_group_years"][0]
         cls.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
                         in cls.exam_enrollments]
 
@@ -137,10 +134,6 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
     def setUp(self):
         self.a_user = self.attribution.tutor.person.user
         self.client.force_login(user=self.a_user)
-        self.mock_academic_year(
-            current_academic_year=self.academic_year,
-            starting_academic_year=self.academic_year
-        )
 
     def assert_enrollments_equal(self, exam_enrollments, attribute_value_list):
         [enrollment.refresh_from_db() for enrollment in exam_enrollments]

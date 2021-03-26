@@ -30,7 +30,8 @@ from django.test import TestCase
 from attribution.models import attribution
 from attribution.models.enums.function import CO_HOLDER, COORDINATOR
 from attribution.tests.factories.attribution import AttributionFactory
-from base.tests.factories import tutor, user, structure, entity_manager, academic_year, learning_unit_year
+from base.tests.factories import tutor, user, entity_manager, academic_year, learning_unit_year
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.models.test_person import create_person_with_user
 
@@ -50,21 +51,30 @@ class AttributionTest(TestCase):
         cls.user = user.UserFactory()
         cls.user.save()
         cls.person = create_person_with_user(cls.user)
-        cls.structure = structure.StructureFactory()
-        cls.structure_children = structure.StructureFactory(part_of=cls.structure)
-        cls.entity_manager = entity_manager.EntityManagerFactory(person=cls.person, structure=cls.structure)
+        cls.entity_version = EntityVersionFactory()
+        cls.entity_version_child = EntityVersionFactory(parent=cls.entity_version.entity)
+        cls.entity_manager = entity_manager.EntityManagerFactory(
+            person=cls.person,
+            entity=cls.entity_version.entity
+        )
         cls.tutor = tutor.TutorFactory(person=cls.person)
         cls.academic_year = academic_year.AcademicYearFactory(year=datetime.date.today().year,
                                                               start_date=datetime.date.today())
-        cls.learning_unit_year = learning_unit_year.LearningUnitYearFactory(structure=cls.structure,
-                                                                            acronym="LBIR1210",
-                                                                            academic_year=cls.academic_year)
-        cls.learning_unit_year_children = learning_unit_year.LearningUnitYearFactory(structure=cls.structure_children,
-                                                                                     acronym="LBIR1211",
-                                                                                     academic_year=cls.academic_year)
-        cls.learning_unit_year_without_attribution = learning_unit_year.LearningUnitYearFactory(structure=cls.structure,
-                                                                                                acronym="LBIR1212",
-                                                                                                academic_year=cls.academic_year)
+        cls.learning_unit_year = learning_unit_year.LearningUnitYearFactory(
+            learning_container_year__requirement_entity=cls.entity_version.entity,
+            acronym="LBIR1210",
+            academic_year=cls.academic_year
+        )
+        cls.learning_unit_year_children = learning_unit_year.LearningUnitYearFactory(
+            learning_container_year__requirement_entity=cls.entity_version_child.entity,
+            acronym="LBIR1211",
+            academic_year=cls.academic_year
+        )
+        cls.learning_unit_year_without_attribution = learning_unit_year.LearningUnitYearFactory(
+            learning_container_year__requirement_entity=cls.entity_version.entity,
+            acronym="LBIR1212",
+            academic_year=cls.academic_year
+        )
         cls.attribution = create_attribution(tutor=cls.tutor,
                                              learning_unit_year=cls.learning_unit_year,
                                              score_responsible=True,

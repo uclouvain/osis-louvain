@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.db.models import Case, Value, BooleanField, When
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -116,7 +116,13 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
         )
 
     def get_versions(self, version):
-        versions = version.offer.educationgroupversion_set.filter(transition_name=NOT_A_TRANSITION)
+        versions = version.offer.educationgroupversion_set.filter(transition_name=NOT_A_TRANSITION).annotate(
+            is_transition=Case(
+                When(transition_name='', then=Value(False)),
+                default=Value(True),
+                output_field=BooleanField()
+            )
+        )
         return MiniTrainingVersionListSerializer(versions, many=True, context=self.context).data
 
     def to_representation(self, obj):

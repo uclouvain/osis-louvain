@@ -34,21 +34,21 @@ from django.utils.translation import gettext_lazy as _
 from program_management.ddd.business_types import *
 from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCommand, GetProgramTreesFromNodeCommand
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
-from program_management.ddd.service.read import search_program_trees_using_node_service
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
 @transaction.atomic()
 def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCommand) -> List['ProgramTreeIdentity']:
     cmd = GetProgramTreesFromNodeCommand(code=cmd.code, year=cmd.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
-    if not program_trees:
-        try:
-            program_trees = [ProgramTreeRepository().get(ProgramTreeIdentity(code=cmd.code, year=cmd.year))]
-        except exception.ProgramTreeNotFoundException:
-            program_trees = []
+    try:
+        program_tree = ProgramTreeRepository().get(ProgramTreeIdentity(code=cmd.code, year=cmd.year))
+        program_trees.append(program_tree)
+    except exception.ProgramTreeNotFoundException:
+        pass
     nodes_to_publish = [program_tree.root_node for program_tree in program_trees]
     t = Thread(target=_bulk_publish, args=(nodes_to_publish,))
     t.start()

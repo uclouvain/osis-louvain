@@ -32,7 +32,8 @@ from django.urls import reverse
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.views import score_sheet
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -43,38 +44,40 @@ class OfferScoreSheetTabViewTest(TestCase):
         cls.academic_year = AcademicYearFactory(start_date=today,
                                                 end_date=today.replace(year=today.year + 1),
                                                 year=today.year)
-        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
-        cls.COMMON_CONTEXT_KEYS = ['offer_year', 'countries', 'is_program_manager', 'entity_versions']
+        cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.COMMON_CONTEXT_KEYS = ['education_group_year', 'countries', 'is_program_manager', 'entity_versions']
         cls.a_superuser = SuperUserFactory()
+        SessionExamCalendarFactory.create_academic_event(cls.academic_year)
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
 
     def test_get_common_context(self):
         request = mock.Mock(method='GET')
-        context = score_sheet._get_common_context(request, self.offer_year.id)
+        context = score_sheet._get_common_context(request, self.educ_group_year.education_group_id)
         self.assert_list_contains(list(context.keys()), self.COMMON_CONTEXT_KEYS)
 
     def test_offer_score_encoding_tab(self):
-        response = self.client.get(reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
+        response = self.client.get(reverse('offer_score_encoding_tab', args=[self.educ_group_year.education_group_id]))
 
         self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
         context_keys = self.COMMON_CONTEXT_KEYS + ['entity_id_selected', 'form']
         self.assert_list_contains(list(response.context.keys()), context_keys)
-        self.assertEqual(response.context['offer_year'], self.offer_year)
+        self.assertEqual(response.context['education_group_year'], self.educ_group_year)
 
     def assert_list_contains(self, container, member):
         self.assertFalse([item for item in member if item not in container])
 
-    @mock.patch('assessments.business.score_encoding_sheet.save_address_from_entity')
+    @mock.patch('assessments.business.score_encoding_sheet._save_address_from_entity')
     @mock.patch('django.contrib.messages.add_message')
     def test_save_score_sheet_address_case_reuse_entity_address(self,
                                                                 mock_add_message,
                                                                 mock_save_address_from_entity):
-        url = reverse('save_score_sheet_address', args=[self.offer_year.id])
+        education_group_id = self.educ_group_year.education_group_id
+        url = reverse('save_score_sheet_address', args=[education_group_id])
         response = self.client.post(url, data={'related_entity': 1234})
         self.assertTrue(mock_add_message.called)
-        self.assertEqual(response.url, reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
+        self.assertEqual(response.url, reverse('offer_score_encoding_tab', args=[education_group_id]))
 
     @mock.patch('assessments.views.score_sheet._save_customized_address')
     def test_save_score_sheet_address_case_customized_address(self, mock_save_customized_address):
@@ -82,7 +85,7 @@ class OfferScoreSheetTabViewTest(TestCase):
 
         mock_save_customized_address.return_value = ScoreSheetAddressForm()
 
-        response = self.client.post(reverse('save_score_sheet_address', args=[self.offer_year.id]))
+        response = self.client.post(reverse('save_score_sheet_address', args=[self.educ_group_year.education_group_id]))
 
         self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
         self.assert_list_contains(list(response.context.keys()), self.COMMON_CONTEXT_KEYS + ['form'])

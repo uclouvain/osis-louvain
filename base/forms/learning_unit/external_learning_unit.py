@@ -44,9 +44,21 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.proposal_type import ProposalType
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 from reference.models.country import Country
 from reference.models.language import Language
 
@@ -179,6 +191,32 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
             self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
+        self._restrict_academic_years_choice(proposal)
+
+    def _restrict_academic_years_choice(self, proposal_type):
+        if proposal_type:
+            self._restrict_academic_years_choice_for_proposal_management(proposal_type)
+        else:
+            self._restrict_academic_years_choice_for_daily_management()
+
+    def _restrict_academic_years_choice_for_proposal_management(self, proposal_type):
+        if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
+            if EntityRoleHelper.has_role(self.person, FacultyManager):
+                target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+            elif EntityRoleHelper.has_role(self.person, CentralManager):
+                target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
+            else:
+                target_years_opened = []
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_external_form(self):
@@ -334,6 +372,16 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
+        self._restrict_academic_years_choice_for_daily_management()
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_form(self):

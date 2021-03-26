@@ -31,7 +31,7 @@ from django.http.response import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
-from base.business.event_perms import AcademicEvent
+from base.business.academic_calendar import AcademicEvent
 from base.forms.academic_calendar.update import AcademicCalendarUpdateForm
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory

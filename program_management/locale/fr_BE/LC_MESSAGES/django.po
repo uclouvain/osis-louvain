@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-24 16:19+0100\n"
+"POT-Creation-Date: 2021-03-12 15:28+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -188,6 +188,9 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
 
+msgid "Cannot copy prerequisite"
+msgstr "Impossible de copier les prérequis"
+
 #, python-format
 msgid ""
 "Cannot detach because the following learning units are prerequisite in "
@@ -203,6 +206,12 @@ msgid ""
 msgstr ""
 "Interdit de détacher car les unités d'enseignement suivantes ont des "
 "prérequis dans %(formation)s: %(learning_units)s"
+
+msgid "Cannot fill content from {}"
+msgstr "Interdit de remplir le contenur à partir de {}"
+
+msgid "Cannot fill content of {}"
+msgstr "Interdit de remplir le contenue de {}"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -298,6 +307,9 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 msgid "Export"
 msgstr "Exporter"
 
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenue de programmes à partir de l'année passée"
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -314,9 +326,6 @@ msgstr[1] ""
 
 msgid "Firstname"
 msgstr "Prénom"
-
-msgid "For all students"
-msgstr "Pour tous les étudiants"
 
 msgid "For approval,"
 msgstr "Pour accord,"
@@ -358,7 +367,12 @@ msgid ""
 "Impossible to create a transition version : an other transition version "
 "exists already on this year."
 msgstr ""
-"Impossible de créer une version de transition : une autre version de transition existe déjà sur cette année."
+"Impossible de créer une version de transition : une autre version de "
+"transition existe déjà sur cette année."
+
+#, python-format
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
+msgstr "Impossible de mettre la dernière année d'organisation à %(end_year)s : %(msg)s"
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -631,6 +645,9 @@ msgstr "Intitulé partiel en anglais"
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
+msgid "Particular"
+msgstr "Particulière"
+
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -687,12 +704,6 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr "Produire un fichier Excel avec la liste des formations"
 
-msgid "Producing annexe"
-msgstr "Production du supplément/annexe"
-
-msgid "Producing certificat"
-msgstr "Production du diplôme/certificat"
-
 msgid "Professionnal title"
 msgstr "Titre professionnel"
 
@@ -717,9 +728,6 @@ msgstr "Quadrimestre"
 
 msgid "Rate code"
 msgstr "Code tarif"
-
-msgid "Reference institution"
-msgstr "Institution de référence"
 
 msgid "Registration ID"
 msgstr "NOMA"
@@ -954,6 +962,9 @@ msgstr "Autres informations"
 msgid "Transformation and modification"
 msgstr "Transformation et modification"
 
+msgid "Transition"
+msgstr "Transition"
+
 msgid "Transition name"
 msgstr "Sigle de la transition"
 
@@ -1058,11 +1069,28 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
+"You can't delete the specific program tree '{code}' in {year} as transition "
+"versions exists during this year and/or in the future."
+msgstr ""
+"Vous ne pouvez pas supprimer la formation particulière '{code}' en {year} "
+"parce qu'il existe une version de transition pour cette année et/ou dans le "
+"futur."
+
+#, python-brace-format
+msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particulière pour cette année et/ou dans le futur."
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as transition "
+"versions exists during this year and/or in the future."
+msgstr ""
+"Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
+"qu'il existe une version de transition pour cette année et/ou dans le futur."
 
 #, python-brace-format
 msgid ""
@@ -1193,9 +1221,6 @@ msgstr "domaines secondaires"
 
 msgid "training"
 msgstr "formation"
-
-msgid "unspecified"
-msgstr "indéterminé"
 
 msgid "yes"
 msgstr "Oui"

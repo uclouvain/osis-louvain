@@ -24,7 +24,9 @@
 #
 ##############################################################################
 from django.conf.urls import url
+from django.urls import path
 
+from attribution.api.views.attribution import AttributionListView, MyAttributionListView
 from attribution.api.views.calendar import ApplicationCoursesCalendarListView
 
 app_name = "attribution"
@@ -34,4 +36,6 @@ urlpatterns = [
         ApplicationCoursesCalendarListView.as_view(),
         name=ApplicationCoursesCalendarListView.name
     ),
+    path('<int:year>/me/', MyAttributionListView.as_view(), name=MyAttributionListView.name),
+    path('<int:year>/<str:global_id>/', AttributionListView.as_view(), name=AttributionListView.name),
 ]

@@ -26,11 +26,11 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth.models import Permission, Group
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.test import TestCase, RequestFactory
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, RequestFactory, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
@@ -39,8 +39,9 @@ from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
-from base.models.learning_unit import LearningUnit
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_editable_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -48,30 +49,30 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.views.learning_units.delete import delete_all_learning_units_year
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 
 @override_flag('learning_unit_delete', active=True)
+@override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
 class LearningUnitDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory(username="jeandp")
-        content_type = ContentType.objects.get_for_model(LearningUnit)
-        permission = Permission.objects.get(codename="can_delete_learningunit",
-                                            content_type=content_type)
-        cls.user.user_permissions.add(permission)
-        person = PersonFactory(user=cls.user)
         cls.entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                                   start_date=datetime.date(year=1990, month=1, day=1),
                                                   end_date=None)
-        PersonEntityFactory(person=person, entity=cls.entity_version.entity, with_child=True)
-        cls.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+        CentralManagerFactory(person__user=cls.user, entity=cls.entity_version.entity, with_child=True)
+        for year in range(YEAR_LIMIT_LUE_MODIFICATION, YEAR_LIMIT_LUE_MODIFICATION + 5):
+            OpenAcademicCalendarFactory(
+                reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
+                data_year__year=year
+            )
+        cls.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
         cls.the_partim_str = _('The partim')
         cls.the_lu_str = _('The learning unit')
 
@@ -147,19 +148,11 @@ class LearningUnitDelete(TestCase):
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 
-        response = delete_all_learning_units_year(request, learning_unit_year_id=learning_unit_years[1].id)
-
-        msg_level = [m.level for m in get_messages(request)]
-        msg = [m.message for m in get_messages(request)]
-
-        self.assertIn(messages.ERROR, msg_level, msg)
+        with self.assertRaises(PermissionDenied):
+            delete_all_learning_units_year(request, learning_unit_year_id=learning_unit_years[1].id)
 
         for y in range(4):
             self.assertTrue(LearningUnitYear.objects.filter(pk=learning_unit_years[y].pk).exists())
-
-        # Check redirection to identification
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('learning_units'))
 
     def test_delete_all_learning_units_year_case_error_have_enrollment(self):
         learning_unit_years = self.learning_unit_year_list

@@ -40,7 +40,6 @@ class FindSummaryCourseSubmissionDatesTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )

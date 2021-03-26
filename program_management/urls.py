@@ -27,8 +27,8 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
-import program_management.views.tree_version.check_version_name
 import program_management.views.tree_version.check_transition_name
+import program_management.views.tree_version.check_version_name
 from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update

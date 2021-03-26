@@ -29,13 +29,14 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.forms.utils.filter_field import filter_field_by_regex
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.campus import Campus
 from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from reference.models.country import Country
 
 
@@ -119,7 +120,11 @@ class ExternalLearningUnitFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        self.form.fields["academic_year"].initial = starting_academic_year()
+        # prendre le basculement event
+        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()
+        self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
+            year__in=targeted_year_opened
+        ).first() or current_academic_year()
 
         if self.data.get('country'):
             self._init_dropdown_list()
@@ -165,7 +170,13 @@ class ExternalLearningUnitFilter(FilterSet):
             "learningcomponentyear_set"
         ).annotate(
             has_proposal=Exists(has_proposal)
-        ).order_by('academic_year__year', 'acronym')
+        ).order_by(
+            'academic_year__year',
+            'acronym'
+        ).distinct(  # Add distinct to protect against duplicate rows when filtering by country or city as the join with
+            'academic_year__year',  # entity version could create similar rows of different entity versions
+            'acronym'
+        )
 
         qs = LearningUnitYearQuerySet.annotate_full_title_class_method(qs)
         qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)

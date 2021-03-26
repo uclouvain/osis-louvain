@@ -27,7 +27,7 @@
 
 <div id="tab_offers_enrollments" class="tab-pane fade in active">
     <ul class="nav nav-tabs" role="tablist">
-        {% regroup offer_enrollments by offer_year.academic_year as grouped_by_year %}
+        {% regroup offer_enrollments by education_group_year.academic_year as grouped_by_year %}
         {% for oe in grouped_by_year %}
         <li class="{% if forloop.counter == 1 %}active{%endif%}" >
             <a data-toggle="tab" href="#tab_offers_enrollments_year_{{oe.grouper}}" role="tab">
@@ -49,7 +49,7 @@
                     <tbody>
                     {% for oe in oe_year.list %}
                     <tr>
-                        <td>{{oe.offer_year.acronym}}</td>
+                        <td>{{oe.education_group_year.acronym}}</td>
                         <td>{{oe.date_enrollment | default_if_none:''|date_in_form_format}}</td>
                     </tr>
                     {% endfor%}

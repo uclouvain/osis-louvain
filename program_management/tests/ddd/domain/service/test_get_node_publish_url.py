@@ -45,33 +45,6 @@ class TestGetNodePublishUrl(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             GetNodePublishUrl.get_url_from_node(self.minor)
 
-    def test_assert_minor_publish_url(self):
-        code = "min-{}".format(self.minor.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.minor.year, code=code)
-
-        self.assertEqual(
-            GetNodePublishUrl.get_url_from_node(self.minor),
-            expected_publish_url
-        )
-
-    def test_assert_deepening_publish_url(self):
-        code = "app-{}".format(self.deepening.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.deepening.year, code=code)
-
-        self.assertEqual(
-            GetNodePublishUrl.get_url_from_node(self.deepening),
-            expected_publish_url
-        )
-
-    def test_assert_major_publish_url(self):
-        code = "fsa1ba-{}".format(self.major.code)
-        expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.major.year, code=code)
-
-        self.assertEqual(
-            GetNodePublishUrl.get_url_from_node(self.major),
-            expected_publish_url
-        )
-
     def test_assert_training_publish_url(self):
         code = self.training.title
         expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.training.year, code=code)

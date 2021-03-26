@@ -28,8 +28,8 @@ from django.db.models import Q, OuterRef, Subquery, Exists
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base.business import event_perms
 from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
 from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
@@ -38,7 +38,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
-from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -149,10 +150,15 @@ class ProposalLearningUnitFilter(FilterSet):
         self.person = person
         self.queryset = self.get_queryset
         self._get_entity_folder_id_linked_ordered_by_acronym(self.person)
+        self.__init_academic_year_field()
 
-        # Academic year default value = n+1 for proposals search -> use event having n+1 as first open academic year
-        event_perm = event_perms.EventPermCreationOrEndDateProposalFacultyManager()
-        self.form.fields["academic_year"].initial = event_perm.get_academic_years().first()
+    def __init_academic_year_field(self):
+        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+
+        self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
+            year__in=target_years_opened
+        ).order_by('year')
+        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first()
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         most_recent_acronym = EntityVersion.objects.filter(

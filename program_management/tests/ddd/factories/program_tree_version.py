@@ -57,11 +57,12 @@ class ProgramTreeVersionFactory(factory.Factory):
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
-        year=factory.SelfAttribute("..tree.root_node.year")
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        transition_name=factory.SelfAttribute("..tree.root_node.transition_name")
     )
     entity_identity = factory.SelfAttribute("entity_id")
     version_name = factory.SelfAttribute("entity_id.version_name")
-    transition_name = factory.SelfAttribute('entity_id.transition_name')
+    transition_name = factory.SelfAttribute("tree.root_node.transition_name")
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 
     @staticmethod
@@ -73,6 +74,21 @@ class ProgramTreeVersionFactory(factory.Factory):
             tree=tree_standard,
             entity_id__year=current_year,
             program_tree_identity=tree_standard.entity_id,
+        )
+
+    class Params:
+        transition = factory.Trait(
+            tree=factory.SubFactory(
+                ProgramTreeFactory,
+                root_node__transition_name='TRANSITION TEST'
+            ),
+            entity_id=factory.SubFactory(
+                ProgramTreeVersionIdentityFactory,
+                offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+                year=factory.SelfAttribute("..tree.root_node.year"),
+                transition_name='TRANSITION TEST',
+                version_name=""
+            )
         )
 
 

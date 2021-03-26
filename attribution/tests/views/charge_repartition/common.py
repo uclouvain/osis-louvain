@@ -28,6 +28,7 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums.learning_container_year_types import MASTER_THESIS
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
@@ -57,6 +58,7 @@ class TestChargeRepartitionMixin:
             learning_unit_year=cls.full_learning_unit_year
         )
         cls.person = CentralManagerFactory(entity=cls.entity).person
+        generate_learning_unit_edition_calendars([cls.learning_unit_year.academic_year])
 
     def setUp(self):
         self.attribution = AttributionNewFactory(

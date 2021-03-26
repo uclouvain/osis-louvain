@@ -35,7 +35,7 @@
 
 {% block breadcrumb %}
   <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution'%}</a></li>
-  <li class="active">{% trans 'Academic calendars'%}</li>
+  <li class="active">{% trans 'Academic calendar'%}</li>
 {% endblock %}
 
 {% block content %}
@@ -87,8 +87,15 @@
         }
 
         function formatDate(date){
+            if (isIndefinitelyDate(date)) {
+                return "{% trans 'Unspecified' %}"
+            }
             month = date.getMonth() + 1;
             return date.getDate() + "/" + month + "/" + date.getFullYear()
+        }
+
+        function isIndefinitelyDate(date) {
+            return date && date.getTime() === new Date(2099, 0, 1).getTime();
         }
 
         function getFromDate() {
@@ -120,7 +127,7 @@
                 const dateObj = moment(gantt.config.start_date);
                 gantt.config.end_date = dateObj.add(5, 'y').toDate();
             }
-
+            gantt.config.show_tasks_outside_timescale = true;
             gantt.config.subscales = [
                 {unit:"month", step:1, date:"%F" }
             ];

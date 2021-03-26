@@ -32,8 +32,8 @@ from base.api.serializers.person import PersonRolesSerializer
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class GetPersonRolesTestCase(APITestCase):
@@ -43,7 +43,7 @@ class GetPersonRolesTestCase(APITestCase):
         for _ in range(2):
             entity = EntityFactory()
             EntityVersionFactory(entity=entity)
-            PersonEntityFactory(
+            CentralManagerFactory(
                 person=cls.person,
                 entity=entity
             )

@@ -26,8 +26,8 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from program_management.ddd.business_types import *
 from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 
 
 class GetNodePublishUrl(interface.DomainService):
@@ -36,14 +36,5 @@ class GetNodePublishUrl(interface.DomainService):
         if not all([settings.ESB_API_URL, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT]):
             raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_PEDAGOGY_ENDPOINT must be set in configuration')
 
-        if node.is_minor():
-            code = "min-{}".format(node.code)
-        elif node.is_deepening():
-            code = "app-{}".format(node.code)
-        elif node.is_major():
-            code = "fsa1ba-{}".format(node.code)
-        else:
-            code = node.title
-
-        endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=code)
+        endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=node.title)
         return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)

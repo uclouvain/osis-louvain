@@ -40,6 +40,7 @@ from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateAcademicYear
@@ -133,6 +134,7 @@ class TestExternalLearningUnitForm(TestCase):
         cls.entity = MainEntityVersionFactory().entity
         cls.manager = CentralManagerFactory(entity=cls.entity, with_child=True)
         cls.person = cls.manager.person
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
     def setUp(self):
         pass
@@ -197,6 +199,7 @@ class TestExternalPartimForm(TestCase):
             allocation_entity=None
         )
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_year)
+        generate_learning_unit_edition_calendars(academic_years)
 
     def setUp(self):
         self.learning_unit_year = LearningUnitYearFactory(

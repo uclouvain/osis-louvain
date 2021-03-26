@@ -170,8 +170,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
-            child_node_code=self.tree.root_node.children_as_nodes[1].code,
-            child_node_year=self.tree.root_node.children_as_nodes[1].year,
+            child_node_code=self.tree.root_node.children_as_nodes[0].code,
+            child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:

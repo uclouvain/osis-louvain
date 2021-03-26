@@ -30,13 +30,13 @@ from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
-
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 
 COMMON_ORDERING_FIELDS = (
     ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
@@ -153,7 +153,11 @@ class LearningUnitFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        self.form.fields["academic_year"].initial = starting_academic_year()
+        # prendre le basculement event
+        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()
+        self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
+            year__in=targeted_year_opened
+        ).first() or current_academic_year()
 
     def filter_tutor(self, queryset, name, value):
         value = value.replace(' ', '\\s')

@@ -28,12 +28,14 @@ from django.contrib.auth.models import Permission
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import SuperUserFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
 class UsersGenerator:
@@ -45,7 +47,7 @@ class UsersGenerator:
         self.students = StudentFactory.create_batch(100)
         self.program_managers = ProgramManagerFactory.create_batch(
             5,
-            offer_year__academic_year__current=True,
+            education_group=EducationGroupYearFactory(academic_year__current=True),
             person__language=settings.LANGUAGE_CODE_FR
         )
 
@@ -81,11 +83,7 @@ class BusinessFacultyManagerFactory(FacultyManagerForUEFactory):
 
         super().__init__(*permissions, *args, **factory_parameters, **kwargs)
         entity = Entity.objects.filter(entityversion__entity_type=entity_type.SECTOR).order_by("?").first()
-        PersonEntityFactory(
-            person=self.person,
-            entity=entity,
-            with_child=True
-        )
+        FacultyManagerFactory(person=self.person, entity=entity, with_child=True)
 
 
 class BusinessCentralManagerFactory(CentralManagerForUEFactory):
@@ -101,8 +99,4 @@ class BusinessCentralManagerFactory(CentralManagerForUEFactory):
 
         super().__init__(*permissions, *args, **factory_parameters, **kwargs)
         entity = Entity.objects.filter(entityversion__entity_type="").order_by("?").first()
-        PersonEntityFactory(
-            person=self.person,
-            entity=entity,
-            with_child=True
-        )
+        CentralManagerFactory(person=self.person, entity=entity, with_child=True)

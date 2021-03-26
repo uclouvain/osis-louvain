@@ -532,7 +532,8 @@ def _save_hops(
 ) -> List[HopsModelDb]:
     _delete_hops(education_group_year_db_obj)
     saved_objs = []
-    if training.hops and training.hops.ares_code and training.hops.ares_graca and training.hops.ares_authorization:
+
+    if _is_hops_fields_presence_correct(training):
         obj, created = HopsModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
             defaults={
@@ -574,3 +575,13 @@ def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearMode
     )
     for aim in certificate_aims_qs:
         aim.delete()
+
+
+def _is_hops_fields_presence_correct(training: 'Training') -> bool:
+    if training.hops:
+        if training.type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
+                training.hops.ares_code and training.hops.ares_authorization:
+            return True
+        else:
+            return training.hops.ares_code and training.hops.ares_graca and training.hops.ares_authorization
+    return False

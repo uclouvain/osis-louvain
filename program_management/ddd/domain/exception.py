@@ -111,11 +111,35 @@ class CannotCopyTreeDueToEndDate(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class CannotDeleteStandardDueToVersionEndDate(BusinessException):
+class CannotDeleteStandardDueToSpecificVersionEndDate(BusinessException):
     def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
         message = _(
             "You can't delete the standard program tree '{code}' "
             "in {year} as specific versions exists during this year and/or in the future."
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotDeleteStandardDueToTransitionVersionEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't delete the standard program tree '{code}' "
+            "in {year} as transition versions exists during this year and/or in the future."
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
+        )
+        super().__init__(message, **kwargs)
+
+
+class CannotDeleteSpecificVersionDueToTransitionVersionEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't delete the specific program tree '{code}' "
+            "in {year} as transition versions exists during this year and/or in the future."
         ).format(
             code=tree.program_tree_identity.code,
             year=tree.entity_id.year,
@@ -409,4 +433,22 @@ class TransitionNameExistsCurrentYearAndInFuture(BusinessException):
 class TransitionNameExistsInPast(BusinessException):
     def __init__(self, transition_name: str, *args, **kwargs):
         message = _("Transition name {} existed").format(transition_name)
+        super().__init__(message, **kwargs)
+
+
+class InvalidTreeVersionToFillFrom(BusinessException):
+    def __init__(self, tree_version_to_fill_from: 'ProgramTreeVersion', **kwargs):
+        message = _("Cannot fill content from {}").format(tree_version_to_fill_from)
+        super().__init__(message, **kwargs)
+
+
+class InvalidTreeVersionToFillTo(BusinessException):
+    def __init__(self, tree_version_to_fill_to: 'ProgramTreeVersion', **kwargs):
+        message = _("Cannot fill content of {}").format(tree_version_to_fill_to)
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyPrerequisiteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Cannot copy prerequisite")
         super().__init__(message, **kwargs)

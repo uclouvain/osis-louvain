@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,19 +36,14 @@ from base.tests.factories.academic_year import AcademicYearFactory
 class AcademicCalendarFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.AcademicCalendar'
-        django_get_or_create = ('academic_year', 'title')
+        django_get_or_create = ('data_year', 'title')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-
-    academic_year = factory.SubFactory(AcademicYearFactory)
     data_year = factory.SubFactory(AcademicYearFactory)
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
-    start_date = factory.SelfAttribute("academic_year.start_date")
-    end_date = factory.SelfAttribute("academic_year.end_date")
-    highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
-    highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
-    highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)
+    start_date = factory.SelfAttribute("data_year.start_date")
+    end_date = factory.SelfAttribute("data_year.end_date")
     reference = factory.Iterator(academic_calendar_type.ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
 
 
@@ -66,71 +61,39 @@ class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
     reference = academic_calendar_type.SCORES_EXAM_SUBMISSION
 
 
-class AcademicCalendarSummaryCourseSubmissionFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-
-
-class AcademicCalendarEducationGroupEditionFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.EDUCATION_GROUP_EDITION
-
-
-class AcademicCalendarLearningUnitCentralEditionFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
-
-
-class AcademicCalendarLearningUnitFacultyEditionFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-
-
-class AcademicCalendarCreationEndDateProposalCentralManagerFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
-
-
-class AcademicCalendarCreationEndDateProposalFacultyManagerFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
-
-
-class AcademicCalendarModificationTransformationProposalCentralManagerFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS
-
-
-class AcademicCalendarModificationTransformationProposalFacultyManagerFactory(AcademicCalendarFactory):
-    reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
-
-
-def generate_creation_or_end_date_proposal_calendars(academic_years):
+def generate_proposal_calendars(academic_years):
     [
-        AcademicCalendarCreationEndDateProposalCentralManagerFactory(
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            start_date=datetime.datetime(academic_year.year - 6,  9, 14),
+            end_date=datetime.datetime(academic_year.year + 1, 9, 13),
         )
         for academic_year in academic_years
     ]
     [
-        AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-            end_date=datetime.datetime(academic_year.year, 9, 14)
+            start_date=datetime.datetime(academic_year.year - 2,  9, 14),
+            end_date=datetime.datetime(academic_year.year, 9, 13),
         )
         for academic_year in academic_years
     ]
 
 
-def generate_modification_transformation_proposal_calendars(academic_years):
+def generate_proposal_calendars_without_start_and_end_date(academic_years):
     [
-        AcademicCalendarModificationTransformationProposalCentralManagerFactory(
-            data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 1, 9, 15),
-            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+            data_year=academic_year
         )
         for academic_year in academic_years
     ]
     [
-        AcademicCalendarModificationTransformationProposalFacultyManagerFactory(
-            data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 1, 9, 15),
-            end_date=datetime.datetime(academic_year.year, 9, 14)
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+            data_year=academic_year
         )
         for academic_year in academic_years
     ]
@@ -138,18 +101,20 @@ def generate_modification_transformation_proposal_calendars(academic_years):
 
 def generate_learning_unit_edition_calendars(academic_years):
     [
-        AcademicCalendarLearningUnitFacultyEditionFactory(
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            start_date=datetime.datetime(academic_year.year - 6, 9, 14),
+            end_date=None,
         )
         for academic_year in academic_years
     ]
     [
-        AcademicCalendarLearningUnitCentralEditionFactory(
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            start_date=datetime.datetime(academic_year.year - 2, 9, 14),
+            end_date=None
         )
         for academic_year in academic_years
     ]

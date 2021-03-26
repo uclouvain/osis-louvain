@@ -60,7 +60,6 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.proposal_type import ProposalType
@@ -68,7 +67,7 @@ from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -85,7 +84,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -117,8 +116,9 @@ class LearningUnitViewCreateFullTestCase(TestCase):
     def setUpTestData(cls):
         FrenchLanguageFactory()
         cls.current_academic_year = create_current_academic_year()
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         cls.url = reverse('learning_unit_create', kwargs={'academic_year_id': cls.current_academic_year.id})
-        cls.user = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit").user
+        cls.user = CentralManagerFactory().person.user
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -246,12 +246,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
-        AcademicCalendarFactory(
-            data_year=cls.current_academic_year,
-            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         entity_version = EntityVersionFactory()
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
@@ -364,12 +359,7 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
-        AcademicCalendarFactory(
-            data_year=cls.current_academic_year,
-            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
 

@@ -88,7 +88,7 @@ class AchievementsSerializer(serializers.Serializer):
     def get_blocs(self, obj):
         offer = self.context.get('offer')
         qs = offer.educationgroupachievement_set.all()
-        return AchievementSerializer(qs, many=True).data
+        return AchievementSerializer(qs, many=True, context=self.context).data
 
     def get_intro(self, obj):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)

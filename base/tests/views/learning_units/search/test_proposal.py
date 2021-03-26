@@ -28,11 +28,13 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_calendar import generate_proposal_calendars_without_start_and_end_date
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
@@ -58,15 +60,15 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
 class TestListButtons(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = create_current_academic_year()
-        AcademicYearFactory(year=academic_year.year+1)
-        luy = LearningUnitYearFactory(academic_year=academic_year)
+        academic_years = AcademicYearFactory.produce(number_past=0)
+        luy = LearningUnitYearFactory(academic_year=academic_years[0])
         ProposalLearningUnitFactory(learning_unit_year=luy)
         cls.url = reverse("learning_units_proposal")
         cls.get_data = {
             "academic_year": str(luy.academic_year.id),
         }
-        cls.person = PersonWithPermissionsFactory("can_access_learningunit")
+        cls.person = CentralManagerFactory().person
+        generate_proposal_calendars_without_start_and_end_date(academic_years)
 
     def setUp(self):
         self.client.force_login(self.person.user)

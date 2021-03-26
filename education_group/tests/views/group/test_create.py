@@ -173,7 +173,7 @@ class TestCreateNonOrphanGroupGetMethod(TestCase):
         )
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
-            data_year__year= cls.parent_element.group_year.academic_year.year
+            data_year__year=cls.parent_element.group_year.academic_year.year
         )
 
         AuthorizedRelationshipFactory(

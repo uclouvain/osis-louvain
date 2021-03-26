@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import namedtuple
-from typing import Union
+from typing import Union, List
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
@@ -617,3 +617,11 @@ SECTIONS_PER_OFFER_TYPE = {
 
 def can_postpone_general_information(obj: Union['EducationGroupYear', 'GroupYear']) -> bool:
     return not obj.academic_year.is_past
+
+
+def get_general_information_labels() -> List[str]:
+    result = []
+    for section in SECTION_LIST:
+        result.extend(section.labels)
+
+    return result

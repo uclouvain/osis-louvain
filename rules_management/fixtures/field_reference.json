@@ -1138,6 +1138,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -1403,6 +1406,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2951,6 +2957,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -2983,6 +2992,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },

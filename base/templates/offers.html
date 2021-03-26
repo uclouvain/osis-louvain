@@ -67,10 +67,10 @@
             </form>
         </div>
     </div>
-    {% if offer_years|length == 0 and init == "0" %}
+    {% if educ_group_years|length == 0 and init == "0" %}
         <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
     {% endif %}
-    {% if offer_years|length > 0%}
+    {% if educ_group_years|length > 0%}
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -80,12 +80,12 @@
                     <th>{% trans 'Entity'%}</th>
                 </tr>
             </thead>
-            {% for offer_year in offer_years %}
+            {% for educ_group_year in educ_group_years %}
                 <tr>
-                    <td>{{ offer_year.academic_year}}</td>
-                    <td><a href="{% url 'offer_score_encoding_tab' offer_year_id=offer_year.id %}" id="lnk_offer_{{offer_year.id}}">{{ offer_year.acronym }}</a></td>
-                    <td>{{ offer_year.title }}</td>
-                    <td>{{ offer_year.entity_management }}</td>
+                    <td>{{ educ_group_year.academic_year}}</td>
+                    <td><a href="{% url 'offer_score_encoding_tab' education_group_id=educ_group_year.education_group_id %}" id="lnk_offer_{{educ_group_year.education_group_id}}">{{ educ_group_year.acronym }}</a></td>
+                    <td>{{ educ_group_year.title }}</td>
+                    <td>{{ educ_group_year.management_entity }}</td>
                 </tr>
             {% endfor %}
         </table>

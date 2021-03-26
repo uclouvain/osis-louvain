@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 13:43+0100\n"
+"POT-Creation-Date: 2021-03-18 08:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,9 +152,6 @@ msgstr ""
 msgid "Academic calendar management"
 msgstr ""
 
-msgid "Academic calendars"
-msgstr ""
-
 msgid "Academic partner"
 msgstr ""
 
@@ -180,6 +177,9 @@ msgid "Access denied!"
 msgstr ""
 
 msgid "Access minor"
+msgstr ""
+
+msgid "Access schedule calendar"
 msgstr ""
 
 msgid "Access to the student's virtual office."
@@ -527,9 +527,6 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
-msgid "Comment"
-msgstr ""
-
 msgid "Common English title"
 msgstr ""
 
@@ -609,22 +606,6 @@ msgstr ""
 msgid "Creation"
 msgstr ""
 
-msgid ""
-"Creation or end date modification proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Creation or end date modification proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-
-msgid "Creation or end date proposal by central managers"
-msgstr ""
-
-msgid "Creation or end date proposal by faculty managers"
-msgstr ""
-
 msgid "Credits"
 msgstr ""
 
@@ -700,6 +681,9 @@ msgid "Detailed program"
 msgstr ""
 
 msgid "Details"
+msgstr ""
+
+msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Diploma title"
@@ -940,6 +924,9 @@ msgid "Existing acronym"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+msgid "Extended proposal management"
 msgstr ""
 
 msgid "External"
@@ -1269,12 +1256,6 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr ""
 
-msgid "Learning unit edition by central managers"
-msgstr ""
-
-msgid "Learning unit edition by faculty managers"
-msgstr ""
-
 msgid "Learning unit search"
 msgstr ""
 
@@ -1326,6 +1307,9 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
+msgid "Limited proposal management"
+msgstr ""
+
 msgid "Link type"
 msgstr ""
 
@@ -1356,6 +1340,9 @@ msgstr ""
 msgid "List of teachers"
 msgstr ""
 
+msgid "List of teachers (email)"
+msgstr ""
+
 msgid "List of trainings with administrative data"
 msgstr ""
 
@@ -1375,9 +1362,6 @@ msgid "Lock"
 msgstr ""
 
 msgid "Login"
-msgstr ""
-
-msgid "Logistic"
 msgstr ""
 
 msgid "Logistics entity"
@@ -1466,9 +1450,6 @@ msgstr ""
 msgid "Marks presentation"
 msgstr ""
 
-msgid "Master"
-msgstr ""
-
 msgid "Master MA 120"
 msgstr ""
 
@@ -1545,22 +1526,6 @@ msgid "Mobility partnership list choice"
 msgstr ""
 
 msgid "Modification"
-msgstr ""
-
-msgid "Modification or transformation proposal by central managers"
-msgstr ""
-
-msgid "Modification or transformation proposal by faculty managers"
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for faculty managers "
-"during this period."
 msgstr ""
 
 #, python-format
@@ -1836,9 +1801,6 @@ msgstr ""
 msgid "Person with reduced mobility"
 msgstr ""
 
-msgid "Ph.D"
-msgstr ""
-
 msgctxt "Ph.D for education group"
 msgid "Ph.D"
 msgstr ""
@@ -1956,9 +1918,6 @@ msgid "Program"
 msgstr ""
 
 msgid "Program Managers"
-msgstr ""
-
-msgid "Program commission"
 msgstr ""
 
 msgid "Program manager"
@@ -2358,9 +2317,6 @@ msgstr ""
 msgid "Team management"
 msgstr ""
 
-msgid "Technologic platform"
-msgstr ""
-
 msgid "Termination"
 msgstr ""
 
@@ -2613,14 +2569,6 @@ msgstr ""
 msgid "This learning unit has application"
 msgstr ""
 
-msgid ""
-"This learning unit is not editable by central managers during this period."
-msgstr ""
-
-msgid ""
-"This learning unit is not editable by faculty managers during this period."
-msgstr ""
-
 #, python-format
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
@@ -2728,9 +2676,6 @@ msgid ""
 "%(year)s"
 msgstr ""
 
-msgid "Undefined"
-msgstr ""
-
 msgid "Unique"
 msgstr ""
 
@@ -2744,6 +2689,9 @@ msgid "University first cycle certificate"
 msgstr ""
 
 msgid "University second cycle certificate"
+msgstr ""
+
+msgid "Unspecified"
 msgstr ""
 
 msgid "Up"
@@ -2933,9 +2881,6 @@ msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "author"
-msgstr ""
-
-msgid "bachelor"
 msgstr ""
 
 msgid "bibliography"

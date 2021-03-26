@@ -35,7 +35,7 @@ from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
 from attribution.business.score_responsible import get_attributions_data
 from attribution.models.attribution import Attribution
-from base import models as mdl_base
+from base.models import session_exam_calendar
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from osis_role.contrib.views import permission_required
@@ -52,7 +52,7 @@ class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, Cache
     def get_filterset_kwargs(self, filterset_class):
         return {
             **super().get_filterset_kwargs(filterset_class),
-            'academic_year': mdl_base.academic_year.current_academic_year()
+            'academic_year': session_exam_calendar.current_opened_academic_year()
         }
 
     def render_to_response(self, context, **response_kwargs):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,12 +42,11 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory, \
     ProgramManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
     FacultyManagerForUEFactory, AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
 def create_person(first_name, last_name, email="", language=None):
@@ -248,7 +247,7 @@ class PersonTest(PersonTestCase):
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"
         self.person_with_user.save()
-        self.assertEqual(self.person_with_user.__str__(), "DOE, John Junior")
+        self.assertEqual(self.person_with_user.__str__(), "DOE, John")
 
     def test_change_language_with_user_with_person(self):
         change_language(self.user_for_person, "en")
@@ -259,14 +258,14 @@ class PersonTest(PersonTestCase):
         self.assertFalse(change_language(self.an_user, "en"))
 
     def test_is_linked_to_entity_in_charge_of_learning_unit_year(self):
-        person_entity = PersonEntityFactory(person=self.person_with_user)
+        central_manager = CentralManagerFactory(person=self.person_with_user)
         luy = LearningUnitYearFactory()
 
         self.assertFalse(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.requirement_entity = central_manager.entity
         luy.learning_container_year.save()
 
         self.assertTrue(
@@ -274,7 +273,7 @@ class PersonTest(PersonTestCase):
         )
 
     def test_is_linked_to_entity_in_charge_of_external_learning_unit_year(self):
-        person_entity = PersonEntityFactory(person=self.person_with_user)
+        faculty_manager = FacultyManagerFactory(person=self.person_with_user)
         luy = LearningUnitYearFactory()
         ExternalLearningUnitYearFactory(learning_unit_year=luy)
 
@@ -282,19 +281,9 @@ class PersonTest(PersonTestCase):
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
 
-        luy.learning_container_year.requirement_entity = person_entity.entity
+        luy.learning_container_year.requirement_entity = faculty_manager.entity
         luy.learning_container_year.save()
 
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
-
-    def test_managed_programs(self):
-        offer_year_1 = OfferYearFactory()
-        offer_year_2 = OfferYearFactory()
-        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_1)
-        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_2)
-        managed_programs = self.person_with_user.get_managed_programs()
-        self.assertTrue(len(managed_programs) == 2)
-        self.assertTrue(offer_year_1 in managed_programs)
-        self.assertTrue(offer_year_2 in managed_programs)

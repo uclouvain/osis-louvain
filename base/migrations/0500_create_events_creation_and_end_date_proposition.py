@@ -4,8 +4,6 @@ from datetime import date
 
 from django.db import migrations
 
-from base.models.enums import academic_calendar_type
-
 
 def create_calendar_events_propositions(apps, schema_editor):
     data_years_to_create = [2019, 2020, 2021, 2022, 2023, 2024, 2025]
@@ -23,7 +21,7 @@ def create_calendar_events_propositions(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Modification UE par gestionnaires centraux",
-                reference=academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+                reference='LEARNING_UNIT_EDITION_CENTRAL_MANAGERS'
             )
             academic_calendar_mdl.objects.create(
                 academic_year=anac,
@@ -34,7 +32,7 @@ def create_calendar_events_propositions(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Propositions création / fin enseignmt gest centr",
-                reference=academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
+                reference='CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS'
             )
             academic_calendar_mdl.objects.create(
                 academic_year=anac,
@@ -45,7 +43,7 @@ def create_calendar_events_propositions(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year, 9, 14),
                 highlight_title="Propositions création / fin enseignmt gest fac",
-                reference=academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+                reference='CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS'
             )
             academic_calendar_mdl.objects.create(
                 academic_year=anac,
@@ -56,7 +54,7 @@ def create_calendar_events_propositions(apps, schema_editor):
                 start_date=date(year - 1, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Propositions modif / transfo gest centr",
-                reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS
+                reference='MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS'
             )
             academic_calendar_mdl.objects.create(
                 academic_year=anac,
@@ -67,7 +65,7 @@ def create_calendar_events_propositions(apps, schema_editor):
                 start_date=date(year - 1, 9, 15),
                 end_date=date(year, 9, 14),
                 highlight_title="Propositions modif / transfo gest fac",
-                reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
+                reference='MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS'
             )
         except academic_year_mdl.DoesNotExist:
             pass
@@ -88,7 +86,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Modification UE par gestionnaires centraux",
-                reference=academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+                reference='LEARNING_UNIT_EDITION_CENTRAL_MANAGERS'
             ).delete()
             academic_calendar_mdl.objects.filter(
                 academic_year=anac,
@@ -99,7 +97,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Propositions création / fin enseignmt gest centr",
-                reference=academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
+                reference='CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS'
             ).delete()
             academic_calendar_mdl.objects.filter(
                 academic_year=anac,
@@ -110,7 +108,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 6, 9, 15),
                 end_date=date(year, 9, 14),
                 highlight_title="Propositions création / fin enseignmt gest fac",
-                reference=academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+                reference='CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS'
             ).delete()
             academic_calendar_mdl.objects.filter(
                 academic_year=anac,
@@ -121,7 +119,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 1, 9, 15),
                 end_date=date(year + 1, 9, 14),
                 highlight_title="Propositions modif / transfo gest centr",
-                reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS
+                reference='MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS'
             ).delete()
             academic_calendar_mdl.objects.filter(
                 academic_year=anac,
@@ -132,7 +130,7 @@ def reverse_migration(apps, schema_editor):
                 start_date=date(year - 1, 9, 15),
                 end_date=date(year, 9, 14),
                 highlight_title="Propositions modif / transfo gest fac",
-                reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
+                reference='MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS'
             ).delete()
         except academic_year_mdl.DoesNotExist:
             pass

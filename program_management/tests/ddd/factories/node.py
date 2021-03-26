@@ -31,7 +31,7 @@ from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from program_management.ddd.domain._campus import Campus
-from program_management.ddd.domain.program_tree_version import STANDARD
+from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
 
 
@@ -46,7 +46,7 @@ def generate_node_identity(node: Node) -> NodeIdentity:
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
-    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    code = factory.Sequence(lambda n: 'OSIS%03dR' % n)
     title = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     start_year = factory.SelfAttribute("year")
@@ -85,7 +85,10 @@ class NodeGroupYearFactory(NodeFactory):
     children = factory.LazyFunction(list)
     teaching_campus = factory.SubFactory(CampusFactory)
     constraint_type = factory.fuzzy.FuzzyChoice(ConstraintTypes)
+    min_constraint = 0
+    max_constraint = 5
     version_name = STANDARD
+    transition_name = NOT_A_TRANSITION
 
     class Params:
         minitraining = factory.Trait(

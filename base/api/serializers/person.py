@@ -23,12 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from base.models import education_group_year
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
+from education_group.auth.roles.central_manager import CentralManager
+from education_group.auth.roles.faculty_manager import FacultyManager
+from osis_role.contrib.helper import EntityRoleHelper
 
 
 class PersonDetailSerializer(serializers.ModelSerializer):
@@ -70,19 +76,16 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         return roles
 
     def roles_for_reddot(self, obj):
-        entities_acronym = set()
-        for person_entity in obj.personentity_set.all():
-            if not person_entity.with_child:
-                acronyms = {person_entity.entity.most_recent_acronym}
-            else:
-                acronyms = set(
-                    row['acronym']
-                    for row in EntityVersion.objects.get_tree(person_entity.entity)
-                    if EntityVersion.objects.filter(acronym=row['acronym']).first().entity_type == FACULTY
-                )
-            entities_acronym |= acronyms
-        return entities_acronym
+        all_entities = EntityRoleHelper.get_all_entities(obj, {CentralManager.group_name, FacultyManager.group_name})
+        return set(
+            row.acronym for row in EntityVersion.objects.current(datetime.now()).filter(
+                entity_id__in=all_entities,
+                entity_type=FACULTY
+            )
+        )
 
     def roles_for_program_managers(self, obj):
-        return [{'acronym': offer_year.acronym, 'year': offer_year.academic_year.year}
-                for offer_year in obj.get_managed_programs()]
+        return [
+            {'acronym': educ_group_year.acronym, 'year': educ_group_year.academic_year.year}
+            for educ_group_year in education_group_year.find_by_user(obj.user).select_related('academic_year')
+        ]

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import Union, Set
 
 import attr
 
@@ -32,7 +32,8 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, \
     CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
-from program_management.ddd.domain import exception, academic_year, program_tree
+from program_management.ddd.domain import exception, academic_year
+from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
@@ -74,6 +75,22 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 
 class ProgramTreeVersionBuilder:
     _tree_version = None
+
+    def fill_from_program_tree_version(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            to_tree_version: 'ProgramTreeVersion',
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree']
+    ) -> 'ProgramTreeVersion':
+        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
+        program_tree.ProgramTreeBuilder().fill_from_program_tree(
+                from_tree_version.get_tree(),
+                to_tree_version.get_tree(),
+                existing_learning_unit_nodes,
+                existing_trees
+            )
+        return to_tree_version
 
     def copy_to_next_year(
             self,
@@ -235,6 +252,18 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def is_official_standard(self) -> bool:
         return self.entity_id.is_official_standard
+
+    @property
+    def is_specific_official(self) -> bool:
+        return self.entity_id.is_specific_official
+
+    @property
+    def is_specific_transition(self) -> bool:
+        return self.entity_id.is_specific_transition
+
+    @property
+    def is_standard_transition(self) -> bool:
+        return self.entity_id.is_standard_transition
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)

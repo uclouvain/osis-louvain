@@ -48,6 +48,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -61,6 +62,10 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
@@ -187,6 +192,7 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.central_person = cls.central_manager.person
 
         cls.post_data = get_valid_form_data(cls.current_academic_year, entity=cls.entity)
+        generate_learning_unit_edition_calendars(cls.acs)
 
     def setUp(self):
         del self.acs[3]
@@ -256,7 +262,8 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         start_year=self.learning_unit_year.academic_year.year,
                         postposal=True)
         actual_choices = [choice[0] for choice in form.fields["academic_year"].choices if choice[0] != '']
-        expected_choices = [acy.id for acy in self.acs[3:10]]
+        targeted_years = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        expected_choices = [acy.id for acy in self.acs if acy.year in targeted_years]
 
         self.assertCountEqual(actual_choices, expected_choices)
 
@@ -266,7 +273,8 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         start_year=self.learning_unit_year.academic_year.year,
                         postposal=True)
         actual_choices = [choice[0] for choice in form.fields["academic_year"].choices if choice[0] != '']
-        expected_choices = [acy.id for acy in self.acs[3:6]]
+        targeted_years = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        expected_choices = [acy.id for acy in self.acs if acy.year in targeted_years]
         self.assertCountEqual(actual_choices, expected_choices)
 
     def test_disable_fields_acronym_with_central_manager_and_other_collective(self):

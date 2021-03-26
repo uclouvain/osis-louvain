@@ -83,7 +83,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
     def _create_administrative_data(self):
         # Course enrollment event
         self.offer_yr_cal_course_enrollment = OfferYearCalendarFactory(
-            academic_calendar__academic_year=self.academic_year,
+            academic_calendar__data_year=self.academic_year,
             academic_calendar__reference=academic_calendar_type.COURSE_ENROLLMENT,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 9, 11, hour=4),
@@ -91,7 +91,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         )
         # Score submission event (session 1)
         self.offer_yr_cal_score_exam_submission_1 = OfferYearCalendarFactory(
-            academic_calendar__academic_year=self.academic_year,
+            academic_calendar__data_year=self.academic_year,
             academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 5, 11, hour=4),
@@ -103,7 +103,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         )
         # Score submission event (session 2)
         self.offer_yr_cal_score_exam_submission_2 = OfferYearCalendarFactory(
-            academic_calendar__academic_year=self.academic_year,
+            academic_calendar__data_year=self.academic_year,
             academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
             education_group_year=self.education_group_year_1,
             start_date=datetime.datetime(2017, 9, 1, hour=4)

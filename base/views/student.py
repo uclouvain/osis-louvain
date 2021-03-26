@@ -71,11 +71,11 @@ def student_read(request, student_id):
     offer_enrollments = OfferEnrollment.objects.filter(
         student=student_id
     ).select_related(
-        "offer_year",
-        "offer_year__academic_year"
+        "education_group_year",
+        "education_group_year__academic_year"
     ).order_by(
-        '-offer_year__academic_year__year',
-        'offer_year__acronym'
+        '-education_group_year__academic_year__year',
+        'education_group_year__acronym'
     )
 
     learning_unit_enrollments = LearningUnitEnrollment.objects.filter(

@@ -40,11 +40,6 @@ from education_group.ddd.service.write import update_group_service
 def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupCommand) -> 'MiniTrainingIdentity':
     errors = set()
     try:
-        update_group_service.update_group(__convert_to_update_group_command(cmd))
-    except MultipleBusinessExceptions as e:
-        errors = e.exceptions
-
-    try:
         mini_training_identity = mini_training.MiniTrainingIdentity(acronym=cmd.abbreviated_title, year=cmd.year)
         mini_training_domain_obj = mini_training_repository.MiniTrainingRepository.get(mini_training_identity)
 
@@ -52,6 +47,11 @@ def update_mini_training_and_group(cmd: command.UpdateMiniTrainingAndGroupComman
         mini_training_repository.MiniTrainingRepository.update(mini_training_domain_obj)
     except MultipleBusinessExceptions as e:
         errors |= e.exceptions
+
+    try:
+        update_group_service.update_group(__convert_to_update_group_command(cmd))
+    except MultipleBusinessExceptions as e:
+        errors = e.exceptions
 
     if errors:
         raise MultipleBusinessExceptions(exceptions=errors)

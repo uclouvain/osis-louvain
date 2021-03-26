@@ -24,3 +24,5 @@
 import math
 
 INFINITE_VALUE = math.inf
+YES = "yes"
+NO = "no"

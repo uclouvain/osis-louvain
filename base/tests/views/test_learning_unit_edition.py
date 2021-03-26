@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 import json
-from unittest import mock
 
 from django.contrib import messages
 from django.contrib.auth.models import Permission
@@ -40,10 +39,8 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
     LearningContainerYearModelForm
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_learning_unit_edition_calendars
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -54,7 +51,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
@@ -98,9 +94,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-    @mock.patch('base.business.event_perms.EventPerm.get_academic_years_ids')
-    def test_view_learning_unit_edition_post(self, mock_get_academic_years_ids):
-        mock_get_academic_years_ids.return_value = [self.starting_academic_year.pk]
+    def test_view_learning_unit_edition_post(self):
         form_data = {"academic_year": self.starting_academic_year.pk}
         response = self.client.post(
             reverse("learning_unit_edition_end_date", args=[self.learning_unit_year.id]),
@@ -425,13 +419,6 @@ class TestLearningUnitVolumesManagement(TestCase):
     @classmethod
     def setUpTestData(cls):
         start_year, end_year = AcademicYearFactory.produce_in_future(quantity=2)
-        AcademicCalendarFactory(
-            data_year=start_year,
-            start_date=datetime.datetime(start_year.year - 2, 9, 15),
-            end_date=datetime.datetime(start_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-
         cls.academic_years = [start_year, end_year]
         generate_learning_unit_edition_calendars(cls.academic_years)
 
@@ -449,7 +436,6 @@ class TestLearningUnitVolumesManagement(TestCase):
             'form_type': 'full'
         })
 
-        PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
         cls.data = get_valid_formset_data(cls.learning_unit_year.acronym)
         cls.partim_formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym, is_partim=True)
         cls.formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym)

@@ -6,7 +6,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@
         {{ header_text }}
         {% if can_edit_information %}
             <a role="button"
-               class="trigger_modal"
+               id="a_add_line_{{ section_name }}"
+               class="trigger_modal btn_to_focus"
                data-url="{% url 'education_group_year_admission_condition_create_line' group.year group.code %}?section={{ section_name }}&amp;language={{ language.current_language }}"
                data-modal_class="modal-lg">
                 <span class="glyphicon glyphicon-plus" style="font-size: 16px;" aria-hidden="true"></span>
@@ -55,23 +56,27 @@
         {% if can_edit_information %}
             <td>
                 <div class="btn-group pull-right" role="group" aria-label="actions">
-                    <a title="{% trans 'Update' %}" role="button" class="trigger_modal"
+                    <a title="{% trans 'Update' %}" role="button" class="trigger_modal btn_to_focus"
+                       id="a_update_line_{{ section_name }}"
                        data-url="{{ update_line_url }}?id={{ record.id }}&amp;section={{ section_name }}&amp;language={{ language.current_language }}"
                        data-modal_class="modal-lg">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
 
-                    <button title="{% trans 'Up' %}" class="trigger_modal btn-as-atag"
+                    <button title="{% trans 'Up' %}" class="trigger_modal btn-as-atag btn_to_focus"
+                            id="btn_up_line_{{ section_name }}"
                             {% if forloop.counter0 == 0 %}disabled{% else %}data-url="{% url "education_group_year_admission_condition_line_order" group.year group.code %}?id={{ record.id }}&action=up"{% endif %}>
                         <i class="fa fa-arrow-up"></i>
                     </button>
 
-                    <button title="{% trans 'Down' %}" class="trigger_modal btn-as-atag"
+                    <button title="{% trans 'Down' %}" class="trigger_modal btn-as-atag btn_to_focus"
+                            id="btn_down_line_{{ section_name }}"
                             {% if forloop.last %}disabled{% else %}data-url="{% url "education_group_year_admission_condition_line_order" group.year group.code %}?id={{ record.id }}&action=down"{% endif %}>
                         <i class="fa fa-arrow-down"></i>
                     </button>
 
-                    <a title="{% trans 'delete' %}" role="button" class="button trigger_modal"
+                    <a title="{% trans 'delete' %}" role="button" class="button trigger_modal btn_to_focus"
+                       id="a_delete_line_{{ section_name }}"
                        data-url="{% url 'education_group_year_admission_condition_remove_line' group.year group.code %}?id={{ record.id }}">
                         <span class="glyphicon glyphicon-remove"></span>
                     </a>

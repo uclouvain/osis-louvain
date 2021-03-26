@@ -532,6 +532,7 @@ class TestAreAllEducationGroupRemovable(TestCase):
 
     def test_case_all_trainings_are_not_removable(self):
         training_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        ElementFactory(group_year=training_roots[0])
         person = FacultyManagerFactory(entity=training_roots[0].management_entity).person
         self.assertFalse(
             predicates.are_all_trainings_removable(

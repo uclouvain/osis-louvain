@@ -1,4 +1,4 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
@@ -20,7 +20,7 @@
 #  A copy of this license - GNU General Public License - is available
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
-# ############################################################################
+#############################################################################
 import functools
 from typing import List, Dict, Optional
 
@@ -45,7 +45,8 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, ContentConstraintTypeMissing, \
-    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
+    HopsFields2OrNoneForFormationPhd
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -182,7 +183,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 elif isinstance(e, exception.ContentConstraintMaximumInvalid):
                     self.training_form.add_error("max_constraint", e.message)
                 elif isinstance(e, HopsFieldsAllOrNone) or \
-                        isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
+                        isinstance(e, HopsFields2OrNoneForFormationPhd):
                     self.training_form.add_error('ares_code', e.message)
                 elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                     self.training_form.add_error('ares_graca', e.message)
@@ -234,7 +236,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             program_management_exception.ProgramTreeNonEmpty,
             exception.TrainingHaveLinkWithEPC,
             exception.TrainingHaveEnrollments,
-            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+            program_management_exception.CannotDeleteStandardDueToSpecificVersionEndDate,
+            program_management_exception.CannotDeleteStandardDueToTransitionVersionEndDate
         ) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(

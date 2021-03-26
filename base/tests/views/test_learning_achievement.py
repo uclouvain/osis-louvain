@@ -41,6 +41,7 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -50,7 +51,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.factories.user import UserFactory
@@ -68,15 +68,14 @@ class TestLearningAchievementView(TestCase):
     def setUp(self):
         self.language_fr = FrenchLanguageFactory()
         self.language_en = EnglishLanguageFactory()
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.person_entity = PersonEntityFactory(person=self.person)
+        self.person = CentralManagerFactory().person
+        self.user = self.person.user
 
         self.academic_year = create_current_academic_year()
+        generate_learning_unit_edition_calendars([self.academic_year])
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=self.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_container_year__requirement_entity=self.person_entity.entity,
         )
         self.client.force_login(self.user)
         self.achievement_fr = LearningAchievementFactory(
@@ -125,7 +124,6 @@ class TestLearningAchievementView(TestCase):
                          "/learning_units/{}/specifications/".format(self.achievement_fr.learning_unit_year.id))
 
     def test_delete_permission_denied(self):
-        self.person_entity.delete()
         request = self.request_factory.post(
             reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]), data={
                 'achievement_id': self.achievement_fr.id,
@@ -181,14 +179,11 @@ class TestLearningAchievementActions(TestCase):
         cls.a_superuser = SuperUserFactory()
         cls.superperson = PersonFactory(user=cls.a_superuser)
 
-        cls.person_entity = PersonEntityFactory(person=cls.superperson)
-
         cls.academic_year = create_current_academic_year()
         AcademicYearFactory.produce_in_future(quantity=2)
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_container_year__requirement_entity=cls.person_entity.entity,
         )
         cls.future_luy = LearningUnitYearFactory(
             academic_year=cls.academic_year.next(),
@@ -397,6 +392,7 @@ class TestLearningAchievementPostponement(TestCase):
         cls.learning_component_years = [LearningComponentYearFactory(
             learning_unit_year=luy,
         ) for luy in cls.learning_unit_years]
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)

@@ -31,10 +31,11 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
-from education_group.ddd.validators._hops_validator import HopsValuesValidator
+from education_group.ddd.validators._hops_validator import HopsValuesValidator, HopsFields2OrNoneForFormationPhd
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
+from base.models.enums.education_group_types import TrainingType
 
 MAX_VALUE_FOR_HOPS_FIELD = 9999
 MIN_VALUE_FOR_HOPS_FIELD = 1
@@ -61,7 +62,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops)
+        training = TrainingFactory(hops=hops, type=TrainingType.BACHELOR)
         validator = HopsValuesValidator(training=training)
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -70,6 +71,22 @@ class TestHopsValidator(SimpleTestCase):
         self.assertIsInstance(
             e.exception.exceptions.pop(),
             HopsFieldsAllOrNone
+        )
+
+    def test_validation_hops_field_ares_code_missing_for_phd(self):
+        hops = HOPSFactory(ares_code=None,
+                           ares_graca=None,
+                           ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
+
+        training = TrainingFactory(hops=hops, type=TrainingType.FORMATION_PHD)
+        validator = HopsValuesValidator(training=training)
+
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            validator.is_valid()
+
+        self.assertIsInstance(
+            e.exception.exceptions.pop(),
+            HopsFields2OrNoneForFormationPhd
         )
 
     def test_validation_ares_code_not_valid(self):

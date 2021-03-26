@@ -724,3 +724,37 @@ class CheckTransitionNameCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class FillProgramTreeVersionContentFromProgramTreeVersionCommand(interface.CommandRequest):
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_transition_name = attr.ib(type=str)
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class FillTreeVersionContentFromPastYearCommand(interface.CommandRequest):
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTreeCmsFromPastYear(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyProgramTreePrerequisitesFromProgramTreeCommand(interface.CommandRequest):
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    to_code = attr.ib(type=str)
+    to_year = attr.ib(type=int)

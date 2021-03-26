@@ -23,8 +23,11 @@
 #
 ##############################################################################
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
-from program_management.models.enums.node_type import NodeType
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.models.enums.node_type import NodeType
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
+from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.program_tree import tree_builder
 
 
@@ -75,6 +78,7 @@ class ProgramTreeBachelorFactory:
                     "node_id": 22,
                     "children": [
                         {
+                            "link_data": {"link_type": LinkTypes.REFERENCE},
                             "node_type": MiniTrainingType.DEEPENING,
                             "year": current_year,
                             "end_year": end_year,
@@ -112,7 +116,18 @@ class ProgramTreeBachelorFactory:
                         },
                     ]
                 },
-                {"node_type": NodeType.LEARNING_UNIT}
+                {
+                    "node_type": NodeType.LEARNING_UNIT,
+                    "year": current_year,
+                    "end_date": end_year,
+                }
             ]
         }
-        return tree_builder(tree_data)
+        tree = tree_builder(tree_data)
+        PrerequisitesFactory.produce_inside_tree(
+            tree,
+            tree.get_node("1|22|32|1211|43|51"),
+            [tree.get_node("1|22|32|1211|43|52")]
+        )
+
+        return tree

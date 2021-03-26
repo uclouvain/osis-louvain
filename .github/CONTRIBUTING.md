@@ -1,81 +1,49 @@
-### Commits : 
-- Ajouter un message explicite à chaque commit
-- Commiter souvent = diff limité = facilité d'identification de commits amenant une régression = facilité de revert
+## Table of Contents
+- [Coding styles](#coding-styles)
+    - [Indentation](#indentation)
+    - [Signature des fonctions](#signature-des-fonctions)
+    - [Constantes](#constantes)
+    - [Enumérations](#enums)
+    - [Kwargs](#kwargs)
+    - [Commits](#commits)
+    - [Pull requests](#pull-requests)
+    - [Performance](#performance)
+    - [Sécurité](#scurit)
+- [API](#api)
+- [Modèle (Django Model)](#modle-django-model)
+- [Vue (Django View)](#vue-django-view)
+- [Formulaire (Django Forms)](#formulaire-django-forms)
+- [Gabarit (Django templates)](#gabarit-django-templates)
+- [Filtre de gabarit (Django Template Tags)](#filtres-de-gabarits-django-template-tags)
+- [Permissions](#permissions)
+- [Droits de merge et reviews](#droits-de-merge-et-reviews)
+- [Emails](#emails)
+- [PDF](#pdf)
+- [Domain driven design](#domain-driven-design)
+    - [Conventions générales](#conventions-gnrales)
+    - [Arborescence des packages](#arborescence-des-packages)
+    - [Commande](#dddcommandpy)
+    - [Domaine](#ddddomain)
+    - [Repository](#dddrepository)
+    - [Application service](#dddservice-application-service)
+    - [Validator](#dddvalidator)
 
-### Lisibilité du code :
-- Séparation des classes: deux lignes vides
-- Séparation des methodes de class: une ligne vide
-- Séparation des fonctions: deux lignes vides
-- Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
-### Coding style :
-On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+<br/><br/>
 
-Dans la mesure du possible, on essaie de tenir compte des conseils suivants : 
-- Pour représenter une structure de données (list, dict, etc.), on peut passer une ligne entre chaque élément, ainsi qu'après l'ouverture de la structure et avant sa fermeture, si la liste est longue et/ou contient de longs éléments et/ou s'étend sur plusieurs lignes.
+## Coding styles
+
+#### PEP8
+- [Guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+
+
+#### Style de code Django
+- [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
+
+
+#### Indentation
+
 ```python
-# Mauvais
-fruits = ['banane', 'pomme', 'poire', 'long_element_in_list_1', 'long_element_in_list_2', 'long_element_in_list_3', 'long_element_in_list_4'] 
-légumes = {'1': 'carotte', '2': 'courgette', 
-    '3': 'salade'}
-            
-# Bon
-fruits = [
-    'banane',
-    'pomme',
-    'poire',
-    'long_element_in_list_1',
-    'long_element_in_list_2',
-    'long_element_in_list_3',
-    'long_element_in_list_4'
-]
-légumes = {
-    '1': 'carotte', 
-    '2': 'courgette', 
-    '3': 'salade',
-}
-```
-
-- Le dernier élément de la structure a également une virgule. Cela permet d'éviter que cette ligne apparaisse dans le diff de git quand on rajoute un élément à la fin de structure.
-```python
-# Mauvais
-fruits = [
-    'banane',
-    'pomme',
-    'poire'
-]
-# Bon
-légumes = {
-    '1': 'carotte', 
-    '2': 'courgette', 
-    '3': 'salade',
-}
-```
-
-- Lors d'un appel de fonction à plusieurs paramètres, si tous les paramètres ne tiennent pas sur une ligne, on passe une ligne entre chaque paramètre, ainsi qu'après l'ouverture de la liste de paramètres et avant sa fermeture.
-```python
-# Mauvais
-result = my_function(first_long_parameter, second_parameter_which_has_a_really_really_long_name, third_parameter_which_has_an_even_longer_name)
-
-result = my_function(first_parameter, 
-                     second_parameter, 
-                     third_parameter)
-# Bon
-result = my_function(
-    first_parameter,
-    second_parameter,
-    third_parameter
-)
-```
-
-- Les règles précédentes sont cumulatives : 
-```python
-# Mauvais
-return render(request, "template.html", {
-        'students': students, 'faculties': faculties,
-        'teacher': teacher
-        })
-
 # Bon
 return render(
     request,
@@ -86,57 +54,176 @@ return render(
         'teacher': teacher,
     }
 )
+
+
+# Mauvais
+return render(request, "template.html", {
+        'students': students, 'faculties': faculties,
+        'teacher': teacher
+        })
+
 ```
-- Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/1.11/internals/contributing/writing-code/coding-style/).
+```python
+# Bon
+def my_function(
+        arg1: str,
+        arg2: int,
+        kwarg1: str = None,
+        kwarg2: int = None
+) -> int:
+    # Do something
+    pass
 
-### Documentation du code :
-- Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
-- Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
 
-### Traductions :
+# Mauvais
+def my_function(arg1: str,
+                arg2: int,
+                kwarg1: str = None,
+                kwarg2: int = None
+) -> int:
+    # Do something
+    pass
+```
+
+
+#### Traductions
 - Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
-- Les "Fuzzy" doivent être supprimés si la traduction du développeur diffère de la traduction proposée (le "fuzzy" signifiant que GetText a tenté de traduire la clé en retrouvant une similitude dans une autre clé).
+- Supprimer les `Fuzzy` après avoir vérifié la traduction
 
-### Réutilisation du code :
-- Ne pas créer de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
-- Ne pas faire de copier/coller ; tout code dupliqué ou faisant la même chose doit être implémenté dans une fonction documentée qui est réutilisable
-- Ne pas utiliser de 'magic_number' (constante non déclarée dans une variable). Par exemple, pas de -1, 1994, 2015 dans le code, mais déclarer en haut du fichier des variables sous la forme LIMIT_START_DATE=1994, LIMIT_END_DATE=2015, etc.
 
-### Performance :
-- Ne pas faire d'appel à la DB (pas de queryset) dans une boucle 'for' :
-    - Récupérer toutes les données nécessaires en une seule requête avant d'effectuer des opérations sur les attributs renvoyés par le Queryset
-    - Si la requête doit récupérer des données dans plusieurs tables, utiliser le select_related fourni par Django (https://docs.djangoproject.com/en/1.9/ref/models/querysets/#select-related)
-    - Forcer l'évaluation du Queryset avant d'effectuer des récupération de données avec *list(a_queryset)* 
+#### Signature des fonctions
+- Doit être typée ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
+- Types de retour de fonctions non autorisés (pas assez explicites) :
+  - `dict` ==> utiliser `Dict[KeyType, ValueType]`
+  - `list` ==> utiliser `List[TypeOfElement]`
+- Éviter l'utilisation de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
 
-### Modèle :
-- Chaque fichier décrivant un modèle doit se trouver dans le répertoire *'models'*
-- Chaque fichier contenant une classe du modèle ne peut renvoyer que des instances du modèle qu'elle déclare. Autrement dit, un fichier my_model.py contient une classe MyModel() et des méthodes qui ne peuvent renvoyer que des records venant de MyModel
-- Un modèle ne peut pas avoir un champs de type "ManyToMany" ; il faut toujours construire une table de liaison, qui contiendra les FK vers les modèles composant la relation ManyToMany.
-- Lorsqu'un nouveau modèle est créé (ou que de nouveaux champs sont ajoutés), il faut penser à mettre à jour l'admin en conséquence (raw_id_fields, search_fields, list_filter...). 
-- Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
 
-### Business :
-- Les fonctions propres à des fonctionnalités business (calculs de crédits ou volumes, etc.) doivent se trouver dans un fichier business. Ces fichiers sont utilisés par les Views et peuvent appeler des fonctions du modèle (et non l'inverse !). 
-- Les fonctions business ne peuvent pas recevoir l'argument 'request', qui est un argument propre aux views.
+#### Constantes
+- Ne pas utiliser de 'magic number' (constante non déclarée dans une variable) 
+```python
+# Bon
+MINIMUM_AUTHORIZED_UPDATE_YEAR = 2026
+NONE_OR_EMPTY_VERBOSE = "-"
 
-### Migration :
-- Ne pas utiliser le framework de persistence de Django lorsqu'il y a du code à exécuter dans les fichiers de migration. Il faut plutôt utiliser du SQL natif (voir https://docs.djangoproject.com/fr/1.10/topics/db/sql/ et https://docs.djangoproject.com/fr/1.10/ref/migration-operations/)
 
-### Dépendances entre applications : 
-- Ne pas faire de références des applications principales ("base" et "reference") vers des applications tierces (Internship, assistant...)
-- Une application peut faire référence à une autre app' en cas de dépendance business (exemple: 'assessments' a besoin de 'attribution').
+def update_object(obj):
+    if obj.year >= MINIMUM_AUTHORIZED_UPDATE_YEAR:
+        pass
 
-### Vue :
-- Ne pas faire appel à des méthodes de queryset dans les views (pas de MyModel.filter(...) ou MyModel.order_by() dans les vues). C'est la responsabilité du modèle d'appliquer des filtres et tris sur ses queryset. Il faut donc créer une fonction dans le modèle qui renvoie une liste de records filtrés sur base des paramètres entrés (find_by_(), search(), etc.).
+def verbose_value(value: int) -> str:
+    return str(value) if value else NONE_OR_EMPTY_VERBOSE
+
+
+# Mauvais
+def update_object(obj):
+    if obj.year >= 2019:
+        pass
+
+
+def verbose_value(value: int) -> str:
+    return str(value) if value else "-"
+```
+
+#### Enums
+- Utiliser des `ChoiceEnum` plutôt que des `CONSTANTES` contenant des tuples
+```python
+from base.models.utils.utils import ChoiceEnum
+
+# Bon
+class Categories(ChoiceEnum):
+    TRAINING = _("Training")
+    MINI_TRAINING = _("Mini-Training")
+    GROUP = _("Group")
+    
+# Mauvais
+TRAINING = "TRAINING"
+MINI_TRAINING = "MINI_TRAINING"
+GROUP = "GROUP"
+CATEGORIES = (
+    (TRAINING, _("Training")),
+    (MINI_TRAINING, _("Mini-Training")),
+    (GROUP, _("Group")),
+)
+```
+
+#### kwargs
+- Toujours déclarer `kwarg=None` (jamais instancier un objet mutable comme une `list`, `dict`...)
+
+#### Commits
+- Ajouter un message explicite à chaque commit
+- Commiter souvent = diff limitée = facilité d'identification de commits amenant une régression = facilité de revert = facilité et rapidité de review
+
+#### Pull requests
+- Réduire au minimum le nombre de fichiers de migrations par fonctionnalité (limite le temps de création de la DB de test, facilite la review, limite les conflits)
+- Ajouter la référence au ticket Jira dans le titre de la pull request (format = "OSIS-12345")
+- Utiliser un titre de pull request qui identifie son contenu (facilite la recherche de pull requests et permet aux contributeurs du projet d'avoir une idée sur son contenu)
+    - Le titre doit correspondre à l'intitulé du ticket Jira associé
+
+
+
+#### Performance
+- Suivre les bonnes pratiques Django :
+    - [Guide des performances Django](https://docs.djangoproject.com/en/2.2/topics/performance/)
+    - [Guide des optimisations Django](https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
+
+
+#### Sécurité
+- Ne pas laisser de données sensibles/privées dans les commentaires/dans le code
+- Dans les URL (`urls.py`), ne jamais passer un ID auto-incrémenté (fourni par le moteur DB) en paramètre 
+    - À éviter : `<site_url>/?tutor_id=1234` ou `<site_url>/score_encoding/print/34`
+    - Alternative : utiliser un UUID 
+- Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur les données qu'il désire injecter.
+
+<br/><br/>
+
+## API
+- Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
+- Incrémenter la version du schema.yml (cf. `info: version: 'X.Y'`) à chaque modification de celui-ci
+- Tout champ utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champ "filtre" doit se trouver dans la donnée renvoyée)
+ 
+<br/><br/>
+
+## Modèle (Django Model)
+- Regroupe les modèles Django et les classes pour la partie administration de Django
+- 1 classe par fichier héritant de `django.db.models.Model`
+- 1 classe par fichier héritant de `osis_common.models.osis_model_admin.OsisModelAdmin`
+- Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
+- Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèle `auth` lors des écrasements des DB de Dev, Test et Qa.
+- Ne peut pas contenir de logique métier
+- Accès : 
+  - [couche Django Model](#modle-django-model) (un modèle peut référencer un autre modèle via FK)
+
+<br/><br/>
+
+## Vue (Django View)
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
-- Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
+- Ne peut pas contenir de logique métier
+- Utiliser les [Class Based Views](https://docs.djangoproject.com/fr/2.2/topics/class-based-views/) à la place des function bases views
+- Accès :
+  - [couche Django Forms](#formulaire-django-forms)
+  - [couche Application Service](#dddservice-application-service)
+  - [couche Templates](#template-html)
+  - [couche Template Tags](#template-django-template-tags)
+  - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues)
 
-### Formulaire :
-- Utiliser les objets Forms fournis par Django (https://docs.djangoproject.com/en/1.9/topics/forms/)
+<br/><br/>
 
-### Template (HTML)
-- Privilégier l'utilisation Django-Bootstrap3
-- Tendre un maximum vers la réutilisation des blocks ; structure :
+## Formulaire (Django Forms)
+- Regroupe les objets qui permettent de faciliter l'affichage du code HTML côté template
+- Ne peut pas contenir de logique métier
+- Accès :
+  - [couche application service](#dddservice-application-service)
+
+<br/><br/>
+
+## Gabarit (Django Templates)
+- Regroupe les fichiers `html` structurés en "blocks" afin de maximiser la réutilisation de templates
+- Utilise Django-Bootstrap3 pour le rendering des [Django Forms](#formulaire-django-forms)
+- Accès :
+  - [couche Dango Templates](#gabarit-django-templates) (un template peut inclure d'autres templates)
+  - [couche Dango Template Tags](#filtres-de-gabarits-django-template-tags)
+- Arborescence des fichiers :
 ```
 [templates]templates                                  # Root structure
 ├── [templates/blocks/]blocks                                # Common blocks used on all 
@@ -161,36 +248,30 @@ return render(
         ├── [templates/learning_unit/simple/list.html]list.html
         └── [templates/learning_unit/simple/update.html]update_***.html
 ```
+<br/><br/>
 
-### Sécurité :
-- Ne pas laisser de données sensibles/privées dans les commentaires/dans le code
-- Dans les URL (url.py), on ne peut jamais passer l'id d'une personne en paramètre (par ex. '?tutor_id' ou '/score_encoding/print/34' sont à éviter! ). 
-- Dans le cas d'insertion/modification des données venant de l'extérieur (typiquement fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur ces données qu'il désire injecter. Cela nécessite une implémentation d'un code de vérification.
+## Filtres de gabarits (Django Template Tags)
+- Regroupe les template tags Django
+- Accès : 
+  - Aucun (un template tag ne doit avoir aucune dépendance externe à lui-même)
 
-### Permissions :
-- Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions frounies par Django), créer un décorateur dans le dossier "perms" des "views". Le code business propre à la permission devra se trouver dans un dossier "perms" dans "business". Voir "base/views/learning_units/perms/" et "base/business/learning_units/perms/".
+<br/><br/>
 
-### Pull request :
-- Ne fournir qu'un seul fichier de migration par issue/branche (fusionner tous les fichiers de migrations que vous avez en local en un seul fichier)
-- Ajouter la référence au ticket Jira dans le titre de la pull request (format = "OSIS-12345")
-- Utiliser un titre de pull request qui identifie son contenu (facilite la recherche de pull requests et permet aux contributeurs du projet d'avoir une idée sur son contenu)
+## Permissions
+- Voir [Osis-role](https://github.com/uclouvain/osis/blob/dev/osis_role/README.md)
+- Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions fournies par Django) : 
+    - créer un décorateur dans le dossier `app_django/views/perms`
+    - exemple : `base/views/learning_units/perms/`
 
-### Droits sur les PR et reviews :
+<br/><br/>
+
+## Droits de merge et reviews
 - Il est permis aux développeurs de merger la branche source (dev pour les branches technical et feature, qa ou master pour les branche hotfix) dans leur branche technical/feature/hotfix et de pusher cette modification directement sur la branche technical/feature/hotfix.
 - La possibilité susvisée permet, techniquement, de merger toute PR vers ses propres branches technical/feature/hotfix. Il est donc impératif de respecter le principe selon lequel on ne merge pas son propre code vers les branches technical/feature/hotfix tant que ce code n'a pas été approuvé par un autre développeur. Quand la review est faite et le code approuvé, on peut merger sa PR si les checks sont au vert (Travis, codeclimate, Quality check).
 
-### Pull request de màj de la référence d'un submodule :
-Quand la PR correspond à la mise-à-jour de la référence pour un submodule, indiquer dans la description de la PR les références des tickets Jira du submodule qui passent dans cette mise-à-jour de référence (format : "IUFC-123").
+<br/><br/>
 
-Pour les trouver : 
-1) Une fois la PR ouverte, cliquer sur l'onglet "Files Changed"
-2) Cliquer sur "x files" dans le texte "Submodule xyz updated x files"
-3) Cela ouvre la liste des commits qui vont passer dans la mise-à-jour de référence -> les références des tickets Jira sont indiquées dans les messages de commits.
-
-### Ressources et dépendances :
-- Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
-
-### Emails
+## Emails
 - Utiliser la fonction d'envoi de mail décrite dans `osis_common/messaging/send_mail.py`. Exemple:
 ```python
 from osis_common.messaging import message_config, send_message as message_service
@@ -221,23 +302,17 @@ def send_an_email(receiver: Person):
 
 ```
 
-### PDF : 
-- Utiliser WeasyPrint pour la création de documents PDF (https://weasyprint.org/).
+<br/><br/>
 
+## PDF
+- Utiliser WeasyPrint ou pour la création de documents PDF (https://weasyprint.org/)
+- Utilisation de ReportLab dépréciée (car compliqué d'utilisation)
 
-### Tests : 
-#### Vues :
-Idéalement lorsqu'on teste une view, on doit vérifier :
-- Le template utilisé (assertTemplateUsed)
-- Les redirections en cas de succès/erreurs
-- Le contenu du contexte utilisé dans le render du template
-- Les éventuels ordres de listes attendus
+<br/><br/>
 
+## Domain driven design
 
-
-### Domain driven design :
-
-#### Conventions générales :
+#### Conventions générales
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
 - Tous les paramètres d'entrée et de sortie doivent être typés
@@ -391,7 +466,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
 - Chargée d'orchestrer les appels vers les couches du DDD (repository, domain...) et de déclencher les événements (exemple : envoi de mail)
 - Les fonctions de service reçoivent en paramètres uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
 - Les services renvoient toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
-- Attention à séparer les services write et read !
+- Séparer les services write et read dans des dossiers séparés
+- Doit être documentée (car couche publique réutilisable)
 - Les fonctions de service sont toujours publiques
 - Nommage des fichiers : <action_metier>_service.py
 - Nommage des fonctions : <action_metier>

@@ -62,7 +62,7 @@
                     <select id="slt_offer_list_selection" name="offer" class="form-control">
                         <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}
-                        <option value="{{o.id}}" {%if offer_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
+                        <option value="{{o.id}}" {%if education_group_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -118,7 +118,7 @@
                 <div class="pull-right">
                     <b><span class="badge" id="scores_encoding_learning_units">{{ notes_list|length }}</span>
                         {% trans 'learning units in' %}
-                        <span class="badge" id="scores_encoding_programs">{% if offer_year_id %} 1 {% else %} {{ offer_list|length }} {% endif %}</span>
+                        <span class="badge" id="scores_encoding_programs">{% if education_group_year_id %} 1 {% else %} {{ offer_list|length }} {% endif %}</span>
                         {% trans 'program(s)' %}.
                     </b>
                 </div>
@@ -321,13 +321,13 @@
                 <div role="tabpanel" class="tab-pane fade" id="tab_via_paper">
             <br>
             <a class="btn btn-default download {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
-               href="{%if tutor_id and tutor_id != -1 and offer_year_id %}
-                        {% url 'notes_printing_all' tutor_id=tutor_id offer_id=offer_year_id %}
+               href="{%if tutor_id and tutor_id != -1 and education_group_year_id %}
+                        {% url 'notes_printing_all' tutor_id=tutor_id education_group_year_id=education_group_year_id %}
                      {%else%}
                         {%if tutor_id and tutor_id != -1 %}
                             {% url 'notes_printing_all' tutor_id=tutor_id %}
-                        {%elif offer_year_id %}
-                            {% url 'notes_printing_all' offer_id=offer_year_id %}
+                        {%elif education_group_year_id %}
+                            {% url 'notes_printing_all' education_group_year_id=education_group_year_id %}
                         {% else %}
                             {% url 'notes_printing_all' %}
                         {%endif%}

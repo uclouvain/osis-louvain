@@ -33,7 +33,7 @@ from django.utils import timezone
 from base.signals.publisher import compute_scores_encodings_deadlines
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 YEAR_CALENDAR = timezone.now().year
@@ -45,13 +45,13 @@ class OfferYearCalendarsAttributesValidation(TestCase):
         cls.academic_year = AcademicYearFactory(year=YEAR_CALENDAR,
                                                 start_date=datetime.date(YEAR_CALENDAR, 9, 1),
                                                 end_date=datetime.date(YEAR_CALENDAR + 1, 10, 30))
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.academic_year,
+        cls.academic_calendar = AcademicCalendarFactory(data_year=cls.academic_year,
                                                         start_date=datetime.date(YEAR_CALENDAR, 9, 1),
                                                         end_date=datetime.date(YEAR_CALENDAR + 1, 10, 30))
-        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+        cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
 
     def test_end_date_lower_than_start_date(self):
-        self.offer_year_calendar = OfferYearCalendarFactory(offer_year=self.offer_year,
+        self.offer_year_calendar = OfferYearCalendarFactory(education_group_year=self.educ_group_year,
                                                             academic_calendar=self.academic_calendar)
         self.offer_year_calendar.start_date = datetime.date(YEAR_CALENDAR, 9, 1)
         self.offer_year_calendar.end_date = datetime.date(YEAR_CALENDAR, 8, 1)

@@ -126,6 +126,9 @@ msgstr ""
 msgid "You are not allowed to create proposal during this academic year"
 msgstr ""
 
+msgid "You are not allowed to manage proposal during this academic year"
+msgstr ""
+
 msgid ""
 "You are not allowed to put in proposal for ending date during this academic "
 "year"

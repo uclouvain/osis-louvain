@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -91,14 +91,15 @@ def find_attached_faculty_entities_version(person: Person, acronym_exceptions=No
 
     entities_ids = EntityRoleHelper.get_all_entities(person, groups)
     for entity in Entity.objects.filter(pk__in=entities_ids):
-        faculties = faculties.union({
-            e.entity for e in entity_structure[entity.id]['all_children']
-            if e.entity_type == FACULTY or (acronym_exceptions and e.acronym in acronym_exceptions)
-        })
+        if entity_structure.get(entity.id):
+            faculties = faculties.union({
+                e.entity for e in entity_structure[entity.id]['all_children']
+                if e.entity_type == FACULTY or (acronym_exceptions and e.acronym in acronym_exceptions)
+            })
 
-        entity_version = entity_structure[entity.id]['entity_version']
-        if acronym_exceptions and entity_version.acronym in acronym_exceptions:
-            faculties.add(entity)
-        else:
-            faculties.add(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
+            entity_version = entity_structure[entity.id]['entity_version']
+            if acronym_exceptions and entity_version.acronym in acronym_exceptions:
+                faculties.add(entity)
+            else:
+                faculties.add(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
     return find_all_current_entities_version().filter(entity__in=faculties)

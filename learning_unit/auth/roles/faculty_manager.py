@@ -22,10 +22,10 @@ class FacultyManager(osis_role_models.EntityRoleModel):
         return rules.RuleSet({
             'base.can_access_catalog': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
-            'base.can_create_learningunit': rules.always_allow,
+            'base.can_create_learningunit': predicates.is_learning_unit_edition_for_faculty_manager_period_open,
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_requirement_entity &
-                predicates.is_learning_unit_edition_period_open &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_learning_unit_with_container &
                 predicates.is_learning_unit_year_full &
                 predicates.is_external_learning_unit_with_cograduation,
@@ -35,12 +35,13 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_container_type_deletable &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_start_year_after_year_limit &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.has_learning_unit_prerequisite_dependencies &
                 predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
-                predicates.is_learning_unit_edition_period_open &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_external_learning_unit_with_cograduation &
                 predicates.is_not_in_proposal_state_for_this_and_previous_years,
             'base.can_edit_learning_unit_proposal':
@@ -59,7 +60,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
                 predicates.is_not_modification_proposal_type,
-            'base.add_externallearningunityear': rules.always_allow,
+            'base.add_externallearningunityear': predicates.is_learning_unit_edition_for_faculty_manager_period_open,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_year_not_a_partim &
@@ -87,18 +88,19 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learningunit_date':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
-                predicates.is_learning_unit_year_not_in_past &
                 predicates.has_learning_unit_no_application_in_future &
                 predicates.has_learning_unit_no_attribution_in_future &
-                predicates.is_learning_unit_edition_period_open &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_external_learning_unit_with_cograduation &
                 predicates.is_not_in_proposal_state_for_this_and_previous_years &
                 (predicates.is_learning_unit_year_a_partim | predicates.is_learning_unit_date_container_type_editable),
             'base.can_edit_learningunit_pedagogy':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
-            'base.can_edit_learningunit_specification': rules.always_allow,
+            'base.can_edit_learningunit_specification':
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open,
             'base.can_consolidate_learningunit_proposal':
                 predicates.is_in_proposal_state &
                 predicates.is_year_in_proposal_state &
@@ -112,18 +114,22 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                  ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_change_attribution':
                 predicates.is_learning_unit_type_allowed_for_attributions &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_delete_attribution':
                 (predicates.is_learning_unit_year_a_partim |
                  predicates.is_learning_unit_type_allowed_for_attributions) &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_edit_summary_locked_field':
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_update_learning_achievement':
                 predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year,
             'base.can_refuse_learning_unit_proposal':
                 predicates.is_in_proposal_state &

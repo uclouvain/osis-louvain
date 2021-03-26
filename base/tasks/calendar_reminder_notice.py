@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from backoffice.celery import app as celery_app
-from base.business.event_perms import AcademicEventRepository, AcademicEvent
+from base.business.academic_calendar import AcademicEventRepository, AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from osis_common.messaging import message_config, send_message as message_service
 

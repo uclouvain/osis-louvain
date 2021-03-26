@@ -48,7 +48,7 @@ class EntityTestCase(TestCase):
                                                  end_date=self.current_academic_year.end_date)
         self.assertIsNone(get_entity_calendar(an_entity_version, self.current_academic_year))
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
                                                        reference=academic_calendar_type.EXAM_ENROLLMENTS)
@@ -64,7 +64,7 @@ class EntityTestCase(TestCase):
                                                  start_date=self.current_academic_year.start_date,
                                                  end_date=self.current_academic_year.end_date)
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
@@ -85,7 +85,7 @@ class EntityTestCase(TestCase):
                                                        end_date=self.current_academic_year.end_date,
                                                        parent=an_entity_parent)
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
