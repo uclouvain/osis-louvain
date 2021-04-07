@@ -29,7 +29,7 @@ from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.utils.search import RenderToExcel
 from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, \
-    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes,\
+    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes, \
     _create_xls_ue_utilizations_with_one_training_per_line
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 

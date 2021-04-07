@@ -33,14 +33,11 @@ from django.test import SimpleTestCase
 import osis_common.ddd.interface
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node, exception
-from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
@@ -50,7 +47,6 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.ddd.validators.validators_by_business_action import PasteNodeValidatorList
-from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory, MandatoryRelationshipObjectFactory
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
@@ -176,35 +172,6 @@ class TestGetNodeProgramTree(SimpleTestCase):
         self.assertEqual(
             result_node.pk,
             self.root_node.pk
-        )
-
-
-class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
-    def setUp(self):
-        link = LinkFactory(child=NodeGroupYearFactory(node_id=1))
-        self.root_node = link.parent
-        self.subgroup_node = link.child
-
-        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=1))
-        self.learning_unit_node = link_with_learning_unit.child
-
-        self.tree = ProgramTreeFactory(root_node=self.root_node)
-
-    def test_should_return_None_when_no_node_present_with_corresponding_node_id(self):
-        result = self.tree.get_node_by_id_and_type(2, node_type.NodeType.LEARNING_UNIT)
-        self.assertIsNone(result)
-
-    def test_should_return_node_matching_specific_node_id_with_respect_to_class(self):
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.LEARNING_UNIT)
-        self.assertEqual(
-            result,
-            self.learning_unit_node
-        )
-
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.GROUP)
-        self.assertEqual(
-            result,
-            self.subgroup_node
         )
 
 

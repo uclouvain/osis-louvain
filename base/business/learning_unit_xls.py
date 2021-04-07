@@ -464,7 +464,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             learning_unit_yr).values()
         if attributions_values:
             for value in attributions_values:
-                data.append(lu_data_part1+_get_attribution_detail(value))
+                data.append(lu_data_part1 + _get_attribution_detail(value))
                 line += 1
                 if not first:
                     cells_with_white_font.extend(

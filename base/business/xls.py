@@ -41,7 +41,7 @@ def convert_boolean(a_boolean_value):
 def _get_all_columns_reference(nb_columns, first_column=1):
     letters = []
     nb_col = first_column
-    while nb_col < nb_columns+1:
+    while nb_col < nb_columns + 1:
         letters.append(get_column_letter(nb_col))
         nb_col += 1
     return letters

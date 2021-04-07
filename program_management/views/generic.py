@@ -47,12 +47,13 @@ from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.models.enums.node_type import NodeType
+from program_management.ddd.service.read import get_program_tree_service
+from program_management.ddd.service.read.node_identity_service import get_node_identity_from_element_id
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -95,20 +96,23 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
 
     @cached_property
     def program_tree(self):
-        return load_tree.load(self.get_root_id())
+        return get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.get_root_id())
+        )
 
     def get_root_id(self) -> int:
         return int(self.kwargs['root_element_id'])
 
     @cached_property
     def node(self):
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs['child_element_id']),
-            NodeType.LEARNING_UNIT
+        node_identity = get_node_identity_from_element_id(
+            command.GetNodeIdentityFromElementId(element_id=int(self.kwargs['child_element_id']))
         )
-        if node is None:
-            raise Http404
-        return node
+        if node_identity:
+            node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
+            if node:
+                return node
+        raise Http404('No learning unit match the given query')
 
     @cached_property
     def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
@@ -147,7 +151,8 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         )
         return context
 
-    def show_prerequisites(self, root_node: 'NodeGroupYear'):
+    @staticmethod
+    def show_prerequisites(root_node: 'NodeGroupYear'):
         return root_node.node_type not in NO_PREREQUISITES
 
     def get_tree_json_url(self) -> str:

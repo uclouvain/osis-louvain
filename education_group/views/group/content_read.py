@@ -28,8 +28,9 @@ from typing import List
 
 from base.utils.urls import reverse_with_get
 from education_group.views.group.common_read import Tab, GroupRead
+from program_management.ddd import command
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.service.read import get_program_tree_service
 
 
 class GroupReadContent(GroupRead):
@@ -55,7 +56,9 @@ class GroupReadContent(GroupRead):
 
     @functools.lru_cache()
     def get_tree(self):
-        return load_tree.load(self.get_root_id())
+        return get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.get_root_id())
+        )
 
     def get_children(self) -> List['Node']:
         parent_node = self.get_tree().get_node(self.get_path())

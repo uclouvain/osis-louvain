@@ -72,16 +72,16 @@
     {% url 'learning_units_external' as learning_units_external_url %}
     {% url 'learning_units_summary' as learning_units_summary_url %}
     {% block navtab %}
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" {% if request.path == learning_units_url %}class="active"{% endif %}>
-            <a href="{{ learning_units_url }}" role="tab" id="lnk_activity_search">
-                {% trans 'Learning unit'%}
-            </a>
-        </li>
-        <li role="presentation" {% if request.path == service_course_url  %}class="active"{% endif %}>
-            <a href="{{ service_course_url }}" role="tab" id="lnk_service_course_search">
-                {% trans 'Service courses'%}
-            </a>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" {% if request.path == learning_units_url %}class="active"{% endif %}>
+                <a href="{{ learning_units_url }}" role="tab" id="lnk_activity_search">
+                    {% trans 'Learning unit' %}
+                </a>
+            </li>
+            <li role="presentation" {% if request.path == service_course_url %}class="active"{% endif %}>
+                <a href="{{ service_course_url }}" role="tab" id="lnk_service_course_search">
+                    {% trans 'Service courses' %}
+                </a>
         </li>
         <li role="presentation" {% if request.path == borrowed_course_url %}class="active"{% endif %}>
             <a href="{{ borrowed_course_url }}" role="tab" id="lnk_borrowed_course_search">

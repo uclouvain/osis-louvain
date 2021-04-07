@@ -531,6 +531,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
 
         self._patch_load_tree()
         self._patch_load_node()
+        self._patch_get_node_from_element_id()
         self.mock_check_paste_validator = self._path_validator()
 
     def _patch_load_node(self):
@@ -544,10 +545,18 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
 
     def _patch_load_tree(self):
         patcher_load_tree = mock.patch(
-            "program_management.ddd.repositories.load_tree.load"
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.get"
         )
         self.mock_load_tree = patcher_load_tree.start()
         self.mock_load_tree.return_value = self.tree
+        self.addCleanup(patcher_load_tree.stop)
+
+    def _patch_get_node_from_element_id(self):
+        patcher_load_tree = mock.patch(
+            "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id"
+        )
+        self.mock_load_tree = patcher_load_tree.start()
+        self.mock_load_tree.return_value = self.tree.root_node
         self.addCleanup(patcher_load_tree.stop)
 
     def _path_validator(self):

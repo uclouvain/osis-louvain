@@ -25,10 +25,11 @@ from django.test import TestCase
 from mock import Mock
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from program_management.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
@@ -37,45 +38,96 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.service.write import delete_node_service
 from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementGroupYearFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 class TestSearchTreesFromChildren(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
+        cls.academic_year = AcademicYearFactory()
         cls.link_1 = GroupElementYearFactory(
-            parent_element__group_year__academic_year=academic_year,
-            child_element__group_year__academic_year=academic_year
+            parent_element__group_year__academic_year=cls.academic_year,
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.link_1_1 = GroupElementYearFactory(
             parent_element=cls.link_1.child_element,
-            child_element__group_year__academic_year=academic_year
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.link_1_1_1 = GroupElementYearFactory(
             parent_element=cls.link_1_1.child_element,
-            child_element__group_year__academic_year=academic_year
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.link_1_2 = GroupElementYearFactory(
             parent_element=cls.link_1.child_element,
-            child_element__group_year__academic_year=academic_year
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.link_2 = GroupElementYearFactory(
             parent_element=cls.link_1.parent_element,
-            child_element__group_year__academic_year=academic_year
+            child_element__group_year__academic_year=cls.academic_year
         )
 
         cls.other_tree_link_1 = GroupElementYearFactory(
-            parent_element__group_year__academic_year=academic_year,
-            child_element__group_year__academic_year=academic_year
+            parent_element__group_year__academic_year=cls.academic_year,
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.other_tree_link_1_1 = GroupElementYearFactory(
             parent_element=cls.other_tree_link_1.child_element,
             child_element=cls.link_1_1_1.child_element
         )
 
+    def test_when_bad_arg(self):
+        with self.assertRaises(Exception):
+            program_tree.ProgramTreeRepository.search_from_children("I'm not a list arg")
+
+    def test_when_child_list_is_empty(self):
+        result = program_tree.ProgramTreeRepository.search_from_children([])
+        self.assertEqual(result, [])
+
+    def test_when_child_is_root(self):
+        node_identity = NodeIdentity(
+            code=self.link_1.parent_element.group_year.partial_acronym,
+            year=self.link_1.parent_element.group_year.academic_year.year
+        )
+        result = program_tree.ProgramTreeRepository.search_from_children([node_identity])
+        self.assertListEqual(result, [])
+
+    def test_when_child_is_learning_unit(self):
+        link_3 = GroupElementYearChildLeafFactory(
+            parent_element=self.link_2.child_element,
+            child_element=ElementLearningUnitYearFactory(learning_unit_year__academic_year=self.academic_year)
+        )
+        node_identity = NodeIdentity(
+            code=link_3.child_element.learning_unit_year.acronym,
+            year=link_3.child_element.learning_unit_year.academic_year.year
+        )
+        result = program_tree.ProgramTreeRepository.search_from_children([node_identity])
+        expected_tree_identity = ProgramTreeIdentity(
+            code=self.link_1.parent_element.group_year.partial_acronym,
+            year=self.link_1.parent_element.group_year.academic_year.year
+        )
+        self.assertListEqual([pt.entity_id for pt in result], [expected_tree_identity])
+
+    def test_when_link_type_is_reference(self):
+        parent_node_type_reference = ElementGroupYearFactory(group_year__academic_year=self.academic_year)
+        child = self.link_2.child_element
+        GroupElementYearFactory(
+            parent_element=parent_node_type_reference,
+            child_element=child,
+            link_type=LinkTypes.REFERENCE.name
+        )
+        node_identity = NodeIdentity(
+            code=child.group_year.partial_acronym,
+            year=child.group_year.academic_year.year
+        )
+        result = program_tree.ProgramTreeRepository.search_from_children([node_identity], link_type=LinkTypes.REFERENCE)
+        expected_tree_identity = ProgramTreeIdentity(
+            code=parent_node_type_reference.group_year.partial_acronym,
+            year=parent_node_type_reference.group_year.academic_year.year
+        )
+        self.assertListEqual([pt.entity_id for pt in result], [expected_tree_identity])
+
     def test_should_return_list_of_one_tree_where_node_present_only_in_one_tree(self):
-        node_identiy = NodeIdentity(
+        node_identity = NodeIdentity(
             code=self.link_2.child_element.group_year.partial_acronym,
             year=self.link_2.child_element.group_year.academic_year.year
         )
@@ -83,7 +135,7 @@ class TestSearchTreesFromChildren(TestCase):
             code=self.link_1.parent_element.group_year.partial_acronym,
             year=self.link_1.parent_element.group_year.academic_year.year
         )
-        result = program_tree.ProgramTreeRepository.search_from_children([node_identiy])
+        result = program_tree.ProgramTreeRepository.search_from_children([node_identity])
 
         self.assertCountEqual(
             [tree.entity_id for tree in result],

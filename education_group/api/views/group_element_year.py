@@ -31,10 +31,11 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
+from program_management.ddd import command
 from program_management.ddd.domain import link, exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.models.element import Element
 
 
@@ -62,7 +63,12 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
     @cached_property
     def program_tree(self) -> 'ProgramTree':
-        return load_tree.load(self.element.id)
+        return get_program_tree_service.get_program_tree(
+            command.GetProgramTree(
+                code=self.element.group_year.partial_acronym,
+                year=self.element.group_year.academic_year.year
+            )
+        )
 
     def get_object(self):
         self.check_object_permissions(self.request, self.element.education_group_year_obj)

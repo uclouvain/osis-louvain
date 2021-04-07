@@ -41,7 +41,8 @@ from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.ddd.repositories import load_tree
+from program_management.ddd import command
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
@@ -98,7 +99,9 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
-        cls.tree = load_tree.load(element.id)
+        cls.tree = get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=element.id)
+        )
         cls.serializer = GeneralInformationSerializer(
             cls.tree.root_node, context={
                 'language': cls.language,
@@ -271,7 +274,10 @@ class IntroOffersSectionTestCase(TestCase):
             reference=reference,
             text_label__entity=entity
         )
-        tree = load_tree.load(self.element.id)
+
+        tree = get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.element.id)
+        )
         node = tree.root_node
         return GeneralInformationSerializer(
             node, context={

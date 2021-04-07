@@ -46,7 +46,7 @@ from base.utils.urls import reverse_with_get
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain import link
-from program_management.forms.tree.paste import BasePasteNodesFormset, PasteNodeForm
+from program_management.forms.tree.paste import BasePasteNodesFormset
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -70,7 +70,8 @@ class TestPasteNodeView(TestCase):
         self.url = reverse("tree_paste_node")
         self.client.force_login(self.person.user)
 
-        fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
+        fetch_tree_patcher = mock.patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get',
+                                        return_value=self.tree)
         fetch_tree_patcher.start()
         self.addCleanup(fetch_tree_patcher.stop)
 

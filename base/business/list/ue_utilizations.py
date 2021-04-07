@@ -136,12 +136,12 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                                 cells_to_color, learning_unit_yr, len(lines) + 1, training_occurence
                             )
                             if training_occurence == 1:
-                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
+                                cells_with_border_top.extend(_add_border_top(len(lines) + 1))
 
                             training_occurence += 1
         else:
             lines.append(lu_data_part1 + lu_data_part2)
-            cells_with_border_top.extend(_add_border_top(len(lines)+1))
+            cells_with_border_top.extend(_add_border_top(len(lines) + 1))
             cells_to_color = _check_cell_to_color(cells_to_color, learning_unit_yr, len(lines) + 1)
 
     return {
@@ -212,7 +212,7 @@ def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYea
     cells_with_white_font = []
     if training_occurence > 1:
         cells_with_white_font = [
-            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN-1)
+            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN - 1)
         ]
 
         colored_cells[WHITE_FONT].extend(cells_with_white_font)

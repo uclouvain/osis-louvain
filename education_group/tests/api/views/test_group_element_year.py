@@ -38,9 +38,12 @@ from base.tests.factories.person import PersonFactory
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd import command
 from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
@@ -164,7 +167,12 @@ class TrainingTreeViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         training_element = Element.objects.get(group_year__educationgroupversion__offer=self.training)
-        program_tree = load_tree.load(training_element.id)
+        program_tree = get_program_tree_service.get_program_tree(
+            command.GetProgramTree(
+                code=training_element.group_year.partial_acronym,
+                year=training_element.group_year.academic_year.year
+            )
+        )
         serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=program_tree.root_node),
             context={
@@ -259,8 +267,12 @@ class MiniTrainingTreeViewTestCase(APITestCase):
     def test_get_mini_training_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        program_tree = load_tree.load(self.mini_training_element.id)
+        program_tree = get_program_tree_service.get_program_tree(
+            command.GetProgramTree(
+                code=self.mini_training_element.group_year.partial_acronym,
+                year=self.mini_training_element.group_year.academic_year.year
+            )
+        )
         serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=program_tree.root_node),
             context={
@@ -342,8 +354,11 @@ class GroupTreeViewTestCase(APITestCase):
     def test_get_group_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        program_tree = load_tree.load(self.element_common_core.id)
+        tree_identity = ProgramTreeIdentity(
+            code=self.element_common_core.group_year.partial_acronym,
+            year=self.element_common_core.group_year.academic_year.year
+        )
+        program_tree = ProgramTreeRepository.get(tree_identity)
         serializer = EducationGroupRootNodeTreeSerializer(
             Link(parent=None, child=program_tree.root_node),
             context={

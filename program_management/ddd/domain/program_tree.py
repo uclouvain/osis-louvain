@@ -386,23 +386,6 @@ class ProgramTree(interface.RootEntity):
         except (StopIteration, IndexError):
             raise NodeNotFoundException
 
-    @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
-    def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
-        """
-        DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
-        Return the corresponding node based on the node_id value with respect to the class.
-        :param node_id: int
-        :param node_type: NodeType
-        :return: Node
-        """
-        return next(
-            (
-                node for node in self.get_all_nodes()
-                if node.node_id == node_id and node.type == node_type
-            ),
-            None
-        )
-
     def get_node_smallest_ordered_path(self, node: 'Node') -> Optional[Path]:
         """
         Return the smallest ordered path of node inside the tree.

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.prerequisite import PrerequisiteExpression, Prerequisite, Prerequisites, \
         PrerequisiteItem
 
-    from program_management.ddd.repositories.load_tree import NodeKey
+    from program_management.ddd.repositories.program_tree import NodeKey
 
     from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
     from program_management.ddd.repositories.program_tree import ProgramTreeRepository

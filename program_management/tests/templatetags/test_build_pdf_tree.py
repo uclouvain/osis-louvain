@@ -32,7 +32,8 @@ from base.templatetags.education_group_pdf import pdf_tree_list
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from program_management.ddd.repositories import load_tree
+from program_management.ddd import command
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
@@ -80,8 +81,8 @@ class TestBuildPDFTree(TestCase):
             is_mandatory=True
         )
 
-        for elem_learning_unit_year in [ self.element_learning_unit_year_1, self.element_learning_unit_year_2,
-                                         self.element_learning_unit_year_3, self.element_learning_unit_year_4]:
+        for elem_learning_unit_year in [self.element_learning_unit_year_1, self.element_learning_unit_year_2,
+                                        self.element_learning_unit_year_3, self.element_learning_unit_year_4]:
             LearningComponentYearFactory(
                 learning_unit_year=elem_learning_unit_year.learning_unit_year,
                 type=LECTURING
@@ -92,7 +93,9 @@ class TestBuildPDFTree(TestCase):
             )
 
     def test_build_pdf_tree_with_mandatory(self):
-        tree = load_tree.load(self.education_group_year_1.id)
+        tree = get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.education_group_year_1.id)
+        )
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
@@ -107,7 +110,9 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.is_mandatory = False
         self.group_element_year_2.save()
 
-        tree = load_tree.load(self.education_group_year_1.id)
+        tree = get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.education_group_year_1.id)
+        )
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"

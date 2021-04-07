@@ -380,6 +380,11 @@ class GetProgramTree(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetProgramTreeFromRootElementIdCommand(interface.CommandRequest):
+    root_element_id = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateLinkCommand(interface.CommandRequest):
     parent_node_code = attr.ib(type=str)
     parent_node_year = attr.ib(type=int)

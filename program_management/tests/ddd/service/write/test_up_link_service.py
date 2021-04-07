@@ -26,7 +26,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 import program_management.ddd.service.write.up_link_service
-from program_management.ddd.domain import program_tree, link, node
+from program_management.ddd.domain import program_tree, node
 from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -43,15 +43,22 @@ class TestUpLink(SimpleTestCase):
         self.link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
 
         self.load_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.load_tree.load",
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.get",
             return_value=self.tree
         )
         self.mocked_load_tree = self.load_tree_patcher.start()
         self.addCleanup(self.load_tree_patcher.stop)
 
+        self.get_node_from_element_id_patcher = mock.patch(
+            "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
+            return_value=self.tree.root_node
+        )
+        self.mocked_get_node_from_element_id = self.get_node_from_element_id_patcher.start()
+        self.addCleanup(self.get_node_from_element_id_patcher.stop)
+
         self.persist_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.persist_tree.persist",
-            return_value=None
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.update",
+            return_value=self.tree.entity_id
         )
         self.mocked_persist_tree = self.persist_tree_patcher.start()
         self.addCleanup(self.persist_tree_patcher.stop)

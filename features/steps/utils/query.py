@@ -23,12 +23,13 @@
 # ############################################################################
 import random
 
-from base.models import person, learning_unit_year, education_group_year
+from base.models import person, learning_unit_year
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_types import GroupType
 from base.models.learning_unit_year import LearningUnitYear
-from program_management.ddd.repositories import load_tree
+from program_management.ddd import command
+from program_management.ddd.service.read import get_program_tree_service
 
 
 def get_random_learning_unit() -> learning_unit_year.LearningUnitYear:
@@ -40,6 +41,8 @@ def get_random_learning_unit() -> learning_unit_year.LearningUnitYear:
 def get_random_element_from_tree(
         tree_node_id: int
 ) -> str:
-    tree = load_tree.load(tree_node_id)
+    tree = get_program_tree_service.get_program_tree_from_root_element_id(
+        command.GetProgramTreeFromRootElementIdCommand(root_element_id=tree_node_id)
+    )
     nodes = tree.get_all_nodes(types={GroupType.COMMON_CORE})
     return random.choice(list(nodes)).code

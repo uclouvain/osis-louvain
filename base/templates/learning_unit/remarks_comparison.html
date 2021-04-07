@@ -24,7 +24,7 @@
 {% endcomment %}
 {% with key=_('Faculty remark (unpublished)') %}
     <tr style="border-top: groove">
-        <td class="table_header">{{key}}</td>
+        <td class="table_header">{{ key }}</td>
         {% if previous %}
             {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
         {% endif %}
@@ -35,8 +35,8 @@
     </tr>
 {% endwith %}
 {% with key=_('Other remark (intended for publication)') %}
-    <tr >
-        <td class="table_header">{{key}}</td>
+    <tr>
+        <td class="table_header">{{ key }}</td>
         {% if previous %}
             {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
         {% endif %}
@@ -48,7 +48,7 @@
 {% endwith %}
 {% with key=_('Other remark in english (intended for publication)') %}
     <tr>
-        <td class="table_header">{{key}}</td>
+        <td class="table_header">{{ key }}</td>
         {% if previous %}
             {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
         {% endif %}

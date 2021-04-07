@@ -25,8 +25,10 @@
 ##############################################################################
 
 import program_management.ddd.command
+from program_management.ddd import command
 from program_management.ddd.domain import node
-from program_management.ddd.repositories import load_tree, node as node_repository, program_tree, program_tree_version
+from program_management.ddd.repositories import node as node_repository, program_tree, program_tree_version
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.validators import validators_by_business_action
 
 
@@ -34,7 +36,9 @@ def check_paste(check_command: program_management.ddd.command.CheckPasteNodeComm
     node_to_paste = node_repository.NodeRepository.get(
         node.NodeIdentity(code=check_command.node_to_paste_code, year=check_command.node_to_paste_year)
     )
-    tree = load_tree.load(check_command.root_id)
+    tree = get_program_tree_service.get_program_tree_from_root_element_id(
+        command.GetProgramTreeFromRootElementIdCommand(root_element_id=check_command.root_id)
+    )
 
     validators_by_business_action.CheckPasteNodeValidatorList(
         tree,

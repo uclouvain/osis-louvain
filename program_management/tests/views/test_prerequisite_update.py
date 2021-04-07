@@ -58,7 +58,6 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         cls.element_learning_unit_year = ElementLearningUnitYearFactory(
             learning_unit_year__learning_container_year__academic_year=cls.academic_year
         )
-
         GroupElementYearChildLeafFactory(parent_element=root_element, child_element=cls.element_learning_unit_year)
         cls.central_manager = CentralManagerFactory(entity=offer.management_entity)
         OpenAcademicCalendarFactory(

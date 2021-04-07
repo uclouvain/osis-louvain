@@ -24,7 +24,8 @@
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_node, load_tree, persist_tree
+from program_management.ddd.repositories import load_node, program_tree
+from program_management.ddd.service.read import get_program_tree_service
 
 
 def up_link(command_up: command.OrderUpLinkCommand) -> 'NodeIdentity':
@@ -34,10 +35,12 @@ def up_link(command_up: command.OrderUpLinkCommand) -> 'NodeIdentity':
     parent_node = load_node.load(parent_id)
     child_node = load_node.load(child_id)
 
-    tree = load_tree.load(root_id)
+    tree = get_program_tree_service.get_program_tree_from_root_element_id(
+        command.GetProgramTreeFromRootElementIdCommand(root_element_id=root_id)
+    )
     link_to_up = tree.get_link(parent_node, child_node)
     parent_node = link_to_up.parent
     parent_node.up_child(child_node)
 
-    persist_tree.persist(tree)
+    program_tree.ProgramTreeRepository.update(tree)
     return child_node.entity_id

@@ -43,6 +43,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
@@ -145,14 +146,24 @@ class NodeIdentitySearch(interface.DomainService):
     @classmethod
     def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
         try:
-            group_year = GroupYear.objects.values(
-                'partial_acronym', 'academic_year__year'
-            ).get(element__pk=element_id)
-            return NodeIdentity(code=group_year['partial_acronym'], year=group_year['academic_year__year'])
-        except GroupYear.DoesNotExist:
+            element = Element.objects.values(
+                'group_year__partial_acronym',
+                'learning_unit_year__acronym',
+                'group_year__academic_year__year',
+                'learning_unit_year__academic_year__year'
+            ).get(pk=element_id)
+            if element['group_year__partial_acronym']:
+                return NodeIdentity(
+                    code=element['group_year__partial_acronym'], year=element['group_year__academic_year__year']
+                )
+            return NodeIdentity(
+                code=element['learning_unit_year__acronym'], year=element['learning_unit_year__academic_year__year']
+            )
+        except Element.DoesNotExist:
             return None
 
-    def get_from_prerequisite_item(self, prerequisite_item: 'PrerequisiteItem') -> 'NodeIdentity':
+    @staticmethod
+    def get_from_prerequisite_item(prerequisite_item: 'PrerequisiteItem') -> 'NodeIdentity':
         return NodeIdentity(code=prerequisite_item.code, year=prerequisite_item.year)
 
 

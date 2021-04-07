@@ -29,9 +29,10 @@ from program_management.ddd.domain import node
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR, ProgramTreeIdentity
 from program_management.ddd.domain.service import identity_search
-from program_management.ddd.repositories import load_tree, program_tree, \
+from program_management.ddd.repositories import program_tree, \
     program_tree_version, node as node_repository
 from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
+from program_management.ddd.service.read import get_program_tree_service
 
 
 @transaction.atomic()
@@ -64,7 +65,12 @@ def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':
 
     if path_to_detach:
         root_tree_to_detach = int(path_to_detach.split(PATH_SEPARATOR)[0])
-        tree_to_detach = tree if root_tree_to_detach == root_id else load_tree.load(root_tree_to_detach)
+        if root_tree_to_detach == root_id:
+            tree_to_detach = tree
+        else:
+            tree_to_detach = get_program_tree_service.get_program_tree_from_root_element_id(
+                command.GetProgramTreeFromRootElementIdCommand(root_element_id=root_tree_to_detach)
+            )
         tree_to_detach.detach_node(path_to_detach, tree_repository, TreePrerequisitesRepository())
         tree_repository.update(tree_to_detach)
 
