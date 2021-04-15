@@ -33,7 +33,7 @@ from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel
 from osis_common.ddd import interface
-from osis_common.ddd.interface import Entity, EntityIdentity, ApplicationService
+from osis_common.ddd.interface import Entity, EntityIdentity, ApplicationService, RootEntity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite as prerequisite_domain
 from program_management.ddd.domain.prerequisite import Prerequisites
@@ -44,11 +44,7 @@ TreeRootId = int
 
 class TreePrerequisitesRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
-        raise NotImplementedError
-
-    @classmethod
-    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
+    def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError
 
     @classmethod

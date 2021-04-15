@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -42,12 +43,17 @@ from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
-from osis_common.ddd.interface import Entity, EntityIdentity
+from osis_common.ddd.interface import Entity, EntityIdentity, RootEntity
 
 
 class MiniTrainingRepository(interface.AbstractRepository):
     @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
+    @classmethod
     def create(cls, mini_training_obj: mini_training.MiniTraining, **_) -> mini_training.MiniTrainingIdentity:
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
             academic_year = AcademicYearModelDb.objects.get(year=mini_training_obj.year)
             start_year = AcademicYearModelDb.objects.get(year=mini_training_obj.start_year)
@@ -98,6 +104,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, mini_training_obj: 'mini_training.MiniTraining', **kwargs) -> 'mini_training.MiniTrainingIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
             _update_education_group(mini_training_obj)
             _update_education_group_year(mini_training_obj)
