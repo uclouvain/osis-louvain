@@ -37,9 +37,6 @@ exrex==0.10.5
 django-autocomplete-light==3.4.1
 bleach==3.3.0
 django-cte==1.1.5
-pycodestyle==2.4.0
-pylint==2.4.4
-diff-cover==3.0.1
 numpy==1.17.4
 # setuptools 50.0 causes issues
 setuptools==49.6.0
