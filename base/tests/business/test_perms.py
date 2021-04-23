@@ -585,7 +585,10 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
 
     def test_is_not_eligible_consolidate_delete_proposal_if_has_applications(self):
         requirement_entity = EntityFactory()
-        luy = LearningUnitYearFactory(learning_container_year__requirement_entity=requirement_entity)
+        luy = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=requirement_entity,
+            subtype=learning_unit_year_subtypes.FULL
+        )
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=ProposalType.SUPPRESSION.name,

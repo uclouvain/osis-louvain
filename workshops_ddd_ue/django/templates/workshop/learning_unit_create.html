@@ -1,0 +1,106 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load static bootstrap3 %}
+{% load i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li class="active">
+        {% trans 'New learning unit' %}
+    </li>
+{% endblock breadcrumb %}
+
+{% block header_content %}
+    <div class="page-header">
+        <h2>{% trans 'New learning unit' %}</h2>
+    </div>
+{% endblock header_content %}
+
+{% block content %}
+
+    {% bootstrap_form_errors form %}
+
+    <form method="post" id="LearningUnitYearForm" novalidate>
+        <div class="panel-footer">
+            {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+        </div>
+
+        <div class="panel-body">
+
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-4 acronym-group">
+                                    {% bootstrap_label form.code.label label_class="control-label" %}
+                                    <abbr title="{% trans 'acronym rules' %}">
+                                                <span class="glyphicon glyphicon-question-sign "
+                                                      title="{% trans 'acronym rules' %}"
+                                                      style="font-size: 14pt;"></span>
+                                    </abbr>
+                                    {% bootstrap_field form.code show_label=False %}
+                                </div>
+                                {% bootstrap_field form.type form_group_class="col-md-3" %}
+                                {% bootstrap_field form.internship_subtype form_group_class="col-md-5" %}
+                            </div>
+                            <div class="row">
+                                {% bootstrap_field form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
+                                {% bootstrap_field form.periodicity form_group_class="col-md-3" %}
+    {#                            {% bootstrap_field form.status form_group_class="col-md-2" %}#}
+                                {% bootstrap_field form.language form_group_class="col-md-4" %}
+                            </div>
+
+                            <br>
+
+                            {% include "workshop/_panel_titles.html" %}
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {% bootstrap_field form.remark_faculty %}
+                            {% bootstrap_field form.remark_publication_fr %}
+                            {% bootstrap_field form.remark_publication_en %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {% include "workshop/_panel_institution.html" %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+            {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+        </div>
+
+
+    </form>
+{% endblock content %}

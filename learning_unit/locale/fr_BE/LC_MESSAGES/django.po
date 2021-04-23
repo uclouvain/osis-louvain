@@ -117,6 +117,9 @@ msgstr "L'unité d'enseignement a au moins une attribution"
 msgid "This learning unit has attribution this year"
 msgstr "L'unité d'enseignement a au moins une attribution cette année"
 
+msgid "This learning unit has teachers"
+msgstr "L'unité d'enseignement a au moins un·e enseignant·e"
+
 msgid "This learning unit is not editable this period."
 msgstr "L'unité d'enseignement n'est pas modifiable durant cette période."
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
+from typing import List
 
 from django.db.models import Q, Prefetch
 
@@ -44,7 +45,7 @@ def find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year
     return create_attributions_dictionary(attribution_charges)
 
 
-def create_attributions_dictionary(attribution_charges):
+def create_attributions_dictionary(attribution_charges: List[AttributionChargeNew]):
     attributions = OrderedDict()
     for attribution_charge in attribution_charges:
         key = attribution_charge.attribution.id
@@ -52,7 +53,8 @@ def create_attributions_dictionary(attribution_charges):
                             "function": attribution_charge.attribution.function,
                             "start_year": attribution_charge.attribution.start_year,
                             "duration": attribution_charge.attribution.duration,
-                            "substitute": attribution_charge.attribution.substitute}
+                            "substitute": attribution_charge.attribution.substitute,
+                            "score_responsible": attribution_charge.attribution.score_responsible}
         attributions.setdefault(key, attribution_dict) \
             .update({attribution_charge.learning_component_year.type: attribution_charge.allocation_charge})
     return attributions

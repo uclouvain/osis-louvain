@@ -22,12 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import warnings
 from typing import Optional, List
 
 from django.core.cache import cache
 
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 from program_management.ddd.domain.report import Report, ReportIdentity
 
 DEFAULT_TIMEOUT = 60  # seconds
@@ -35,7 +36,12 @@ DEFAULT_TIMEOUT = 60  # seconds
 
 class ReportRepository(interface.AbstractRepository):
     @classmethod
+    def save(cls, entity: Report) -> None:
+        raise NotImplementedError
+
+    @classmethod
     def create(cls, report: Report, **kwargs) -> ReportIdentity:
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         cache.set(str(report.entity_id.transaction_id), report, timeout=DEFAULT_TIMEOUT)
         return report.entity_id
 
@@ -45,12 +51,13 @@ class ReportRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
-        pass
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
+        raise NotImplementedError
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
-        pass
+        raise NotImplementedError
 
     @classmethod
     def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
-        pass
+        raise NotImplementedError

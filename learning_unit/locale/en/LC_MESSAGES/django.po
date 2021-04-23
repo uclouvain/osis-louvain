@@ -108,6 +108,9 @@ msgstr ""
 msgid "This learning unit has attribution this year"
 msgstr ""
 
+msgid "This learning unit has teachers"
+msgstr ""
+
 msgid "This learning unit is not editable this period."
 msgstr ""
 

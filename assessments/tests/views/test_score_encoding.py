@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -302,12 +302,13 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.client.post(url, data=self.get_form_with_all_students_filled())
 
         self.assertTrue(mock_send_email.called)
-        (persons, enrollments, learning_unit_acronym, offer_acronym), kwargs = mock_send_email.call_args
+        (persons, enrollments, learning_unit_acronym, offer_acronym, enrollment_ids), kwargs = mock_send_email.call_args
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[0]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
         education_group_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.education_group_year
         self.assertEqual(offer_acronym, education_group_year.acronym)
+        self.assertEqual(enrollment_ids[0], self.enrollments[0].id)
 
     @patch("base.utils.send_mail.send_message_after_all_encoded_by_manager")
     def test_email_after_encoding_all_students_for_education_group_year_with_justification(self, mock_send_email):
@@ -317,12 +318,13 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_unjustified())
 
         self.assertTrue(mock_send_email.called)
-        (persons, enrollments, learning_unit_acronym, offer_acronym), kwargs = mock_send_email.call_args
+        (persons, enrollments, learning_unit_acronym, offer_acronym, enrollments_id), kwargs = mock_send_email.call_args
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[1]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
         education_group_year = self.enrollments[1].learning_unit_enrollment.offer_enrollment.education_group_year
         self.assertEqual(offer_acronym, education_group_year.acronym)
+        self.assertEqual(enrollments_id[0], self.enrollments[1].id)
 
     @patch("base.utils.send_mail.send_mail_after_scores_submission")
     def test_online_encoding_submission_not_all_encoded(self, mock_send_mail_after_scores_submission):

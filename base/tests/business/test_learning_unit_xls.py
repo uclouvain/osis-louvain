@@ -569,6 +569,8 @@ class TestLearningUnitXls(TestCase):
             luy.complete_title_english,
             '',
             '',
+            '',
+            '',
             luy.get_periodicity_display(),
             yesno(luy.status),
             get_significant_volume(luy.pm_vol_tot or 0),
@@ -673,16 +675,20 @@ class TestLearningUnitXls(TestCase):
 
 def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
     expected_attributions = []
+    score_responsibles = []
     for k, v in luy.attribution_charge_news.items():
         expected_attributions.append(v)
+        if v.get('score_responsible'):
+            score_responsibles.append(v)
 
-    complete_name = ';'.join("{} {}".format(
-            expected_attribution.get('person').last_name.upper(),
-            expected_attribution.get('person').first_name
-        ) for expected_attribution in expected_attributions)
+    tutors_names_concat = _get_persons_names(expected_attributions)
+    tutors_emails_concat = _get_persons_emails(expected_attributions)
 
-    emails = ";".join(expected_attribution.get('person').email for expected_attribution in expected_attributions)
-    ex = [complete_name, emails]
+    ex = [tutors_names_concat, tutors_emails_concat]
+
+    score_responsibles_names_concat = _get_persons_names(score_responsibles)
+    score_responsibles_emails_concat = _get_persons_emails(score_responsibles)
+    ex.extend([score_responsibles_names_concat, score_responsibles_emails_concat])
     ex.extend(expected)
     return ex
 
@@ -740,3 +746,14 @@ def _expected_titles_for_external() -> List[str]:
         str(_('Url')),
         str(_('Local credits')),
     ]
+
+
+def _get_persons_emails(attributions):
+    return ";".join(expected_attribution.get('person').email for expected_attribution in attributions)
+
+
+def _get_persons_names(attributions):
+    return ';'.join("{} {}".format(
+        expected_attribution.get('person').last_name.upper(),
+        expected_attribution.get('person').first_name
+    ) for expected_attribution in attributions)

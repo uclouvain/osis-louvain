@@ -2220,6 +2220,9 @@ msgstr "Les scores doivent être compris entre 0 et 20"
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
+msgid "Scores responsibles (emails)"
+msgstr "Responsables de notes (emails)"
+
 msgid "Search for an entity"
 msgstr "Rechercher une entité"
 
@@ -2766,6 +2769,9 @@ msgstr "Enseignant·e"
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
+msgid "Tutors (scores responsibles included)"
+msgstr "Enseignant·e·s (responsables de notes inclus)"
+
 msgid "Type"
 msgstr "Type"
 
@@ -2821,6 +2827,9 @@ msgstr "Mise-à-jour bloquée pour l'enseignant"
 
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
+
+msgid "Updated"
+msgstr "Mis à jour"
 
 msgid "Url"
 msgstr "URL"

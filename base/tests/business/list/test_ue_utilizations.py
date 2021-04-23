@@ -65,9 +65,9 @@ from program_management.tests.factories.education_group_version import \
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 
-TRAINING_TITLE_COLUMN = 28
-TRAINING_CODE_COLUMN = 27
-GATHERING_COLUMN = 26
+TRAINING_TITLE_COLUMN = 30
+TRAINING_CODE_COLUMN = 29
+GATHERING_COLUMN = 28
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -175,6 +175,8 @@ class TestUeUtilization(TestCase):
                                  str(_('Title in English')),
                                  str(_('List of teachers')),
                                  str(_('List of teachers (email)')),
+                                 str(_('Scores responsibles')),
+                                 str(_('Scores responsibles (emails)')),
                                  str(_('Periodicity')),
                                  str(_('Active')),
                                  "{} - {}".format(_('Lecturing vol.'), _('Annual')),
@@ -288,7 +290,7 @@ class TestUeUtilization(TestCase):
 
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
 
@@ -300,7 +302,7 @@ class TestUeUtilization(TestCase):
         )        
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
         self.assertDictEqual(result, {PROPOSAL_LINE_STYLES.get(self.proposal.type): row_colored_because_of_proposal})
 
@@ -318,10 +320,10 @@ class TestUeUtilization(TestCase):
         )        
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
         ]
         row_colored_because_of_proposal = [
-            'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1'
+            'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
@@ -370,6 +372,8 @@ class TestUeUtilization(TestCase):
             luy.complete_title_english,
             '{} {}'.format(a_tutor.person.last_name.upper(), a_tutor.person.first_name),
             a_tutor.person.email,
+            '',
+            '',
             luy.get_periodicity_display(),
             yesno(luy.status),
             get_significant_volume(luy.pm_vol_tot or 0),

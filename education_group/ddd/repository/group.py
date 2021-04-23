@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -52,11 +53,17 @@ from education_group.ddd.domain.service.enum_converter import EducationGroupType
 from education_group.models.group import Group as GroupModelDb
 from education_group.models.group_year import GroupYear as GroupYearModelDb
 from osis_common.ddd import interface
+from osis_common.ddd.interface import RootEntity
 
 
 class GroupRepository(interface.AbstractRepository):
     @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
+    @classmethod
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
@@ -122,6 +129,7 @@ class GroupRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
             management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
                 acronym=group.management_entity.acronym,

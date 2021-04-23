@@ -28,9 +28,14 @@ from typing import Optional, List
 from attribution.ddd.domain.attribution import AttributionIdentity, Attribution
 from attribution.ddd.repositories.load_attribution import load_attributions
 from osis_common.ddd import interface
+from osis_common.ddd.interface import RootEntity
 
 
 class AttributionRepository(interface.AbstractRepository):
+
+    @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
 
     @classmethod
     def search(cls, entity_ids: Optional[List['AttributionIdentity']] = None, **kwargs) -> List[Attribution]:
@@ -38,14 +43,6 @@ class AttributionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'AttributionIdentity', **_) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def create(cls, program_tree: 'AttributionIdentity', **_) -> 'AttributionIdentity':
-        raise NotImplementedError
-
-    @classmethod
-    def update(cls, program_tree: 'AttributionIdentity', **_) -> 'AttributionIdentity':
         raise NotImplementedError
 
     @classmethod

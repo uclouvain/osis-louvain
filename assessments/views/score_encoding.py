@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,11 +39,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as  PsycopInterfaceError
+from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as PsycopInterfaceError
 
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
+from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
@@ -55,6 +56,7 @@ from base.models.person import Person
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
+
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
@@ -227,6 +229,11 @@ def online_encoding(request, learning_unit_year_id=None):
 def online_encoding_form(request, learning_unit_year_id=None):
     template_name = "online_encoding_form.html"
     if request.method == 'POST':
+        scores_list_before_update = score_encoding_list.get_scores_encoding_list(
+            user=request.user,
+            learning_unit_year_id=learning_unit_year_id
+        )
+
         updated_enrollments = None
         encoded_enrollment_ids = _extract_id_from_post_data(request)
         # Get only encoded from database
@@ -247,11 +254,12 @@ def online_encoding_form(request, learning_unit_year_id=None):
         else:
             template_name = "online_encoding.html"
             send_messages_to_notify_encoding_progress(
-                context["enrollments"],
-                context["learning_unit_year"],
-                context["is_program_manager"],
-                updated_enrollments,
-                pgm_manager=mdl.person.find_by_user(request.user)
+                all_enrollments=context["enrollments"],
+                learning_unit_year=context["learning_unit_year"],
+                is_program_manager=context["is_program_manager"],
+                updated_enrollments=updated_enrollments,
+                pgm_manager=mdl.person.find_by_user(request.user),
+                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
             )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
@@ -369,6 +377,10 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
 def online_double_encoding_validation(request, learning_unit_year_id=None):
     if request.method == 'POST':
         updated_enrollments = None
+        scores_list_before_update = score_encoding_list.get_scores_encoding_list(
+            user=request.user,
+            learning_unit_year_id=learning_unit_year_id
+        )
         scores_list_encoded = _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id)
 
         updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
@@ -379,11 +391,12 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                 user=request.user,
                 learning_unit_year_id=learning_unit_year_id)
             send_messages_to_notify_encoding_progress(
-                scores_list_encoded.enrollments,
-                scores_list_encoded.learning_unit_year,
-                is_program_manager,
-                updated_enrollments,
-                pgm_manager=mdl.person.find_by_user(request.user)
+                all_enrollments=scores_list_encoded.enrollments,
+                learning_unit_year=scores_list_encoded.learning_unit_year,
+                is_program_manager=is_program_manager,
+                updated_enrollments=updated_enrollments,
+                pgm_manager=mdl.person.find_by_user(request.user),
+                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
             )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -441,7 +454,8 @@ def __send_messages_for_each_education_group_year(
         all_enrollments,
         learning_unit_year,
         updated_enrollments,
-        pgm_manager: mdl.person.Person
+        pgm_manager: mdl.person.Person,
+        encoding_already_completed_before_update: bool
 ):
     """
     Send a message for each education group year to all the tutors of a learning unit inside a program
@@ -452,6 +466,7 @@ def __send_messages_for_each_education_group_year(
     :param learning_unit_year: The learning unit year of the enrollments.
     :param updated_enrollments: list of exam enrollments objects which has been updated
     :param pgm_manager: The program manager (current logged user) that has encoded scores.
+    :param encoding_already_completed_before_update: Before update encoding was already complete.
     :return: A list of error message if message cannot be sent
     """
     sent_error_messages = []
@@ -474,7 +489,9 @@ def __send_messages_for_each_education_group_year(
             learning_unit_year,
             education_group_year,
             pgm_manager=pgm_manager,
-            score_sheet_address=score_sheet_address
+            encoding_already_completed_before_update=encoding_already_completed_before_update,
+            score_sheet_address=score_sheet_address,
+            updated_enrollments=updated_enrollments
         )
         if sent_error_message:
             sent_error_messages.append(sent_error_message)
@@ -486,7 +503,9 @@ def __send_message_for_education_group_year(
         learning_unit_year,
         education_group_year,
         pgm_manager: mdl.person.Person,
-        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None
+        encoding_already_completed_before_update: bool,
+        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None,
+        updated_enrollments=None,
 ):
     enrollments = filter_enrollments_by_education_group_year(all_enrollments, education_group_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
@@ -500,11 +519,14 @@ def __send_message_for_education_group_year(
         if score_sheet_address and score_sheet_address.email:
             # Todo: Refactor CC list must not be a person but a list of email...
             cc_list.append(Person(email=score_sheet_address.email))
+        updated_enrollments_ids = [enrollment.id for enrollment in updated_enrollments]
         sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
             receivers,
             enrollments,
             learning_unit_year.acronym,
             offer_acronym,
+            updated_enrollments_ids,
+            encoding_already_completed_before_update=encoding_already_completed_before_update,
             cc=cc_list
         )
     return sent_error_message
@@ -551,6 +573,10 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
         mail_already_sent_by_learning_unit = set()
         for enrollment in updated_enrollments:
             learning_unit_year = enrollment.learning_unit_enrollment.learning_unit_year
+            scores_list_before_update = score_encoding_list.get_scores_encoding_list(
+                user=logged_user,
+                learning_unit_year_id=learning_unit_year.id
+            )
             if learning_unit_year in mail_already_sent_by_learning_unit:
                 continue
             scores_list = score_encoding_list.get_scores_encoding_list(
@@ -558,11 +584,12 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
                 learning_unit_year_id=learning_unit_year.id
             )
             send_messages_to_notify_encoding_progress(
-                scores_list.enrollments,
-                learning_unit_year,
-                is_program_manager,
-                updated_enrollments,
-                pgm_manager=pgm_manager
+                all_enrollments=scores_list.enrollments,
+                learning_unit_year=learning_unit_year,
+                is_program_manager=is_program_manager,
+                updated_enrollments=updated_enrollments,
+                pgm_manager=pgm_manager,
+                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
             )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
@@ -572,14 +599,16 @@ def send_messages_to_notify_encoding_progress(
         learning_unit_year,
         is_program_manager,
         updated_enrollments,
-        pgm_manager: mdl.person.Person
+        pgm_manager: mdl.person.Person,
+        encoding_already_completed_before_update: bool
 ):
     if is_program_manager:
         __send_messages_for_each_education_group_year(
             all_enrollments,
             learning_unit_year,
             updated_enrollments,
-            pgm_manager
+            pgm_manager,
+            encoding_already_completed_before_update
         )
 
 
@@ -745,3 +774,7 @@ def _get_count_still_enrolled(enrollments):
         if enrollment.enrollment_state == enrollment_states.ENROLLED:
             nb_enrolled += 1
     return nb_enrolled
+
+
+def _is_encoding_completed_before_update(scores_list_before_update: ScoresEncodingList) -> bool:
+    return scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments

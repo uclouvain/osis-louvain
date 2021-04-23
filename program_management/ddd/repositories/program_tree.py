@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Set
+import warnings
+from typing import Optional, List, Set, Union
 
 from django.db.models import Q
 
@@ -31,6 +32,7 @@ from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from osis_common.ddd.interface import Entity, RootEntity
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception, program_tree
@@ -39,6 +41,10 @@ from program_management.models.element import Element
 
 
 class ProgramTreeRepository(interface.AbstractRepository):
+
+    @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
 
     @classmethod
     def search(
@@ -82,6 +88,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
             create_orphan_group_service: interface.ApplicationService = None,
             copy_group_service: interface.ApplicationService = None,
     ) -> 'ProgramTreeIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         for node in [n for n in program_tree.get_all_nodes() if n._has_changed and not n.is_learning_unit()]:
             # FIXME _is_copied attribute is a dirty fix for the issue of having to know whether to create or copy
             if create_orphan_group_service and not node._is_copied:
@@ -119,6 +126,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, program_tree: 'ProgramTree', **_) -> 'ProgramTreeIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         persist_tree.persist(program_tree)
         return program_tree.entity_id
 

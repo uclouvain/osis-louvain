@@ -35,6 +35,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_start_year_after_year_limit &
                 predicates.is_learning_unit_edition_for_central_manager_period_open &
                 predicates.has_learning_unit_prerequisite_dependencies &
+                predicates.has_learning_unit_partim_no_application_all_years &
                 predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &

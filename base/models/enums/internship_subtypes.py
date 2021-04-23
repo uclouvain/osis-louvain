@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 TEACHING_INTERNSHIP = "TEACHING_INTERNSHIP"
 CLINICAL_INTERNSHIP = "CLINICAL_INTERNSHIP"
 PROFESSIONAL_INTERNSHIP = "PROFESSIONAL_INTERNSHIP"
@@ -34,5 +36,12 @@ INTERNSHIP_SUBTYPES = (
     (TEACHING_INTERNSHIP, _("Teaching internship")),
     (CLINICAL_INTERNSHIP, _("Clinical internship")),
     (PROFESSIONAL_INTERNSHIP, _("Professional internship")),
-    (RESEARCH_INTERNSHIP, _("Research internship"))
+    (RESEARCH_INTERNSHIP, _("Research internship")),
 )
+
+
+class InternshipSubtype(ChoiceEnum):
+    TEACHING_INTERNSHIP = _("Teaching internship")
+    CLINICAL_INTERNSHIP = _("Clinical internship")
+    PROFESSIONAL_INTERNSHIP = _("Professional internship")
+    RESEARCH_INTERNSHIP = _("Research internship")

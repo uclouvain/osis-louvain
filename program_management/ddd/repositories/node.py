@@ -29,7 +29,7 @@ from django.db.models import Q
 
 from base.models import group_element_year
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, Entity
+from osis_common.ddd.interface import EntityIdentity, Entity, RootEntity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_node
 from program_management.models.element import Element
@@ -39,11 +39,7 @@ from program_management.models.element import Element
 class NodeRepository(interface.AbstractRepository):
 
     @classmethod
-    def create(cls, entity: 'Node', **_) -> EntityIdentity:
-        raise NotImplementedError
-
-    @classmethod
-    def update(cls, entity: 'Node', **_) -> EntityIdentity:
+    def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError
 
     @classmethod

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import contextlib
+import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -37,6 +38,7 @@ from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from osis_common.ddd.interface import RootEntity
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
@@ -49,11 +51,16 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
     @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
+    @classmethod
     def create(
             cls,
             program_tree_version: 'ProgramTreeVersion',
             **_
     ) -> 'ProgramTreeVersionIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         offer_acronym = program_tree_version.entity_id.offer_acronym
         year = program_tree_version.entity_id.year
         try:
@@ -93,6 +100,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, program_tree_version: 'ProgramTreeVersion', **_) -> 'ProgramTreeVersionIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         obj = EducationGroupVersion.objects.get(
             offer__acronym=program_tree_version.entity_identity.offer_acronym,
             offer__academic_year__year=program_tree_version.entity_identity.year,

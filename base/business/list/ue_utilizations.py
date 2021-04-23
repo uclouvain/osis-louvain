@@ -48,8 +48,8 @@ CELLS_TO_COLOR = 'cells_to_color'
 XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
-FIRST_TRAINING_COLUMN = 26
-TOTAL_NB_OF_COLUMNS = 31
+FIRST_TRAINING_COLUMN = 28
+TOTAL_NB_OF_COLUMNS = 33
 HEADER_PROGRAMS = [
     str(_('Gathering')),
     str(_('Training code')),

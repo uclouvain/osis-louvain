@@ -24,10 +24,13 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List, Set
+from functools import partial
+from typing import List, Set, Union
+
+import attr
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
-from osis_common.ddd.interface import BusinessException
+from osis_common.ddd.interface import BusinessException, RootEntity, Entity, EntityIdentity, ValueObject, PrimitiveType
 
 
 class BusinessValidator(ABC):
@@ -38,7 +41,11 @@ class BusinessValidator(ABC):
 
     success_messages = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self,
+            *args: Union['RootEntity', 'Entity', 'EntityIdentity', 'ValueObject', 'PrimitiveType'],
+            **kwargs: Union['RootEntity', 'Entity', 'EntityIdentity', 'ValueObject', 'PrimitiveType']
+    ):
         self._messages = []
         if self.success_messages is None:
             self.success_messages = []
@@ -121,14 +128,69 @@ class MultipleBusinessExceptions(Exception):
 
 class MultipleExceptionBusinessListValidator(BusinessListValidator):
     def validate(self):
-        exceptions = set()
-        for validator in self.validators:
-            try:
-                validator.validate()
-            except MultipleBusinessExceptions as e:
-                exceptions |= e.exceptions
-            except BusinessException as e:
-                exceptions.add(e)
+        _catch_exceptions_from_validators_and_raise_multiple_business_exceptions(self.validators)
 
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
+
+def _catch_exceptions_from_validators_and_raise_multiple_business_exceptions(validators: List['BusinessValidator']):
+    exceptions = set()
+    for validator in validators:
+        try:
+            validator.validate()
+        except MultipleBusinessExceptions as e:
+            exceptions |= e.exceptions
+        except BusinessException as e:
+            exceptions.add(e)
+
+    if exceptions:
+        raise MultipleBusinessExceptions(exceptions=exceptions)
+
+
+@attr.s(frozen=True, slots=True)
+class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        """Contains ONLY validations for :
+        - Type of fields
+        - Enums fields
+        - RequiredFields
+        - ValidationRules (cf. "validation_rules.csv")
+        """
+        raise NotImplementedError()
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        raise NotImplementedError()
+
+    def __validate_data_contract(self):
+        _catch_exceptions_from_validators_and_raise_multiple_business_exceptions(self.get_data_contract_validators())
+
+    def __validate_invariants(self):
+        _catch_exceptions_from_validators_and_raise_multiple_business_exceptions(self.get_invariants_validators())
+
+    def validate(self):
+        self.__validate_data_contract()
+        self.__validate_invariants()
+
+
+def execute_functions_and_aggregate_exceptions(*functions_to_execute: partial) -> list:
+    """
+    Execute functions given in parameter.
+    All Exceptions of type :
+        - BusinessException
+        - MultipleBusinessExceptions
+    raised by these functions are aggregated to raise a single MultipleBusinessExceptions.
+
+    :param functions_to_execute: List of functools.partial thaht will be called
+    :return: List of results of each executed function
+    """
+    exceptions = []
+    function_results = []
+    for func in functions_to_execute:
+        try:
+            function_results.append(func())
+        except BusinessException as e:
+            exceptions.append(e)
+        except MultipleBusinessExceptions as e:
+            exceptions.extend(e.exceptions)
+    if exceptions:
+        raise MultipleBusinessExceptions(exceptions=set(exceptions))
+    return function_results

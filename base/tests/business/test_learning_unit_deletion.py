@@ -392,9 +392,16 @@ class LearningUnitYearDeletion(TestCase):
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
     def test_cannot_delete_if_has_application_same_year(self, mock_is_linked):
-        luy = LearningUnitYearFactory()
+        luy = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
         manager = CentralManagerFactory(entity=luy.requirement_entity)
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+        self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', luy))
+
+    @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
+    def test_cannot_delete_partim_if_has_application(self, mock_is_linked):
+        luy = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.PARTIM)
+        manager = CentralManagerFactory(entity=luy.requirement_entity)
+        AttributionChargeNewFactory(learning_component_year__learning_unit_year=luy)
         self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', luy))
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)

@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 SECTOR = "SECTOR"
 FACULTY = "FACULTY"
 SCHOOL = "SCHOOL"
@@ -48,3 +50,14 @@ ENTITY_TYPES = (
 
 
 PEDAGOGICAL_ENTITY_TYPES = (SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION)
+
+
+class EntityType(ChoiceEnum):
+    SECTOR = _("Sector")
+    FACULTY = _("Faculty")
+    SCHOOL = _("School")
+    INSTITUTE = _("Institute")
+    POLE = _("Pole")
+    DOCTORAL_COMMISSION = _("Doctoral commission")
+    PLATFORM = _("Platform")
+    LOGISTICS_ENTITY = _("Logistics entity")
