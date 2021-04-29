@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service, \
     update_mini_training_and_group_service
 from program_management.ddd import command as pgm_cmd
@@ -39,15 +41,19 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
 
 def postpone_mini_training_and_program_tree_modifications(
         update_command: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand,
-        academic_year_repository: 'IAcademicYearRepository'
+        academic_year_repository: 'IAcademicYearRepository',
+        mini_training_repository: 'MiniTrainingRepository'
 ) -> List['MiniTrainingIdentity']:
     is_in_past = IsAcademicYearInPast().is_in_past(update_command.year, academic_year_repository)
+    mini_training_identity = MiniTrainingIdentity(acronym=update_command.abbreviated_title, year=update_command.year)
+    mini_training_domain_obj = mini_training_repository.get(mini_training_identity)
+    has_end_year_changed = mini_training_domain_obj.end_year != update_command.end_year
 
     update_program_tree_version_end_date_service.update_program_tree_version_end_date(
         __convert_to_update_program_tree_version_end_date_command(update_command)
     )
     postpone_cmd = __convert_to_postpone_mini_training_and_group_modification_command(update_command)
-    if not is_in_past:
+    if not is_in_past or has_end_year_changed:
         consistency_error = None
         try:
             mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service. \

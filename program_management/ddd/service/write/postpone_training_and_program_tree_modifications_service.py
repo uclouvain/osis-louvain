@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.write import postpone_training_and_group_modification_service, \
     update_training_and_group_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
@@ -41,15 +43,22 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
 
 def postpone_training_and_program_tree_modifications(
         update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand,
-        academic_year_repository: 'IAcademicYearRepository'
+        academic_year_repository: 'IAcademicYearRepository',
+        training_repository: 'TrainingRepository'
 ) -> List['TrainingIdentity']:
     is_in_past = IsAcademicYearInPast().is_in_past(update_command.postpone_from_year, academic_year_repository)
+    training_identity = TrainingIdentity(
+        acronym=update_command.postpone_from_acronym,
+        year=update_command.postpone_from_year
+    )
+    training_domain_obj = training_repository.get(training_identity)
+    has_end_year_changed = training_domain_obj.end_year != update_command.end_year
 
     update_program_tree_version_end_date_service.update_program_tree_version_end_date(
         __convert_to_update_program_tree_version_end_date_command(update_command)
     )
     postpone_cmd = __convert_to_postpone_training_and_group_modification_command(update_command)
-    if not is_in_past:
+    if not is_in_past or has_end_year_changed:
         consistency_error = None
         try:
             training_identities = \

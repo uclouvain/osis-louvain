@@ -29,6 +29,8 @@ from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from education_group.ddd.repository.mini_training import MiniTrainingRepository
+from education_group.tests.factories.mini_training import MiniTrainingFactory
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from program_management.ddd import command
 from program_management.ddd.service.write import \
@@ -105,17 +107,24 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.mocked_update_mini_training_and_group = self.update_mini_training_and_group_patcher.start()
         self.addCleanup(self.update_mini_training_and_group_patcher.stop)
 
-        self.mock_repository = mock.create_autospec(AcademicYearRepository)
+        self.mock_anac_repository = mock.create_autospec(AcademicYearRepository)
         current_anac = AcademicYear(
             entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year - 1),
             start_date=None,
             end_date=None
         )
-        self.mock_repository.get_current.return_value = current_anac
+        self.mock_anac_repository.get_current.return_value = current_anac
+
+        self.mock_minitraining_repository = mock.create_autospec(MiniTrainingRepository)
+        self.mock_minitraining_repository.get.return_value = MiniTrainingFactory()
 
     def test_assert_call_multiple_service(self):
-        postpone_mini_training_and_program_tree_modifications_service. \
-            postpone_mini_training_and_program_tree_modifications(self.cmd, self.mock_repository)
+        postpone_mini_training_and_program_tree_modifications_service \
+            .postpone_mini_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_minitraining_repository
+        )
 
         self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
@@ -128,9 +137,13 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
             start_date=None,
             end_date=None
         )
-        self.mock_repository.get_current.return_value = current_anac
+        self.mock_anac_repository.get_current.return_value = current_anac
         postpone_mini_training_and_program_tree_modifications_service. \
-            postpone_mini_training_and_program_tree_modifications(self.cmd, self.mock_repository)
+            postpone_mini_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_minitraining_repository
+        )
 
         self.assertFalse(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
         self.assertFalse(self.mocked_postpone_pgrm_tree.called)
@@ -138,3 +151,23 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
 
         self.assertTrue(self.mocked_update_version_end_date.called)
         self.assertTrue(self.mocked_update_mini_training_and_group.called)
+
+    def test_assert_call_postponement_services_if_in_past_but_end_year_changed(self):
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year + 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_anac_repository.get_current.return_value = current_anac
+        self.mock_minitraining_repository.get.return_value = MiniTrainingFactory(end_year=2025)
+        postpone_mini_training_and_program_tree_modifications_service \
+            .postpone_mini_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_minitraining_repository
+        )
+
+        self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
+        self.assertTrue(self.mocked_postpone_pgrm_tree.called)
+        self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)
+        self.assertTrue(self.mocked_update_version_end_date.called)

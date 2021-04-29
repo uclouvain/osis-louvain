@@ -26,6 +26,8 @@ from django.test import TestCase
 
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from education_group.ddd.repository.training import TrainingRepository
+from education_group.tests.ddd.factories.training import TrainingFactory
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from program_management.ddd.service.write import postpone_training_and_program_tree_modifications_service
 from program_management.tests.ddd.factories.commands.postpone_training_and_root_group_modification_with_program_tree \
@@ -85,17 +87,23 @@ class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
         self.mocked_update_training_and_group = self.update_training_and_group_patcher.start()
         self.addCleanup(self.update_training_and_group_patcher.stop)
 
-        self.mock_repository = mock.create_autospec(AcademicYearRepository)
+        self.mock_anac_repository = mock.create_autospec(AcademicYearRepository)
         current_anac = AcademicYear(
             entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year - 1),
             start_date=None,
             end_date=None
         )
-        self.mock_repository.get_current.return_value = current_anac
+        self.mock_anac_repository.get_current.return_value = current_anac
+        self.mock_training_repository = mock.create_autospec(TrainingRepository)
+        self.mock_training_repository.get.return_value = TrainingFactory(end_year=None)
 
     def test_assert_call_multiple_service(self):
         postpone_training_and_program_tree_modifications_service. \
-            postpone_training_and_program_tree_modifications(self.cmd, self.mock_repository)
+            postpone_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_training_repository
+        )
 
         self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
         self.assertTrue(self.mocked_postpone_pgrm_tree.called)
@@ -108,9 +116,13 @@ class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
             start_date=None,
             end_date=None
         )
-        self.mock_repository.get_current.return_value = current_anac
+        self.mock_anac_repository.get_current.return_value = current_anac
         postpone_training_and_program_tree_modifications_service. \
-            postpone_training_and_program_tree_modifications(self.cmd, self.mock_repository)
+            postpone_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_training_repository
+        )
 
         self.assertFalse(self.mocked_postpone_training_and_group_modification.called)
         self.assertFalse(self.mocked_postpone_pgrm_tree.called)
@@ -118,3 +130,23 @@ class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
 
         self.assertTrue(self.mocked_update_version_end_date.called)
         self.assertTrue(self.mocked_update_training_and_group.called)
+
+    def test_assert_call_postponement_services_if_in_past_but_end_year_changed(self):
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year + 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_anac_repository.get_current.return_value = current_anac
+        self.mock_training_repository.get.return_value = TrainingFactory(end_year=2025)
+        postpone_training_and_program_tree_modifications_service \
+            .postpone_training_and_program_tree_modifications(
+            self.cmd,
+            self.mock_anac_repository,
+            self.mock_training_repository
+        )
+
+        self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
+        self.assertTrue(self.mocked_postpone_pgrm_tree.called)
+        self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)
+        self.assertTrue(self.mocked_update_version_end_date.called)
