@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
 from django.test import TestCase, SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.translation import gettext_lazy as _
@@ -31,7 +33,7 @@ from base.models.enums import education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.publication_contact_type import PublicationContactType
-from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from education_group.ddd.domain.group import GroupIdentity
@@ -45,6 +47,7 @@ from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaA
 from education_group.tests.ddd.factories.funding import FundingFactory
 from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.remark import RemarkFactory
+from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
@@ -62,7 +65,6 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 
 FIRST_CUSTOMIZABLE_COL = 7
 
@@ -340,6 +342,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
         cls.standard_current_version = StandardProgramTreeVersionFactory()
         cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en', title_fr='Title fr')
 
@@ -351,12 +354,12 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             cls.aims2,
         ])
         cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory,
-                                       type=TrainingType.BACHELOR)
+                                       type=TrainingType.BACHELOR, entity_identity__year=cls.academic_year.year)
         cls.training_finality = TrainingFactory(titles=titles,
                                                 type=TrainingType.MASTER_MA_120)
 
-        cls.mini_training = MiniTrainingFactory(titles=titles)
-        cls.group = GroupFactory(titles=titles)
+        cls.mini_training = MiniTrainingFactory(titles=titles, entity_identity__year=cls.academic_year.year)
+        cls.group = GroupFactory(titles=titles, entity_identity__year=cls.academic_year.year)
 
     def test_get_titles_en_for_training_standard_version_not_finality(self):
         self.assertListEqual(_get_titles_en(self.standard_current_version, self.training, self.group),
@@ -392,7 +395,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         self.assertListEqual(_get_titles_en(None, None, self.group),
                              [self.group.titles.title_en, '', ''])
 
-    def test_build_organization_data_for_training(self):
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_build_organization_data_for_training(self, mock_is_entity_active):
         result = _build_organization_data(self.standard_current_version, self.training, None, self.group)
         expected = [
             self.training.schedule_type.value,
@@ -412,7 +416,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             result,
             expected)
 
-    def test_build_organization_data_for_mini_training(self):
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_build_organization_data_for_mini_training(self, mock_is_entity_active):
         result = _build_organization_data(None, None, self.mini_training, self.group)
         expected = [
             self.mini_training.schedule_type.value,
@@ -432,7 +437,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             result,
             expected)
 
-    def test_build_organization_data_for_group(self):
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_build_organization_data_for_group(self, mock_is_entity_active):
         result = _build_organization_data(None, None, None, self.group)
         expected = [
             "",

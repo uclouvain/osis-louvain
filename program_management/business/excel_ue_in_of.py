@@ -389,9 +389,11 @@ def _get_optional_data(
             )
         )
     if optional_data_needed['has_allocation_entity']:
-        get_entity_version_xls_repr(
-            luy.entities.allocation_entity_acronym,
-            AcademicYear.objects.get(year=luy.year)
+        data.append(
+            get_entity_version_xls_repr(
+                luy.entities.allocation_entity_acronym,
+                AcademicYear.objects.get(year=luy.year)
+            )
         )
     if optional_data_needed['has_credits']:
         data.append(link.relative_credits or '-')
