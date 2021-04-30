@@ -227,11 +227,11 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,
             a_version.version_label()
-        ),
+            ),
         TYPE_COL: "{}{}".format(
             an_education_group_year.education_group_type,
             _get_title(a_version, language)
-        ),
+            ),
         ACADEMIC_YEAR_COL: an_education_group_year.academic_year.name,
         WEIGHTING_COL: convert_boolean(an_education_group_year.weighting),
         DEFAULT_LEARNING_UNIT_ENROLLMENT_COL: convert_boolean(an_education_group_year.default_learning_unit_enrollment)
@@ -350,7 +350,7 @@ def _get_offer_year_calendar_from_prefetched_data(an_education_group_year: Educa
         offer_year_cals = [
             offer_year_cal for offer_year_cal in offer_year_cals
             if offer_year_cal.academic_calendar.sessionexamcalendar and
-               offer_year_cal.academic_calendar.sessionexamcalendar.number_session == session_number
+            offer_year_cal.academic_calendar.sessionexamcalendar.number_session == session_number
         ]
 
     if len(offer_year_cals) > 1:
