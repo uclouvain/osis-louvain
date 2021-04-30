@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
 from typing import Set
 
 from dal import autocomplete
@@ -34,7 +35,7 @@ from django.utils.html import format_html
 
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.models.campus import Campus
-from base.models.entity_version import find_pedagogical_entities_version
+from base.models.entity_version import find_pedagogical_entities_version, EntityVersion
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
@@ -109,9 +110,7 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if country:
             qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
             if country != "all":
-                qs = qs.filter(
-                    entity__entityversion__entityversionaddress__country_id=country
-                )
+                qs = qs.filter(entityversionaddress__country_id=country)
         else:
             qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:

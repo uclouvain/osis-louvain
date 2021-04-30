@@ -48,6 +48,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory, \
     find_all_current_entities_version
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
@@ -251,10 +252,10 @@ def pgm_manager_search(request):
         'entity_selected': entity_selected,
         'entity_root_selected': entity_root_selected,
         'offer_types': __search_offer_types(),
-        'pgms': _get_programs(current_academic_yr,
-                              get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
-                              manager_person,
-                              pgm_offer_type),
+        'pgms': _get_trainings(current_academic_yr,
+                               get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
+                               manager_person,
+                               pgm_offer_type),
         'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
@@ -328,10 +329,11 @@ def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', 
     return structures
 
 
-def _get_programs(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
+def _get_trainings(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
     qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         management_entity__in={ev.entity_id for ev in entity_list},
+        education_group_type__category=education_group_categories.TRAINING,
     )
 
     if education_group_type:

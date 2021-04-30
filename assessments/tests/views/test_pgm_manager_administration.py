@@ -32,7 +32,7 @@ from django.urls import reverse
 from assessments.views import pgm_manager_administration
 from base.auth.roles.program_manager import ProgramManager
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
@@ -197,15 +197,24 @@ class PgmManagerAdministrationTest(TestCase):
             academic_year=self.academic_year_current,
             management_entity=an_entity_management.entity,
         )
+        #  Mini-trainings : cannot be in results of _get_trainings
+        MiniTrainingFactory(
+            academic_year=self.academic_year_previous,
+            management_entity=an_entity_management.entity,
+        )
+        MiniTrainingFactory(
+            academic_year=self.academic_year_current,
+            management_entity=an_entity_management.entity,
+        )
 
-        self.assertEqual(len(pgm_manager_administration._get_programs(self.academic_year_current,
-                                                                      [an_entity_management],
-                                                                      None,
-                                                                      None)), 2)
-        self.assertEqual(len(pgm_manager_administration._get_programs(self.academic_year_previous,
-                                                                      [an_entity_management],
-                                                                      None,
-                                                                      None)), 1)
+        self.assertEqual(len(pgm_manager_administration._get_trainings(self.academic_year_current,
+                                                                       [an_entity_management],
+                                                                       None,
+                                                                       None)), 2)
+        self.assertEqual(len(pgm_manager_administration._get_trainings(self.academic_year_previous,
+                                                                       [an_entity_management],
+                                                                       None,
+                                                                       None)), 1)
 
     def test_pgm_manager_queried_by_academic_year(self):
         a_management_entity = EntityVersionFactory()
