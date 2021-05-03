@@ -543,12 +543,8 @@ class EntityVersion(SerializableModel):
         )
 
         active_entity_subquery = Subquery(
-            AcademicYear.objects.filter(year=year).annotate(
-                is_active_entity=Case(
-                    When(current_clause, then=Value(True)),
-                    default=Value(False),
-                    output_field=BooleanField()
-                )
+            AcademicYear.objects.filter(current_clause, year=year).annotate(
+                is_active_entity=Value(True, output_field=BooleanField())
             ).values('is_active_entity')[:1]
         )
 
