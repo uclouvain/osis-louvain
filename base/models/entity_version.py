@@ -558,8 +558,7 @@ class EntityVersion(SerializableModel):
             max_date=Case(
                 When(end_date__isnull=True, then=Value(datetime.date.max)),
                 output_field=DateField()
-            )
-        ).annotate(
+            ),
             active_entity_version=active_entity_subquery
         ).order_by('-start_date').first()
 
