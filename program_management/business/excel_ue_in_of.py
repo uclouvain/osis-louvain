@@ -41,7 +41,6 @@ from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
 from base.business.xls import get_entity_version_xls_repr
-from base.models.academic_year import AcademicYear
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
@@ -385,14 +384,14 @@ def _get_optional_data(
         data.append(
             get_entity_version_xls_repr(
                 luy.entities.requirement_entity_acronym,
-                AcademicYear.objects.get(year=luy.year)
+                luy.year
             )
         )
     if optional_data_needed['has_allocation_entity']:
         data.append(
             get_entity_version_xls_repr(
                 luy.entities.allocation_entity_acronym,
-                AcademicYear.objects.get(year=luy.year)
+                luy.year
             )
         )
     if optional_data_needed['has_credits']:

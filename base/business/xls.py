@@ -27,7 +27,6 @@ from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 
 from base import models as mdl_base
-from base.models.academic_year import AcademicYear as AcademicYearDB
 
 
 def get_name_or_username(a_user):
@@ -48,10 +47,7 @@ def _get_all_columns_reference(nb_columns, first_column=1):
     return letters
 
 
-def get_entity_version_xls_repr(acronym, academic_year):
-    # resolve with DDD academic year
-    if type(academic_year) != AcademicYearDB:
-        academic_year = AcademicYearDB.objects.get(year=academic_year.year)
-    if mdl_base.entity_version.EntityVersion.is_entity_active(acronym, academic_year):
+def get_entity_version_xls_repr(acronym, year):
+    if mdl_base.entity_version.EntityVersion.is_entity_active(acronym, year):
         return acronym
     return '\u0336'.join(acronym) + '\u0336'  # strikethrough styled str

@@ -356,8 +356,8 @@ def _build_title_fr(offer: Union['Training', 'MiniTraining'],
 
 def management_entity(training: 'Training', group: 'Group', current_version: 'ProgramTreeVersion') -> str:
     if current_version.is_standard:
-        return get_entity_version_xls_repr(training.management_entity.acronym, training.academic_year)
-    return get_entity_version_xls_repr(group.management_entity.acronym, group.academic_year)
+        return get_entity_version_xls_repr(training.management_entity.acronym, training.year)
+    return get_entity_version_xls_repr(group.management_entity.acronym, group.year)
 
 
 def _get_responsibles_and_contacts(group: 'Group') -> str:
@@ -501,10 +501,10 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
         management_entity_acronym = training.management_entity.acronym \
             if current_version and current_version.is_standard else group.management_entity.acronym
         data.append(
-            get_entity_version_xls_repr(management_entity_acronym, training.academic_year)
+            get_entity_version_xls_repr(management_entity_acronym, training.year)
         )
         data.append(
-            get_entity_version_xls_repr(training.administration_entity.acronym, training.academic_year)
+            get_entity_version_xls_repr(training.administration_entity.acronym, training.year)
         )
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
 
@@ -515,7 +515,7 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
         management_entity_acronym = mini_training.management_entity.acronym \
             if current_version and current_version.is_standard else group.management_entity.acronym
         data.append(
-            get_entity_version_xls_repr(management_entity_acronym, mini_training.academic_year)
+            get_entity_version_xls_repr(management_entity_acronym, mini_training.year)
         )
         data.append("")
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
@@ -524,7 +524,7 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
     else:
         data.append("")
         data.append(
-            get_entity_version_xls_repr(group.management_entity.acronym, group.academic_year)
+            get_entity_version_xls_repr(group.management_entity.acronym, group.year)
         )
         data.append("")
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
@@ -623,10 +623,10 @@ def _common_training_mini_training_organization_data(current_version, group, off
     management_entity_acronym = offer.management_entity.acronym \
         if current_version.is_standard else group.management_entity.acronym
     data.append(
-        get_entity_version_xls_repr(management_entity_acronym, offer.academic_year)
+        get_entity_version_xls_repr(management_entity_acronym, offer.academic_year.year)
     )
     data.append(
-        get_entity_version_xls_repr(offer.administration_entity.acronym, offer.academic_year)
+        get_entity_version_xls_repr(offer.administration_entity.acronym, offer.academic_year.year)
     )
     data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
     return data

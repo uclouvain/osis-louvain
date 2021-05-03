@@ -23,11 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Case, When, Value, BooleanField, Q
-from django.utils.functional import cached_property
 from reversion.models import Version
 
-from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion
 from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
@@ -43,7 +40,7 @@ class GroupReadIdentification(GroupRead):
             "history": self.get_related_history(),
             "active_management_entity": EntityVersion.is_entity_active(
                 self.get_group().management_entity.acronym,
-                self.academic_year
+                self.node_identity.year
             ),
         }
 
@@ -66,7 +63,3 @@ class GroupReadIdentification(GroupRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
-
-    @cached_property
-    def academic_year(self):
-        return AcademicYear.objects.get(year=self.node_identity.year)

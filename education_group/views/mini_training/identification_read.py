@@ -23,11 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Case, When, Value, BooleanField, Q
-from django.utils.functional import cached_property
 from reversion.models import Version
 
-from base.models.academic_year import AcademicYear
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
@@ -50,7 +47,7 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
             "permission_object": self.get_permission_object(),
             "active_management_entity": EntityVersion.is_entity_active(
                 self.get_group().management_entity.acronym,
-                self.academic_year
+                self.node_identity.year
             ),
         }
 
@@ -79,7 +76,3 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
-
-    @cached_property
-    def academic_year(self):
-        return AcademicYear.objects.get(year=self.node_identity.year)

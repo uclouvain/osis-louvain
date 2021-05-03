@@ -222,7 +222,7 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
         MANAGEMENT_ENTITY_COL:
             get_entity_version_xls_repr(
                 an_education_group_year.management_entity_version.acronym,
-                an_education_group_year.academic_year
+                an_education_group_year.academic_year.year
             ) if an_education_group_year.management_entity_version else '',
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,

@@ -54,12 +54,12 @@ class TestXls(TestCase):
     def test_get_active_entity_version_xls_repr(self, mock_entity_is_active):
         acronym = self.entity.acronym
         self.assertEqual(
-            get_entity_version_xls_repr(acronym, self.academic_year), acronym
+            get_entity_version_xls_repr(acronym, self.academic_year.year), acronym
         )
 
     @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=False)
     def test_get_inactive_entity_version_xls_repr(self, mock_entity_is_active):
         acronym = self.entity.acronym
         self.assertEqual(
-            get_entity_version_xls_repr(acronym, self.academic_year), '\u0336'.join(acronym) + '\u0336'
+            get_entity_version_xls_repr(acronym, self.academic_year.year), '\u0336'.join(acronym) + '\u0336'
         )
