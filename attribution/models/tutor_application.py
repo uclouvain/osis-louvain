@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
 from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -50,6 +51,7 @@ class TutorApplicationAdmin(admin.ModelAdmin):
 
 
 class TutorApplication(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.PROTECT)
