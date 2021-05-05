@@ -34,7 +34,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import training
 from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached
-from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory

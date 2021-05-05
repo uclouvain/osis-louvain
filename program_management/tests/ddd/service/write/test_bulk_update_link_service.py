@@ -21,51 +21,86 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from imp import reload
-from unittest import mock
 
-from django.test import SimpleTestCase
-from mock import patch
+import attr
 
-import program_management.ddd.service.write.bulk_update_link_service
-from program_management.ddd.command import BulkUpdateLinkCommand
-from program_management.ddd.service.write import update_link_service, bulk_update_link_service
-from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from base.models.enums.link_type import LinkTypes
+from program_management.ddd.command import BulkUpdateLinkCommand, UpdateLinkCommand
+from program_management.ddd.domain.exception import BulkUpdateLinkException
+from program_management.ddd.domain.link import LinkIdentity
+from program_management.ddd.service.write import bulk_update_link_service
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
+from testing.testcases import DDDTestCase
 
 
-def mock_decorator(f):
-    def decorated_function(g):
-        return g
-    return decorated_function(f)
-
-
-class TestBulkUpdateLink(SimpleTestCase):
-
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.parent = self.tree.root_node
-        self.link = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory())
-        self.mock_atomic_transaction = patch(
-            "program_management.ddd.service.write.bulk_update_link_service.transaction.atomic",
-            return_value=mock_decorator
+class TestBulkUpdateLink(DDDTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.tree = OSIS1BAFactory()[0].tree
+        self.cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[
+                UpdateLinkCommand(
+                    block="123",
+                    parent_node_code=self.tree.root_node.code,
+                    parent_node_year=self.tree.root_node.year,
+                    child_node_code=self.tree.root_node.children_as_nodes[0].code,
+                    child_node_year=self.tree.root_node.children_as_nodes[0].year,
+                    link_type=None,
+                    comment="A comment",
+                    comment_english="A comment in english",
+                    relative_credits=20,
+                    is_mandatory=False,
+                    access_condition=False
+                ),
+                UpdateLinkCommand(
+                    block=None,
+                    parent_node_code=self.tree.root_node.code,
+                    parent_node_year=self.tree.root_node.year,
+                    child_node_code=self.tree.root_node.children_as_nodes[1].code,
+                    child_node_year=self.tree.root_node.children_as_nodes[1].year,
+                    link_type=None,
+                    comment="Another update",
+                    comment_english="ANother update",
+                    relative_credits=20,
+                    is_mandatory=False,
+                    access_condition=False
+                )
+            ]
         )
-        self.mock_atomic_transaction_patcher = self.mock_atomic_transaction.start()
-        self.addCleanup(self.mock_atomic_transaction.stop)
 
-    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
-    @patch('program_management.ddd.domain.program_tree.ProgramTree.update_link')
-    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.update')
-    def test_should_call_tree_update_link_for_bulk_update(self, mock_update_tree, mock_update_link, mock_get_tree):
-        mock_get_tree.return_value = self.tree
-        # reload update_link_service to apply mock decorator
-        reload(bulk_update_link_service)
-        command = BulkUpdateLinkCommand(
-            parent_node_code=self.parent.code, parent_node_year=self.parent.year,
-            update_link_cmds=[UpdateLinkCommandFactory() for _ in range(0, 2)]
+    def test_should_return_link_updated(self):
+        result = bulk_update_link_service.bulk_update_links(self.cmd)
+
+        expected = [
+            LinkIdentity(
+                parent_code=self.tree.root_node.code,
+                child_code=self.tree.root_node.children_as_nodes[1].code,
+                parent_year=self.tree.root_node.year,
+                child_year=self.tree.root_node.children_as_nodes[1].year
+            ),
+            LinkIdentity(
+                parent_code=self.tree.root_node.code,
+                child_code=self.tree.root_node.children_as_nodes[0].code,
+                parent_year=self.tree.root_node.year,
+                child_year=self.tree.root_node.children_as_nodes[0].year
+            )
+        ]
+        actual_identities = [link.entity_id for link in result]
+        self.assertCountEqual(expected, actual_identities)
+
+    def test_should_aggregate_each_update_link_errors_into_one(self):
+        cmd = attr.evolve(
+            self.cmd,
+            update_link_cmds=[
+                attr.evolve(self.cmd.update_link_cmds[0], block="159"),
+                attr.evolve(self.cmd.update_link_cmds[1], link_type=LinkTypes.REFERENCE.name)
+            ]
         )
-        bulk_update_link_service.bulk_update_links(cmd=command)
-        self.assertTrue(mock_update_link.called)
-        self.assertTrue(mock_update_tree.called)
+
+        with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(cmd)
+
+        exceptions = e.exception.exceptions
+        self.assertTrue(len(exceptions) > 1)

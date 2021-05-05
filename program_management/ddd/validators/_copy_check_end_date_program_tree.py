@@ -34,5 +34,5 @@ class CheckProgramTreeEndDateValidator(business_validator.BusinessValidator):
 
     def validate(self, *args, **kwargs):
         root_node = self.tree.root_node
-        if root_node.end_year and root_node.year >= root_node.end_year:
+        if root_node.end_year and root_node.year > root_node.end_year:
             raise exception.CannotCopyTreeDueToEndDate(self.tree)

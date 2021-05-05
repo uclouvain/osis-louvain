@@ -23,25 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
-from django.test import SimpleTestCase
+from django.test import TestCase
 
+from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
-from education_group.ddd.domain.training import TrainingIdentity
+from education_group.tests.ddd.factories.training import TrainingIdentityFactory
 
 
-class TestEnrollmentCounter(SimpleTestCase):
-    @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
-    def test_assert_qs_count_called_when_training(self, mock_count_enrollments):
-        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
-        EnrollmentCounter().get_training_enrollments_count(training_id)
+class TestEnrollmentCounter(TestCase):
+    def test_should_return_0_when_no_offer_enrollments_for_training(self):
+        identity = TrainingIdentityFactory()
 
-        self.assertTrue(mock_count_enrollments.called)
+        result = EnrollmentCounter().get_training_enrollments_count(identity)
 
-    # @mock.patch('education_group.ddd.domain.service.enrollment_counter.offer_enrollment.count_enrollments')
-    # def test_assert_mini_training_called_when_instance_of_mini_training_identity(self, mock_count_enrollments):
-    #     mini_training_id = MiniTrainingIdentity(acronym="DROI2M", year=2000)
-    #     EnrollmentCounter().get_mini_training_enrollments_count(mini_training_id)
-    #
-    #     self.assertTrue(mock_count_enrollments.called)
+        self.assertEqual(0, result)
 
+    def test_should_return_number_of_enrollements_for_training(self):
+        identity = TrainingIdentityFactory()
+        OfferEnrollmentFactory.create_batch(
+            4,
+            education_group_year__acronym=identity.acronym,
+            education_group_year__academic_year__year=identity.year,
+            education_group_year__partial_acronym="LOPES54"
+        )
+
+        result = EnrollmentCounter().get_training_enrollments_count(identity)
+
+        self.assertEqual(4, result)

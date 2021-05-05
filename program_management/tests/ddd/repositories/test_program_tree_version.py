@@ -52,13 +52,7 @@ class TestVersionRepositoryCreateMethod(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.year = cls.academic_year.year
-        cls.entity_identity = ProgramTreeVersionIdentityFactory(year=cls.year)
         cls.type = TrainingEducationGroupTypeFactory()
-        cls.database_offer = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group_type=cls.type,
-            acronym=cls.entity_identity.offer_acronym,
-        )
         cls.repository = ProgramTreeVersionRepository()
         cls.new_program_tree = ProgramTreeFactory(
             root_node__year=cls.year,
@@ -67,11 +61,15 @@ class TestVersionRepositoryCreateMethod(TestCase):
             root_node__node_type=TrainingType[cls.type.name],
         )
         cls.new_program_tree_version = ProgramTreeVersionFactory(
-            entity_identity=cls.entity_identity,
-            entity_id=cls.entity_identity,
             program_tree_identity=cls.new_program_tree.entity_id,
             tree=cls.new_program_tree,
             end_year_of_existence=cls.academic_year.year,
+        )
+        cls.entity_identity = cls.new_program_tree_version.entity_identity
+        cls.database_offer = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type=cls.type,
+            acronym=cls.entity_identity.offer_acronym,
         )
 
     @patch.object(Node, '_has_changed', return_value=True)

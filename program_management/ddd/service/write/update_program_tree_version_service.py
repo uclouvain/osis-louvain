@@ -30,7 +30,7 @@ from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree_version import UpdateProgramTreeVersiongData, \
     ProgramTreeVersionIdentity, ProgramTreeVersion
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repo
 from program_management.ddd.service.write import delete_specific_version_service
 
 
@@ -44,7 +44,7 @@ def update_program_tree_version(
         version_name=command.version_name,
         transition_name=command.transition_name,
     )
-    repository = ProgramTreeVersionRepository()
+    repository = program_tree_version_repo.ProgramTreeVersionRepository()
     program_tree_version = repository.get(entity_id=identity)
 
     __call_delete_service(program_tree_version, command.end_year)

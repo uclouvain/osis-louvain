@@ -30,7 +30,7 @@ from program_management.ddd import command
 from program_management.ddd.domain import link
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.domain.service import identity_search
-from program_management.ddd.repositories import persist_tree, program_tree
+from program_management.ddd.repositories import program_tree
 from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
 
 
@@ -47,7 +47,7 @@ def detach_node(detach_command: command.DetachNodeCommand) -> link.LinkIdentity:
     deleted_link = working_tree.detach_node(path_to_detach, program_tree_repository, TreePrerequisitesRepository())
 
     if commit:
-        persist_tree.persist(working_tree)
+        program_tree_repository.update(working_tree)
         publisher.element_detached.send(None, path_detached=path_to_detach)
 
     return deleted_link.entity_id

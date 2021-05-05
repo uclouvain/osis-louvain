@@ -21,17 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
 
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.service.write import delete_orphan_mini_training_service
-from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
-class TestDeleteOrphanMiniTraining(TestCase, MockPatcherMixin):
+class TestDeleteOrphanMiniTraining(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.DeleteOrphanMiniTrainingCommand(
@@ -40,14 +38,11 @@ class TestDeleteOrphanMiniTraining(TestCase, MockPatcherMixin):
         )
 
     def setUp(self) -> None:
+        super().setUp()
         self.mini_training_2018 = MiniTrainingFactory(
             entity_identity__acronym=self.cmd.abbreviated_title,
-            entity_identity__year=self.cmd.year
-        )
-        self.fake_mini_training_repo = get_fake_mini_training_repository([self.mini_training_2018])
-        self.mock_repo(
-            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
-            self.fake_mini_training_repo
+            entity_identity__year=self.cmd.year,
+            persist=True
         )
 
     def test_should_return_entity_identity_of_deleted_mini_training(self):
@@ -60,5 +55,5 @@ class TestDeleteOrphanMiniTraining(TestCase, MockPatcherMixin):
         entity_identity_of_deleted_mini_training = delete_orphan_mini_training_service.delete_orphan_mini_training(
             self.cmd
         )
-        with self.assertRaises(exception.MiniTrainingNotFoundException):
-            self.fake_mini_training_repo.get(entity_identity_of_deleted_mini_training)
+        with self.assertRaisesBusinessException(exception.MiniTrainingNotFoundException):
+            self.fake_mini_training_repository.get(entity_identity_of_deleted_mini_training)

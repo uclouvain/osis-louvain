@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
 from mock import patch
 
 from base.models.enums.active_status import ActiveStatusEnum
@@ -30,13 +29,12 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain import mini_training
 from education_group.ddd.service.write import update_mini_training_and_group_service
-from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-class TestUpdateAndPostponeMiniTrainingAndGroupService(TestCase, MockPatcherMixin):
+class TestUpdateAndPostponeMiniTrainingAndGroupService(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = command.UpdateMiniTrainingAndGroupCommand(
@@ -61,20 +59,16 @@ class TestUpdateAndPostponeMiniTrainingAndGroupService(TestCase, MockPatcherMixi
         )
 
     def setUp(self) -> None:
+        super().setUp()
         self.mini_training_2018 = MiniTrainingFactory(
             entity_identity__acronym=self.cmd.abbreviated_title,
-            entity_identity__year=2018
+            entity_identity__year=2018,
+            persist=True
         )
         self.mini_training_2019 = MiniTrainingFactory(
             entity_identity__acronym=self.cmd.abbreviated_title,
-            entity_identity__year=2019
-        )
-        self.mini_trainings = [self.mini_training_2018, self.mini_training_2019]
-
-        self.fake_mini_training_repo = get_fake_mini_training_repository(self.mini_trainings)
-        self.mock_repo(
-            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
-            self.fake_mini_training_repo
+            entity_identity__year=2019,
+            persist=True
         )
 
     def test_should_return_entity_id_of_updated_mini_trainings(self, mock_update_group):
@@ -84,7 +78,7 @@ class TestUpdateAndPostponeMiniTrainingAndGroupService(TestCase, MockPatcherMixi
     def test_should_update_value_of_mini_trainings_based_on_command_value(self, mock_update_group):
         entity_id = update_mini_training_and_group_service.update_mini_training_and_group(self.cmd)
 
-        mini_training_update = self.fake_mini_training_repo.get(entity_id)
+        mini_training_update = self.fake_mini_training_repository.get(entity_id)
         self.assert_has_same_value_as_update_command(mini_training_update)
 
     def assert_has_same_value_as_update_command(self, update_mini_training: 'mini_training.MiniTraining'):

@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import factory.fuzzy
 
 from base.models.enums.academic_type import AcademicTypes
@@ -33,8 +35,11 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
 from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.ddd.repository import training as training_repository
+from education_group.ddd.service.write import copy_training_service
+from education_group.tests.ddd.factories.campus import CampusFactory
 from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
 from education_group.tests.ddd.factories.diploma import DiplomaFactory
 from education_group.tests.ddd.factories.entity import EntityFactory
@@ -44,6 +49,7 @@ from education_group.tests.ddd.factories.isced_domain import IscedDomainFactory
 from education_group.tests.ddd.factories.language import LanguageFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
+from program_management.ddd.domain.node import NodeGroupYear
 
 
 def generate_end_date(training):
@@ -102,7 +108,7 @@ class TrainingFactory(factory.Factory):
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
     end_year = factory.LazyAttribute(generate_end_date)
-    enrollment_campus = factory.SubFactory(CampusIdentityFactory)
+    enrollment_campus = factory.SubFactory(CampusFactory)
     other_campus_activities = factory.fuzzy.FuzzyChoice(ActivityPresence)
     funding = factory.SubFactory(FundingFactory)
     hops = factory.SubFactory(HOPSFactory)
@@ -111,3 +117,42 @@ class TrainingFactory(factory.Factory):
     academic_type = factory.fuzzy.FuzzyChoice(AcademicTypes)
     duration_unit = factory.fuzzy.FuzzyChoice(DurationUnitsEnum)
     diploma = factory.SubFactory(DiplomaFactory)
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            training_repository.TrainingRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['Training']:
+        first_training = cls(*args, **kwargs)  # type: Training
+
+        result = [first_training]
+        for year in range(first_training.year, first_training.year + n - 1):
+            identity = copy_training_service.copy_training_to_next_year(
+                command.CopyTrainingToNextYearCommand(acronym=first_training.acronym, postpone_from_year=year)
+            )
+            result.append(training_repository.TrainingRepository.get(identity))
+
+        return result
+
+    @classmethod
+    def from_node(cls, node: 'NodeGroupYear') -> Training:
+        return cls(
+            code=node.code,
+            type=node.node_type,
+            entity_identity__acronym=node.title,
+            entity_identity__year=node.year,
+            start_year=node.start_year,
+            end_year=node.end_date,
+            management_entity__acronym=node.management_entity_acronym,
+            credits=node.credits,
+            schedule_type=node.schedule_type,
+            titles__title_fr=node.offer_title_fr,
+            titles__title_en=node.offer_title_en,
+            titles__partial_title_fr=node.offer_partial_title_fr,
+            titles__partial_title_en=node.offer_partial_title_en,
+            status=node.offer_status
+        )
+
+

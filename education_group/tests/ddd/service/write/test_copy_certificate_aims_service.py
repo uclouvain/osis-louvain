@@ -22,17 +22,15 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-from django.test import TestCase
-
 from education_group.ddd import command
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import copy_certificate_aims_service
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
-class TestCopyCertificateAimsToNextYear(TestCase, MockPatcherMixin):
+# FIXME delete this test as this application service is not used directly
+class TestCopyCertificateAimsToNextYear(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.year = 2020
@@ -42,14 +40,14 @@ class TestCopyCertificateAimsToNextYear(TestCase, MockPatcherMixin):
         )
 
     def setUp(self) -> None:
+        super().setUp()
         self.trainings = [
             TrainingFactory(
                 entity_identity__acronym=self.cmd.acronym,
-                entity_identity__year=year
+                entity_identity__year=year,
+                persist=True
             ) for year in [self.year, self.year+1]
         ]
-        self.fake_training_repo = get_fake_training_repository(self.trainings)
-        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
 
     def test_should_return_identity(self):
         result = copy_certificate_aims_service.copy_certificate_aims_to_next_year(self.cmd)

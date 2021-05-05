@@ -21,19 +21,25 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
-
-from django.test import SimpleTestCase
 
 from education_group.ddd import command
+from education_group.ddd.domain import exception
 from education_group.ddd.service.read import get_group_service
+from education_group.tests.ddd.factories.group import GroupFactory
+from testing.testcases import DDDTestCase
 
 
-class TestGetGroup(SimpleTestCase):
+class TestGetGroup(DDDTestCase):
     def setUp(self):
-        self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
+        super().setUp()
+        self.group = GroupFactory(persist=True)
+        self.cmd = command.GetGroupCommand(year=self.group.year, code=self.group.code)
 
-    def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.get_group_service.GroupRepository.get') as mock_grp_repo_get:
-            get_group_service.get_group(self.cmd)
-            self.assertTrue(mock_grp_repo_get.called)
+    def test_throw_exception_when_no_matching_group(self):
+        cmd = command.GetGroupCommand(year=self.group.year + 1, code=self.group.code)
+        with self.assertRaisesBusinessException(exception.GroupNotFoundException):
+            get_group_service.get_group(cmd)
+
+    def test_return_matching_group(self):
+        result = get_group_service.get_group(self.cmd)
+        self.assertEqual(self.group, result)

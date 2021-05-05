@@ -26,11 +26,7 @@
 
 import factory.fuzzy
 
-from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType
-from program_management.tests.ddd.factories.domain.program_tree.LDROP221O_OPTDROI2MAR import \
-    ProgramTreeOptionLDROP221OFactory
-from program_management.tests.ddd.factories.domain.program_tree.LIURE200S_DROI2MSIU import \
-    ProgramTreeFinalityDROI2MSIUFactory
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory

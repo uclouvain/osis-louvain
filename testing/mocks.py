@@ -44,6 +44,7 @@ class MockFormValid(mock.Mock):
         self.errors.append('error')
 
 
+# TODO to suppress
 class FakeRepository:
     root_entities = list()  # type: List['interface.RootEntity']
     not_found_exception_class = None

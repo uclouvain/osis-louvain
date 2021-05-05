@@ -39,10 +39,3 @@ class HasSpecificVersionWithGreaterEndYear(interface.DomainService):
         ).exclude(
             version_name=standard_version.version_name
         ).exists()
-
-    @classmethod
-    def inferior_than_version(cls, specific_version: 'ProgramTreeVersion') -> bool:
-        return EducationGroupVersion.standard.filter(
-            offer__education_group__end_year__year__lte=specific_version.entity_id.year,
-            offer__acronym=specific_version.entity_id.offer_acronym,
-        ).exists()

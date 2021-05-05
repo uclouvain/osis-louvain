@@ -177,26 +177,26 @@ class GroupRepository(interface.AbstractRepository):
         return results[0]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, **kwargs) -> List['Group']:
-        if entity_ids:
-            qs = GroupYearModelDb.objects.all().select_related(
-                'academic_year',
-                'education_group_type',
-                'main_teaching_campus__organization',
-                'group__start_year',
-                'group__end_year',
-            ).prefetch_related(
-                Prefetch(
-                    'management_entity',
-                    EntityModelDb.objects.all().annotate(
-                        most_recent_acronym=Subquery(
-                            EntityVersionModelDb.objects.filter(
-                                entity__id=OuterRef('pk')
-                            ).order_by('-start_date').values('acronym')[:1]
-                        )
+    def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, code: str = None, **kwargs) -> List['Group']:
+        qs = GroupYearModelDb.objects.all().select_related(
+            'academic_year',
+            'education_group_type',
+            'main_teaching_campus__organization',
+            'group__start_year',
+            'group__end_year',
+        ).prefetch_related(
+            Prefetch(
+                'management_entity',
+                EntityModelDb.objects.all().annotate(
+                    most_recent_acronym=Subquery(
+                        EntityVersionModelDb.objects.filter(
+                            entity__id=OuterRef('pk')
+                        ).order_by('-start_date').values('acronym')[:1]
                     )
-                ),
-            )
+                )
+            ),
+        )
+        if entity_ids:
             filter_or_clause = Q()
             for entity_id in entity_ids:
                 filter_or_clause |= Q(
@@ -204,6 +204,8 @@ class GroupRepository(interface.AbstractRepository):
                     academic_year__year=entity_id.year
                 )
             return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(filter_or_clause)]
+        if code:
+            return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(partial_acronym=code)]
         return []
 
     @classmethod

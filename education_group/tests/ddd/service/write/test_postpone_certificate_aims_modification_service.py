@@ -21,65 +21,78 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
 
-from django.test import SimpleTestCase
+import attr
 
-from education_group.ddd.domain.exception import CertificateAimsCopyConsistencyException
+from education_group.ddd import command
+from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached, \
+    CertificateAimsCopyConsistencyException
+from education_group.ddd.domain.training import Training
 from education_group.ddd.service.write import postpone_certificate_aims_modification_service
-from education_group.tests.ddd.factories.command.postpone_certificacte_aims_command import \
-    PostponeCertificateAimsCommandFactory
-from education_group.tests.ddd.factories.training import TrainingIdentityFactory
+from education_group.tests.ddd.factories.diploma import DiplomaFactory
+from education_group.tests.ddd.factories.training import TrainingFactory
+from testing.testcases import DDDTestCase
 
 
-class TestPostponeCertificateAimsModificationService(SimpleTestCase):
+class TestPostponeCertificateAims(DDDTestCase):
     def setUp(self) -> None:
-        self.training_identity = TrainingIdentityFactory()
-        self.cmd = PostponeCertificateAimsCommandFactory(
-            postpone_from_year=self.training_identity.year,
-            aims=['dummy_aim']
+        super().setUp()
+        self.trainings = TrainingFactory.multiple(3, persist=True)
+        self.cmd = command.PostponeCertificateAimsCommand(
+            postpone_from_acronym=self.trainings[0].acronym,
+            postpone_from_year=self.trainings[0].entity_identity.year,
+            aims=[(1, 2)]
         )
-        self.end_postponement_year = self.training_identity.year + 1
+        self.mock_service(
+            "program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement."
+            "calculate_end_postponement_year_training",
+            self.trainings[0].year + 3
+        )
 
-    @mock.patch('education_group.ddd.service.write.update_certificate_aims_service.update_certificate_aims')
-    @mock.patch('program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement.'
-                'calculate_end_postponement_year_training')
-    @mock.patch('education_group.ddd.service.write.copy_certificate_aims_service.copy_certificate_aims_to_next_year')
-    @mock.patch('education_group.ddd.domain.service.conflicted_fields.ConflictedFields.get_conflicted_certificate_aims')
-    def test_postpone_certificate_aims(
-            self,
-            mock_get_conflicted_fields,
-            mock_copy_certificate_aims,
-            mock_calculate_end_postponement_year,
-            mock_update_aims,
-    ):
-        mock_get_conflicted_fields.return_value = []
-        mock_update_aims.return_value = self.training_identity
-        mock_calculate_end_postponement_year.return_value = self.end_postponement_year
+    def test_cannot_have_more_than_one_certificate_aim_of_section_2(self):
+        cmd = attr.evolve(self.cmd, aims=[(1, 2), (4, 2)])
 
-        updated_trainings_in_future = [
-            TrainingIdentityFactory(year=year)
-            for year in range(self.training_identity.year, self.end_postponement_year)
-        ]
-        mock_copy_certificate_aims.side_effect = updated_trainings_in_future
+        with self.assertRaisesBusinessException(MaximumCertificateAimType2Reached):
+            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(cmd)
 
+    def test_should_empty_certificate_aims_if_none_given_of_trainings_from_year(self):
+        cmd = attr.evolve(self.cmd, aims=None)
+
+        identities = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(cmd)
+
+        for identity in identities:
+            updated_training = self.fake_training_repository.get(identity)
+
+            self.assert_training_certificate_aims_match_command(updated_training, cmd)
+
+    def test_should_update_certificate_aims_of_trainings_from_year(self):
+        identities = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+
+        for identity in identities:
+            updated_training = self.fake_training_repository.get(identity)
+
+            self.assert_training_certificate_aims_match_command(updated_training, self.cmd)
+
+    def test_should_return_training_identities(self):
         result = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
 
-        self.assertEqual([self.training_identity] + updated_trainings_in_future, result)
+        expected_identities = [training.entity_id for training in self.trainings]
+        self.assertListEqual(expected_identities, result)
 
-    @mock.patch('education_group.ddd.service.write.update_certificate_aims_service.update_certificate_aims')
-    @mock.patch('program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement.'
-                'calculate_end_postponement_year_training')
-    @mock.patch('education_group.ddd.domain.service.conflicted_fields.ConflictedFields.get_conflicted_certificate_aims')
-    def test_postpone_raise_exception_when_conflicted_aims_in_future_years(
-            self,
-            mock_get_conflicted_fields,
-            mock_calculate_end_postponement_year,
-            mock_update_aims,
-    ):
-        mock_get_conflicted_fields.return_value = [self.end_postponement_year]
-        mock_update_aims.return_value = self.training_identity
-        mock_calculate_end_postponement_year.return_value = self.end_postponement_year
+    def test_should_not_update_certificate_aims_of_trainings_with_conflicts_with_previous_year(self):
+        self.trainings[2].diploma = DiplomaFactory(with_aims=True)
 
-        with self.assertRaises(CertificateAimsCopyConsistencyException):
+        with self.assertRaisesBusinessException(CertificateAimsCopyConsistencyException) as e:
             postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+
+        self.assertEqual(self.trainings[2].year, e.exception.conflicted_fields_year)
+
+    def assert_training_certificate_aims_match_command(
+            self,
+            training: 'Training',
+            cmd: 'command.PostponeCertificateAimsCommand'):
+        if not cmd.aims:
+            self.assertListEqual([], training.diploma.aims)
+        else:
+            diploma_aims = [(aim.code, aim.section) for aim in training.diploma.aims]
+            self.assertEqual(self.cmd.aims, diploma_aims)

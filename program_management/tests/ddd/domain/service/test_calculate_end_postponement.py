@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, \
-    get_fake_mini_training_repository, get_fake_group_repository
+    get_fake_mini_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
@@ -144,7 +144,7 @@ class TestCalculateEndPostponementYear(MockPatcherMixin, TestCase):
         group = GroupFactory(
             entity_identity__year=self.program_tree.entity_id.year,
             entity_identity__code=self.program_tree.entity_id.code,
-            end_year=end_year
+            end_year=end_year,
         )
         result = CalculateEndPostponement.calculate_end_postponement_year_group(
             identity=group.entity_id,

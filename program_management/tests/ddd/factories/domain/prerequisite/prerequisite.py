@@ -30,7 +30,6 @@ import factory.fuzzy
 from base.models.enums.prerequisite_operator import AND
 from program_management.ddd.domain.prerequisite import Prerequisites
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory, PrerequisiteItemGroupFactory, \
     PrerequisiteItemFactory
 
@@ -41,7 +40,7 @@ class PrerequisitesFactory(factory.Factory):
         model = Prerequisites
         abstract = False
 
-    context_tree = factory.SubFactory(ProgramTreeIdentityFactory)
+    context_tree = factory.SubFactory("..ProgramTreeIdentityFactory")
     prerequisites = factory.LazyFunction(list)
 
     @staticmethod

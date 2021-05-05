@@ -23,24 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
-from django.test import SimpleTestCase
+from django.test import TestCase
 
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
-from education_group.ddd.domain.training import TrainingIdentity
+from education_group.tests.ddd.factories.training import TrainingIdentityFactory
 
 
-class TestLinkWithEPC(SimpleTestCase):
-    @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
-    def test_assert_qs_exist_called_when_training(self, mock_have_link):
-        training_id = TrainingIdentity(acronym="DROI2M", year=2000)
-        LinkWithEPC().is_training_have_link_with_epc(training_id)
+class TestLinkWithEPC(TestCase):
+    def test_should_return_false_when_training_does_not_exist(self):
+        identity = TrainingIdentityFactory()
 
-        self.assertTrue(mock_have_link.called)
+        result = LinkWithEPC().is_training_have_link_with_epc(identity)
 
-    # @mock.patch('education_group.ddd.domain.service.link_with_epc.education_group_year.have_link_with_epc')
-    # def test_assert_qs_exist_called_when_mini_training(self, mock_have_link):
-    #     mini_training_id = MiniTrainingIdentity(acronym="OPT200M", year=2000)
-    #     LinkWithEPC().mini_training_have_link_with_epc(mini_training_id)
-    #
-    #     self.assertTrue(mock_have_link.called)
+        self.assertFalse(result)
+
+    def test_should_return_false_when_training_is_not_linked_to_epc(self):
+        identity = TrainingIdentityFactory()
+        EducationGroupYearFactory(acronym=identity.acronym, academic_year__year=identity.year)
+
+        result = LinkWithEPC().is_training_have_link_with_epc(identity)
+
+        self.assertFalse(result)
+
+    def test_should_return_true_when_training_is_linked_to_epc(self):
+        identity = TrainingIdentityFactory()
+        EducationGroupYearFactory(acronym=identity.acronym, academic_year__year=identity.year, linked_with_epc=True)
+
+        result = LinkWithEPC().is_training_have_link_with_epc(identity)
+
+        self.assertTrue(result)

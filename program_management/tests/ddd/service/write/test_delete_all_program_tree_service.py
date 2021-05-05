@@ -21,46 +21,53 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
 
-from django.test import TestCase
-from mock import call
+import attr
 
 from program_management.ddd import command
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException, ProgramTreeNonEmpty, \
+    NodeHaveLinkException
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import delete_all_program_tree_service
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.empty import EmptyTrainingFactory
+from testing.testcases import DDDTestCase
 
 
-class TestDeleteAllProgramTreeService(TestCase):
+class TestDeleteAllProgramTreeService(DDDTestCase):
     def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.parent = self.tree.root_node
-        self.link1 = LinkFactory(parent=self.parent, child=NodeGroupYearFactory(), order=0)
+        super().setUp()
+        self.trees = [tree_version.tree for tree_version in EmptyTrainingFactory()]
+        self.cmd = command.DeleteAllProgramTreeCommand(code=self.trees[0].entity_id.code)
 
-        self.delete_tree_service_patcher = mock.patch(
-            "program_management.ddd.service.write.delete_program_tree_service.delete_program_tree",
-            return_value=[]
-        )
-        self.mocked_delete_tree_service = self.delete_tree_service_patcher.start()
-        self.addCleanup(self.delete_tree_service_patcher.stop)
+    def test_cannot_delete_tree_that_are_not_empty(self):
+        non_empty_trees = [tree_version.tree for tree_version in OSIS1BAFactory()]
 
-    @mock.patch("program_management.ddd.domain.service.node_identities_search.NodeIdentitiesSearch.search_from_code")
-    def test_assert_delete_program_tree_service_called(self, mock_existing_years):
-        mock_existing_years.return_value = [
-            NodeIdentity(year=2017, code=self.parent.code),
-            NodeIdentity(year=2018, code=self.parent.code),
-            NodeIdentity(year=2019, code=self.parent.code),
-        ]
+        cmd = attr.evolve(self.cmd, code=non_empty_trees[0].root_node.code)
 
-        cmd = command.DeleteAllProgramTreeCommand(code=self.parent.code)
-        delete_all_program_tree_service.delete_all_program_tree(cmd)
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
+            delete_all_program_tree_service.delete_all_program_tree(cmd)
 
-        expected_calls = [
-            call(command.DeleteProgramTreeCommand(code=cmd.code, year=2017)),
-            call(command.DeleteProgramTreeCommand(code=cmd.code, year=2018)),
-            call(command.DeleteProgramTreeCommand(code=cmd.code, year=2019))
-        ]
-        self.mocked_delete_tree_service.assert_has_calls(expected_calls)
+    def test_cannot_delete_trees_that_are_used(self):
+        OSIS1BAFactory()
+
+        cmd = attr.evolve(self.cmd, code='LINFO102R')
+
+        with self.assertRaisesBusinessException(NodeHaveLinkException):
+            delete_all_program_tree_service.delete_all_program_tree(cmd)
+
+    def test_should_return_program_tree_identities(self):
+        result = delete_all_program_tree_service.delete_all_program_tree(self.cmd)
+
+        expected = [tree.entity_id for tree in self.trees]
+        self.assertListEqual(expected, result)
+
+    def test_should_suppress_all_program_trees_with_same_code(self):
+        identities_of_tree_deleted = delete_all_program_tree_service.delete_all_program_tree(self.cmd)
+
+        for tree_identity in identities_of_tree_deleted:
+            with self.subTest(identity=tree_identity):
+                with self.assertRaisesBusinessException(ProgramTreeNotFoundException):
+                    get_program_tree_service.get_program_tree(
+                        command.GetProgramTree(code=tree_identity.code, year=tree_identity.year)
+                    )

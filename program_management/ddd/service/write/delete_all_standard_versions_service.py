@@ -31,6 +31,7 @@ from program_management.ddd.domain.service import identity_search
 from program_management.ddd.service.write import delete_training_standard_version_service
 
 
+# FIXME should be deleted as it is a duplicate of delete_all_specific_versions_service
 @transaction.atomic()
 def delete_permanently_training_standard_version(
         cmd: command.DeletePermanentlyTrainingStandardVersionCommand

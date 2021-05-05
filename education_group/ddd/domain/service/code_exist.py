@@ -25,14 +25,15 @@
 ##############################################################################
 from typing import Union
 
-from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 
 
+#  FIXME Dependency injection
 class CheckCodeExist(interface.DomainService):
     @classmethod
     def get_existing_year(cls, code: str) -> Union[int, None]:
-        existing_group = GroupYear.objects.filter(partial_acronym=code).select_related('academic_year').first()
-        if existing_group:
-            return existing_group.academic_year.year
+        from education_group.ddd.repository import group as group_repository
+        existing_groups = group_repository.GroupRepository().search(code=code)
+        if existing_groups:
+            return existing_groups[0].year
         return None

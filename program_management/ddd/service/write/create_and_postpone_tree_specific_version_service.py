@@ -28,7 +28,7 @@ from typing import List
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeSpecificVersionCommand, \
     PostponeProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as tree_version_repository
 from program_management.ddd.service.write import postpone_tree_specific_version_service, \
     postpone_program_tree_service, create_program_tree_specific_version_service
 
@@ -38,7 +38,7 @@ def create_and_postpone_program_tree_specific_version(
 ) -> List[ProgramTreeVersionIdentity]:
 
     identity = create_program_tree_specific_version_service.create_program_tree_specific_version(command)
-    tree_version = ProgramTreeVersionRepository().get(identity)
+    tree_version = tree_version_repository.ProgramTreeVersionRepository().get(identity)
 
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(

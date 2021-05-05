@@ -28,7 +28,7 @@ import factory.fuzzy
 from education_group.ddd.domain._campus import Campus
 
 
-class CampusIdentityFactory(factory.Factory):
+class CampusFactory(factory.Factory):
     class Meta:
         model = Campus
         abstract = False

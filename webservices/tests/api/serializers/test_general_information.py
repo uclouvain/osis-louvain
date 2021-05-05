@@ -39,7 +39,7 @@ from cms.enums.entity_name import OFFER_YEAR, GROUP_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.repositories import load_tree
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
@@ -106,7 +106,8 @@ class GeneralInformationSerializerTestCase(TestCase):
                 'offer': cls.egy,
                 'group': GroupFactory(
                     type=cls.group.education_group_type,
-                    entity_identity=GroupIdentity(code=cls.group.partial_acronym, year=cls.group.academic_year.year)
+                    entity_identity=GroupIdentity(code=cls.group.partial_acronym, year=cls.group.academic_year.year),
+                    persist=False,
                 )
             }
         )
@@ -173,7 +174,8 @@ class GeneralInformationSerializerTestCase(TestCase):
                         entity_identity=GroupIdentity(
                             code=self.group.partial_acronym,
                             year=self.group.academic_year.year
-                        )
+                        ),
+                        persist=False
                     )
                 }
             ).data['sections'][0]
@@ -282,7 +284,8 @@ class IntroOffersSectionTestCase(TestCase):
                     entity_identity=GroupIdentity(
                         code=self.group.partial_acronym,
                         year=self.group.academic_year.year
-                    )
+                    ),
+                    persist=False
                 )
             }
         ).data['sections'][0]

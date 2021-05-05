@@ -26,6 +26,9 @@ from typing import Optional
 from base.ddd.utils import business_validator
 from program_management.ddd.domain import exception
 
+MAX_RELATIVE_CREDITS = 999
+MIN_RELATIVE_CREDITS = 0
+
 
 class RelativeCreditsValidator(business_validator.BusinessValidator):
     def __init__(self, relative_credits: Optional[int]):
@@ -36,8 +39,8 @@ class RelativeCreditsValidator(business_validator.BusinessValidator):
         if self.relative_credits is None:
             return
 
-        if self.relative_credits < 0:
+        if self.relative_credits < MIN_RELATIVE_CREDITS:
             raise exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
 
-        elif self.relative_credits > 999:
+        elif self.relative_credits > MAX_RELATIVE_CREDITS:
             raise exception.RelativeCreditShouldBeLowerOrEqualThan999

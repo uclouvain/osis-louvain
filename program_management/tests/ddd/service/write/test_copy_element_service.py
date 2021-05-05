@@ -23,11 +23,9 @@
 # ############################################################################
 from django.test import SimpleTestCase
 
-from base.tests.factories.user import UserFactory
 from base.utils import cache
 from program_management.ddd import command
 from program_management.ddd.service.write import copy_element_service
-from program_management.models.enums import node_type
 
 
 class TestCopyElementService(SimpleTestCase):

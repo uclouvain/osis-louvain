@@ -130,7 +130,7 @@ class TestDeleteTrainingGetMethod(TestCase):
 class TestDeleteTrainingPostMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.training = TrainingFactory(entity_identity__year=2025)
+        cls.training = TrainingFactory(entity_identity__year=2025, persist=False)
         cls.root_node = NodeGroupYearFactory(year=cls.training.year)
         cls.program_tree_version = ProgramTreeVersionFactory(
             entity_id=ProgramTreeVersionIdentity(

@@ -26,9 +26,9 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from education_group.ddd.repository import group as group_repository
 
 
 def get_group(cmd: command.GetGroupCommand) -> 'Group':
     group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return GroupRepository.get(group_id)
+    return group_repository.GroupRepository.get(group_id)

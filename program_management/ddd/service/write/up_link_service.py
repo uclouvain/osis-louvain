@@ -24,20 +24,25 @@
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_node, load_tree, persist_tree
+from program_management.ddd.domain.service import identity_search
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 def up_link(command_up: command.OrderUpLinkCommand) -> 'NodeIdentity':
-    root_id = int(command_up.path.split("|")[0])
     *_, parent_id, child_id = [int(element_id) for element_id in command_up.path.split("|")]
+    repo = program_tree_repository.ProgramTreeRepository()
 
-    parent_node = load_node.load(parent_id)
-    child_node = load_node.load(child_id)
+    tree_identity = identity_search.ProgramTreeIdentitySearch.get_from_element_id(parent_id)
+    tree = repo.get(tree_identity)
+    parent_node = tree.root_node
 
-    tree = load_tree.load(root_id)
+    child_identity = identity_search.NodeIdentitySearch.get_from_element_id(child_id)
+    child_node = tree.get_node_by_code_and_year(child_identity.code, child_identity.year)
+
     link_to_up = tree.get_link(parent_node, child_node)
     parent_node = link_to_up.parent
     parent_node.up_child(child_node)
 
-    persist_tree.persist(tree)
+    repo.update(tree)
+
     return child_node.entity_id

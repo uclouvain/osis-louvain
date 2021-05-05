@@ -163,10 +163,6 @@ class ProgramTreeIdentitySearch(interface.DomainService):
         return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
 
     @classmethod
-    def get_from_program_tree_version_identity(cls, identity: 'ProgramTreeVersionIdentity') -> 'ProgramTreeIdentity':
-        return cls.get_from_node_identity(NodeIdentitySearch().get_from_tree_version_identity(identity))
-
-    @classmethod
     def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'ProgramTreeIdentity':
         return ProgramTreeIdentity(code=group_identity.code, year=group_identity.year)
 
@@ -185,15 +181,6 @@ class TrainingIdentitySearch(interface.DomainService):
     ) -> 'TrainingIdentity':
         return TrainingIdentity(acronym=version_identity.offer_acronym, year=version_identity.year)
 
-    @classmethod
-    def get_from_program_tree_identity(
-            cls,
-            identity: 'ProgramTreeIdentity'
-    ) -> 'TrainingIdentity':
-        return EducationGroupTrainingIdentitySearch().get_from_node_identity(
-            node_identity=NodeIdentitySearch().get_from_program_tree_identity(tree_identity=identity)
-        )
-
 
 # TODO :: review : is this at the correct place?
 class GroupIdentitySearch(interface.DomainService):
@@ -209,26 +196,6 @@ class GroupIdentitySearch(interface.DomainService):
         ).values('code', 'year')
         if values:
             return GroupIdentity(code=values[0]['code'], year=values[0]['year'])
-
-
-class TrainingOrMiniTrainingOrGroupIdentitySearch(interface.DomainService):
-
-    # FIXME :: This function calls another domain : we can't do that. It's the proof that we need to improve the
-    # FIXME :: division of the roots Entities in the domain layer.
-    @classmethod
-    def get_from_program_tree_identity(
-            cls,
-            tree_identity: 'ProgramTreeIdentity'
-    ) -> Union['GroupIdentity', 'MiniTrainingIdentity', 'TrainingIdentity']:
-        data = _get_data_from_db(tree_identity)
-        offer_acronym = data['offer_acronym']
-        offer_type = data['offer_type']
-        if not offer_acronym:
-            return GroupIdentity(code=tree_identity.code, year=tree_identity.year)
-        elif offer_type in MiniTrainingType.get_names():
-            return MiniTrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
-        elif offer_type in TrainingType.get_names():
-            return TrainingIdentity(acronym=offer_acronym, year=tree_identity.year)
 
 
 def _get_data_from_db(tree_identity):

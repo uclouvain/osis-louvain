@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
 
 from education_group.ddd.domain.service.code_exist import CheckCodeExist
-from education_group.tests.factories.group_year import GroupYearFactory
+from education_group.tests.ddd.factories.group import GroupFactory
+from testing.testcases import DDDTestCase
 
 
-class TestCheckCodeExist(TestCase):
+class TestCheckCodeExist(DDDTestCase):
     def test_assert_existing_year(self):
-        group_db_obj = GroupYearFactory(academic_year__year=2020)
-        self.assertEqual(CheckCodeExist.get_existing_year(group_db_obj.partial_acronym), 2020)
+        group = GroupFactory(persist=True)
+
+        result = CheckCodeExist.get_existing_year(group.code)
+
+        self.assertEqual(group.entity_id.year, result)
 
     def test_assert_none_when_no_existing_year(self):
         self.assertIsNone(CheckCodeExist.get_existing_year("DUMMY"))

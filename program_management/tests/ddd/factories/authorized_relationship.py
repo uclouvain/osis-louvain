@@ -23,10 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import json
+from typing import Dict, List
+
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipObject, AuthorizedRelationshipList
+from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType
+from program_management.models.enums import node_type
 
 
 class AuthorizedRelationshipObjectFactory(factory.Factory):
@@ -57,3 +62,56 @@ class AuthorizedRelationshipListFactory(factory.Factory):
         abstract = False
 
     authorized_relationships = factory.LazyAttribute(generate_auth_relation)
+
+    @classmethod
+    def load_from_fixture(cls) -> 'AuthorizedRelationshipList':
+        fixture_path = "base/fixtures/authorized_relationship.json"
+        with open(fixture_path, "r") as fixture_file:
+            json_fixture = json.load(fixture_file)
+            relationships = [cls._fixture_data_to_authorized_relationship_object(data) for data in json_fixture]
+            relationships.extend(cls._generate_learning_unit_authorized_relationship_objects())
+            return cls(authorized_relationships=relationships)
+
+    @classmethod
+    def _fixture_data_to_authorized_relationship_object(cls, fixture_data: Dict) -> 'AuthorizedRelationshipObject':
+        return AuthorizedRelationshipObjectFactory(
+            parent_type=cls._get_education_group_type(fixture_data["fields"]["parent_type"][0]),
+            child_type=cls._get_education_group_type(fixture_data["fields"]["child_type"][0]),
+            min_count_authorized=fixture_data["fields"]["min_count_authorized"],
+            max_count_authorized=fixture_data["fields"]["max_count_authorized"]
+        )
+
+    @classmethod
+    def _get_education_group_type(cls, name: str) -> education_group_types.EducationGroupTypesEnum:
+        try:
+            return education_group_types.TrainingType[name]
+        except KeyError:
+            pass
+        try:
+            return education_group_types.MiniTrainingType[name]
+        except KeyError:
+            pass
+        return education_group_types.GroupType[name]
+
+    @classmethod
+    def _generate_learning_unit_authorized_relationship_objects(cls) -> List['AuthorizedRelationshipObject']:
+        return [
+            AuthorizedRelationshipObjectFactory(
+                parent_type=education_group_types.GroupType.SUB_GROUP,
+                child_type=node_type.NodeType.LEARNING_UNIT,
+                min_count_authorized=0,
+                max_count_authorized=None
+            ),
+            AuthorizedRelationshipObjectFactory(
+                parent_type=education_group_types.GroupType.COMPLEMENTARY_MODULE,
+                child_type=node_type.NodeType.LEARNING_UNIT,
+                min_count_authorized=0,
+                max_count_authorized=None
+            ),
+            AuthorizedRelationshipObjectFactory(
+                parent_type=education_group_types.GroupType.COMMON_CORE,
+                child_type=node_type.NodeType.LEARNING_UNIT,
+                min_count_authorized=0,
+                max_count_authorized=None
+            )
+        ]

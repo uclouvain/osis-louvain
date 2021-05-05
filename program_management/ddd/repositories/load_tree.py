@@ -52,7 +52,6 @@ def load(tree_root_id: int) -> 'ProgramTree':
     return trees[0]
 
 
-@deprecated  # use ProgramTreeRepository.search() instead
 def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     trees = []
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)

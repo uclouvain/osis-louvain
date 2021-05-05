@@ -42,12 +42,13 @@ from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
     TeachingCampusNotFound, CodeAlreadyExistException, MultipleEntitiesFoundException
 from education_group.ddd.domain.group import GroupIdentity, Group
-from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository
 from education_group.models.group_year import GroupYear as GroupYearModelDb
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 
 
+# FIXME test get with create
 class TestGroupRepositoryGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -137,15 +138,12 @@ class TestGroupRepositoryCreateMethod(TestCase):
         self.group_identity = GroupIdentity(code="LTRONC1200", year=2017)
         self.group = GroupFactory(
             entity_identity=self.group_identity,
-            entity_id=self.group_identity,
             type=self.education_group_type,
-            management_entity=EntityValueObject(acronym='DRT'),
-            teaching_campus=Campus(
-                name=self.campus.name,
-                university_name=self.campus.organization.name,
-            ),
+            management_entity__acronym='DRT',
+            teaching_campus__name=self.campus.name,
+            teaching_campus__university_name=self.campus.organization.name,
             start_year=2017,
-            end_year=None
+            end_year=None,
         )
 
     def test_assert_raise_academic_year_not_found(self):
@@ -267,6 +265,13 @@ class TestGroupRepositorySearchMethod(TestCase):
         self.assertEqual(len(results), 2, msg="Should have two results because search on multiple ID")
         self.assertIsInstance(results[0], Group)
 
+    def test_assert_search_by_code(self):
+        results = GroupRepository.search(code=self.group_identity.code)
+
+        self.assertIsInstance(results, List)
+        self.assertEqual(len(results), 1, msg="Should have one result because search on specific code")
+        self.assertIsInstance(results[0], Group)
+
 
 class TestGroupRepositoryUpdateMethod(TestCase):
     @classmethod
@@ -288,12 +293,9 @@ class TestGroupRepositoryUpdateMethod(TestCase):
         dummy_group_identity = GroupIdentity(code="dummy-code", year=1966)
         group = GroupFactory(
             entity_identity=dummy_group_identity,
-            entity_id=dummy_group_identity,
-            management_entity=EntityValueObject(acronym='DRT'),
-            teaching_campus=Campus(
-                name=self.group_year_db.main_teaching_campus.name,
-                university_name=self.group_year_db.main_teaching_campus.organization.name,
-            )
+            management_entity__acronym='DRT',
+            teaching_campus__name=self.group_year_db.main_teaching_campus.name,
+            teaching_campus__university_name=self.group_year_db.main_teaching_campus.organization.name,
         )
         with self.assertRaises(exception.GroupNotFoundException):
             GroupRepository.update(group)
@@ -303,12 +305,10 @@ class TestGroupRepositoryUpdateMethod(TestCase):
 
         group = GroupFactory(
             entity_identity=self.group_identity,
-            entity_id=self.group_identity,
-            management_entity=EntityValueObject(acronym=new_entity.acronym),
-            teaching_campus=Campus(
-                name=self.group_year_db.main_teaching_campus.name,
-                university_name=self.group_year_db.main_teaching_campus.organization.name,
-            )
+            management_entity__acronym=new_entity.acronym,
+            teaching_campus__name=self.group_year_db.main_teaching_campus.name,
+            teaching_campus__university_name=self.group_year_db.main_teaching_campus.organization.name,
+            end_year=None,
         )
         GroupRepository.update(group)
 

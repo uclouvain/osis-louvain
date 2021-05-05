@@ -25,20 +25,14 @@
 ##############################################################################
 from typing import Optional
 
+import attr
+
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class ContentConstraint(interface.ValueObject):
-    def __init__(self, type: Optional[ConstraintTypeEnum], minimum: Optional[int], maximum: Optional[int]):
-        self.type = type
-        self.minimum = minimum
-        self.maximum = maximum
-
-    def __eq__(self, other):
-        return self.type == other.type \
-               and self.minimum == other.minimum \
-               and self.maximum == other.maximum
-
-    def __hash__(self):
-        return hash(str(self.type) + str(self.minimum) + str(self.maximum))
+    type = attr.ib(type=Optional[ConstraintTypeEnum])
+    minimum = attr.ib(type=Optional[int])
+    maximum = attr.ib(type=Optional[int])

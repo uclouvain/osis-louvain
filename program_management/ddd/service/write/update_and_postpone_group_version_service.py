@@ -33,7 +33,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as tree_version_repo
 from program_management.ddd.service.write import copy_program_version_service
 
 
@@ -69,7 +69,7 @@ def update_and_postpone_group_version(
     identities_created = []
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_group(
         identity=group.entity_identity,
-        repository=ProgramTreeVersionRepository(),
+        repository=tree_version_repo.ProgramTreeVersionRepository(),
     )
     for year in range(from_year, end_postponement_year):
         try:

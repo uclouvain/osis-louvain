@@ -21,27 +21,62 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
+import attr
 
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.ddd import command
 from education_group.ddd.domain import group
+from education_group.ddd.domain.exception import ContentConstraintMinimumMaximumMissing, \
+    CreditShouldBeGreaterOrEqualsThanZero
 from education_group.ddd.service.write import update_group_service
+from education_group.ddd.validators import _credits
 from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
-from education_group.tests.factories.factories.command import UpdateGroupCommandFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
-class TestUpdateGroup(TestCase, MockPatcherMixin):
+class TestUpdateGroup(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = UpdateGroupCommandFactory()
+        cls.cmd = command.UpdateGroupCommand(
+            year=2018,
+            code="LTRONC1",
+            abbreviated_title="TRONC-COMMUN",
+            title_fr="Tronc commun",
+            title_en="Common core",
+            credits=20,
+            constraint_type=ConstraintTypeEnum.CREDITS.name,
+            min_constraint=0,
+            max_constraint=10,
+            management_entity_acronym="DRT",
+            teaching_campus_name="Mons Fucam",
+            organization_name="UCLouvain",
+            remark_fr="Remarque en français",
+            remark_en="Remarque en anglais",
+            end_year=None,
+        )
 
     def setUp(self) -> None:
-        self.group_2018 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2018,)
-        self.group_2019 = GroupFactory(entity_identity__code=self.cmd.code, entity_identity__year=2019,)
-        self.groups = [self.group_2018, self.group_2019]
-        self.fake_group_repo = get_fake_group_repository(self.groups)
-        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
+        super().setUp()
+
+        self.group_2018, self.group_2019 = GroupFactory.multiple(
+            2,
+            entity_identity__code=self.cmd.code,
+            entity_identity__year=2018,
+            persist=True
+        )
+
+    def test_must_check_constraints_are_valid(self):
+        # For all business rules for constraints see TestCreateGroup test cases
+        cmd = attr.evolve(self.cmd, min_constraint=None, max_constraint=None)
+
+        with self.assertRaisesBusinessException(ContentConstraintMinimumMaximumMissing):
+            update_group_service.update_group(cmd)
+
+    def test_cannot_have_credits_lower_than_min_accepted_credits_value(self):
+        cmd = attr.evolve(self.cmd, credits=_credits.MIN_CREDITS_VALUE - 1)
+
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
+            update_group_service.update_group(cmd)
 
     def test_should_return_entity_id_of_updated_group(self):
         result = update_group_service.update_group(self.cmd)
@@ -52,7 +87,7 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
     def test_should_update_value_of_group_based_on_command_value(self):
         entity_id = update_group_service.update_group(self.cmd)
 
-        group_updated = self.fake_group_repo.get(entity_id)
+        group_updated = self.fake_group_repository.get(entity_id)
         self.assert_has_same_value_as_update_command(group_updated)
 
     def assert_has_same_value_as_update_command(self, update_group: 'group.Group'):

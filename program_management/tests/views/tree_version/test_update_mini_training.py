@@ -31,7 +31,7 @@ from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
@@ -51,7 +51,7 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
             entity_identity=GroupIdentity(
                 code=cls.mini_training_version_obj.tree.root_node.code,
                 year=cls.mini_training_version_obj.tree.root_node.year
-            )
+            ),
         )
         cls.mini_training_obj = MiniTrainingFactory()
 
@@ -197,7 +197,8 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
             entity_identity=GroupIdentity(
                 code=cls.mini_training_version_obj.tree.root_node.code,
                 year=cls.mini_training_version_obj.tree.root_node.year
-            )
+            ),
+            persist=False,
         )
         cls.mini_training_obj = MiniTrainingFactory()
 

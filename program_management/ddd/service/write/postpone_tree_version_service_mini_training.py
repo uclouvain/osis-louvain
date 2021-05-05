@@ -30,7 +30,7 @@ from django.db import transaction
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, CopyTreeVersionToNextYearCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as tree_version_repo
 from program_management.ddd.service.write import copy_program_version_service
 
 
@@ -50,7 +50,7 @@ def postpone_program_tree_version(
             year=postpone_cmd.from_year,
             transition_name=postpone_cmd.from_transition_name,
         ),
-        repository=ProgramTreeVersionRepository()
+        repository=tree_version_repo.ProgramTreeVersionRepository()
     )
 
     # WHEN

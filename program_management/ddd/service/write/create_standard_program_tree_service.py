@@ -27,13 +27,12 @@
 from django.db import transaction
 
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.repository.group import GroupRepository
+from education_group.ddd.repository import group as group_repository
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
-from program_management.ddd.repositories.node import NodeRepository
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import node as node_repository, program_tree as program_tree_repository
 
 
 @transaction.atomic()
@@ -41,16 +40,16 @@ def create_standard_program_tree(create_standard_cmd: command.CreateStandardVers
 
     # GIVEN
     group_identity = GroupIdentity(code=create_standard_cmd.code, year=create_standard_cmd.start_year)
-    root_group = GroupRepository().get(entity_id=group_identity)
+    root_group = group_repository.GroupRepository().get(entity_id=group_identity)
 
     # WHEN
     program_tree = ProgramTreeBuilder().build_from_orphan_group_as_root(
         orphan_group_as_root=root_group,
-        node_repository=NodeRepository(),
+        node_repository=node_repository.NodeRepository(),
     )
 
     # THEN
-    program_tree_identity = ProgramTreeRepository().create(
+    program_tree_identity = program_tree_repository.ProgramTreeRepository().create(
         program_tree=program_tree,
         create_orphan_group_service=create_group_service.create_orphan_group
     )

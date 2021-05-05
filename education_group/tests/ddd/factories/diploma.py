@@ -28,17 +28,6 @@ import factory.fuzzy
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
 
 
-class DiplomaFactory(factory.Factory):
-    class Meta:
-        model = Diploma
-        abstract = False
-
-    leads_to_diploma = True
-    printing_title = factory.Sequence(lambda n: 'Printing title %02d' % n)
-    professional_title = factory.Sequence(lambda n: 'Professionnal title %02d' % n)
-    aims = []
-
-
 class DiplomaAimIdentityFactory(factory.Factory):
     class Meta:
         model = DiplomaAimIdentity
@@ -55,3 +44,17 @@ class DiplomaAimFactory(factory.Factory):
 
     entity_id = factory.SubFactory(DiplomaAimIdentityFactory)
     description = factory.fuzzy.FuzzyText()
+
+
+class DiplomaFactory(factory.Factory):
+    class Meta:
+        model = Diploma
+        abstract = False
+
+    leads_to_diploma = True
+    printing_title = factory.Sequence(lambda n: 'Printing title %02d' % n)
+    professional_title = factory.Sequence(lambda n: 'Professionnal title %02d' % n)
+    aims = []
+
+    class Params:
+        with_aims = factory.Trait(aims=[DiplomaAimFactory(), DiplomaAimFactory()])

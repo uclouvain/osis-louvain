@@ -31,8 +31,7 @@ from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateP
     PostponeGroupVersionCommand, PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.service.write import update_program_tree_version_service, \
-    update_and_postpone_group_version_service, postpone_training_and_program_tree_modifications_service, \
-    postpone_program_tree_service, postpone_tree_specific_version_service
+    update_and_postpone_group_version_service, postpone_program_tree_service, postpone_tree_specific_version_service
 
 
 def update_and_postpone_training_version(

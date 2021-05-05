@@ -21,23 +21,20 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import SimpleTestCase
 
 from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
     check_training_empty_fields_on_warning
 from education_group.tests.ddd.factories.funding import FundingFactory
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
-class TestCheckEmptyFields(SimpleTestCase, MockPatcherMixin):
+class TestCheckEmptyFields(DDDTestCase):
     def setUp(self):
-        self.training = TrainingFactory()
-        fake_training_repository = get_fake_training_repository([self.training])
-        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", fake_training_repository)
+        super().setUp()
+        self.training = TrainingFactory(persist=True)
 
         self.command = GetTrainingEmptyFieldsOnWarningCommand(
             acronym=self.training.entity_id.acronym,
@@ -58,5 +55,5 @@ class TestCheckEmptyFields(SimpleTestCase, MockPatcherMixin):
         self.training.main_domain = None
         self.training.funding = FundingFactory(funding_orientation=None)
 
-        with self.assertRaises(exception.TrainingEmptyFieldException):
+        with self.assertRaisesBusinessException(exception.TrainingEmptyFieldException):
             check_training_empty_fields_on_warning(self.command)

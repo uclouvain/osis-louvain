@@ -146,7 +146,8 @@ class GeneralInformationTestCase(APITestCase):
                 'offer': self.egy,
                 'group': GroupFactory(
                     type=self.group.education_group_type,
-                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year)
+                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year),
+                    persist=False
                 )
             }
         )
@@ -169,7 +170,8 @@ class GeneralInformationTestCase(APITestCase):
                 'offer': self.egy,
                 'group': GroupFactory(
                     type=self.group.education_group_type,
-                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year)
+                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year),
+                    persist=False
                 )
             }
         )

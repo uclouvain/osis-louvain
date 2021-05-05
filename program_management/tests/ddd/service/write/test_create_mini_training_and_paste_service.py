@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 from education_group.ddd.domain import mini_training
 from program_management.ddd import command

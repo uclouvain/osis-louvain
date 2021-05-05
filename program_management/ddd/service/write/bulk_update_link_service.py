@@ -29,7 +29,7 @@ from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain.exception import BulkUpdateLinkException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.write import update_link_service
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
@@ -37,7 +37,8 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 @transaction.atomic()
 def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
     tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
+    repo = program_tree_repository.ProgramTreeRepository()
+    tree = repo.get(tree_id)
 
     links_updated = []
     exceptions = dict()
@@ -50,5 +51,5 @@ def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
             exceptions[update_cmd] = e
     if exceptions:
         raise BulkUpdateLinkException(exceptions=exceptions)
-    ProgramTreeRepository.update(tree)
+    repo.update(tree)
     return links_updated

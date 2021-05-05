@@ -30,9 +30,6 @@ import factory.fuzzy
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain.prerequisite import PrerequisiteItem, PrerequisiteItemGroup, Prerequisite
 
-from program_management.ddd.business_types import *
-from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
-
 
 class PrerequisiteItemFactory(factory.Factory):
     class Meta:

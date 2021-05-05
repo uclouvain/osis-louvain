@@ -21,30 +21,31 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.test import TestCase
 from mock import patch
 
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import update_training_and_group_service
 from education_group.tests.ddd.factories.command.update_training_and_group_factory import \
     UpdateTrainingAndGroupCommandFactory
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
 from education_group.tests.ddd.factories.training import TrainingFactory
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
 @patch("education_group.ddd.service.write.update_group_service.update_group")
-class TestUpdateAndPostponeTrainingAndGroupService(TestCase, MockPatcherMixin):
+class TestUpdateAndPostponeTrainingAndGroupService(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.cmd = UpdateTrainingAndGroupCommandFactory(year=2018, acronym="MERC")
 
     def setUp(self) -> None:
-        self.trainings = [TrainingFactory(entity_identity__year=year,
-                                          entity_identity__acronym=self.cmd.acronym)
-                          for year in range(2018, 2020)]
-        self.fake_training_repo = get_fake_training_repository(self.trainings)
-        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repo)
+        super().setUp()
+        self.trainings = [
+            TrainingFactory(
+                entity_identity__year=year,
+                entity_identity__acronym=self.cmd.acronym,
+                persist=True
+            ) for year in range(2018, 2020)
+        ]
 
     def test_should_return_identity(self, mock_update_group):
         result = update_training_and_group_service.update_training_and_group(self.cmd)

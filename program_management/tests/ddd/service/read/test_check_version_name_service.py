@@ -32,6 +32,7 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 from testing.mocks import MockPatcherMixin
 
 
+# TODO refactor
 class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.mock_get_last_version = self.mock_service(

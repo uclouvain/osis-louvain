@@ -1,5 +1,4 @@
 import mock
-from django import forms
 from django.http import HttpResponseBadRequest
 from django.test import TestCase
 from django.urls import reverse
@@ -7,9 +6,9 @@ from django.utils.translation import pgettext_lazy
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
-from education_group.ddd.factories.group import GroupFactory
-from program_management.forms.select_type import SelectTypeForm
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.forms.select_type import SelectTypeForm
 
 
 class TestSelectTypeCreateView(TestCase):

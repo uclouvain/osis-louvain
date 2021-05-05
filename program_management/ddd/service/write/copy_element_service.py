@@ -25,6 +25,7 @@ from base.utils import cache
 from program_management.ddd import command
 
 
+# FIXME should not be a domain service
 def copy_element_service(copy_command: command.CopyElementCommand):
     cache.ElementCache(
         copy_command.user_id

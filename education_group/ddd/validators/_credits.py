@@ -26,6 +26,8 @@ from typing import Optional
 from base.ddd.utils import business_validator
 from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero
 
+MIN_CREDITS_VALUE = 0
+
 
 class CreditsValidator(business_validator.BusinessValidator):
     def __init__(self, credits: Optional[int]):
@@ -36,5 +38,5 @@ class CreditsValidator(business_validator.BusinessValidator):
         if self.credits is None:
             return
 
-        if self.credits < 0:
+        if self.credits < MIN_CREDITS_VALUE:
             raise CreditShouldBeGreaterOrEqualsThanZero

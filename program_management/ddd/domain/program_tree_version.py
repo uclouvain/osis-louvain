@@ -184,6 +184,7 @@ class ProgramTreeVersionBuilder:
                 command.transition_name
             )
         if validator.is_valid():
+            #  FIXME should extract this logic into a validator
             assert isinstance(from_existing_version, ProgramTreeVersion)
             assert not from_existing_version.is_transition, "Forbidden to create a version from a transition"
             assert not (from_existing_version.version_name and command.version_name and not command.transition_name), \

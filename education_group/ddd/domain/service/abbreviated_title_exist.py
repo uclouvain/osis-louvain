@@ -28,6 +28,7 @@ from base.models.education_group_year import EducationGroupYear
 from osis_common.ddd import interface
 
 
+# FIXME use group repository
 class CheckAcronymExist(interface.DomainService):
     @classmethod
     def exists(cls, abbreviated_title: str) -> bool:

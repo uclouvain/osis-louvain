@@ -21,80 +21,43 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
+import threading
+from unittest.mock import patch
 
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import override_settings
 
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from program_management.ddd import command
 from program_management.ddd.service.write import publish_program_trees_using_node_service
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from testing.testcases import DDDTestCase
 
 
-class TestPublishProgramTreesUsingNodeService(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.program_tree = ProgramTreeFactory()
+def mock_thread_start(self):
+    self._target(*self._args, **self._kwargs)
 
-        cls.cmd = command.PublishProgramTreesVersionUsingNodeCommand(
-            code=cls.program_tree.root_node.code,
-            year=cls.program_tree.root_node.year
-        )
 
+class TestPublishProgramTreesUsingNodeService(DDDTestCase):
     def setUp(self):
-        self.get_pgrm_trees_patcher = mock.patch(
-            "program_management.ddd.service.write.publish_program_trees_using_node_service."
-            "search_program_trees_using_node_service.search_program_trees_using_node",
-            return_value=[self.program_tree]
-        )
-        self.mocked_get_pgrm_trees = self.get_pgrm_trees_patcher.start()
-        self.addCleanup(self.get_pgrm_trees_patcher.stop)
+        super().setUp()
+        self.program_tree = ProgramTreeFactory(persist=True)
 
-        self.get_publish_url_patcher = mock.patch(
-            "program_management.ddd.service.write.publish_program_trees_using_node_service."
-            "GetNodePublishUrl.get_url_from_node",
-            return_value="dummy-url"
+        self.cmd = command.PublishProgramTreesVersionUsingNodeCommand(
+            code=self.program_tree.root_node.code,
+            year=self.program_tree.root_node.year
         )
-        self.mocked_get_publish_url = self.get_publish_url_patcher.start()
-        self.addCleanup(self.get_publish_url_patcher.stop)
 
-    @mock.patch('requests.get', return_value=HttpResponse)
-    @mock.patch('threading.Thread')
-    def test_publish_call_seperate_thread(self, mock_thread, mock_requests_get):
-        mock_thread.start.return_value = True
+        self.mock_get = self.mock_service("requests.get", return_value=HttpResponse)
+
+    @patch.object(threading.Thread, "start", mock_thread_start)
+    @override_settings(ESB_API_URL="esb", ESB_REFRESH_PEDAGOGY_ENDPOINT="{year}{code}")
+    def test_publish_call_seperate_thread(self):
         publish_program_trees_using_node_service.publish_program_trees_using_node(self.cmd)
-        self.assertTrue(mock_thread.start)
 
-
-class TestBulkPublish(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.minor = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
-        cls.deepening = NodeGroupYearFactory(node_type=MiniTrainingType.DEEPENING)
-        cls.major = NodeGroupYearFactory(node_type=MiniTrainingType.FSA_SPECIALITY)
-        cls.training = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
-
-    def setUp(self):
-        self.requests_get_patcher = mock.patch('requests.get', return_value=HttpResponse)
-        self.mocked_requests_get = self.requests_get_patcher.start()
-        self.addCleanup(self.requests_get_patcher.stop)
-
-        self.get_publish_url_patcher = mock.patch(
-            "program_management.ddd.service.write.publish_program_trees_using_node_service."
-            "GetNodePublishUrl.get_url_from_node",
-            return_value="dummy-url"
+        self.assertTrue(
+            self.mock_get.call_args[0],
+            "esb/{}{}".format(self.cmd.year, self.cmd.code)
         )
-        self.mocked_get_publish_url = self.get_publish_url_patcher.start()
-        self.addCleanup(self.get_publish_url_patcher.stop)
 
-    def test_assert_multiple_publication_call(self):
-        publish_program_trees_using_node_service._bulk_publish([
-            self.minor,
-            self.deepening,
-            self.major,
-            self.training
-        ])
-        self.assertEqual(self.mocked_requests_get.call_count, 4)
+
 

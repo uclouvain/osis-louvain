@@ -31,6 +31,19 @@ from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
     HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 
 
+TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL = [
+    TrainingType.FORMATION_PHD.name,
+    TrainingType.CERTIFICATE_OF_PARTICIPATION.name,
+    TrainingType.CERTIFICATE_OF_SUCCESS.name,
+    TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name,
+    TrainingType.CAPAES.name,
+    TrainingType.CERTIFICATE.name,
+    TrainingType.RESEARCH_CERTIFICATE.name,
+    TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+    TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
+]
+
+
 class HopsValuesValidator(business_validator.BusinessValidator):
 
     def __init__(self, training: 'Training'):
@@ -47,18 +60,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         exceptions = []
         hops_fields_values = [value for value in [self.ares_code, self.ares_graca, self.ares_authorization] if value]
-        training_hops_types_names = [
-            TrainingType.FORMATION_PHD.name,
-            TrainingType.CERTIFICATE_OF_PARTICIPATION.name,
-            TrainingType.CERTIFICATE_OF_SUCCESS.name,
-            TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name,
-            TrainingType.CAPAES.name,
-            TrainingType.CERTIFICATE.name,
-            TrainingType.RESEARCH_CERTIFICATE.name,
-            TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
-            TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
-        ]
-        if self.training_type.name in training_hops_types_names:
+        if self.training_type.name in TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL:
             if 0 < len(hops_fields_values) < 2 or \
                     (len(hops_fields_values) == 2 and (self.ares_code is None or self.ares_authorization is None)):
                 exceptions.append(HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES())

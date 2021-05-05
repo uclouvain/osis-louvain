@@ -36,7 +36,7 @@ from program_management.ddd.command import PublishProgramTreesVersionUsingNodeCo
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.read import search_program_trees_using_node_service
 
 
@@ -45,7 +45,8 @@ def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCom
     cmd = GetProgramTreesFromNodeCommand(code=cmd.code, year=cmd.year)
     program_trees = search_program_trees_using_node_service.search_program_trees_using_node(cmd)
     try:
-        program_tree = ProgramTreeRepository().get(ProgramTreeIdentity(code=cmd.code, year=cmd.year))
+        identity = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+        program_tree = program_tree_repository.ProgramTreeRepository().get(identity)
         program_trees.append(program_tree)
     except exception.ProgramTreeNotFoundException:
         pass

@@ -26,7 +26,7 @@
 from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     STANDARD, NOT_A_TRANSITION
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as tree_version_repo
 from program_management.ddd.service.write import duplicate_program_tree_service
 
 
@@ -41,7 +41,8 @@ def create_program_tree_specific_version(
         version_name=STANDARD,
         transition_name=NOT_A_TRANSITION
     )
-    program_tree_version_from = ProgramTreeVersionRepository().get(entity_id=tree_version_identity_from)
+    repo = tree_version_repo.ProgramTreeVersionRepository()
+    program_tree_version_from = repo.get(entity_id=tree_version_identity_from)
 
     # WHEN
     new_program_tree_identity = duplicate_program_tree_service.create_and_fill_from_existing_tree(
@@ -60,7 +61,7 @@ def create_program_tree_specific_version(
     )
 
     # THEN
-    identity = ProgramTreeVersionRepository.create(
+    identity = repo.create(
         program_tree_version=new_program_tree_version,
     )
 

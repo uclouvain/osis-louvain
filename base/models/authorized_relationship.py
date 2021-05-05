@@ -70,10 +70,9 @@ class AuthorizedRelationshipObject:
     max_count_authorized = attr.ib(type=int, converter=lambda value: INFINITE_VALUE if value is None else value)
 
 
+@attr.s()
 class AuthorizedRelationshipList:
-
-    def __init__(self, authorized_relationships: List[AuthorizedRelationshipObject]):
-        self.authorized_relationships = authorized_relationships
+    authorized_relationships = attr.ib(type=List[AuthorizedRelationshipObject])
 
     def get_authorized_relationship(
             self,

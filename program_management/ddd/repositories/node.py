@@ -27,9 +27,8 @@ from typing import Optional, List
 
 from django.db.models import Q
 
-from base.models import group_element_year
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, Entity, RootEntity
+from osis_common.ddd.interface import RootEntity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_node
 from program_management.models.element import Element

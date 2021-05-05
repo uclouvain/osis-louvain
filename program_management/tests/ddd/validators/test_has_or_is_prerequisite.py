@@ -48,6 +48,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
+#  TODO extract in detach service tests
 class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):

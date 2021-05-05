@@ -407,44 +407,6 @@ class TestGetOptionsList(SimpleTestCase):
         self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
 
 
-class TestUpDownChild(SimpleTestCase):
-    def setUp(self) -> None:
-        self.parent_node = NodeGroupYearFactory()
-        self.link1 = LinkFactory(parent=self.parent_node, order=0)
-        self.link2 = LinkFactory(parent=self.parent_node, order=1)
-        self.link3 = LinkFactory(parent=self.parent_node, order=2)
-
-    def test_should_not_change_order_when_applying_up_on_first_link(self):
-        self.parent_node.up_child(self.link1.child)
-
-        self.assertListEqual(
-            self.parent_node.children,
-            [self.link1, self.link2, self.link3]
-        )
-
-    def test_should_not_change_order_when_applying_down_on_last_link(self):
-        self.parent_node.down_child(self.link3.child)
-
-        self.assertListEqual(
-            self.parent_node.children,
-            [self.link1, self.link2, self.link3]
-        )
-
-    def test_should_not_change_order_when_applying_up_then_down_on_link(self):
-        self.parent_node.up_child(self.link2.child)
-
-        self.assertListEqual(
-            self.parent_node.children,
-            [self.link2, self.link1, self.link3]
-        )
-
-        self.parent_node.down_child(self.link2.child)
-        self.assertListEqual(
-            self.parent_node.children,
-            [self.link1, self.link2, self.link3]
-        )
-
-
 class TestGetFinalitiesList(SimpleTestCase):
     def test_when_has_no_children(self):
         node = NodeGroupYearFactory()

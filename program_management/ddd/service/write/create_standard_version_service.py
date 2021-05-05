@@ -29,9 +29,8 @@ from django.db import transaction
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import create_standard_program_tree_service
+from program_management.ddd.repositories import program_tree as program_tree_repository, \
+    program_tree_version as tree_version_repo
 
 
 @transaction.atomic()
@@ -45,10 +44,10 @@ def create_standard_program_version(
     # WHEN
     program_tree_version = ProgramTreeVersionBuilder().build_standard_version(
         cmd=cmd,
-        tree_repository=ProgramTreeRepository()
+        tree_repository=program_tree_repository.ProgramTreeRepository()
     )
 
     # THEN
-    program_tree_version_identity = ProgramTreeVersionRepository().create(program_tree_version)
+    program_tree_version_identity = tree_version_repo.ProgramTreeVersionRepository().create(program_tree_version)
 
     return program_tree_version_identity

@@ -34,7 +34,7 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.organization import MainOrganizationFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
-from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory, MiniTrainingIdentityFactory
 from reference.tests.factories.language import FrenchLanguageFactory
@@ -48,7 +48,7 @@ class TestMiniTrainingUpdateView(TestCase):
         cls.mini_training_identity = MiniTrainingIdentityFactory(year=get_current_year())
         cls.mini_training = MiniTrainingFactory(
             entity_identity=cls.mini_training_identity,
-            start_year=get_current_year()-1
+            start_year=get_current_year()-1,
         )
         cls.organization = MainOrganizationFactory()
         cls.teaching_campus = CampusFactory(organization=cls.organization)

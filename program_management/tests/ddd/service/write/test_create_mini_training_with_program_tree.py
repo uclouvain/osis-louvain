@@ -21,57 +21,127 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
 
-from education_group.ddd.domain import mini_training
-from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
-from program_management.ddd.domain import program_tree, program_tree_version
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
+import attr
+
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
+from education_group.ddd.domain.exception import CodeAlreadyExistException, AcronymRequired, AcronymAlreadyExist, \
+    StartYearGreaterThanEndYearException, CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.tests.ddd.factories.group import GroupFactory
+from program_management.ddd.command import GetProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
+from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
+from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.ddd.service.write import create_mini_training_with_program_tree
+from testing.testcases import DDDTestCase
 
 
-class TestCreateAndReportMiniTrainingWithProgramTree(TestCase):
-    @mock.patch("program_management.ddd.service.write.postpone_tree_version_service_mini_training"
-                ".postpone_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
-    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service_mini_training."
-                "postpone_program_tree")
-    @mock.patch("program_management.ddd.service.write.create_standard_program_tree_service."
-                "create_standard_program_tree")
-    @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
-                "create_and_postpone_orphan_mini_training")
-    def test_should_create_mini_trainings_until_postponement_limit(
-            self,
-            mock_create_and_postpone_orphan_mini_training,
-            mock_create_standard_program_tree,
-            mock_postpone_program_tree,
-            mock_create_standard_program_version,
-            mock_postpone_program_tree_version,):
+class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.max_postponement_year = cls.starting_academic_year_year + DEFAULT_YEARS_TO_POSTPONE
 
-        mini_training_identities = [
-            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2020),
-            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2021),
-            mini_training.MiniTrainingIdentity(acronym="ACRO", year=2022)
-        ]
+    def setUp(self) -> None:
+        super().setUp()
 
-        mock_create_and_postpone_orphan_mini_training.return_value = mini_training_identities
-        mock_create_standard_program_tree.return_value = program_tree.ProgramTreeIdentity(code="CODE", year=2020)
-        mock_postpone_program_tree.return_value = None
-        mock_create_standard_program_version.return_value = program_tree_version.ProgramTreeVersionIdentity(
-            offer_acronym="Offer",
-            year=2020,
-            version_name=STANDARD,
-            transition_name=NOT_A_TRANSITION,
+        self.cmd = command.CreateMiniTrainingCommand(
+            code="LMINI200I",
+            year=2021,
+            type=MiniTrainingType.OPTION.name,
+            abbreviated_title="MININFO",
+            title_fr="Mineure en info",
+            title_en="Minor info",
+            keywords="",
+            status=ActiveStatusEnum.ACTIVE.name,
+            schedule_type=ScheduleTypeEnum.DAILY.name,
+            credits=20,
+            constraint_type=ConstraintTypeEnum.CREDITS.name,
+            min_constraint=0,
+            max_constraint=5,
+            management_entity_acronym="INFO",
+            teaching_campus_name="LLN",
+            organization_name="UCL",
+            remark_fr="",
+            remark_en="",
+            start_year=2021,
+            end_year=None
         )
-        mock_postpone_program_tree_version.return_value = None
 
-        cmd = CreateMiniTrainingCommandFactory()
+    def test_cannot_create_mini_training_for_which_code_already_exists(self):
+        GroupFactory(entity_identity__code=self.cmd.code, persist=True)
+
+        with self.assertRaisesBusinessException(CodeAlreadyExistException):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
+
+    def test_acronym_should_be_required(self):
+        cmd = attr.evolve(self.cmd, abbreviated_title="")
+        with self.assertRaisesBusinessException(AcronymRequired):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
+
+    def test_cannot_create_mini_training_for_which_acronym_already_exists(self):
+        GroupFactory(abbreviated_title=self.cmd.abbreviated_title, persist=True)
+
+        with self.assertRaisesBusinessException(AcronymAlreadyExist):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
+
+    def test_start_year_cannot_be_greater_than_end_year(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year - 1)
+
+        with self.assertRaisesBusinessException(StartYearGreaterThanEndYearException):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
+
+    def test_credits_cannot_be_inferior_to_0(self):
+        cmd = attr.evolve(self.cmd, credits=-1)
+
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
+
+    def test_if_min_or_max_constraint_is_set_then_constraint_type_must_be_set(self):
+        # For all business rules for constraints see
+        # education_group.tests.ddd.service.write.test_create_group_service.TestCreateGroup
+        cmd = attr.evolve(self.cmd, constraint_type=None)
+
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
+            create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
+
+    def test_should_return_identities_of_mini_training_created(self):
+        result = create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
+
+        expected = [
+            MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(2021, self.max_postponement_year+1)
+        ]
+        self.assertListEqual(expected, result)
+
+    def test_should_create_mini_trainings_until_end_year_when_inferior_to_max_postponement_year(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year + 2)
+
         result = create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
-        self.assertListEqual(mini_training_identities, result)
-        self.assertTrue(mock_create_and_postpone_orphan_mini_training.called)
-        self.assertTrue(mock_create_standard_program_tree.called)
-        self.assertTrue(mock_postpone_program_tree.called)
-        self.assertTrue(mock_create_standard_program_version.called)
-        self.assertTrue(mock_postpone_program_tree_version.called)
+        expected = [
+            MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(cmd.start_year, cmd.end_year + 1)
+        ]
+        self.assertListEqual(expected, result)
+
+    def test_should_create_tree_versions_of_mini_trainings(self):
+        mini_training_identities = create_mini_training_with_program_tree.\
+            create_and_report_mini_training_with_program_tree(self.cmd)
+
+        cmds = [
+            GetProgramTreeVersionCommand(
+                acronym=identity.acronym,
+                year=identity.year,
+                version_name=STANDARD,
+                transition_name=NOT_A_TRANSITION
+            )
+            for identity in mini_training_identities
+        ]
+
+        tree_versions = [get_program_tree_version_service.get_program_tree_version(cmd) for cmd in cmds]
+        self.assertEqual(len(mini_training_identities), len(tree_versions))

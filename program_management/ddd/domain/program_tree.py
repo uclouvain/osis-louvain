@@ -681,6 +681,11 @@ class ProgramTree(interface.RootEntity):
         my_map = self._links_mapped_by_child_and_parent()
         return my_map.get(str(child.entity_id) + str(parent.entity_id))
 
+    def get_link_by_identity(self, link_identity: 'LinkIdentity') -> 'Link':
+        return next(
+            link for link in self.get_all_links() if link.entity_id == link_identity
+        )
+
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = copy.deepcopy(self.root_node)
         if ignore_children_from:

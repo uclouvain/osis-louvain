@@ -29,7 +29,7 @@ from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.domain.training import TrainingIdentity
-from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import copy_training_service, update_training_and_group_service, \
     copy_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
@@ -109,7 +109,7 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
     ]
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
         identity=from_training_id,
-        repository=TrainingRepository()
+        repository=training_repository.TrainingRepository()
     )
     for year in range(from_training_id.year, end_postponement_year):
         if year + 1 in conflicted_fields:
