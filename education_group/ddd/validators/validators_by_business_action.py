@@ -28,6 +28,7 @@ from base.ddd.utils.business_validator import MultipleExceptionBusinessListValid
 
 from education_group.ddd.business_types import *
 from education_group.ddd.validators._abbreviated_title_already_exist import AcronymAlreadyExistValidator
+from education_group.ddd.validators._acronym_pattern import CodePatternValidator
 from education_group.ddd.validators._acronym_required import AcronymRequiredValidator
 from education_group.ddd.validators._certificate_aim_type_2 import CertificateAimType2Validator
 from education_group.ddd.validators._content_constraint import ContentConstraintValidator
@@ -69,6 +70,7 @@ class CreateMiniTrainingValidatorList(MultipleExceptionBusinessListValidator):
             UniqueCodeValidator(mini_training_domain_obj.code),
             AcronymRequiredValidator(mini_training_domain_obj.acronym),
             AcronymAlreadyExistValidator(mini_training_domain_obj.acronym),
+            CodePatternValidator(mini_training_domain_obj.code),
             StartAndEndYearValidator(mini_training_domain_obj.start_year, mini_training_domain_obj.end_year)
         ]
         super().__init__()
@@ -88,6 +90,7 @@ class CreateTrainingValidatorList(MultipleExceptionBusinessListValidator):
             UniqueCodeValidator(training.code),
             AcronymRequiredValidator(training.acronym),
             AcronymAlreadyExistValidator(training.acronym),
+            CodePatternValidator(training.code),
             StartYearEndYearValidator(training),
             HopsValuesValidator(training)
         ]

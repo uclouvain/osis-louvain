@@ -50,6 +50,12 @@ class TrainingAcronymAlreadyExistException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class CodeIsInvalid(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Code is invalid")
+        super().__init__(message, **kwargs)
+
+
 class AcademicYearNotFound(Exception):
     pass
 
