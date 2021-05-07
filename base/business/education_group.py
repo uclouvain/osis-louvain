@@ -216,14 +216,20 @@ def prepare_xls_content_administrative(education_group_versions: List[EducationG
     return xls_data
 
 
+def _get_entity_acronym(egy) -> str:
+    return egy.management_entity_version.acronym \
+        if egy.management_entity_version else egy.management_entity.most_recent_acronym
+
+
 def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
     an_education_group_year = a_version.offer
+    management_entity_acronym = _get_entity_acronym(an_education_group_year)
     return {
         MANAGEMENT_ENTITY_COL:
             get_entity_version_xls_repr(
-                an_education_group_year.management_entity_version.acronym,
+                management_entity_acronym,
                 an_education_group_year.academic_year.year
-            ) if an_education_group_year.management_entity_version else '',
+            ) if management_entity_acronym else '',
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,
             a_version.version_label()
