@@ -275,7 +275,7 @@ msgid "Diplomas /  Certificates"
 msgstr "Diplômes /  Certificats"
 
 msgid "Direct gathering"
-msgstr "Regroupement direct"
+msgstr "Groupement"
 
 msgid "Dissertation"
 msgstr "Mémoire"
