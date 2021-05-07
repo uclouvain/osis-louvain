@@ -34,6 +34,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -90,10 +91,14 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_management_entity_field(self):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
         )
 
     def __init_teaching_campus(self):
@@ -133,6 +138,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         self.fields['academic_year'].required = False
         self.fields['code'].disabled = True
         self.fields['code'].required = False
+        self.__init_management_entity_field()
 
     # PermissionFieldMixin
     def get_context(self) -> str:
@@ -143,3 +149,17 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+
+    def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('management_entity'),
+            disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year,
+            help_text=msg
+        )

@@ -211,15 +211,6 @@ class TestGroupRepositoryCreateMethod(TestCase):
         with self.assertRaises(CodeAlreadyExistException):
             GroupRepository.create(self.group)
 
-    def test_assert_raise_multiple_entities_found_exception(self):
-        EntityVersionFactory(
-            acronym=self.management_entity_version.acronym,
-            start_date=self.management_entity_version.start_date,
-            end_date=self.management_entity_version.end_date,
-        )
-        with self.assertRaises(MultipleEntitiesFoundException):
-            GroupRepository.create(self.group)
-
 
 class TestGroupRepositorySearchMethod(TestCase):
     @classmethod

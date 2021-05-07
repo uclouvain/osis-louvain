@@ -26,12 +26,12 @@
 import collections
 import datetime
 from collections import OrderedDict
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
-from django.db.models.expressions import F, Func, RawSQL, Value
+from django.db.models import Q, BooleanField, DateField
+from django.db.models.expressions import F, Func, RawSQL, Value, Case, When, Subquery, OuterRef
 from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -40,6 +40,7 @@ from django.utils.translation import gettext_lazy as _
 from django_cte import CTEManager, CTEQuerySet, With
 from reversion.admin import VersionAdmin
 
+from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
@@ -88,6 +89,22 @@ class EntityVersionQuerySet(CTEQuerySet):
     def current(self, date):
         if date:
             return self.filter(Q(end_date__gte=date) | Q(end_date__isnull=True), start_date__lte=date, )
+        else:
+            return self
+
+    def active_for_academic_year(self, academic_year: Optional[AcademicYear]):
+        if academic_year:
+            return self.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                    Q(start_date__lte=academic_year.start_date) &
+                    (
+                        Q(end_date__isnull=True) |
+                        Q(end_date__gte=academic_year.end_date)
+                    )
+                )
+            )
         else:
             return self
 
@@ -174,19 +191,44 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(children_entities)
 
-    def with_parents(self, *extra_fields, date=None, **filter_kwargs):
+    def with_parents(
+            self,
+            *extra_fields,
+            date=None,
+            academic_year: AcademicYear = None,
+            with_expired: bool = False,
+            **filter_kwargs
+    ):
         """
         Use a Common Table Expression to construct the hierarchy of parent entities
         The Union is made recursively on LEFT.parent_id = CTE.children_id
 
         :param date: Date to filter the entity versions on (default: now)
+        :param academic_year: Academic year to filter the entity versions on
         :param extra_fields: Any field to add on the cte query
         :param filter_kwargs: Any filter to add on the original query
         :return: a CTE queryset
         :rtype: With
         """
-        if date is None:
-            date = now()
+
+        if with_expired:
+            current_clause = (Q(start_date__isnull=False))
+        elif academic_year:
+            current_clause = (
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                    Q(start_date__lte=academic_year.start_date) &
+                    (
+                        Q(end_date__isnull=True) |
+                        Q(end_date__gte=academic_year.end_date)
+                    )
+                )
+            )
+        else:
+            if date is None:
+                date = now()
+            current_clause = ((Q(end_date__gte=date) | Q(end_date__isnull=True)) & Q(start_date__lte=date))
 
         def parent_entities(cte):
             """ This function is used for the recursive SQL query """
@@ -206,8 +248,7 @@ class EntityVersionQuerySet(CTEQuerySet):
             ).union(
                 # recursive union: get parents with entity_id = parent_id
                 cte.join(EntityVersion, parent_id=cte.col.entity_id).filter(
-                    Q(end_date__gte=date) | Q(end_date__isnull=True),
-                    start_date__lte=date,
+                    current_clause
                 ).values(
                     'id',
                     'parent_id',
@@ -224,7 +265,7 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(parent_entities)
 
-    def get_tree(self, entity_ids, date=None):
+    def get_tree(self, entity_ids, date=None, academic_year: AcademicYear = None, with_expired: bool = False):
         """
         :return: a list of dictionaries returning
             - entityversion_id,
@@ -252,7 +293,13 @@ class EntityVersionQuerySet(CTEQuerySet):
                 if isinstance(entity, Entity):
                     entity_ids[i] = entity.pk
 
-        cte = self.with_parents('acronym', date=date, entity_id__in=entity_ids)
+        cte = self.with_parents(
+            'acronym',
+            date=date,
+            academic_year=academic_year,
+            with_expired=with_expired,
+            entity_id__in=entity_ids
+        )
         qs = cte.queryset().with_cte(cte).annotate(
             level=Func('parents', function='cardinality'),
             date=Value(date, models.DateField()),
@@ -290,6 +337,23 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity__organization__type=MAIN),
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
+
+    def pedagogical_entities_with_academic_year(self, academic_year: AcademicYear = None):
+        qs = self.pedagogical_entities()
+
+        if academic_year:
+            qs = qs.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+            )
+        return qs
 
     def only_roots(self):
         return self.filter(parent__isnull=True)
@@ -382,7 +446,7 @@ class EntityVersion(SerializableModel):
                 Q(start_date__range=(self.start_date, self.end_date)) |
                 Q(end_date__range=(self.start_date, self.end_date)) |
                 (
-                        Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
+                    Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
                 )
             )
         else:
@@ -483,6 +547,47 @@ class EntityVersion(SerializableModel):
 
         return nodes[tree[0]['entity_id']].to_json(limit)
 
+    @classmethod
+    def is_entity_active(cls, acronym_entity: str, year: int) -> bool:
+
+        current_clause = (
+            (
+                (Q(start_date__lte=OuterRef('start_date')) | Q(start_date__lte=OuterRef('end_date'))) &
+                (Q(end_date__gte=OuterRef('end_date')) | Q(end_date__gte=OuterRef('start_date')))
+            )
+            # using max_date because impossible to check OuterRef value is None in clause
+            | (Q(end_date__lte=OuterRef('max_date')) & Q(start_date__gte=OuterRef('start_date')))
+        )
+
+        active_entity_subquery = Subquery(
+            AcademicYear.objects.filter(current_clause, year=year).annotate(
+                is_active_entity=Value(True, output_field=BooleanField())
+            ).values('is_active_entity')[:1]
+        )
+
+        entity = cls.objects.filter(
+            acronym=acronym_entity,
+        ).annotate(
+            max_date=Case(
+                When(end_date__isnull=True, then=Value(datetime.date.max)),
+                output_field=DateField()
+            ),
+        ).annotate(
+            active_entity_version=active_entity_subquery
+        ).order_by('-start_date').first()
+
+        return entity.active_entity_version if entity else False
+
+    @classmethod
+    def get_message_is_entity_active(cls, acronym_entity: str, year: int) -> str:
+        if acronym_entity and not cls.is_entity_active(acronym_entity, year):
+            msg = _('The entity %(acronym_entity)s is not active for this academic year') % {
+                'acronym_entity': acronym_entity
+            }
+        else:
+            msg = None
+        return msg
+
 
 def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):
     if entity_version.entity_type == parent_type:
@@ -505,6 +610,17 @@ def find(acronym, date=None):
 
 def find_latest_version(date) -> EntityVersionQuerySet:
     return EntityVersion.objects.current(date).select_related('entity', 'entity__organization').order_by('-start_date')
+
+
+def find_version_for_academic_year(academic_year: 'AcademicYear') -> EntityVersionQuerySet:
+    return EntityVersion.objects.active_for_academic_year(
+        academic_year
+    ).select_related(
+        'entity',
+        'entity__organization'
+    ).order_by(
+        '-start_date'
+    )
 
 
 def get_last_version(entity, date=None):
@@ -690,6 +806,10 @@ def find_pedagogical_entities_version():
     return find_all_current_entities_version().pedagogical_entities().order_by('acronym')
 
 
+def find_pedagogical_entities_version_for_specific_academic_year(academic_year: 'AcademicYear'):
+    return find_version_for_academic_year(academic_year).pedagogical_entities().order_by('acronym')
+
+
 def find_latest_version_by_entity(entity, date):
     return EntityVersion.objects.current(date).entity(entity).select_related('entity', 'parent').first()
 
@@ -706,3 +826,7 @@ def find_by_acronym_and_year(acronym: str, year: int):
         Q(acronym=acronym, start_date__year__lte=year),
         Q(end_date__isnull=True) | Q(end_date__year__gt=year)
     ).order_by('start_date').last()
+
+
+def find_by_acronym(acronym: str):
+    return EntityVersion.objects.filter(acronym=acronym).order_by('start_date').last()

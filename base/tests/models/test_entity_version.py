@@ -41,7 +41,7 @@ from base.models.entity_version import (
 )
 from base.models.enums import organization_type
 from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE, SECTOR
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -625,3 +625,156 @@ class EntityVersionLoadInMemoryTest(TestCase):
                                                                         .most_recent_acronym,
                                                                         entity_type=case.get('entity_type'))
                 self.assertEqual(case.get('expected_result'), to_test)
+
+
+class EntityVersionActiveTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.entity = EntityFactory(country=cls.country, organization=cls.organization)
+        cls.academic_year = create_current_academic_year()
+
+    def test_entity_start_date_and_end_date_in_academic_year_range_is_active(self):
+
+        entity_version_start_date = self.academic_year.start_date + datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.end_date - datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_before_and_end_date_after_academic_year_range_is_active(self):
+
+        entity_version_start_date = self.academic_year.start_date - datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.end_date + datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_before_and_end_date_in_academic_year_range_is_active(self):
+
+        entity_version_start_date = self.academic_year.start_date - datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.end_date - datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_in_and_end_date_after_academic_year_range_is_active(self):
+
+        entity_version_start_date = self.academic_year.start_date + datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.end_date + datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_before_and_end_date_before_academic_year_range_is_inactive(self):
+
+        entity_version_start_date = self.academic_year.start_date - datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.start_date - datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertFalse(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_after_and_end_date_after_academic_year_range_is_inactive(self):
+
+        entity_version_start_date = self.academic_year.end_date + datetime.timedelta(days=1)
+        entity_version_end_date = self.academic_year.end_date + datetime.timedelta(days=1)
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertFalse(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_in_academic_year_range_and_end_date_is_null(self):
+
+        entity_version_start_date = self.academic_year.start_date + datetime.timedelta(days=1)
+        entity_version_end_date = None
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_before_academic_year_range_and_end_date_is_null(self):
+
+        entity_version_start_date = self.academic_year.start_date - datetime.timedelta(days=1)
+        entity_version_end_date = None
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertTrue(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))
+
+    def test_entity_start_date_after_academic_year_range_and_end_date_is_null(self):
+
+        entity_version_start_date = self.academic_year.end_date + datetime.timedelta(days=1)
+        entity_version_end_date = None
+
+        entity_version = EntityVersionFactory(
+            entity=self.entity,
+            acronym="ENTITY_V_" + str(self.entity),
+            title="This is the entity version " + str(self.entity),
+            entity_type="FACULTY",
+            start_date=entity_version_start_date,
+            end_date=entity_version_end_date,
+        )
+
+        self.assertFalse(EntityVersion.is_entity_active(entity_version.acronym, self.academic_year.year))

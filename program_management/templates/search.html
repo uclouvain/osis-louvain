@@ -230,7 +230,24 @@
                 },
                 {"name": "full_title_fr", "targets": 2, "data": "full_title_fr"},
                 {"name": "type", "targets": 3,  "data": "education_group_type_text"},
-                {"name": "management_entity", "targets": 4, "data": "management_entity"},
+                {
+                    "name": "management_entity",
+                    "targets": 4,
+                    "data": "management_entity",
+                    "render": function ( data, type, row, meta ) {
+                        if (row['active_entity_management_version'] === true)
+                            return data;
+                        else {
+                            let my_msg = gettext("This entity is not active during this academic year");
+                            return '<del>' + data + '</del>' +
+                                ' <span class="glyphicon glyphicon-question-sign" ' +
+                                'data-toggle="tooltip" ' +
+                                'data-placement="top" ' +
+                                'title="'+ my_msg +'" ' +
+                                'style="font-size: 12pt;"></span>';
+                        }
+                    }
+                    },
                 {"name": "main_teaching_campus", "targets": 5, "data": "main_teaching_campus"},
                 {"name": "code", "targets": 6, "data": "code"},
             ];
@@ -290,6 +307,10 @@
             $("#xls_order").val('');
             $("#xls_order_col").val('');
         }
+
+        $('#table_education_groups').on('draw.dt', function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>

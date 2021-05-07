@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-from openpyxl.utils import get_column_letter
-
-from base import models as mdl_base
+from base.models.entity_version import EntityVersion
+from osis_common.ddd import interface
 
 
-def get_name_or_username(a_user):
-    person = mdl_base.person.find_by_user(a_user)
-    return "{}, {}".format(person.last_name, person.first_name) if person else a_user.username
-
-
-def convert_boolean(a_boolean_value):
-    return _('yes') if a_boolean_value else _('no')
-
-
-def _get_all_columns_reference(nb_columns, first_column=1):
-    letters = []
-    nb_col = first_column
-    while nb_col < nb_columns+1:
-        letters.append(get_column_letter(nb_col))
-        nb_col += 1
-    return letters
-
-
-def get_entity_version_xls_repr(acronym, year):
-    if mdl_base.entity_version.EntityVersion.is_entity_active(acronym, year):
-        return acronym
-    return '\u0336'.join(acronym) + '\u0336' if acronym else ''  # strikethrough styled str
+class ActiveEntity(interface.DomainService):
+    @staticmethod
+    def is_entity_active_for_year(acronym_entity: str, year: int) -> bool:
+        return EntityVersion.is_entity_active(acronym_entity, year)

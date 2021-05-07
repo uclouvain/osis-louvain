@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import html
+from unittest import mock
 
 from django.template.defaultfilters import yesno
 from django.test import TestCase
@@ -209,6 +210,8 @@ class TestContent(TestCase):
         tree = ProgramTreeFactory(root_node=cls.parent_node)
         cls.tree_version = StandardProgramTreeVersionFactory(tree=tree)
 
+        AcademicYearFactory(year=cls.luy.year)
+
     def test_fix_data(self):
         expected = get_expected_data_new(self.child_node, self.luy, self.link_1_1, self.link_1.parent)
         res = _fix_data(self.link_1_1,
@@ -351,13 +354,15 @@ class TestContent(TestCase):
                               }
                              )
 
-    def test_get_optional_required_entity(self):
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_get_optional_required_entity(self, mock_entity_is_active):
         optional_data = initialize_optional_data()
         optional_data['has_required_entity'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.entities.requirement_entity_acronym])
 
-    def test_get_optional_allocation_entity(self):
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_get_optional_allocation_entity(self, mock_entity_is_active):
         optional_data = initialize_optional_data()
         optional_data['has_allocation_entity'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),

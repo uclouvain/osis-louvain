@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.widgets import CKEditorWidget
 import functools
 import operator
 from typing import Dict, List, Union, Optional
@@ -40,15 +39,13 @@ from django.db.models.functions import Concat
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.utils.fields import OsisRichTextFormField
-from education_group.calendar.education_group_extended_daily_management import \
-    EducationGroupExtendedDailyManagementCalendar
-from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE, add_blank
+from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.certificate_aim import CertificateAim
+from base.models.entity_version import EntityVersion
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.activity_presence import ActivityPresence
@@ -60,6 +57,9 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.ddd.business_types import *
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
@@ -207,11 +207,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        to_field_name="acronym",
-        label=_('Administration entity')
-    )
+    administration_entity = forms.CharField()
+
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start'),
@@ -334,6 +331,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
         self.__init_academic_year_field()
         self.__init_management_entity_field()
+        self.__init_administration_entity_field()
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
         self.__init_main_language()
@@ -357,10 +355,25 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_management_entity_field(self):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
+        )
+
+    def __init_administration_entity_field(self):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
+        self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
+            queryset=None,
+            to_field_name="acronym",
+            label=_('Administration entity'),
+            academic_year=academic_year
         )
 
     def __init_certificate_aims_field(self):
@@ -417,6 +430,8 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
         self.__init_certificate_aims_field()
+        self.__init_management_entity_field()
+        self.__init_administration_entity_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
@@ -438,6 +453,30 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
             self.fields['section'].disabled = True
             self.fields['certificate_aims'].widget.attrs['title'] = permission_error_msg
             self.fields['certificate_aims'].widget.attrs['class'] = 'cursor-not-allowed'
+
+    def __init_management_entity_field(self):
+        academic_year = AcademicYear.objects.get(year=self.year)
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('management_entity'),
+            disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year,
+            help_text=msg
+        )
+
+    def __init_administration_entity_field(self):
+        academic_year = AcademicYear.objects.get(year=self.year)
+        old_entity = self.initial.get('administration_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
+            queryset=None,
+            to_field_name="acronym",
+            label=_('Administration entity'),
+            academic_year=academic_year,
+            help_text=msg
+        )
 
     # PermissionFieldMixin
     def get_context(self) -> str:

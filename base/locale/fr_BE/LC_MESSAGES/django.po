@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-21 13:46+0200\n"
+"POT-Creation-Date: 2021-04-27 13:51+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2428,6 +2428,10 @@ msgstr ""
 "Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
 "encoder une exception par rapport aux sessions calculées en fonction des "
 "quadrimestres."
+
+#, python-format
+msgid "The entity %(acronym_entity)s is not active for this academic year"
+msgstr "L'entité %(acronym_entity)s n'est pas active durant cette année académique"
 
 #, python-format
 msgid ""

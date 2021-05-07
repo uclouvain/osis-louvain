@@ -33,7 +33,7 @@ from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models import entity_version, academic_year, campus
+from base.models import academic_year, campus
 from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
@@ -176,7 +176,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'constraint_type': group_obj.content_constraint.type.name if group_obj.content_constraint.type else None,
             'min_constraint': group_obj.content_constraint.minimum,
             'max_constraint': group_obj.content_constraint.maximum,
-            'management_entity': entity_version.find(group_obj.management_entity.acronym),
+            'management_entity': group_obj.management_entity.acronym,
             'teaching_campus': campus.find_by_name_and_organization_name(
                 name=group_obj.teaching_campus.name,
                 organization_name=group_obj.teaching_campus.university_name

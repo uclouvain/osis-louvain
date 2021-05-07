@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 07:45+0200\n"
+"POT-Creation-Date: 2021-05-06 08:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -447,8 +447,9 @@ msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -788,6 +789,10 @@ msgstr ""
 msgid "The following fields are empty: %(fields)s "
 msgstr ""
 
+#, python-format
+msgid "The following fields has issues: %(fields)s "
+msgstr ""
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -858,6 +863,9 @@ msgid "There can only be one type 2 expectation"
 msgstr ""
 
 msgid "This education group is not editable during this period."
+msgstr ""
+
+msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "Title"

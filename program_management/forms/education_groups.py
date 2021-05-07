@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from dal import autocomplete
 from django import forms
-from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
+from django.db.models import Case, When, Value, CharField, OuterRef, Subquery, BooleanField, F
 from django.db.models import Q
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
@@ -195,10 +196,22 @@ class GroupFilter(FilterSet):
             entity=OuterRef('management_entity'),
         ).current(
             OuterRef('academic_year__start_date')
-        ).values('acronym')[:1]
+        )
+
+        current_clause = (
+            Q(entity_management_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(entity_management_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(entity_management_start_date__lte=F('academic_year__start_date')) &
+                (
+                    Q(entity_management_end_date__isnull=True) |
+                    Q(entity_management_end_date__gte=F('academic_year__end_date'))
+                )
+            )
+        )
 
         standard_clause = (
-                Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
+            Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
         )
         group_clause = Q(educationgroupversion__isnull=True)
         not_transition_clause = Q(educationgroupversion__transition_name=NOT_A_TRANSITION)
@@ -210,7 +223,15 @@ class GroupFilter(FilterSet):
                 output_field=CharField()
             )
         ).annotate(
-            entity_management_version=Subquery(management_entity)
+            entity_management_version=Subquery(management_entity.values('acronym')[:1]),
+            entity_management_start_date=Subquery(management_entity.values('start_date')[:1]),
+            entity_management_end_date=Subquery(management_entity.values('end_date')[:1])
+        ).annotate(
+            active_entity_management_version=Case(
+                When(current_clause, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
         ).annotate(
             version=Case(
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),

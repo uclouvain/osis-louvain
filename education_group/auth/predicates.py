@@ -130,7 +130,10 @@ def is_education_group_type_authorized_according_to_user_scope(
         return any(
             obj.education_group_type.name in role.get_allowed_education_group_types()
             for role in self.context['role_qs']
-            if obj.management_entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
+            if obj.management_entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids(
+                obj.academic_year,
+                with_expired=True
+            )
         )
     return None
 
@@ -144,7 +147,7 @@ def is_user_attached_to_management_entity(
         obj: Union[EducationGroupYear, GroupYear] = None
 ):
     if obj:
-        user_entity_ids = self.context['role_qs'].get_entities_ids()
+        user_entity_ids = self.context['role_qs'].get_entities_ids(obj.academic_year, with_expired=True)
         return obj.management_entity_id in user_entity_ids
     return obj
 

@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from ckeditor.widgets import CKEditorWidget
 from typing import Dict, Optional
 
 from django import forms
@@ -29,17 +28,18 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.utils.fields import OsisRichTextFormField
-from education_group.calendar.education_group_extended_daily_management import \
-    EducationGroupExtendedDailyManagementCalendar
-from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils import choice_field
+from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums import active_status, schedule_type as schedule_type_enum, education_group_categories, \
     education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
@@ -135,10 +135,14 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_management_entity_field(self):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
         )
 
     def __init_type_field(self):
@@ -197,6 +201,7 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
         self.year = year
         super().__init__(*args, **kwargs)
         self.__init_end_year_field()
+        self.__init_management_entity_field()
 
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
@@ -205,6 +210,18 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
                 year__gte=initial_academic_year_value,
                 year__in=EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
             )
+
+    def __init_management_entity_field(self):
+        academic_year = AcademicYear.objects.get(year=self.year)
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('management_entity'),
+            disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year,
+            help_text=msg
+        )
 
     # PermissionFieldMixin
     def get_context(self) -> str:

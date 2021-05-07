@@ -35,13 +35,12 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
-from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from attribution.ddd.domain.teacher import Teacher
-from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_unit_xls import get_significant_volume
+from base.business.xls import get_entity_version_xls_repr
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
@@ -49,7 +48,9 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.excel import get_html_to_text
+from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
+from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -380,9 +381,19 @@ def _get_optional_data(
         score_responsibles: List[ScoreResponsibleDTO]
 ):
     if optional_data_needed['has_required_entity']:
-        data.append(luy.entities.requirement_entity_acronym)
+        data.append(
+            get_entity_version_xls_repr(
+                luy.entities.requirement_entity_acronym,
+                luy.year
+            )
+        )
     if optional_data_needed['has_allocation_entity']:
-        data.append(luy.entities.allocation_entity_acronym)
+        data.append(
+            get_entity_version_xls_repr(
+                luy.entities.allocation_entity_acronym,
+                luy.year
+            )
+        )
     if optional_data_needed['has_credits']:
         data.append(link.relative_credits or '-')
         data.append(luy.credits.to_integral_value() or '-')

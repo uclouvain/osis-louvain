@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from reversion.models import Version
 
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -30,6 +32,11 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.entity_version import EntityVersion
+from education_group.ddd.command import GetMiniTrainingIssueFieldsOnWarningCommand
+from education_group.ddd.domain import exception
+from education_group.ddd.service.read.check_mini_training_issue_fields_on_warning_service import \
+    check_mini_training_issue_fields_on_warning
 from education_group.models.group_year import GroupYear
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
 from program_management.models.education_group_version import EducationGroupVersion
@@ -43,7 +50,12 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
-            "permission_object": self.get_permission_object()
+            "permission_object": self.get_permission_object(),
+            "fields_warnings": self.get_fields_in_warning_entities(),
+            "active_management_entity": EntityVersion.is_entity_active(
+                self.get_group().management_entity.acronym,
+                self.node_identity.year
+            ),
         }
 
     def get_related_history(self):
@@ -71,3 +83,14 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
+
+    def get_fields_in_warning_entities(self) -> List[str]:
+        try:
+            cmd = GetMiniTrainingIssueFieldsOnWarningCommand(
+                acronym=self.get_mini_training_identity().acronym,
+                year=self.get_mini_training_identity().year
+            )
+            check_mini_training_issue_fields_on_warning(cmd)
+        except exception.MiniTrainingAlertFieldException as e:
+            return e.fields
+        return []

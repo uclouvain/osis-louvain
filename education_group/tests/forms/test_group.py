@@ -28,6 +28,7 @@ from django.test import TestCase
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory
 from education_group.forms.group import GroupUpdateForm, GroupForm
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
@@ -73,10 +74,12 @@ class TestGroupForm(TestCase):
 class TestGroupUpdateForm(TestCase):
     def setUp(self) -> None:
         self.person = PersonFactory()
+        academic_years = AcademicYearFactory.produce(number_past=0, number_future=1)
         self.form = GroupUpdateForm(
             user=self.person.user,
+            year=academic_years[0].year,
             group_type=GroupType.COMMON_CORE.name,
-            initial={'code': 'CODE'}
+            initial={'code': 'CODE'},
         )
 
     def test_assert_code_is_disabled(self):

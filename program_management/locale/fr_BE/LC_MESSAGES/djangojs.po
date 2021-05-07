@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-03 12:57+0100\n"
+"POT-Creation-Date: 2021-03-18 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,23 +28,11 @@ msgstr "Couper"
 msgid "Detach"
 msgstr "Détacher"
 
-msgid "Existed name version in "
-msgstr "Cette version existe dans le passé en "
-
-msgid "Existing name version"
-msgstr "Cette version existe déjà"
-
 msgid "Forbidden because of prerequisites"
 msgstr "Interdit à cause des prérequis"
 
-msgid "Invalid name version"
-msgstr "Sigle de version invalide"
-
 msgid "Modify the link"
 msgstr "Modifier le lien"
-
-msgid "New version"
-msgstr "Nouvelle version"
 
 msgid "Open all"
 msgstr "Ouvrir tout"
@@ -52,11 +40,11 @@ msgstr "Ouvrir tout"
 msgid "Paste"
 msgstr "Coller"
 
-msgid "Prolong"
-msgstr "Prolonger"
-
 msgid "Search"
 msgstr "Rechercher"
+
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année académique"
 
 #, python-brace-format
 msgid ""

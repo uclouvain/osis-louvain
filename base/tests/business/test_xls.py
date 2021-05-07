@@ -23,18 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from base.business.xls import convert_boolean, _get_all_columns_reference
+from base.business.xls import convert_boolean, _get_all_columns_reference, get_entity_version_xls_repr
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.entity_version import EntityVersionFactory
 
 
 class TestXls(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.now = timezone.now()
+        cls.academic_year = create_current_academic_year()
+        cls.entity = EntityVersionFactory()
 
     def test_convert_boolean(self):
         self.assertEqual(convert_boolean(None), _('no'))
@@ -44,3 +49,17 @@ class TestXls(TestCase):
     def test_get_all_columns_reference(self):
         self.assertCountEqual(_get_all_columns_reference(0), [])
         self.assertCountEqual(_get_all_columns_reference(2), ['A', 'B'])
+
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
+    def test_get_active_entity_version_xls_repr(self, mock_entity_is_active):
+        acronym = self.entity.acronym
+        self.assertEqual(
+            get_entity_version_xls_repr(acronym, self.academic_year.year), acronym
+        )
+
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=False)
+    def test_get_inactive_entity_version_xls_repr(self, mock_entity_is_active):
+        acronym = self.entity.acronym
+        self.assertEqual(
+            get_entity_version_xls_repr(acronym, self.academic_year.year), '\u0336'.join(acronym) + '\u0336'
+        )

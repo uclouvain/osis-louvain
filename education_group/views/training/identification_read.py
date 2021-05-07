@@ -32,10 +32,13 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
-from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
+from base.models.entity_version import EntityVersion
+from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand, GetTrainingIssueFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
     check_training_empty_fields_on_warning
+from education_group.ddd.service.read.check_training_issue_fields_on_warning_service import \
+    check_training_issue_fields_on_warning
 from education_group.models.group_year import GroupYear
 from education_group.views.training.common_read import TrainingRead, Tab
 from program_management.models.education_group_version import EducationGroupVersion
@@ -50,16 +53,38 @@ class TrainingReadIdentification(TrainingRead):
             **super().get_context_data(**kwargs),
             "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
-            "fields_warnings": self.get_fields_in_warning()
+            "fields_warnings": list(
+                set(self.get_fields_in_warning_on_empty_fields()) | set(self.get_fields_in_warning_entities())
+            ),
+            "training_active_management_entity": EntityVersion.is_entity_active(
+                self.training.management_entity.acronym,
+                self.training.year
+            ),
+            "group_active_management_entity": EntityVersion.is_entity_active(
+                self.group.management_entity.acronym,
+                self.group.year
+            ),
+            "active_administration_entity": EntityVersion.is_entity_active(
+                self.training.administration_entity.acronym,
+                self.training.year
+            ),
         }
 
-    def get_fields_in_warning(self) -> List[str]:
+    def get_fields_in_warning_on_empty_fields(self) -> List[str]:
         if self.current_version.is_official_standard:
             try:
                 cmd = GetTrainingEmptyFieldsOnWarningCommand(acronym=self.training.acronym, year=self.training.year)
                 check_training_empty_fields_on_warning(cmd)
             except exception.TrainingEmptyFieldException as e:
                 return e.fields
+        return []
+
+    def get_fields_in_warning_entities(self) -> List[str]:
+        try:
+            cmd = GetTrainingIssueFieldsOnWarningCommand(acronym=self.training.acronym, year=self.training.year)
+            check_training_issue_fields_on_warning(cmd)
+        except exception.TrainingAlertFieldException as e:
+            return e.fields
         return []
 
     def get_related_history(self):
