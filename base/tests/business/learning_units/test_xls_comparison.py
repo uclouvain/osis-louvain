@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \
     XLS_FILENAME, XLS_DESCRIPTION, learning_unit_titles, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
-    get_representing_string, _get_data_from_initial_data
+    get_representing_string, _get_data_from_initial_data, BOLD_FONT
 from base.business.proposal_xls import components_titles, basic_titles, BLANK_VALUE
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -47,6 +47,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
+from base.tests.factories.learning_unit_year import simulate_annotate_on_entities
 
 
 class TestComparisonXls(TestCase):
@@ -182,52 +183,53 @@ class TestPropositionComparisonXls(TestCase):
             type=LECTURING
         ).first()
 
-        data = _get_proposal_data(self.learning_unit_year_1)
+        luy = simulate_annotate_on_entities(self.learning_unit_year_1)
+        data = _get_proposal_data(luy)
 
         self.assertEqual(data[0], _('Proposal'))
-        self.assertEqual(data[1], self.learning_unit_year_1.acronym)
-        self.assertEqual(data[2], "{}   ({} {})".format(self.learning_unit_year_1.academic_year.name,
+        self.assertEqual(data[1], luy.acronym)
+        self.assertEqual(data[2], "{}   ({} {})".format(luy.academic_year.name,
                                                         _('End').lower(),
-                                                        self.learning_unit_year_1.learning_unit.end_year.name)
+                                                        luy.learning_unit.end_year.name)
                          )
-        self.assertEqual(data[3], self.learning_unit_year_1.learning_container_year.get_container_type_display())
-        self.assertEqual(data[4], translate_status(self.learning_unit_year_1.status))
-        self.assertEqual(data[5], self.learning_unit_year_1.get_subtype_display())
+        self.assertEqual(data[3], luy.learning_container_year.get_container_type_display())
+        self.assertEqual(data[4], translate_status(luy.status))
+        self.assertEqual(data[5], luy.get_subtype_display())
         self.assertEqual(data[6],
-                         str(_(self.learning_unit_year_1.get_internship_subtype_display()))
-                         if self.learning_unit_year_1.internship_subtype else '-')
-        self.assertEqual(data[7], str(self.learning_unit_year_1.credits))
-        self.assertEqual(data[8], self.learning_unit_year_1.language.name or BLANK_VALUE)
-        self.assertEqual(data[9], str(_(self.learning_unit_year_1.get_periodicity_display())) or BLANK_VALUE)
-        self.assertEqual(data[10], str(_(self.learning_unit_year_1.quadrimester)) or BLANK_VALUE)
-        self.assertEqual(data[11], str(_(self.learning_unit_year_1.session)) or BLANK_VALUE)
-        self.assertEqual(data[12], self.learning_unit_year_1.learning_container_year.common_title or BLANK_VALUE)
-        self.assertEqual(data[13], self.learning_unit_year_1.specific_title or BLANK_VALUE)
-        self.assertEqual(data[14], self.learning_unit_year_1.learning_container_year.common_title_english
+                         str(_(luy.get_internship_subtype_display()))
+                         if luy.internship_subtype else '-')
+        self.assertEqual(data[7], str(luy.credits))
+        self.assertEqual(data[8], luy.language.name or BLANK_VALUE)
+        self.assertEqual(data[9], str(_(luy.get_periodicity_display())) or BLANK_VALUE)
+        self.assertEqual(data[10], str(_(luy.quadrimester)) or BLANK_VALUE)
+        self.assertEqual(data[11], str(_(luy.session)) or BLANK_VALUE)
+        self.assertEqual(data[12], luy.learning_container_year.common_title or BLANK_VALUE)
+        self.assertEqual(data[13], luy.specific_title or BLANK_VALUE)
+        self.assertEqual(data[14], luy.learning_container_year.common_title_english
                          or BLANK_VALUE)
-        self.assertEqual(data[15], self.learning_unit_year_1.specific_title_english or BLANK_VALUE)
+        self.assertEqual(data[15], luy.specific_title_english or BLANK_VALUE)
 
-        self.assertEqual(data[16], self.learning_unit_year_1.entities.get(REQUIREMENT_ENTITY).acronym or BLANK_VALUE)
-        self.assertEqual(data[17], self.learning_unit_year_1.entities.get(ALLOCATION_ENTITY).acronym or BLANK_VALUE)
-        self.assertEqual(data[18], self.learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_1).acronym
+        self.assertEqual(data[16], luy.ent_requirement_acronym or BLANK_VALUE)
+        self.assertEqual(data[17], luy.ent_allocation_acronym or BLANK_VALUE)
+        self.assertEqual(data[18], luy.additional_entity_1_acronym
                          or BLANK_VALUE)
-        self.assertEqual(data[19], BLANK_VALUE)
-        self.assertEqual(data[20], _('Yes') if self.learning_unit_year_1.professional_integration else _('No'))
-        if self.learning_unit_year_1.campus:
-            self.assertEqual(data[21], self.learning_unit_year_1.campus.organization.name)
-            self.assertEqual(data[22], self.learning_unit_year_1.campus)
+        self.assertEqual(data[19], luy.additional_entity_2_acronym or BLANK_VALUE)
+        self.assertEqual(data[20], _('Yes') if luy.professional_integration else _('No'))
+        if luy.campus:
+            self.assertEqual(data[21], luy.campus.organization.name)
+            self.assertEqual(data[22], luy.campus)
         else:
             self.assertEqual(data[21], BLANK_VALUE)
             self.assertEqual(data[22], BLANK_VALUE)
-        self.assertEqual(data[23], self.learning_unit_year_1.faculty_remark or BLANK_VALUE)
-        self.assertEqual(data[24], self.learning_unit_year_1.other_remark or BLANK_VALUE)
-        self.assertEqual(data[25], self.learning_unit_year_1.other_remark_english or BLANK_VALUE)
-        self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.team else _('No'))
-        self.assertEqual(data[27], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
+        self.assertEqual(data[23], luy.faculty_remark or BLANK_VALUE)
+        self.assertEqual(data[24], luy.other_remark or BLANK_VALUE)
+        self.assertEqual(data[25], luy.other_remark_english or BLANK_VALUE)
+        self.assertEqual(data[26], _('Yes') if luy.learning_container_year.team else _('No'))
+        self.assertEqual(data[27], _('Yes') if luy.learning_container_year.is_vacant else _('No'))
         self.assertEqual(data[28],
-                         self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display()
+                         luy.learning_container_year.get_type_declaration_vacant_display()
                          or BLANK_VALUE)
-        self.assertEqual(data[29], self.learning_unit_year_1.get_attribution_procedure_display() or BLANK_VALUE)
+        self.assertEqual(data[29], luy.get_attribution_procedure_display() or BLANK_VALUE)
 
         self.assertEqual(data[30], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE)
         self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE)
@@ -351,9 +353,9 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: learning_unit_titles(),
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
-            xls_build.FONT_ROWS: None,
+            xls_build.FONT_ROWS: {BOLD_FONT: [0]},
             xls_build.ROW_HEIGHT: None,
-            xls_build.FONT_CELLS: None,
+            xls_build.FONT_CELLS: {},
             xls_build.BORDER_CELLS: None
         }]
     }

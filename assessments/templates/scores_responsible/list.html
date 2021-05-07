@@ -80,7 +80,24 @@
             let domTable =  $('#tb_scores_responsible');
             domTable.DataTable({
                 "columnDefs": [
-                    {"name": "requirement_entity", "targets": 0, "data": "requirement_entity"},
+                    {
+                        "name": "requirement_entity",
+                        "targets": 0,
+                        "data": "requirement_entity",
+                        "render": function (data, type, row, meta) {
+                            if (row["requirement_entity"] !== null) {
+                                return row["requirement_entity"];
+                            } else {
+                                let my_msg = gettext("This entity is not active during this academic year");
+                                return '<del>' + row["most_recent_requirement_entity"] + '</del>' +
+                                    ' <span class="glyphicon glyphicon-question-sign" ' +
+                                    'data-toggle="tooltip" ' +
+                                    'data-placement="top" ' +
+                                    'title="' + my_msg + '" ' +
+                                    'style="font-size: 12pt;"></span>';
+                            }
+                        }
+                    },
                     {"name": "acronym", "targets": 1, "data": "acronym"},
                     {"name": "learning_unit_title", "targets": 2, "data": "learning_unit_title"},
                     {

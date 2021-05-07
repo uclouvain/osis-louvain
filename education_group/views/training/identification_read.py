@@ -32,6 +32,7 @@ from base.models.education_group_certificate_aim import EducationGroupCertificat
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.entity_version import EntityVersion
 from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
@@ -50,7 +51,19 @@ class TrainingReadIdentification(TrainingRead):
             **super().get_context_data(**kwargs),
             "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
-            "fields_warnings": self.get_fields_in_warning()
+            "fields_warnings": self.get_fields_in_warning(),
+            "training_active_management_entity": EntityVersion.is_entity_active(
+                self.training.management_entity.acronym,
+                self.training.year
+            ),
+            "group_active_management_entity": EntityVersion.is_entity_active(
+                self.group.management_entity.acronym,
+                self.group.year
+            ),
+            "active_administration_entity": EntityVersion.is_entity_active(
+                self.training.administration_entity.acronym,
+                self.training.year
+            ),
         }
 
     def get_fields_in_warning(self) -> List[str]:

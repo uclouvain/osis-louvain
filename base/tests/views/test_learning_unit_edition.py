@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -612,3 +612,62 @@ class TestEntityAutocomplete(TestCase):
         self.assertIn('AAA - ', results[0]['text'])
         self.assertIn('BBB - ', results[1]['text'])
         self.assertIn('CCC - ', results[2]['text'])
+
+    def test_get_only_active_entities(self):
+        current_academic_year = create_current_academic_year()
+        previous_academic_year = AcademicYearFactory(year=current_academic_year.year - 1,
+                                                     end_date=datetime.date(current_academic_year.year, 9, 1))
+        next_academic_year = AcademicYearFactory(year=current_academic_year.year + 1,
+                                                 start_date=datetime.date(current_academic_year.year + 1, 10, 1))
+        active_entity_version_1 = EntityVersionFactory(
+            entity_type=entity_type.FACULTY,
+            start_date=previous_academic_year.start_date,
+            end_date=None,
+            acronym="AAA",
+            entity__organization__type=MAIN
+        )
+        active_entity_version_2 = EntityVersionFactory(
+            entity_type=entity_type.FACULTY,
+            start_date=current_academic_year.start_date,
+            end_date=current_academic_year.end_date,
+            acronym="BBB",
+            entity__organization__type=MAIN
+
+        )
+        inactive_entity_version_future = EntityVersionFactory(
+            entity_type=entity_type.FACULTY,
+            start_date=next_academic_year.start_date,
+            end_date=None,
+            acronym="CCC",
+            entity__organization__type=MAIN
+
+        )
+        inactive_entity_version_too_old = EntityVersionFactory(
+            entity_type=entity_type.FACULTY,
+            start_date=previous_academic_year.start_date,
+            end_date=previous_academic_year.end_date,
+            acronym="DDD",
+            entity__organization__type=MAIN
+
+        )
+        response = self.client.get(
+            self.url, data={'forward': '{"academic_year": "%s"}' % current_academic_year.id}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(str(active_entity_version_1.id), results[0]['id'])
+        self.assertEqual(str(active_entity_version_2.id), results[1]['id'])
+
+        response = self.client.get(
+            self.url, data={'forward': '{"academic_year": "%s"}' % next_academic_year.id}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(str(active_entity_version_1.id), results[0]['id'])
+        self.assertEqual(str(inactive_entity_version_future.id), results[1]['id'])

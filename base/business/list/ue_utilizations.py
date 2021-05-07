@@ -35,7 +35,8 @@ from base.business.learning_unit_xls import HEADER_TEACHERS, \
     acronym_with_version_label, BOLD_FONT, get_name_or_username, \
     WRAP_TEXT_ALIGNMENT, _get_col_letter, PROPOSAL_LINE_STYLES
 from base.business.xls import _get_all_columns_reference
-from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear, \
+    LearningUnitYearQuerySet
 from osis_common.document import xls_build
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
@@ -57,6 +58,10 @@ HEADER_PROGRAMS = [
     str(_('Training management entity')),
     str(_('Training management entity faculty')),
 ]
+BLACK_FONT = Font(color=Color('00000000'))
+REQUIREMENT_ENTITY_COL = 'F'
+ALLOCATION_ENTITY_COL = 'J'
+STYLED_CELLS = "styled_cells"
 
 
 def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters):
@@ -89,7 +94,7 @@ def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
     parameters = _get_parameters_configurable_list(learning_units, titles_part1, user)
     parameters.update(
         {
-            xls_build.FONT_CELLS: data.get(CELLS_TO_COLOR),
+            xls_build.FONT_CELLS: data.get(STYLED_CELLS),
             xls_build.BORDER_CELLS: {xls_build.BORDER_TOP: data.get(CELLS_WITH_BORDER_TOP)},
             xls_build.FONT_ROWS: {BOLD_FONT: [0]},
         }
@@ -102,10 +107,10 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
     qs = qs.annotate(
         closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
     ).prefetch_related('element')
-
+    qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
     lines = []
     cells_with_border_top = []
-    cells_to_color = defaultdict(list)
+    styled_cells = defaultdict(list)
     for learning_unit_yr in qs:
         lu_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list=False)
         lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions=True)
@@ -132,8 +137,11 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                         )
                         if training_data:
                             lines.append(lu_data_part1 + lu_data_part2 + training_data)
-                            cells_to_color = _check_cell_to_color(
-                                cells_to_color, learning_unit_yr, len(lines) + 1, training_occurence
+                            styled_cells = _get_styled_cells(
+                                styled_cells,
+                                learning_unit_yr,
+                                len(lines) + 1,
+                                training_occurence
                             )
                             if training_occurence == 1:
                                 cells_with_border_top.extend(_add_border_top(len(lines)+1))
@@ -142,12 +150,12 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
         else:
             lines.append(lu_data_part1 + lu_data_part2)
             cells_with_border_top.extend(_add_border_top(len(lines)+1))
-            cells_to_color = _check_cell_to_color(cells_to_color, learning_unit_yr, len(lines) + 1)
+            styled_cells = _get_styled_cells(styled_cells, learning_unit_yr, len(lines) + 1)
 
     return {
         'working_sheets_data': lines,
         CELLS_WITH_BORDER_TOP: cells_with_border_top,
-        CELLS_TO_COLOR: cells_to_color
+        STYLED_CELLS: styled_cells
     }
 
 
@@ -206,25 +214,48 @@ def _add_border_top(row: int) -> List['str']:
     ]
 
 
-def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYear, row_number: int,
-                         training_occurence: int = 1) -> dict:
-    colored_cells = dict_to_update.copy()
-    cells_with_white_font = []
+def _get_styled_cells(
+        styled_cells_to_update: Dict[Font, List],
+        learning_unit_yr: LearningUnitYear,
+        row_number: int,
+        training_occurence: int = 1
+) -> Dict[Font, List]:
+    styled_cells = styled_cells_to_update.copy()
+    font_training = BLACK_FONT
+    font_ue = BLACK_FONT
+
     if training_occurence > 1:
-        cells_with_white_font = [
-            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN-1)
-        ]
+        font_ue = WHITE_FONT
+        if getattr(learning_unit_yr, "proposallearningunit", None):
+            font_training = PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type).copy()
+    else:
+        if getattr(learning_unit_yr, "proposallearningunit", None):
+            font_ue = PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type).copy()
+            font_training = PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type).copy()
+    font_requirement_entity = font_ue.copy()
+    font_allocation_entity = font_ue.copy()
 
-        colored_cells[WHITE_FONT].extend(cells_with_white_font)
+    if not learning_unit_yr.active_entity_requirement_version:
+        font_requirement_entity.strikethrough = True
 
-    if getattr(learning_unit_yr, "proposallearningunit", None):
-        cells_to_color = []
-        for letter in _get_all_columns_reference(TOTAL_NB_OF_COLUMNS):
-            cell_ref = "{}{}".format(letter, row_number)
-            if cell_ref not in cells_with_white_font:
-                cells_to_color.append(cell_ref)
-        colored_cells[PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type)].extend(cells_to_color)
-    return colored_cells
+    if not learning_unit_yr.active_entity_allocation_version:
+        font_allocation_entity.strikethrough = True
+
+    ue_cols = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+        'W', 'X', 'Y', 'Z'
+    ]
+    for letter in _get_all_columns_reference(TOTAL_NB_OF_COLUMNS):
+        cell_ref = "{}{}".format(letter, row_number)
+        if letter == REQUIREMENT_ENTITY_COL:
+            styled_cells[font_requirement_entity].append(cell_ref)
+        elif letter == ALLOCATION_ENTITY_COL:
+            styled_cells[font_allocation_entity].append(cell_ref)
+        elif letter in ue_cols:
+            styled_cells[font_ue].append(cell_ref)
+        else:
+            styled_cells[font_training].append(cell_ref)
+    return styled_cells
 
 
 def _get_management_entity_faculty(management_entity: EntityVersion, academic_year: AcademicYear) -> str:

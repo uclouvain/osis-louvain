@@ -50,7 +50,8 @@ from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
+from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, \
+    LearningUnitYearQuerySet
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -86,12 +87,23 @@ class TestLearningUnitXls(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2017)
-        cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
+        ent = EntityVersionFactory(start_date=cls.academic_year.start_date,
+                                   end_date=None)
+
+        cls.learning_container_luy1 = LearningContainerYearFactory(
+            academic_year=cls.academic_year,
+            requirement_entity=ent.entity,
+            allocation_entity=ent.entity
+        )
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
                                                          credits=10)
         cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
-        cls.learning_container_luy_external = LearningContainerYearFactory(academic_year=cls.academic_year)
+        cls.learning_container_luy_external = LearningContainerYearFactory(
+            academic_year=cls.academic_year,
+            requirement_entity=ent.entity,
+            allocation_entity=ent.entity
+        )
         cls.learning_unit_yr_external = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year=cls.learning_container_luy_external,
@@ -342,7 +354,9 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = get_data_part1(luy, is_external_ue_list=False)
+        qs = LearningUnitYear.objects.filter(id=luy.id)
+        learning_unit_yr = LearningUnitYearQuerySet.annotate_entities_status(qs).first()
+        data = get_data_part1(learning_unit_yr, is_external_ue_list=False)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -352,6 +366,10 @@ class TestLearningUnitXls(TestCase):
     def test_get_parameters_configurable_list(self):
         an_user = UserFactory()
         titles = ['title1', 'title2']
+        self.learning_unit_yr_1.active_entity_requirement_version = True
+        self.learning_unit_yr_1.active_entity_allocation_version = True
+        self.learning_unit_yr_2.active_entity_requirement_version = True
+        self.learning_unit_yr_2.active_entity_allocation_version = True
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
@@ -633,6 +651,7 @@ class TestLearningUnitXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
+        qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
         result = prepare_xls_content_with_attributions(qs, 31)
         self.assertEqual(len(result.get('data')), 2)
         self.assertCountEqual(result.get('cells_with_top_border'), ['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2',

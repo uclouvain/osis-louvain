@@ -176,7 +176,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'constraint_type': group_obj.content_constraint.type.name if group_obj.content_constraint.type else None,
             'min_constraint': group_obj.content_constraint.minimum,
             'max_constraint': group_obj.content_constraint.maximum,
-            'management_entity': entity_version.find(group_obj.management_entity.acronym),
+            'management_entity': group_obj.management_entity.acronym,
             'teaching_campus': campus.find_by_name_and_organization_name(
                 name=group_obj.teaching_campus.name,
                 organization_name=group_obj.teaching_campus.university_name

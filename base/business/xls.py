@@ -45,3 +45,9 @@ def _get_all_columns_reference(nb_columns, first_column=1):
         letters.append(get_column_letter(nb_col))
         nb_col += 1
     return letters
+
+
+def get_entity_version_xls_repr(acronym, year):
+    if mdl_base.entity_version.EntityVersion.is_entity_active(acronym, year):
+        return acronym
+    return '\u0336'.join(acronym) + '\u0336'  # strikethrough styled str

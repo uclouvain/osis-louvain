@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-21 13:46+0200\n"
+"POT-Creation-Date: 2021-04-27 14:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2366,6 +2366,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The entity %(acronym_entity)s is not active for this academic year"
+msgstr ""
+
+#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2569,6 +2573,9 @@ msgid "This code already exists for this learning unit"
 msgstr ""
 
 msgid "This education group is not editable during this period."
+msgstr ""
+
+msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "This feature is in testing phase"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
+from html import escape
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -123,7 +124,18 @@ def dl_tooltip(context, instance, key, **kwargs):
     )
 
     if url:
-        value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
+        if _is_entity_data_and_inactive(context, key):
+            value = \
+                "<a href='{url}'><del>{value}</del></a>   " \
+                "<span class='glyphicon glyphicon-question-sign' data-toggle='tooltip' data-placement='top' " \
+                "title='' " \
+                "style='font-size: 12pt;' data-original-title='{msg_inactive_entity}'></span>".format(
+                    value=value or '',
+                    url=url,
+                    msg_inactive_entity=escape(_('This entity is not active during this academic year'), quote=True)
+                )
+        else:
+            value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
 
     if inherited == PARTIM and not common_title:
         label_text = get_style_of_label_text(
@@ -275,3 +287,12 @@ def th_tooltip(context, key, **kwargs):
     return mark_safe("<span {difference}>{value}</span>".format(
         difference=difference, value=_(str(value))
     ))
+
+
+def _is_entity_data_and_inactive(context, key):
+    return key.lower() in (
+        'requirement_entity',
+        'allocation_entity',
+        'additional_requirement_entity_1',
+        'additional_requirement_entity_2'
+    ) and not context.get('active_{}'.format(key.lower()), True)

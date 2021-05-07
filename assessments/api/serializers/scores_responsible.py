@@ -37,6 +37,7 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
     acronym = serializers.CharField()
     learning_unit_title = serializers.CharField(source='full_title')
     requirement_entity = serializers.CharField()
+    most_recent_requirement_entity = serializers.CharField()
     attributions = serializers.SerializerMethodField()
 
     # FIXME Have to filter attribution to not have same person twice for a luy

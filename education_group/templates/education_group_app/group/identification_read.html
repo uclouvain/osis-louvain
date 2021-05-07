@@ -103,7 +103,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Management entity") label_class='d-block'%}
-                            <p>{{ group.management_entity.acronym }}</p>
+                            {% trans "This entity is not active during this academic year" as msg_inactive_entity %}
+                            {% if active_management_entity %}
+                                <p>{{ group.management_entity.acronym }}</p>
+                            {% else %}
+                                <p><del>{{ group.management_entity.acronym }}</del> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="" style="font-size: 12pt;" data-original-title="{{ msg_inactive_entity }}"></span></p>
+                            {% endif %}
                         </div>
                     </div>
                     <br>

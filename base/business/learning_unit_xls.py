@@ -42,7 +42,8 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear, \
+    LearningUnitYearQuerySet
 from base.models.person import Person
 from osis_common.document import xls_build
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
@@ -82,6 +83,12 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
+REQUIREMENT_ENTITY_COL = 'F'
+ALLOCATION_ENTITY_COL = 'J'
+STRIKETHROUGH_FONT = Font(strikethrough=True)
+WHITE_FONT = Font(color=Color('00FFFFFF'))
+WHITE_FONT_STRIKETHROUGH = Font(color=Color('00FFFFFF'), strikethrough=True)
+BLACK_FONT_STRIKETHROUGH = Font(color=Color('00000000'), strikethrough=True)
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -105,6 +112,7 @@ def prepare_xls_content(learning_unit_years: QuerySet,
                         with_grp=False,
                         with_attributions=False) -> List:
     qs = annotate_qs(learning_unit_years)
+    qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
 
     if with_grp:
         qs = qs.annotate(
@@ -190,6 +198,7 @@ def _get_parameters_configurable_list(learning_units, titles, user) -> dict:
             )
         },
         xls_build.FONT_ROWS: _get_font_rows(learning_units),
+        xls_build.FONT_CELLS: _get_strikethrough_cells(learning_units)
     }
     return parameters
 
@@ -324,8 +333,6 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) 
 
 def get_data_part1(learning_unit_yr: LearningUnitYear, is_external_ue_list: bool) -> List[str]:
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
-    requirement_acronym = learning_unit_yr.entity_requirement
-    allocation_acronym = learning_unit_yr.entity_allocation
 
     lu_common_data_part1 = [
         learning_unit_yr.acronym,
@@ -333,7 +340,7 @@ def get_data_part1(learning_unit_yr: LearningUnitYear, is_external_ue_list: bool
         learning_unit_yr.complete_title,
         learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
-        requirement_acronym,
+        learning_unit_yr.ent_requirement_acronym if learning_unit_yr.ent_requirement_acronym else '-',
         ]
     if is_external_ue_list:
         lu_proposal_data = []
@@ -345,7 +352,7 @@ def get_data_part1(learning_unit_yr: LearningUnitYear, is_external_ue_list: bool
 
     lu_common_data_part2 = [
         learning_unit_yr.credits,
-        allocation_acronym,
+        learning_unit_yr.ent_allocation_acronym if learning_unit_yr.ent_allocation_acronym else '-',
         learning_unit_yr.complete_title_english,
     ]
     return lu_common_data_part1 + lu_proposal_data + lu_common_data_part2
@@ -433,17 +440,24 @@ def create_xls_attributions(user, found_learning_units, filters):
                                                                             str(_('Attrib. vol1')),
                                                                             str(_('Attrib. vol2')),
                                                                             ]
+    found_learning_units = LearningUnitYearQuerySet.annotate_entities_status(found_learning_units)
     xls_data = prepare_xls_content_with_attributions(found_learning_units, len(titles))
     working_sheets_data = xls_data.get('data')
     cells_with_top_border = xls_data.get('cells_with_top_border')
     cells_with_white_font = xls_data.get('cells_with_white_font')
+    cells_strike_with_white_font = xls_data.get('cells_strike_with_white_font')
+    cells_strike_with_black_font = xls_data.get('cells_strike_with_black_font')
     parameters = {xls_build.DESCRIPTION: _('Learning units list with attributions'),
                   xls_build.USER: get_name_or_username(user),
                   xls_build.FILENAME: XLS_FILENAME,
                   xls_build.HEADER_TITLES: titles,
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
                   xls_build.BORDER_CELLS: {xls_build.BORDER_TOP: cells_with_top_border},
-                  xls_build.FONT_CELLS: {Font(color=Color('00FFFFFF')): cells_with_white_font},
+                  xls_build.FONT_CELLS: {
+                      WHITE_FONT: cells_with_white_font,
+                      WHITE_FONT_STRIKETHROUGH: cells_strike_with_white_font,
+                      BLACK_FONT_STRIKETHROUGH: cells_strike_with_black_font
+                  },
                   xls_build.FONT_ROWS: {BOLD_FONT: [0]}
                   }
 
@@ -455,6 +469,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
     qs = annotate_qs(found_learning_units)
     cells_with_top_border = []
     cells_with_white_font = []
+    cells_strike_with_white_font = []
+    cells_strike_with_black_font = []
     line = 2
 
     for learning_unit_yr in qs:
@@ -476,6 +492,23 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     cells_with_white_font.extend(
                         ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(24)]
                     )
+                    if not learning_unit_yr.active_entity_requirement_version:
+                        cells_strike_with_white_font.append(
+                            "{}{}".format(REQUIREMENT_ENTITY_COL, line - 1)
+                        )
+                    if not learning_unit_yr.active_entity_allocation_version:
+                        cells_strike_with_white_font.append(
+                            "{}{}".format(ALLOCATION_ENTITY_COL, line - 1)
+                        )
+                else:
+                    if not learning_unit_yr.active_entity_requirement_version:
+                        cells_strike_with_black_font.append(
+                            "{}{}".format(REQUIREMENT_ENTITY_COL, line - 1)
+                        )
+                    if not learning_unit_yr.active_entity_allocation_version:
+                        cells_strike_with_black_font.append(
+                            "{}{}".format(ALLOCATION_ENTITY_COL, line - 1)
+                        )
                 first = False
         else:
             data.append(lu_data_part1)
@@ -485,6 +518,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
         'data': data,
         'cells_with_top_border': cells_with_top_border or None,
         'cells_with_white_font': cells_with_white_font or None,
+        'cells_strike_with_white_font': cells_strike_with_white_font or None,
+        'cells_strike_with_black_font': cells_strike_with_black_font or None,
     }
 
 
@@ -584,3 +619,36 @@ def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
     for attribution in attributions:
         score_responsibles.add(attribution.tutor.person)
     return score_responsibles
+
+
+def _get_strikethrough_cells(learning_units):
+    strikethrough_cells = defaultdict(list)
+    for idx, luy in enumerate(learning_units, start=2):
+        strikethrough_cells = _get_strikethrough_cells_on_entity(
+            idx,
+            luy,
+            strikethrough_cells,
+            luy.active_entity_allocation_version,
+            ALLOCATION_ENTITY_COL
+        )
+
+        strikethrough_cells = _get_strikethrough_cells_on_entity(
+            idx,
+            luy,
+            strikethrough_cells,
+            luy.active_entity_requirement_version,
+            REQUIREMENT_ENTITY_COL
+        )
+    return strikethrough_cells
+
+
+def _get_strikethrough_cells_on_entity(idx, luy, strikethrough_cells_param, is_entity_active, col):
+    strikethrough_cells = strikethrough_cells_param.copy()
+    if not is_entity_active:
+        if getattr(luy, "proposallearningunit", None):
+            font_to_copy = PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type).copy()
+            font_to_copy.strikethrough = True
+            strikethrough_cells[font_to_copy].append("{}{}".format(col, idx))
+        else:
+            strikethrough_cells[STRIKETHROUGH_FONT].append("{}{}".format(col, idx))
+    return strikethrough_cells

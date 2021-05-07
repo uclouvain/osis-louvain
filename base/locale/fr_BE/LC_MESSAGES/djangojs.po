@@ -57,6 +57,9 @@ msgstr "Vous devez utiliser le raccourci Ctrl+V pour coller."
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année académique"
+
 msgid "This field is required"
 msgstr "Ce champ est obligatoire."
 

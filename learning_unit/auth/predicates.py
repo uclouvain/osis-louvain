@@ -4,6 +4,7 @@ from rules import predicate
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.tutor_application import TutorApplication
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.proposal_state import ProposalState
@@ -48,7 +49,7 @@ def is_user_attached_to_requirement_entity(self, user, learning_unit_year=None):
     if learning_unit_year:
         initial_container_year = learning_unit_year.learning_container_year
         requirement_entity_id = initial_container_year.requirement_entity
-        return _is_attached_to_entity(requirement_entity_id, self)
+        return _is_attached_to_entity(requirement_entity_id, learning_unit_year.academic_year, self)
     return learning_unit_year
 
 
@@ -59,13 +60,13 @@ def is_user_attached_to_current_requirement_entity(self, user, learning_unit_yea
     if learning_unit_year:
         current_container_year = learning_unit_year.learning_container_year
         return current_container_year is not None and _is_attached_to_entity(
-            current_container_year.requirement_entity_id, self
+            current_container_year.requirement_entity_id, learning_unit_year.academic_year, self
         )
     return learning_unit_year
 
 
-def _is_attached_to_entity(requirement_entity, self):
-    user_entity_ids = self.context['role_qs'].get_entities_ids()
+def _is_attached_to_entity(requirement_entity, academic_year: AcademicYear, self):
+    user_entity_ids = self.context['role_qs'].get_entities_ids(academic_year, with_expired=True)
     return requirement_entity in user_entity_ids
 
 

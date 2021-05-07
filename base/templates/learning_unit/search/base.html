@@ -214,8 +214,46 @@
                 { "name": "title", "targets": 2, "data": "title"},
                 {"name": "type", "targets": 3,  "data": "type_text"},
                 {"name": "subtype", "targets": 4,  "data": "subtype_text"},
-                {"name": "requirement_entity", "targets": 5, "data": "requirement_entity"},
-                {"name": "allocation_entity", "targets": 6, "data": "allocation_entity"},
+                {
+                    "name": "requirement_entity", "targets": 5, "data": "requirement_entity",
+                    "render": function ( data, type, row, meta ) {
+                        if (row['active_entity_requirement_version'] === true)
+                            return data;
+                        else {
+                            if (data) {
+                                let my_msg = gettext("This entity is not active during this academic year");
+                                return '<del>' + row['ent_requirement_acronym'] + '</del>' +
+                                    ' <span class="glyphicon glyphicon-question-sign" ' +
+                                    'data-toggle="tooltip" ' +
+                                    'data-placement="top" ' +
+                                    'title="' + my_msg + '" ' +
+                                    'style="font-size: 12pt;"></span>';
+                            }else {
+                                return '-'
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "allocation_entity", "targets": 6, "data": "allocation_entity",
+                    "render": function ( data, type, row, meta ) {
+                        if (row['active_entity_allocation_version'] === true)
+                            return data;
+                        else {
+                            if (data) {
+                                let my_msg = gettext("This entity is not active during this academic year");
+                                return '<del>' + row['ent_allocation_acronym'] + '</del>' +
+                                    ' <span class="glyphicon glyphicon-question-sign" ' +
+                                    'data-toggle="tooltip" ' +
+                                    'data-placement="top" ' +
+                                    'title="' + my_msg + '" ' +
+                                    'style="font-size: 12pt;"></span>';
+                            }else{
+                                return '-'
+                            }
+                        }
+                    }
+                },
                 {"name": "credits", "targets": 7, "data": "credits"},
                 {
                     "name": "status",

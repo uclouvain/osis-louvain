@@ -41,7 +41,7 @@ from base.views.learning_units.search.common import _create_xls_proposal, \
     _create_xls_proposal_comparison, BaseLearningUnitSearch, SearchTypes, _create_xls_with_parameters, \
     _create_xls_attributions, _create_xls_ue_utilizations_with_one_training_per_line, \
     _create_xls_educational_specifications
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitSearchSerializer
 
 ACTION_BACK_TO_INITIAL = "back_to_initial"
 ACTION_CONSOLIDATE = "consolidate"
@@ -58,7 +58,7 @@ class SearchLearningUnitProposal(BaseLearningUnitSearch):
     template_name = "learning_unit/search/proposal.html"
     search_type = SearchTypes.PROPOSAL_SEARCH
     filterset_class = ProposalLearningUnitFilter
-    serializer_class = LearningUnitDetailedSerializer
+    serializer_class = LearningUnitSearchSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)

@@ -35,15 +35,16 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import WRAP_TEXT_ALIGNMENT, annotate_qs, PROPOSAL_LINE_STYLES, \
     get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_BORDER_TOP, \
-    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, CELLS_TO_COLOR, XLS_DESCRIPTION, \
-    _check_cell_to_color, _get_management_entity_faculty
+    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, XLS_DESCRIPTION, \
+    _get_management_entity_faculty, STYLED_CELLS, _get_styled_cells, BLACK_FONT, REQUIREMENT_ENTITY_COL, \
+    ALLOCATION_ENTITY_COL
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type
 from base.models.enums import proposal_type
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.auth.roles.tutor import Tutor
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -71,12 +72,22 @@ GATHERING_COLUMN = 28
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
+FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA = [
+    'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
+    'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1'
+]
+
 
 class TestUeUtilization(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
+        entity_version = EntityVersionFactory(start_date=cls.academic_year.start_date,
+                                              acronym='DRT')
+        cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year,
+                                                                   requirement_entity=entity_version.entity,
+                                                                   allocation_entity=entity_version.entity
+                                                                   )
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
                                                          credits=10)
@@ -151,6 +162,7 @@ class TestUeUtilization(TestCase):
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
+
         cls.learning_unit_yr_with_proposal = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.proposal = ProposalLearningUnitFactory(
             learning_unit_year=cls.learning_unit_yr_with_proposal,
@@ -200,7 +212,7 @@ class TestUeUtilization(TestCase):
         an_user = UserFactory()
         titles = ['title1', 'title2']
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
-        data = {CELLS_WITH_BORDER_TOP: [], CELLS_TO_COLOR: []}
+        data = {CELLS_WITH_BORDER_TOP: [], STYLED_CELLS: []}
 
         param = _get_parameters(data, learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
@@ -212,14 +224,11 @@ class TestUeUtilization(TestCase):
         self.assertEqual(param.get(xls_build.FONT_CELLS), [])
 
     def test_prepare_xls_content_ue_used_in_one_training(self):
-        qs = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
-            entity_requirement=Subquery(self.entity_requirement),
-            entity_allocation=Subquery(self.entity_allocation),
-        )
+        qs = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk)
         result = _prepare_xls_content(qs)
         self.assertEqual(len(result.get("working_sheets_data")), 1)
 
-        luy = annotate_qs(qs).get()
+        luy = _simulate_annotate_on_entities(annotate_qs(qs).get())
         self.assertListEqual(
             result.get("working_sheets_data")[0],
             self._get_luy_expected_data(luy, self.a_tutor)
@@ -276,56 +285,53 @@ class TestUeUtilization(TestCase):
         )
 
     def test_no_white_cells(self):
+        luy = _simulate_annotate_on_entities(self.learning_unit_yr_1)
         dict_to_update = defaultdict(list)
-        result = _check_cell_to_color(
-            dict_to_update=dict_to_update, learning_unit_yr=self.learning_unit_yr_1, row_number=1
+        result = _get_styled_cells(
+            styled_cells_to_update=dict_to_update, learning_unit_yr=luy, row_number=1
         )
         self.assertListEqual(result[WHITE_FONT], [])
 
     def test_white_cells_because_second_line_of_usage_of_an_UE(self):
+        luy = _simulate_annotate_on_entities(self.learning_unit_yr_1)
         dict_to_update = defaultdict(list)
-        result = _check_cell_to_color(
-            dict_to_update=dict_to_update, learning_unit_yr=self.learning_unit_yr_1, row_number=1, training_occurence=2
+        result = _get_styled_cells(
+            styled_cells_to_update=dict_to_update, learning_unit_yr=luy, row_number=1, training_occurence=2
         )
 
-        first_row_cells_without_training_data = [
-            'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
-        ]
-        self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
+        self.assertListEqual(result[WHITE_FONT], FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA)
 
-    def test_colored_cells_because_of_proposal(self):    
-
+    def test_colored_cells_because_of_proposal(self):
+        luy = _simulate_annotate_on_entities(self.proposal.learning_unit_year)
         dict_to_update = defaultdict(list)
-        result = _check_cell_to_color(
-            dict_to_update=dict_to_update, learning_unit_yr=self.proposal.learning_unit_year, row_number=1
+        result = _get_styled_cells(
+            styled_cells_to_update=dict_to_update, learning_unit_yr=luy, row_number=1
         )        
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
             'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
-        self.assertDictEqual(result, {PROPOSAL_LINE_STYLES.get(self.proposal.type): row_colored_because_of_proposal})
+        self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(self.proposal.type)], row_colored_because_of_proposal)
 
     def test_colored_cells_because_of_proposal_on_second_training_usage(self):    
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_yr_1,
             type=proposal_type.ProposalType.MODIFICATION.name,
         )
+        luy = _simulate_annotate_on_entities(self.learning_unit_yr_1)
+
         dict_to_update = defaultdict(list)
-        result = _check_cell_to_color(
-            dict_to_update=dict_to_update,
-            learning_unit_yr=proposal.learning_unit_year,
+        result = _get_styled_cells(
+            styled_cells_to_update=dict_to_update,
+            learning_unit_yr=luy,
             row_number=1,
             training_occurence=2
         )        
-        first_row_cells_without_training_data = [
-            'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
-        ]
         row_colored_because_of_proposal = [
-            'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
+            'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
-        self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
+
+        self.assertListEqual(result[WHITE_FONT], FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
 
     def test_get_management_entity_faculty_no_management_entity(self):
@@ -357,6 +363,23 @@ class TestUeUtilization(TestCase):
             entity_child1_version.acronym
         )
 
+    def test_strikethrough_because_of_inactive_entities(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+        )
+        # Simulate annotate with inactive entities
+        luy.active_entity_requirement_version = False
+        luy.active_entity_allocation_version = False
+
+        result = _get_styled_cells(
+            styled_cells_to_update=defaultdict(list), learning_unit_yr=luy, row_number=1
+        )
+        strike_font = BLACK_FONT.copy()
+        strike_font.strikethrough = True
+        self.assertListEqual(result[strike_font],
+                             ["{}{}".format(REQUIREMENT_ENTITY_COL, 1), "{}{}".format(ALLOCATION_ENTITY_COL, 1)]
+                             )
+
     def _get_luy_expected_data(self, luy, a_tutor):
         return [
             luy.acronym,
@@ -364,11 +387,11 @@ class TestUeUtilization(TestCase):
             luy.complete_title,
             luy.get_container_type_display(),
             luy.get_subtype_display(),
-            luy.entity_requirement,
+            'DRT',
             '',  # Proposal
             '',  # Proposal state
             luy.credits,
-            luy.entity_allocation,
+            'DRT',
             luy.complete_title_english,
             '{} {}'.format(a_tutor.person.last_name.upper(), a_tutor.person.first_name),
             a_tutor.person.email,
@@ -421,3 +444,11 @@ def _create_tutor_and_attributions(learning_unit_yr_1: LearningUnitYear) -> Tuto
         attribution=an_attribution_1,
         allocation_charge=5.0)
     return a_tutor_1
+
+
+def _simulate_annotate_on_entities(luy_to_complete):
+    # Simulate annotate with inactive entities
+    luy = luy_to_complete
+    luy.active_entity_requirement_version = True
+    luy.active_entity_allocation_version = True
+    return luy

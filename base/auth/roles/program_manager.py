@@ -33,11 +33,11 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.auth.predicates import is_linked_to_offer, is_scores_responsible_period_opened
+from base.business.entity_version import MainEntityStructure
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
-from base.models.entity_version import find_parent_of_type_into_entity_structure, EntityVersion
-from base.models.enums.entity_type import FACULTY
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
 from education_group.contrib.admin import EducationGroupRoleModelAdmin
@@ -165,7 +165,7 @@ def find_by_management_entity(administration_entities: List['EntityVersion']):
     return None
 
 
-def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure):
+def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure: MainEntityStructure):
     current_ac = current_academic_year()
     allowed_entities_scopes = set()
 
@@ -200,19 +200,12 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
 
     for learning_unit_enrollment in offer_enrollments_education_group_year:
         education_group_year = learning_unit_enrollment.offer_enrollment.education_group_year
-        administration_fac_level = find_parent_of_type_into_entity_structure(
-           education_group_year.administration_entity_version,
-           entity_structure,
-           FACULTY
-        )
-        if not administration_fac_level:
-            administration_fac_level = education_group_year.administration_entity
 
-        allowed_entities_scopes.add(administration_fac_level.pk)
-        allowed_entities_scopes = allowed_entities_scopes.union({
-            entity_version.entity_id for entity_version in
-            entity_structure[administration_fac_level.pk].get('all_children', [])
-        })
+        administration_faculty = entity_structure.get_containing_faculty(education_group_year.administration_entity.id)
+        faculty_children = entity_structure.get_children(administration_faculty.entity_id)
+
+        allowed_entities_scopes.add(education_group_year.administration_entity.id)
+        allowed_entities_scopes.update([child.entity_id for child in faculty_children])
 
     return lu_enrollments.filter(
         learning_unit_year__learning_container_year__requirement_entity__in=allowed_entities_scopes

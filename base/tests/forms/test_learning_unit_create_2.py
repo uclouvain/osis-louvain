@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
-    LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
+    LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm, INACTIVE_ENTITY_CSS_STYLE
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
@@ -69,6 +69,10 @@ from education_group.calendar.education_group_limited_daily_management import \
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
+
+
+ENTITIES_FIELD_NAMES = ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']
+INACTIVE_ENTITY_ACRONYM = 'DRT'
 
 
 def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_instance=None, start_year=None,
@@ -194,6 +198,14 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.post_data = get_valid_form_data(cls.current_academic_year, entity=cls.entity)
         generate_learning_unit_edition_calendars(cls.acs)
 
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year-2)
+
+        cls.inactive_entity_in_current_acad_yr = EntityWithVersionFactory(
+            version__start_date=cls.previous_academic_year.start_date,
+            version__end_date=cls.previous_academic_year.end_date,
+            version__acronym=INACTIVE_ENTITY_ACRONYM
+        )
+
     def setUp(self):
         del self.acs[3]
         for ac in self.acs:
@@ -292,6 +304,33 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         self.assertTrue("acronym" not in disabled_fields)
+
+    def test_entities_active_help_text(self):
+
+        form = FullForm(self.central_person,
+                        self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit
+                        )
+        for field_name in ENTITIES_FIELD_NAMES:
+            self.assertIsNone(form.fields[field_name].help_text)
+
+    def test_entities_inactive_help_text(self):
+        self.learning_unit_year.learning_container_year.requirement_entity = self.inactive_entity_in_current_acad_yr
+        self.learning_unit_year.learning_container_year.allocation_entity = self.inactive_entity_in_current_acad_yr
+        self.learning_unit_year.learning_container_year.additional_entity_1 = self.inactive_entity_in_current_acad_yr
+        self.learning_unit_year.learning_container_year.additional_entity_2 = self.inactive_entity_in_current_acad_yr
+        self.learning_unit_year.learning_container_year.save()
+
+        form = FullForm(self.central_person,
+                        self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit
+                        )
+        for field_name in ENTITIES_FIELD_NAMES:
+            self.assertEqual(
+                form.fields[field_name].help_text,
+                "<span style=\"{}\">L'entité {} n'est pas active durant cette année académique</span>"
+                    .format(INACTIVE_ENTITY_CSS_STYLE, INACTIVE_ENTITY_ACRONYM)
+            )
 
 
 class TestFullFormIsValid(LearningUnitFullFormContextMixin):

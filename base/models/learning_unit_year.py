@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, BooleanField, F
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -200,6 +200,189 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
         return cls.annotate_entity_allocation_acronym(
             cls.annotate_entity_requirement_acronym(queryset)
         )
+
+    @classmethod
+    def annotate_most_recent_requirement_acronym(cls, queryset):
+        entity_requirement = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).order_by("-start_date").values('acronym')[:1]
+        return queryset.annotate(
+            most_recent_entity_requirement=Subquery(entity_requirement)
+        )
+
+    @classmethod
+    def annotate_entities_status(cls, queryset):
+        allocation_entity = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        )
+        allocation_entity_recent = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).order_by('start_date')
+
+        queryset = queryset.annotate(
+            entity_allocation_acronym=Subquery(allocation_entity_recent.values('acronym')[:1]),
+        )
+
+        requirement_entity = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        )
+        requirement_entity_recent = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).order_by('start_date')
+
+        queryset = queryset.annotate(
+            entity_requirement_acronym=Subquery(requirement_entity_recent.values('acronym')[:1]),
+        )
+        current_clause_allocation_entity = (
+            Q(entity_allocation_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(entity_allocation_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(entity_allocation_start_date__lte=F('academic_year__start_date')) &
+                (
+                    Q(entity_allocation_end_date__isnull=True) |
+                    Q(entity_allocation_end_date__gte=F('academic_year__end_date'))
+                )
+            )
+        )
+        queryset = queryset.annotate(
+            entity_allocation_version=Subquery(allocation_entity.values('acronym')[:1]),
+            entity_allocation_start_date=Subquery(allocation_entity.values('start_date')[:1]),
+            entity_allocation_end_date=Subquery(allocation_entity.values('end_date')[:1])
+        ).annotate(
+            active_entity_allocation_version=Case(
+                When(current_clause_allocation_entity, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).annotate(
+            ent_allocation_acronym=Case(
+                When(current_clause_allocation_entity, then=F('entity_allocation_version')),
+                default=F('entity_allocation_acronym'),
+                output_field=CharField()
+            )
+        )
+
+        current_clause_requirement_entity = (
+            Q(entity_requirement_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(entity_requirement_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(entity_requirement_start_date__lte=F('academic_year__start_date')) &
+                (
+                    Q(entity_requirement_end_date__isnull=True) |
+                    Q(entity_requirement_end_date__gte=F('academic_year__end_date'))
+                )
+            )
+        )
+        queryset = queryset.annotate(
+            entity_requirement_version=Subquery(requirement_entity.values('acronym')[:1]),
+            entity_requirement_start_date=Subquery(requirement_entity.values('start_date')[:1]),
+            entity_requirement_end_date=Subquery(requirement_entity.values('end_date')[:1])
+        ).annotate(
+            active_entity_requirement_version=Case(
+                When(current_clause_requirement_entity, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).annotate(
+            ent_requirement_acronym=Case(
+                When(current_clause_requirement_entity, then=F('entity_requirement_version')),
+                default=F('entity_requirement_acronym'),
+                output_field=CharField()
+            )
+        )
+
+        return queryset
+
+    @classmethod
+    def annotate_additional_entities_status(cls, queryset):
+        additional_entity_1 = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__additional_entity_1'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        )
+        additional_entity_1_recent = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__additional_entity_1'),
+        ).order_by('start_date')
+
+        queryset = queryset.annotate(
+            additional_entity_1_acronym=Subquery(additional_entity_1_recent.values('acronym')[:1]),
+        )
+
+        additional_entity_2 = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__additional_entity_2'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        )
+        additional_entity_2_recent = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__additional_entity_2'),
+        ).order_by('start_date')
+
+        queryset = queryset.annotate(
+            additional_entity_2_acronym=Subquery(additional_entity_2_recent.values('acronym')[:1]),
+        )
+        current_clause_additional_entity_1 = (
+            Q(additional_entity_1_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(additional_entity_1_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(additional_entity_1_start_date__lte=F('academic_year__start_date')) &
+                (
+                    Q(additional_entity_1_end_date__isnull=True) |
+                    Q(additional_entity_1_end_date__gte=F('academic_year__end_date'))
+                )
+            )
+        )
+        queryset = queryset.annotate(
+            additional_entity_1_version=Subquery(additional_entity_1.values('acronym')[:1]),
+            additional_entity_1_start_date=Subquery(additional_entity_1.values('start_date')[:1]),
+            additional_entity_1_end_date=Subquery(additional_entity_1.values('end_date')[:1])
+        ).annotate(
+            active_additional_entity_1_version=Case(
+                When(current_clause_additional_entity_1, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).annotate(
+            additional_entity_1_acronym=Case(
+                When(current_clause_additional_entity_1, then=F('additional_entity_1_version')),
+                default=F('additional_entity_1_acronym'),
+                output_field=CharField()
+            )
+        )
+
+        current_clause_additional_entity_2 = (
+            Q(additional_entity_2_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(additional_entity_2_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(additional_entity_2_start_date__lte=F('academic_year__start_date')) &
+                (
+                    Q(additional_entity_2_end_date__isnull=True) |
+                    Q(additional_entity_2_end_date__gte=F('academic_year__end_date'))
+                )
+            )
+        )
+        queryset = queryset.annotate(
+            additional_entity_2_version=Subquery(additional_entity_2.values('acronym')[:1]),
+            additional_entity_2_start_date=Subquery(additional_entity_2.values('start_date')[:1]),
+            additional_entity_2_end_date=Subquery(additional_entity_2.values('end_date')[:1])
+        ).annotate(
+            active_additional_entity_2_version=Case(
+                When(current_clause_additional_entity_2, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).annotate(
+            additional_entity_2_acronym=Case(
+                When(current_clause_additional_entity_2, then=F('additional_entity_2_version')),
+                default=F('additional_entity_2_acronym'),
+                output_field=CharField()
+            )
+        )
+
+        return queryset
 
 
 class BaseLearningUnitYearManager(SerializableModelManager):

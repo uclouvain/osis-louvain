@@ -25,6 +25,7 @@
 ##############################################################################
 from reversion.models import Version
 
+from base.models.entity_version import EntityVersion
 from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
 
@@ -37,6 +38,10 @@ class GroupReadIdentification(GroupRead):
         return {
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
+            "active_management_entity": EntityVersion.is_entity_active(
+                self.get_group().management_entity.acronym,
+                self.node_identity.year
+            ),
         }
 
     def get_related_history(self):

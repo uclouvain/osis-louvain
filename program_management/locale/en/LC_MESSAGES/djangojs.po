@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-03 12:57+0100\n"
+"POT-Creation-Date: 2021-03-18 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,31 +30,16 @@ msgstr ""
 msgid "Detach"
 msgstr ""
 
-msgid "Existed name version in "
-msgstr ""
-
-msgid "Existing name version"
-msgstr ""
-
 msgid "Forbidden because of prerequisites"
 msgstr ""
 
-msgid "Invalid name version"
-msgstr ""
-
 msgid "Modify the link"
-msgstr ""
-
-msgid "New version"
 msgstr ""
 
 msgid "Open all"
 msgstr ""
 
 msgid "Paste"
-msgstr ""
-
-msgid "Prolong"
 msgstr ""
 
 msgid "Search"

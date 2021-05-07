@@ -24,57 +24,74 @@
 #
 ##############################################################################
 import itertools
-from datetime import datetime
-from typing import Iterable, Dict, Optional, List
+from collections import namedtuple
+from typing import Dict, Optional, List
 
 import attr
 
-from base.models.entity_version import EntityVersion, find_latest_version
+from base.models.entity_version import EntityVersion
+
+EntityAttributes = namedtuple("EntityAttributes", "acronym entity_type entity_id")
 
 
 @attr.s(frozen=True, slots=True)
 class MainEntityStructure:
     @attr.s(slots=True)
     class Node:
-        entity_version = attr.ib(type=EntityVersion)
-        parent = attr.ib(type=Optional['MainEntityStructure.Node'], default=None)
-        direct_children = attr.ib(type=List['MainEntityStructure.Node'], factory=list)
+        entity_id = attr.ib(type=int)
+        parent_id = attr.ib(type=Optional[int])
+        parents = attr.ib(type=List[int])
+        acronym = attr.ib(type=str)
+        entity_type = attr.ib(type=str)
 
-        def faculty(self) -> Optional['MainEntityStructure.Node']:
-            if self.entity_version.is_faculty():
-                return self
-            if self.parent:
-                return self.parent.faculty()
-            return None
+        def is_faculty(self):
+            return EntityVersion.is_faculty_cls(self.entity_type, self.acronym)
 
-        def containing_faculty(self):
-            return self.faculty() or self
-
-        def get_all_children(self) -> List['MainEntityStructure.Node']:
-            return list(itertools.chain.from_iterable((child.get_all_children() for child in self.direct_children))) + \
-                self.direct_children
-
-    root = attr.ib(type='MainEntityStructure.Node')
     nodes = attr.ib(type=Dict[int, 'MainEntityStructure.Node'])
 
-    def get_node(self, entity_id: int) -> Optional['MainEntityStructure.Node']:
-        return self.nodes.get(entity_id)
+    def get_direct_children(self, parent_entity_id: int) -> List['EntityAttributes']:
+        nodes = (node for node in self.nodes.values() if node.parent_id == parent_entity_id)
+        return [self.get_entity_attributes(node.entity_id) for node in nodes]
+
+    def get_children(self, parent_entity_id: int) -> List['EntityAttributes']:
+        children = self.get_direct_children(parent_entity_id)
+        children += itertools.chain.from_iterable(self.get_children(child.entity_id) for child in children)
+        return children
+
+    def get_containing_faculty(self, entity_id: int) -> Optional['EntityAttributes']:
+        return self.get_entity_faculty(entity_id) or self.get_entity_attributes(entity_id)
+
+    def get_entity_attributes(self, entity_id: int) -> Optional['EntityAttributes']:
+        try:
+            node = self.nodes[entity_id]
+            return EntityAttributes(acronym=node.acronym, entity_type=node.entity_type, entity_id=node.entity_id)
+        except KeyError:
+            return None
+
+    def get_entity_faculty(self, entity_id: int) -> Optional['EntityAttributes']:
+        try:
+            node = self.nodes[entity_id]
+        except KeyError:
+            return None
+
+        if node.is_faculty():
+            return self.get_entity_attributes(entity_id)
+        return self.get_entity_faculty(node.parent_id) if node.parent_id else None
 
     def in_same_faculty(self, entity_id: int, other_entity_id: int):
-        node = self.nodes.get(entity_id)
-        another_node = self.nodes.get(other_entity_id)
-        return (node and node.containing_faculty()) == (another_node and another_node.containing_faculty())
+        return self.get_containing_faculty(entity_id) == self.get_containing_faculty(other_entity_id)
 
 
-def load_main_entity_structure(date: datetime.date) -> MainEntityStructure:
-    all_current_entities_version = find_latest_version(date=date).of_main_organization  # type: Iterable[EntityVersion]
-
-    nodes = {ev.entity.id: MainEntityStructure.Node(ev) for ev in all_current_entities_version}
-    for ev in all_current_entities_version:
-        if not ev.parent_id:
-            continue
-        nodes[ev.entity.id].parent = nodes[ev.parent_id]
-        nodes[ev.parent_id].direct_children.append(nodes[ev.entity.id])
-
-    root = next((value for key, value in nodes.items() if not value.parent))
-    return MainEntityStructure(root, nodes)
+def load_main_entity_structure() -> MainEntityStructure:
+    tree_rows = EntityVersion.objects.get_main_tree(with_expired=True)
+    nodes = {
+        row["entity_id"]: MainEntityStructure.Node(
+            entity_id=row["entity_id"],
+            parent_id=row["parent_id"],
+            parents=row["parents"],
+            acronym=row["acronym"],
+            entity_type=row["entity_type"]
+        )
+        for row in tree_rows
+    }
+    return MainEntityStructure(nodes)

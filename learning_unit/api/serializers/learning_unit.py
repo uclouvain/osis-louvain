@@ -162,3 +162,22 @@ class ExternalLearningUnitDetailedSerializer(LearningUnitDetailedSerializer):
             'local_code',
             'local_url'
         )
+
+
+class LearningUnitSearchSerializer(LearningUnitDetailedSerializer):
+
+    active_entity_requirement_version = serializers.BooleanField()
+    active_entity_allocation_version = serializers.BooleanField()
+    requirement_entity = serializers.CharField()
+    allocation_entity = serializers.CharField()
+    ent_requirement_acronym = serializers.CharField()
+    ent_allocation_acronym = serializers.CharField()
+
+    class Meta(LearningUnitDetailedSerializer.Meta):
+        model = LearningUnitYear
+        fields = LearningUnitDetailedSerializer.Meta.fields + (
+            'active_entity_requirement_version',
+            'active_entity_allocation_version',
+            'ent_requirement_acronym',
+            'ent_allocation_acronym'
+        )

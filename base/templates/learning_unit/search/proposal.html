@@ -183,7 +183,22 @@
                     "data": "title"
                 },
                 {"name": "type", "targets": 5,  "data": "type_text"},
-                {"name": "requirement_entity", "targets": 6, "data": "requirement_entity"},
+                {
+                    "name": "requirement_entity", "targets": 6, "data": "requirement_entity",
+                    "render": function ( data, type, row, meta ) {
+                        if (row['active_entity_requirement_version'] === true)
+                            return data;
+                        else {
+                            let my_msg = gettext("This entity is not active during this academic year");
+                            return '<del>' + data + '</del>' +
+                                ' <span class="glyphicon glyphicon-question-sign" ' +
+                                'data-toggle="tooltip" ' +
+                                'data-placement="top" ' +
+                                'title="'+ my_msg +'" ' +
+                                'style="font-size: 12pt;"></span>';
+                        }
+                    }
+                },
                 {
                     "name": "proposal_type",
                     "targets": 7,

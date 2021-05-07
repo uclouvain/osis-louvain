@@ -30,7 +30,7 @@ from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
-from base.business.xls import get_name_or_username, convert_boolean
+from base.business.xls import get_name_or_username, convert_boolean, get_entity_version_xls_repr
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
@@ -96,7 +96,7 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
     ACADEMIC_YEAR_COL,
     START_COURSE_REGISTRATION_COL,
     END_COURSE_REGISTRATION_COL,
-    SESSIONS_COLUMNS,   # this columns will be duplicate by SESSIONS_NUMBER [content: SESSION_HEADERS]
+    SESSIONS_COLUMNS,  # this columns will be duplicate by SESSIONS_NUMBER [content: SESSION_HEADERS]
     WEIGHTING_COL,
     DEFAULT_LEARNING_UNIT_ENROLLMENT_COL,
     CHAIR_OF_THE_EXAM_BOARD_COL,
@@ -220,16 +220,18 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
     an_education_group_year = a_version.offer
     return {
         MANAGEMENT_ENTITY_COL:
-            an_education_group_year.management_entity_version.acronym
-            if an_education_group_year.management_entity_version else '',
+            get_entity_version_xls_repr(
+                an_education_group_year.management_entity_version.acronym,
+                an_education_group_year.academic_year.year
+            ) if an_education_group_year.management_entity_version else '',
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,
             a_version.version_label()
-        ),
+            ),
         TYPE_COL: "{}{}".format(
             an_education_group_year.education_group_type,
             _get_title(a_version, language)
-        ),
+            ),
         ACADEMIC_YEAR_COL: an_education_group_year.academic_year.name,
         WEIGHTING_COL: convert_boolean(an_education_group_year.weighting),
         DEFAULT_LEARNING_UNIT_ENROLLMENT_COL: convert_boolean(an_education_group_year.default_learning_unit_enrollment)

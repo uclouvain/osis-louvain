@@ -80,7 +80,6 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
 
         ids = filter_borrowed_learning_units(
             qs,
-            academic_year,
             faculty_borrowing_id=faculty_borrowing_id
         )
         return qs.filter(id__in=ids)
@@ -88,10 +87,9 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
 
 def filter_borrowed_learning_units(
         learning_unit_year_qs: LearningUnitYearQuerySet,
-        academic_year: AcademicYear,
         faculty_borrowing_id: int = None
 ):
-    entity_structure = load_main_entity_structure(academic_year.start_date)
+    entity_structure = load_main_entity_structure()
     entities_borrowing_restriction = _get_faculty_entities(entity_structure, faculty_borrowing_id) \
         if faculty_borrowing_id else []
 
@@ -105,9 +103,8 @@ def filter_borrowed_learning_units(
 
 
 def _get_faculty_entities(entity_structure: 'MainEntityStructure', faculty_borrowing_id: int) -> List[int]:
-    faculty_entities = entity_structure.get_node(faculty_borrowing_id).get_all_children()
-    faculty_entities += [entity_structure.get_node(faculty_borrowing_id)]
-    return [node.entity_version.entity.id for node in faculty_entities]
+    children = entity_structure.get_children(faculty_borrowing_id)
+    return [faculty_borrowing_id] + [child.entity_id for child in children]
 
 
 def _get_management_entity_of_roots_by_elements(

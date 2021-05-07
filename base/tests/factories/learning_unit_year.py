@@ -172,3 +172,15 @@ def create_learning_unit_year(academic_yr, title, learning_unit):
                                    attribution_procedure=attribution_procedure.EXTERNAL,
                                    learning_unit=learning_unit
                                    )
+
+
+def simulate_annotate_on_entities(luy_to_complete):
+    # Simulate annotate with inactive entities
+    luy = luy_to_complete
+    luy.active_entity_requirement_version = True
+    luy.active_entity_allocation_version = True
+    luy.ent_requirement_acronym = 'DRT'
+    luy.ent_allocation_acronym = 'BUDR'
+    luy.additional_entity_1_acronym = 'AGRO'
+    luy.additional_entity_2_acronym = 'ESPO'
+    return luy

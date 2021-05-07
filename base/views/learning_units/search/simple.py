@@ -31,7 +31,7 @@ from base.views.learning_units.search.common import _create_xls, _create_xls_com
     _create_xls_attributions, _create_xls_with_parameters, \
     BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes, \
     _create_xls_ue_utilizations_with_one_training_per_line
-from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitSearchSerializer
 
 
 @RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
@@ -44,7 +44,7 @@ class LearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
     search_type = SearchTypes.SIMPLE_SEARCH
     filterset_class = LearningUnitFilter
-    serializer_class = LearningUnitSerializer
+    serializer_class = LearningUnitSearchSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField, Q
+from django.db.models import Prefetch, Case, When, Value, IntegerField, CharField, Q, QuerySet
 from django.db.models.expressions import F
 from django.db.models.functions import Concat, Upper
 from django.utils.translation import gettext_lazy as _
@@ -56,29 +57,35 @@ WORKSHEET_TITLE = _('Learning units list')
 WRAP_TEXT_ALIGN = Alignment(wrapText=True, vertical="top")
 CMS_ALLOWED_TAGS = []
 BOLD_FONT = Font(bold=True)
+STRIKETHROUGH_FONT = Font(strikethrough=True)
+REQUIREMENT_ENTITY_COL = "C"
 
 
-def create_xls_educational_information_and_specifications(user, learning_units, request, filters):
+def create_xls_educational_information_and_specifications(user, learning_units: QuerySet, request, filters):
     titles = _get_titles()
 
     working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
 
-    parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
-                  xls_build.USER: get_name_or_username(user),
-                  xls_build.FILENAME: XLS_FILENAME,
-                  xls_build.HEADER_TITLES: titles,
-                  xls_build.WS_TITLE: WORKSHEET_TITLE,
-                  xls_build.ROW_HEIGHT: {'height': 30,
-                                         'start': 2,
-                                         'stop': (len(learning_units)) + 1
-                                         },
-                  xls_build.ALIGN_CELLS: {
-                      WRAP_TEXT_ALIGN: _get_wrapped_cells_educational_information_and_specifications(
-                          learning_units, len(titles)
-                      )
-                  },
-                  xls_build.FONT_ROWS: {BOLD_FONT: [0]}
-                  }
+    parameters = {
+        xls_build.DESCRIPTION: XLS_DESCRIPTION,
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: XLS_FILENAME,
+        xls_build.HEADER_TITLES: titles,
+        xls_build.WS_TITLE: WORKSHEET_TITLE,
+        xls_build.ROW_HEIGHT: {'height': 30,
+                               'start': 2,
+                               'stop': (len(learning_units)) + 1
+                               },
+        xls_build.ALIGN_CELLS: {
+            WRAP_TEXT_ALIGN: _get_wrapped_cells_educational_information_and_specifications(
+                learning_units, len(titles)
+            )
+        },
+        xls_build.FONT_CELLS: {
+            STRIKETHROUGH_FONT: _get_inactive_entity_font_style(learning_units)
+        },
+        xls_build.FONT_ROWS: {BOLD_FONT: [0]}
+    }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheet_data, parameters), filters)
 
@@ -130,7 +137,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         line = [
             learning_unit_yr.acronym,
             learning_unit_yr.complete_title,
-            learning_unit_yr.entity_requirement,
+            learning_unit_yr.ent_requirement_acronym,
         ]
 
         for label_key in CMS_LABEL_PEDAGOGY_FR_AND_EN:
@@ -297,3 +304,13 @@ def _get_wrapped_cells_educational_information_and_specifications(learning_units
 def _add_text_label(a_text_label, language_code):
     a_label = TranslatedTextLabel.objects.filter(text_label=a_text_label, language=language_code).first()
     return "{} - {}".format(a_label if a_label else '', language_code.upper())
+
+
+def _get_inactive_entity_font_style(learning_units: QuerySet) -> List[str]:
+    cells_strike = []
+    for xls_line_number, learning_unit_yr in enumerate(learning_units, 2):
+        if not learning_unit_yr.active_entity_requirement_version:
+            cells_strike.append(
+                "{}{}".format(REQUIREMENT_ENTITY_COL, xls_line_number)
+            )
+    return cells_strike
