@@ -43,7 +43,6 @@ from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmi
 from base import models as mdl
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
-from dissertation.models.adviser import Adviser as DissertationAdviser
 from osis_common.models import application_notice
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, build_title
@@ -164,8 +163,11 @@ def logged_out(request):
 @login_required
 @permission_required('base.can_access_student_path', raise_exception=True)
 def studies(request):
-    show_dissertation_link = 'dissertation' in settings.INSTALLED_APPS and \
-                             DissertationAdviser.objects.filter(person__user=request.user).exists()
+    if 'dissertation' in settings.INSTALLED_APPS:
+        from dissertation.models.adviser import Adviser
+        show_dissertation_link = Adviser.objects.filter(person__user=request.user).exists()
+    else:
+        show_dissertation_link = False
 
     return render(
         request,

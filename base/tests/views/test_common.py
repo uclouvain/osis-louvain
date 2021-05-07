@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import TestCase, SimpleTestCase
 from django.test.utils import override_settings
@@ -33,7 +34,6 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from base.views.common import home, _build_attention_message, studies
-from dissertation.tests.factories.adviser import AdviserTeacherFactory
 from osis_common.tests.factories.application_notice import ApplicationNoticeFactory
 
 
@@ -105,6 +105,8 @@ class TestCommonStudiesViewDissertationLink(TestCase):
         self.assertFalse(response.context['show_dissertation_link'])
 
     def test_user_can_see_dissertation_link(self):
-        AdviserTeacherFactory(person__user=self.user)
-        response = self.client.get(self.url)
-        self.assertTrue(response.context['show_dissertation_link'])
+        if 'dissertation' in settings.INSTALLED_APPS:
+            from dissertation.tests.factories.adviser import AdviserTeacherFactory
+            AdviserTeacherFactory(person__user=self.user)
+            response = self.client.get(self.url)
+            self.assertTrue(response.context['show_dissertation_link'])
