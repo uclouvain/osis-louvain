@@ -303,6 +303,33 @@ class TrainingEmptyFieldException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class TrainingAlertFieldException(BusinessException):
+    def __init__(self, empty_fields: Iterable[str], *args, **kwargs):
+        self.fields = [str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in empty_fields]
+        message = _("The following fields has issues: %(fields)s ") % {
+            "fields": ", ".join(self.fields)
+        }
+        super().__init__(message, **kwargs)
+
+
+class MiniTrainingAlertFieldException(BusinessException):
+    def __init__(self, empty_fields: Iterable[str], *args, **kwargs):
+        self.fields = [str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in empty_fields]
+        message = _("The following fields has issues: %(fields)s ") % {
+            "fields": ", ".join(self.fields)
+        }
+        super().__init__(message, **kwargs)
+
+
+class GroupAlertFieldException(BusinessException):
+    def __init__(self, empty_fields: Iterable[str], *args, **kwargs):
+        self.fields = [str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in empty_fields]
+        message = _("The following fields has issues: %(fields)s ") % {
+            "fields": ", ".join(self.fields)
+        }
+        super().__init__(message, **kwargs)
+
+
 class HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")

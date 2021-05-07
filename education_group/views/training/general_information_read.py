@@ -54,7 +54,10 @@ class TrainingReadGeneralInformation(TrainingRead):
             ]) +
             "?path={}".format(self.path),
             "can_edit_information":
-                self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer),
+                self.request.user.has_perm(
+                    "base.change_training_pedagogyinformation",
+                    self.education_group_version.offer
+                ),
             "show_contacts": self.can_have_contacts(),
             "entity_contact": self.get_entity_contact(),
             "academic_responsibles": self.get_academic_responsibles(),

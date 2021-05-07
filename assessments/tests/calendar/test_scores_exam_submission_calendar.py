@@ -83,3 +83,31 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ).count(),
             21
         )
+
+
+class TestClosestSession(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
+        ScoresExamSubmissionCalendar.ensure_consistency_until_n_plus_6()
+
+    def test_when_date_corresponds_to_open_session_should_return_that_session(self):
+        date = datetime.date(self.current_academic_year.year, 12, 15)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertEqual(1, result.session)
+        self.assertEqual(self.current_academic_year.year, result.authorized_target_year)
+
+    def test_should_return_next_session_when_outside_of_sessions(self):
+        date = datetime.date(self.current_academic_year.year+1, 5, 10)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertEqual(2, result.session)
+        self.assertEqual(self.current_academic_year.year, result.authorized_target_year)
+
+    def test_should_return_none_if_outside_of_session_and_next_session_is_first_session(self):
+        date = datetime.date(self.current_academic_year.year, 12, 1)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertIsNone(result)

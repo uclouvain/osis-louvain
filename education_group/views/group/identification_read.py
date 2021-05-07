@@ -23,9 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from reversion.models import Version
 
 from base.models.entity_version import EntityVersion
+from education_group.ddd.domain import exception
+from education_group.ddd.command import GetGroupIssueFieldsOnWarningCommand
+from education_group.ddd.service.read.check_group_issue_fields_on_warning_service import \
+    check_group_issue_fields_on_warning
 from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
 
@@ -38,6 +44,7 @@ class GroupReadIdentification(GroupRead):
         return {
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
+            "fields_warnings": self.get_fields_in_warning_entities(),
             "active_management_entity": EntityVersion.is_entity_active(
                 self.get_group().management_entity.acronym,
                 self.node_identity.year
@@ -63,3 +70,11 @@ class GroupReadIdentification(GroupRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
+
+    def get_fields_in_warning_entities(self) -> List[str]:
+        try:
+            cmd = GetGroupIssueFieldsOnWarningCommand(code=self.node_identity.code, year=self.node_identity.year)
+            check_group_issue_fields_on_warning(cmd)
+        except exception.GroupAlertFieldException as e:
+            return e.fields
+        return []

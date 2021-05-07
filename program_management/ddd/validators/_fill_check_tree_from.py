@@ -34,6 +34,9 @@ class CheckValidTreeVersionToFillFrom(business_validator.BusinessValidator):
         super().__init__()
 
     def validate(self, *args, **kwargs):
+        if self.tree_version_to.is_standard and self.__is_tree_from_last_year_tree():
+            return
+
         if self.tree_version_to.is_specific_official and self.__is_tree_from_last_year_tree():
             return
 

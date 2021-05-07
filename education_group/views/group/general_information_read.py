@@ -45,7 +45,10 @@ class GroupReadGeneralInformation(GroupRead):
             **super().get_context_data(**kwargs),
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
-            "can_edit_information": self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year())
+            "can_edit_information": self.request.user.has_perm(
+                "base.change_group_pedagogyinformation",
+                self.get_group_year()
+            )
         }
 
     def get_sections(self):

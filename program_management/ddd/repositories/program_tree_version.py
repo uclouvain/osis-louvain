@@ -139,6 +139,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year__lt=entity_id.year,
+            transition_name=entity_id.transition_name
         ).order_by(
             'offer__academic_year'
         ).values_list(

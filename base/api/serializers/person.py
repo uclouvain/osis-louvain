@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import datetime
 
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -34,6 +35,7 @@ from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+from education_group.auth.scope import Scope
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -77,12 +79,18 @@ class PersonRolesSerializer(serializers.ModelSerializer):
 
     def roles_for_reddot(self, obj):
         all_entities = EntityRoleHelper.get_all_entities(obj, {CentralManager.group_name, FacultyManager.group_name})
-        return set(
+        all_faculties = set(
             row.acronym for row in EntityVersion.objects.current(datetime.now()).filter(
-                entity_id__in=all_entities,
-                entity_type=FACULTY
+                entity_id__in=all_entities
+            ).filter(
+                Q(entity_type=FACULTY) | Q(acronym__iexact=Scope.IUFC.name)
             )
         )
+
+        if CentralManager.objects.filter(person=obj, scopes__contains=[Scope.IUFC.name]).exists() | \
+                FacultyManager.objects.filter(person=obj, scopes__contains=[Scope.IUFC.name]).exists():
+            all_faculties.add(Scope.IUFC.name)
+        return all_faculties
 
     def roles_for_program_managers(self, obj):
         return [

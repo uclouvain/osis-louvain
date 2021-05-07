@@ -9,7 +9,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,14 +40,6 @@
         <div class="row">
             <form method="get" action="{% url 'offers_search'%}">
                 <div class="col-md-3">
-                    <label for="slt_academic_year">{% trans 'Academic year'%}</label>
-                    <select class="form-control" id="slt_academic_year" name="academic_year" value="{{ academic_year }}">
-                        {% for v in academic_years %}
-                            <option {%if v.id == academic_year%} selected {%endif%} value="{{ v.id }}">{{ v }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
                     <label for="txt_entity_acronym">{% trans 'Entity' %}</label>
                     <input class="form-control" id="txt_entity_acronym" placeholder="{% trans 'Entity' %}"
                            name="entity_acronym"
@@ -58,7 +50,7 @@
                     <input class="form-control" id="txt_code" placeholder="{% trans 'Acronym/Short title' %}" name="code"
                            value="{{ code  | default_if_none:'' }}" style="text-transform:uppercase" maxlength="15">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <br>
                     <button type="submit" id="bt_submit_offer_year_search" class="btn btn-primary" role="button"
                             title="{% trans 'Search of annual programs' %}">
@@ -74,7 +66,6 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>{% trans 'Academic year'%}</th>
                     <th>{% trans 'Acronym/Short title'%}</th>
                     <th>{% trans 'Title'%}</th>
                     <th>{% trans 'Entity'%}</th>
@@ -82,7 +73,6 @@
             </thead>
             {% for educ_group_year in educ_group_years %}
                 <tr>
-                    <td>{{ educ_group_year.academic_year}}</td>
                     <td><a href="{% url 'offer_score_encoding_tab' education_group_id=educ_group_year.education_group_id %}" id="lnk_offer_{{educ_group_year.education_group_id}}">{{ educ_group_year.acronym }}</a></td>
                     <td>{{ educ_group_year.title }}</td>
                     <td>{{ educ_group_year.management_entity }}</td>

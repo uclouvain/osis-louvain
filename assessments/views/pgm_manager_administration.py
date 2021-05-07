@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,12 +42,13 @@ from django.views.generic.edit import BaseUpdateView
 from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
 from base.auth.roles.program_manager import ProgramManager
-from base.models import session_exam_calendar
+from base.models import academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory, \
     find_all_current_entities_version
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
@@ -77,7 +78,7 @@ class ProgramManagerListView(ListView):
             offer_acronym=Subquery(
                 EducationGroupYear.objects.filter(
                     education_group_id=OuterRef('education_group_id'),
-                    academic_year__year=session_exam_calendar.current_session_exam().authorized_target_year,
+                    academic_year=academic_year.current_academic_year(),
                 ).values('acronym')[:1]
             ),
         ).select_related(
@@ -210,9 +211,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    current_academic_yr = session_exam_calendar.current_opened_academic_year()
     return render(request, "admin/pgm_manager.html", {
-        'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
         'offer_types': __search_offer_types(),
@@ -244,20 +243,19 @@ def pgm_manager_search(request):
 
     administrator_entities = get_administrator_entities(request.user)
 
-    current_academic_yr = session_exam_calendar.current_opened_academic_year()
+    current_academic_yr = academic_year.current_academic_year()
 
     data = {
-        'academic_year': current_academic_yr,
         'person': manager_person,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
         'entity_selected': entity_selected,
         'entity_root_selected': entity_root_selected,
         'offer_types': __search_offer_types(),
-        'pgms': _get_programs(current_academic_yr,
-                              get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
-                              manager_person,
-                              pgm_offer_type),
+        'pgms': _get_trainings(current_academic_yr,
+                               get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
+                               manager_person,
+                               pgm_offer_type),
         'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
@@ -331,10 +329,11 @@ def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', 
     return structures
 
 
-def _get_programs(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
+def _get_trainings(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
     qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         management_entity__in={ev.entity_id for ev in entity_list},
+        education_group_type__category=education_group_categories.TRAINING,
     )
 
     if education_group_type:

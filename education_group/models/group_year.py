@@ -41,6 +41,24 @@ from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
+def fill_from_past_year(modeladmin, request, queryset):
+    from program_management.ddd.command import FillProgramTreeContentFromLastYearCommand
+    from program_management.ddd.service.write import bulk_fill_program_tree_content_service_from_past_year
+    cmds = []
+    qs = queryset.select_related("academic_year")
+    for obj in qs:
+        cmd = FillProgramTreeContentFromLastYearCommand(
+            to_year=obj.academic_year.year,
+            to_code=obj.partial_acronym
+        )
+        cmds.append(cmd)
+    result = bulk_fill_program_tree_content_service_from_past_year.bulk_fill_program_tree_content_from_last_year(cmds)
+    modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
+
+
+fill_from_past_year.short_description = _("Fill program tree content from last year")
+
+
 class GroupYearManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related(
@@ -105,6 +123,7 @@ class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
     raw_id_fields = (
         'education_group_type', 'academic_year', 'group', 'main_teaching_campus',
     )
+    actions = [fill_from_past_year]
 
 
 class GroupYear(models.Model):

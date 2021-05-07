@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.auth.predicates import is_linked_to_offer
+from base.auth.predicates import is_linked_to_offer, is_scores_responsible_period_opened
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
@@ -79,8 +79,8 @@ class ProgramManager(EducationGroupRoleModel):
     def rule_set(cls):
         return rules.RuleSet({
             'assessments.can_access_scoreencoding': rules.always_allow,
-            'assessments.change_scoresresponsible': rules.always_allow,
-            'assessments.view_scoresresponsible': rules.always_allow,
+            'assessments.change_scoresresponsible': is_scores_responsible_period_opened,
+            'assessments.view_scoresresponsible': is_scores_responsible_period_opened,
             'base.can_access_catalog': rules.always_allow,
             'base.can_access_evaluation': rules.always_allow,
             'base.can_access_externallearningunityear': rules.always_allow,

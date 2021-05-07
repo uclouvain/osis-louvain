@@ -24,20 +24,26 @@
 #
 ##############################################################################
 import mock
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from base.forms.utils import choice_field
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
+from base.tests.factories.person import PersonFactory
+from education_group.auth.scope import Scope
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.forms.select_type import SelectTypeForm
 
 
-class TestSelectTypeForm(SimpleTestCase):
+class TestSelectTypeForm(TestCase):
+    def setUp(self) -> None:
+        self.central_manager = CentralManagerFactory(scopes=[Scope.ALL.name])
+
     @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types",
                 return_value=set())
     def test_assert_call_allowed_children_types_service(self, mock_get_allowed_child_types):
-        SelectTypeForm(category=Categories.GROUP.name, path_to=None)
+        SelectTypeForm(person=self.central_manager.person, category=Categories.GROUP.name, path_to=None)
         self.assertTrue(mock_get_allowed_child_types.called)
 
     @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types")
@@ -47,7 +53,7 @@ class TestSelectTypeForm(SimpleTestCase):
             GroupType.COMMON_CORE
         }
 
-        form = SelectTypeForm(category=Categories.GROUP.name, path_to=None)
+        form = SelectTypeForm(person=self.central_manager.person, category=Categories.GROUP.name, path_to=None)
         self.assertListEqual(
             form.fields['name'].choices,
             [
@@ -60,7 +66,7 @@ class TestSelectTypeForm(SimpleTestCase):
     @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types",
                 return_value=set())
     def test_assert_label_is_adapted_to_category(self, mock_get_allowed_child_types):
-        form = SelectTypeForm(category=Categories.GROUP.name, path_to=None)
+        form = SelectTypeForm(person=self.central_manager.person, category=Categories.GROUP.name, path_to=None)
 
         expected_label = _("Which type of %(category)s do you want to create ?") % {
             "category": Categories.GROUP.value
@@ -68,4 +74,24 @@ class TestSelectTypeForm(SimpleTestCase):
         self.assertEqual(
             form.fields['name'].label,
             expected_label
+        )
+
+    @mock.patch("program_management.forms.select_type.allowed_children_types_service.get_allowed_child_types")
+    def test_assert_filter_according_person_scope_case_iufc_scope(self, mock_get_allowed_child_types):
+        self.central_manager.scopes = [Scope.IUFC.name]
+        self.central_manager.save()
+
+        mock_get_allowed_child_types.return_value = {
+            GroupType.SUB_GROUP,
+            GroupType.COMMON_CORE,
+            TrainingType.CERTIFICATE_OF_PARTICIPATION,
+        }
+
+        form = SelectTypeForm(person=self.central_manager.person, category=Categories.GROUP.name, path_to=None)
+        self.assertListEqual(
+            form.fields['name'].choices,
+            [
+                (None, choice_field.BLANK_CHOICE_DISPLAY),
+                (TrainingType.CERTIFICATE_OF_PARTICIPATION.name, TrainingType.CERTIFICATE_OF_PARTICIPATION.value),
+            ]
         )

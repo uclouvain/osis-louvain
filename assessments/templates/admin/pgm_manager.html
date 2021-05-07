@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 {% block content %}
     {% if administrator_entities_string %}
         <div class="page-header">
-            <h2>{% trans 'Program managers' %} - <label>{{ administrator_entities_string }} </label>({{ academic_year }})
+            <h2>{% trans 'Program managers' %} - <label>{{ administrator_entities_string }}</label>
             </h2>
         </div>
         <div class="panel panel-default">
@@ -129,8 +129,8 @@
                                                            onclick="load_managers()">
                                                 </td>
                                                 <td>{{ pgm.acronym }}</td>
-                                                <td>{{ pgm.education_group_type.get_name_verbose | default_if_none:'' }}</td>
-                                                <td>{{ pgm.management_entity.acronym }}</td>
+                                                <td>{{ pgm.education_group_type }}</td>
+                                                <td>{{ pgm.management_entity }}</td>
                                             </tr>
                                         {% endfor %}
                                     </table>

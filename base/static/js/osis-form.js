@@ -33,6 +33,7 @@ function init() {
 
     // In case of invalid input for type integer, the value accessible from js is "", therefore you would never got an error.
     $(".osis-form").each(function () {
+        $(this).parsley().validate({group: "validateOnLoad", force: true});
         addValidationOnNumberInput($(this));
         enableValidationEmptyOnSemiRequiredField($(this));
     })
@@ -70,10 +71,11 @@ function displayWarning(inputField) {
     inputField._ui.$errorClassHandler.removeClass("has-success");
     inputField._ui.$errorClassHandler.addClass("has-warning");
     inputField._ui.$errorsWrapper.text(inputField.warning);
+    inputField._insertErrorWrapper();
 }
 
 function hideWarning(inputField) {
-    if (inputField._ui !== undefined && inputField._ui.$errorClassHandler.hasClass("has-warning")) {
+    if(inputField._ui !== undefined && inputField._ui.$errorClassHandler.hasClass("has-warning")){
         inputField._ui.$errorClassHandler.removeClass("has-warning");
         inputField._ui.$errorsWrapper.text("");
     }

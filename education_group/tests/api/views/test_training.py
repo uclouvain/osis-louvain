@@ -33,19 +33,24 @@ from rest_framework.settings import api_settings
 from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, organization_type
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from education_group.api.views.training import TrainingOfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
     StandardTransitionEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.domain import DomainFactory
 
 
@@ -416,3 +421,59 @@ class GetTrainingTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data['domain_name'], domain.parent.name)
         self.assertEqual(response.data['domain_code'], domain.code)
+
+
+class TrainingOfferRootsTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
+
+        cls.finality = TrainingFactory(
+            academic_year=cls.academic_year,
+            education_group_type__name=TrainingType.MASTER_MA_120.name
+        )
+        version = StandardEducationGroupVersionFactory(
+            offer=cls.finality,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type=cls.finality.education_group_type,
+            root_group__partial_acronym=cls.finality.partial_acronym
+        )
+        finality_element = ElementFactory(group_year=version.root_group)
+        for _ in range(0, 3):
+            offer = TrainingFactory(academic_year=cls.academic_year)
+            group = GroupYearFactory(
+                academic_year=cls.academic_year,
+                acronym=offer.acronym,
+                partial_acronym=offer.partial_acronym,
+                education_group_type=offer.education_group_type
+            )
+            StandardEducationGroupVersionFactory(offer=offer, root_group=group)
+            GroupElementYearFactory(parent_element__group_year=group, child_element=finality_element)
+
+        cls.user = UserFactory()
+        cls.url = reverse('education_group_api_v1:' + TrainingOfferRoots.name, kwargs={
+            'acronym': cls.finality.acronym,
+            'year': cls.academic_year.year
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)

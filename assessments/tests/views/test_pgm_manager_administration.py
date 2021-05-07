@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -33,7 +32,7 @@ from django.urls import reverse
 from assessments.views import pgm_manager_administration
 from base.auth.roles.program_manager import ProgramManager
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
@@ -102,6 +101,7 @@ class PgmManagerAdministrationTest(TestCase):
             )
         )
         self.assertEqual(response.context['other_programs'].get(), pgm2)
+        self.assertTrue(isinstance(response.context['other_programs'].get(), ProgramManager))
 
         self.client.post(
             reverse('delete_manager', args=[pgm1.pk])
@@ -197,15 +197,24 @@ class PgmManagerAdministrationTest(TestCase):
             academic_year=self.academic_year_current,
             management_entity=an_entity_management.entity,
         )
+        #  Mini-trainings : cannot be in results of _get_trainings
+        MiniTrainingFactory(
+            academic_year=self.academic_year_previous,
+            management_entity=an_entity_management.entity,
+        )
+        MiniTrainingFactory(
+            academic_year=self.academic_year_current,
+            management_entity=an_entity_management.entity,
+        )
 
-        self.assertEqual(len(pgm_manager_administration._get_programs(self.academic_year_current,
-                                                                      [an_entity_management],
-                                                                      None,
-                                                                      None)), 2)
-        self.assertEqual(len(pgm_manager_administration._get_programs(self.academic_year_previous,
-                                                                      [an_entity_management],
-                                                                      None,
-                                                                      None)), 1)
+        self.assertEqual(len(pgm_manager_administration._get_trainings(self.academic_year_current,
+                                                                       [an_entity_management],
+                                                                       None,
+                                                                       None)), 2)
+        self.assertEqual(len(pgm_manager_administration._get_trainings(self.academic_year_previous,
+                                                                       [an_entity_management],
+                                                                       None,
+                                                                       None)), 1)
 
     def test_pgm_manager_queried_by_academic_year(self):
         a_management_entity = EntityVersionFactory()

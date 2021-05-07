@@ -32,7 +32,7 @@ from education_group.views.group.common_read import Tab, GroupRead
 
 class GroupUpdateGeneralInformation(GroupRead, UpdateCmsView):
     active_tab = Tab.GENERAL_INFO
-    permission_required = 'base.change_pedagogyinformation'
+    permission_required = 'base.change_group_pedagogyinformation'
 
     def get_success_url(self):
         return ""

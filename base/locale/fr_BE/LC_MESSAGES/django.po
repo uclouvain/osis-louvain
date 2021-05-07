@@ -2565,6 +2565,9 @@ msgstr "L'UE complète est inactive et au moins un partim est actif"
 msgid "The partim"
 msgstr "Le partim"
 
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr "La période d'édition des responsables de notes n'est pas encore ouverte."
+
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."

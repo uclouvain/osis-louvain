@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ from django.test import TestCase
 
 from base.api.serializers.person import PersonDetailSerializer, PersonRolesSerializer
 from base.tests.factories.person import PersonFactory
+from education_group.auth.scope import Scope
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class PersonDetailSerializerTestCase(TestCase):
@@ -59,3 +61,9 @@ class PersonRolesSerializerTestCase(TestCase):
             'roles'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_get_person_roles_assert_iufc_scope(self):
+        CentralManagerFactory(person=self.person, scopes=[Scope.IUFC.name])
+
+        serializer = PersonRolesSerializer(self.person)
+        self.assertIn(Scope.IUFC.name, serializer.data['roles']['reddot']['scope'])

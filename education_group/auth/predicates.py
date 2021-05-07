@@ -114,6 +114,13 @@ def is_education_group_year_older_or_equals_than_limit_settings_year(
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_user_attached_to_all_scopes(self, user: User, obj: GroupYear = None):
+    return any(Scope.ALL.name in role.scopes for role in self.context['role_qs'] if hasattr(role, 'scopes'))
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_education_group_type_authorized_according_to_user_scope(
         self,
         user: User,

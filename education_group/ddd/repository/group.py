@@ -68,8 +68,12 @@ class GroupRepository(interface.AbstractRepository):
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=group.management_entity.acronym,
+            ).latest(
+                'start_date'
             )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,
@@ -131,8 +135,12 @@ class GroupRepository(interface.AbstractRepository):
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=group.management_entity.acronym,
+            ).latest(
+                'start_date'
             )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,

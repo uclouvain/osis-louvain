@@ -180,19 +180,6 @@ class ProgramTreeVersionMismatch(BusinessException):
             if version_identity.is_official_standard else version_label(version_identity, only_label=True)
 
 
-class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
-    def __init__(self, version: 'ProgramTreeVersion', transition_year: int, *args, **kwargs):
-        message = _(
-            "You can't extend the program tree '{code}' in {year} as other transition version exists in "
-            "{transition_year}"
-        ).format(
-            code=version.program_tree_identity.code,
-            year=version.end_year_of_existence,
-            transition_year=transition_year
-        )
-        super().__init__(message, **kwargs)
-
-
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
     def __init__(self, node_2m: 'Node', **kwargs):
         message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
@@ -419,15 +406,52 @@ class InvalidTransitionNameException(BusinessException):
         super().__init__(message)
 
 
-class VersionNameAlreadyExist(BusinessException):
+class VersionNameExistsCurrentYearAndInFuture(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)
 
 
-class VersionNameExistedException(BusinessException):
+class VersionNameExistsInPast(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} existed").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsCurrentYearAndInFuture(BusinessException):
+    def __init__(self, transition_name: str, *args, **kwargs):
+        message = _("Transition name {} already exists").format(transition_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsInPast(BusinessException):
+    def __init__(self, transition_name: str, *args, **kwargs):
+        message = _("Transition name {} existed").format(transition_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessException):
+    def __init__(
+            self,
+            offer_acronym: str,
+            year: int,
+            transition_year: int,
+            transition_name: str,
+            version_name: str,
+            **kwargs
+    ):
+        if version_name:
+            full_code = offer_acronym + "[" + version_name+" - " + transition_name + "]"
+        else:
+            full_code = offer_acronym + "[" + transition_name + "]"
+        message = _(
+            "You can't create/extend the transition version '{full_code}' in {year} as other transition version exists "
+            "in {transition_year}"
+        ).format(
+            full_code=full_code,
+            year=year,
+            transition_year=transition_year
+        )
         super().__init__(message, **kwargs)
 
 

@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, Set
+from typing import List, Optional, Set
 
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.validators._at_least_one_finality_have_transition_version import \
+    AtLeastOneFinalityHaveTransitionVersionValidator
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, DetachAuthorizedRelationshipValidator, \
@@ -38,6 +40,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import \
+    CannotFillContentOfProgramTreeOfTypeFinalityValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -48,11 +52,8 @@ from program_management.ddd.validators._end_date_between_finalities_and_masters 
     CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._fill_check_tree_from import CheckValidTreeVersionToFillFrom
 from program_management.ddd.validators._fill_check_tree_to import CheckValidTreeVersionToFillTo
-from program_management.ddd.validators._at_least_one_finality_have_transition_version import \
-    AtLeastOneFinalityHaveTransitionVersionValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import CannotFillContentOfProgramTreeOfTypeFinalityValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -60,8 +61,9 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
-from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator, \
-    FullTransitionNamePatternValidator
+from program_management.ddd.validators._transition_name_existed import TransitionNameExistedValidator
+from program_management.ddd.validators._transition_name_exists import TransitionNameExistsValidator
+from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator
 from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransition
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
@@ -308,7 +310,13 @@ class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidat
         tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
-            CheckExistenceOfTransition(tree_version, initial_end_year)
+            CheckExistenceOfTransition(
+                tree_version.end_year_of_existence,
+                initial_end_year,
+                tree_version.entity_id.offer_acronym,
+                tree_version.version_name,
+                tree_version.transition_name
+            )
         ]
         super().__init__()
 
@@ -323,10 +331,11 @@ class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
 
 class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
+    def __init__(self, end_year: int, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            FullTransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=transition_name),
+            CheckExistenceOfTransition(end_year, year, offer_acronym, version_name, transition_name)
         ]
         super().__init__()
 
@@ -342,8 +351,15 @@ class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
 
 
 class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, transition_name: str):
+    def __init__(
+            self,
+            from_specific_version: 'ProgramTreeVersionIdentity',
+            new_transition_name: str,
+            all_versions: List['ProgramTreeVersion']
+    ):
         self.validators = [
-            TransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=new_transition_name),
+            TransitionNameExistsValidator(from_specific_version, new_transition_name, all_versions),
+            TransitionNameExistedValidator(from_specific_version, new_transition_name, all_versions)
         ]
         super().__init__()

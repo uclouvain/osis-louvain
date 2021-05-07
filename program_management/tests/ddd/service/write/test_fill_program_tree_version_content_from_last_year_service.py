@@ -71,11 +71,10 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         self.add_tree_version_to_repo(self.tree_version_to_fill)
 
         self.mock_copy_cms()
-        self.create_node_next_years()
+        self.create_node_next_years(self.tree_version_from.tree.root_node.get_all_children_as_nodes())
         self.mock_copy_group()
 
-    def create_node_next_years(self):
-        nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
+    def create_node_next_years(self, nodes):
         for node in nodes:
             if node.is_group():
                 continue
@@ -121,6 +120,26 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
             fill_program_tree_version_content_from_program_tree_version,
             cmd
         )
+
+    def test_can_fill_standard_version_from_last_year(self):
+        tree_version_from = StandardProgramTreeVersionFactory(
+            tree=ProgramTreeBachelorFactory(current_year=CURRENT_ACADEMIC_YEAR_YEAR, end_year=NEXT_ACADEMIC_YEAR_YEAR)
+        )
+        tree_version_to_fill = StandardProgramTreeVersionFactory(
+            tree__root_node__code=tree_version_from.tree.root_node.code,
+            tree__root_node__title=tree_version_from.entity_id.offer_acronym,
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__transition_name=NOT_A_TRANSITION,
+            tree__root_node__node_type=TrainingType.BACHELOR,
+            transition_name=NOT_A_TRANSITION
+        )
+        self.add_tree_version_to_repo(tree_version_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+        self.create_node_next_years(tree_version_from.tree.root_node.get_all_children_as_nodes())
+
+        cmd = self._generate_cmd(tree_version_from, tree_version_to_fill)
+        result = fill_program_tree_version_content_from_program_tree_version(cmd)
+        self.assertTrue(result)
 
     def test_should_return_program_tree_version_identity_of_tree_filled(self):
         result = fill_program_tree_version_content_from_program_tree_version(self.cmd)

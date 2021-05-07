@@ -12,8 +12,8 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import check_formations_impacted_by_update
-from base.views.common import display_error_messages, display_warning_messages, display_success_messages
+from base.views.common import display_error_messages, display_warning_messages, display_success_messages, \
+    check_formations_impacted_by_update
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
@@ -32,7 +32,7 @@ from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
-from program_management.forms import version, transition
+from program_management.forms import transition, version
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):

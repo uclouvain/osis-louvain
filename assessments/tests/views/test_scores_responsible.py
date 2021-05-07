@@ -25,12 +25,14 @@
 ##############################################################################
 import datetime
 
+import mock
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -256,6 +258,12 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
         self.get_data = {
             'learning_unit_year': "learning_unit_year_%d" % self.learning_unit_year.pk
         }
+        patcher = mock.patch(
+            "base.models.session_exam_calendar.current_sessions_academic_year",
+            return_value=self.academic_year
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_case_when_user_not_logged(self):
         self.client.logout()
@@ -319,6 +327,13 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         self.client.force_login(self.program_manager.person.user)
         self.url = reverse('scores_responsible_management')
 
+        patcher = mock.patch(
+            "base.models.session_exam_calendar.current_sessions_academic_year",
+            return_value=self.academic_year
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_case_user_which_cannot_managed_learning_unit_not_entity_managed(self):
         unauthorized_learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
 
@@ -371,6 +386,13 @@ class ScoresResponsibleAddTestCase(TestCase):
             'attribution': "attribution_%d" % attrib.pk
         }
         self.client.force_login(self.person.user)
+
+        patcher = mock.patch(
+            "base.models.session_exam_calendar.current_sessions_academic_year",
+            return_value=self.academic_year
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_case_when_user_not_logged(self):
         self.client.logout()

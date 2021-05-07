@@ -52,7 +52,7 @@ class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, Cache
     def get_filterset_kwargs(self, filterset_class):
         return {
             **super().get_filterset_kwargs(filterset_class),
-            'academic_year': session_exam_calendar.current_opened_academic_year()
+            'academic_year': session_exam_calendar.current_sessions_academic_year()
         }
 
     def render_to_response(self, context, **response_kwargs):

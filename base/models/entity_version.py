@@ -338,6 +338,23 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
 
+    def pedagogical_entities_with_academic_year(self, academic_year: AcademicYear = None):
+        qs = self.pedagogical_entities()
+
+        if academic_year:
+            qs = qs.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+            )
+        return qs
+
     def only_roots(self):
         return self.filter(parent__isnull=True)
 
@@ -562,8 +579,8 @@ class EntityVersion(SerializableModel):
         return entity.active_entity_version if entity else False
 
     @classmethod
-    def get_message_is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> str:
-        if acronym_entity and not cls.is_entity_active(acronym_entity, academic_year.year):
+    def get_message_is_entity_active(cls, acronym_entity: str, year: int) -> str:
+        if acronym_entity and not cls.is_entity_active(acronym_entity, year):
             msg = _('The entity %(acronym_entity)s is not active for this academic year') % {
                 'acronym_entity': acronym_entity
             }
@@ -809,3 +826,7 @@ def find_by_acronym_and_year(acronym: str, year: int):
         Q(acronym=acronym, start_date__year__lte=year),
         Q(end_date__isnull=True) | Q(end_date__year__gt=year)
     ).order_by('start_date').last()
+
+
+def find_by_acronym(acronym: str):
+    return EntityVersion.objects.filter(acronym=acronym).order_by('start_date').last()

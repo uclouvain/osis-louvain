@@ -25,17 +25,27 @@
 {% endcomment %}
 
 <div class="modal-content">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4>{% trans 'New transition version' %}</h4>
-    </div>
-    <div class="modal-body">
-        {% if error %}
+    {% if error %}
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4>{% trans 'New transition version' %}</h4>
+        </div>
+        <div class="modal-body">
             <div class="alert alert-danger">{{ error }}</div>
-        {% else %}
-            <form class="form osis-form" method="POST" id="TransitionVersionForm"
-                  action="{{ request.path }}">
-
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                {% trans "Cancel" %}
+            </button>
+        </div>
+    {% else %}
+        <form class="form osis-form" method="POST" id="TransitionVersionForm"
+              action="{{ request.path }}">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4>{% trans 'New transition version' %}</h4>
+            </div>
+            <div class="modal-body">
                 {% csrf_token %}
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -45,20 +55,18 @@
                         {% bootstrap_field form.end_year %}
                     </div>
                 </div>
-            </form>
-        {% endif %}
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">
-            {% trans "Cancel" %}
-        </button>
-        {% if not error %}
-            <button id="bt_submit_specific_version_form" type="submit" class="btn btn-primary no_spinner"
-                    onclick="$('#TransitionVersionForm').submit();" title="{% trans 'Add' %}" value="new_version">
-                {% trans 'Save' %}
-            </button>
-        {% endif %}
-    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans "Cancel" %}
+                </button>
+                <button id="bt_submit_transition_form" type="submit" class="btn btn-primary no_spinner"
+                        title="{% trans 'Add' %}" value="new_version">
+                    {% trans 'Save' %}
+                </button>
+            </div>
+        </form>
+    {% endif %}
 </div>
 
 {% block script %}

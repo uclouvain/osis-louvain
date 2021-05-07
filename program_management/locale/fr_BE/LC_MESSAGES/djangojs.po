@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -46,3 +45,11 @@ msgstr "Rechercher"
 
 msgid "This entity is not active during this academic year"
 msgstr "Cette entité n'est pas active durant cette année académique"
+
+#, python-brace-format
+msgid ""
+"You can't extend the transition version '{full_code}' in {year} as other "
+"transition version exists in {transition_year}"
+msgstr ""
+"Vous ne pouvez pas étendre la version de transition '{full_code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"

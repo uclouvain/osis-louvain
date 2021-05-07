@@ -62,17 +62,19 @@ class SpecificVersionForm(forms.Form):
         max_length=15,
         required=True,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     end_year = forms.ChoiceField(
         required=False,

@@ -24,10 +24,21 @@
 from django import forms
 
 
-def set_remote_validation(field: forms.Field, url: str) -> None:
+def set_remote_validation(
+        field: forms.Field,
+        url: str,
+        validate_if_empty: bool = False,
+        validate_on_load: bool = False) -> None:
+    parameters = {
+        "data-parsley-remote": url,
+        "data-parsley-remote-validator": "async-osis",
+        "data-parsley-trigger": "focusin focusout input load",
+    }
+    if validate_if_empty:
+        parameters["data-parsley-validate-if-empty"] = True
+    if validate_on_load:
+        parameters["data-parsley-group"] = "validateOnLoad"
+
     field.widget.attrs.update(
-        {
-            "data-parsley-remote": url,
-            "data-parsley-remote-validator": "async-osis"
-        }
+        parameters
     )

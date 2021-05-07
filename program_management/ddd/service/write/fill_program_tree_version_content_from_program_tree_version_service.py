@@ -67,7 +67,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         version_name=to_tree_version.version_name,
         transition_name=to_tree_version.transition_name,
         year=cmd.to_year
-    )
+    ) if not to_tree_version.is_standard else []
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)

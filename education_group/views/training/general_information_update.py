@@ -34,7 +34,7 @@ from education_group.views.training.common_read import TrainingRead, Tab
 
 class TrainingUpdateGeneralInformation(TrainingRead, UpdateCmsView):
     active_tab = Tab.GENERAL_INFO
-    permission_required = 'base.change_pedagogyinformation'
+    permission_required = 'base.change_training_pedagogyinformation'
 
     def get_success_url(self):
         return ""

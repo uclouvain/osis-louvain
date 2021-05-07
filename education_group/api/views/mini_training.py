@@ -165,11 +165,11 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
         return egv
 
 
-class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
+class MiniTrainingOfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     """
         Return the list of offer roots for a mini training.
     """
-    name = 'offer_roots'
+    name = 'minitraining_offer_roots'
     serializer_class = TrainingListSerializer
 
     def get_queryset(self):
@@ -178,7 +178,9 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
         version_name = self.kwargs.get('version_name', '')
 
         element = get_object_or_404(
-            Element.objects.all().select_related(
+            Element.objects.filter(
+                group_year__education_group_type__category=education_group_categories.MINI_TRAINING
+            ).select_related(
                 'group_year__academic_year',
             ),
             group_year__educationgroupversion__offer__acronym__iexact=acronym,

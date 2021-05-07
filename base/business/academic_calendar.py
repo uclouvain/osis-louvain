@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List, Union
+from typing import List, Union, Optional
 
 import attr
 from django.db.models import F
@@ -170,6 +170,7 @@ class AcademicEventCalendarHelper(ABC):
 
 
 class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
+
     def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
         """
         Return academic session event related to target_year and session provided

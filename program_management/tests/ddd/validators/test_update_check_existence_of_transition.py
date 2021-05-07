@@ -51,7 +51,13 @@ class TestValidateExistenceOfTransition(TestValidatorValidateMixin, TestCase):
         self.transition.end_year_of_existence = self.year + 4
 
         self.assertValidatorRaises(
-            _update_check_existence_of_transition.CheckExistenceOfTransition(self.transition, self.year),
+            _update_check_existence_of_transition.CheckExistenceOfTransition(
+                self.transition.end_year_of_existence,
+                self.year,
+                self.tree_version.entity_identity.offer_acronym,
+                self.transition.version_name,
+                self.transition.transition_name,
+            ),
             None
         )
 
@@ -59,5 +65,11 @@ class TestValidateExistenceOfTransition(TestValidatorValidateMixin, TestCase):
         self.transition.end_year_of_existence = self.year + 4
 
         self.assertValidatorNotRaises(
-            _update_check_existence_of_transition.CheckExistenceOfTransition(self.transition, self.year)
+            _update_check_existence_of_transition.CheckExistenceOfTransition(
+                self.transition.end_year_of_existence,
+                self.year,
+                self.tree_version.entity_identity.offer_acronym,
+                self.transition.version_name,
+                self.transition.transition_name,
+            )
         )

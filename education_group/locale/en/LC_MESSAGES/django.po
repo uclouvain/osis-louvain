@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 13:53+0200\n"
+"POT-Creation-Date: 2021-05-06 08:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -440,12 +440,16 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
+msgid "Fill program tree content from last year"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -783,6 +787,10 @@ msgstr ""
 
 #, python-format
 msgid "The following fields are empty: %(fields)s "
+msgstr ""
+
+#, python-format
+msgid "The following fields has issues: %(fields)s "
 msgstr ""
 
 #, python-brace-format

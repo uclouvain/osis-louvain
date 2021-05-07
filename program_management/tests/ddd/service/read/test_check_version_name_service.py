@@ -70,7 +70,7 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions)),
-            exception.VersionNameAlreadyExist
+            exception.VersionNameExistsCurrentYearAndInFuture
         )
 
     def test_should_check_if_version_name_has_existed(self):
@@ -87,5 +87,5 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions)),
-            exception.VersionNameExistedException
+            exception.VersionNameExistsInPast
         )

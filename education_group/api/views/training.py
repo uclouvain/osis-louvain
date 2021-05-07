@@ -28,6 +28,7 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
 from base.models.enums.active_status import ActiveStatusEnum
@@ -36,6 +37,7 @@ from education_group.api.serializers.education_group_title import EducationGroup
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class TrainingFilter(filters.FilterSet):
@@ -178,3 +180,34 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             version_name__iexact=version_name
         )
         return egv
+
+
+class TrainingOfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+        Return the list of offer roots for a training.
+    """
+    name = 'training_offer_roots'
+    serializer_class = TrainingListSerializer
+
+    def get_queryset(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        version_name = self.kwargs.get('version_name', '')
+
+        element = get_object_or_404(
+            Element.objects.filter(
+                group_year__education_group_type__category=education_group_categories.TRAINING
+            ).select_related(
+                'group_year__academic_year',
+            ),
+            group_year__educationgroupversion__offer__acronym__iexact=acronym,
+            group_year__academic_year__year=year,
+            group_year__educationgroupversion__version_name__iexact=version_name
+        )
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [element],
+            as_instances=True
+        ).get(element.id, [])
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('root_group__academic_year', 'root_group__education_group_type')

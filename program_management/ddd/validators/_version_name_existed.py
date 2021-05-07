@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import VersionNameExistedException
+from program_management.ddd.domain.exception import VersionNameExistsInPast
 
 
 class VersionNameExistedValidator(BusinessValidator):
@@ -36,7 +36,7 @@ class VersionNameExistedValidator(BusinessValidator):
         self.offer_acronym = offer_acronym
         self.transition_name = transition_name
 
-    def validate(self, *args, **kwargs):
+    def validate(self):
         from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
         last_version_identity = GetLastExistingVersion().get_last_existing_version_identity(
             self.version_name,
@@ -44,4 +44,4 @@ class VersionNameExistedValidator(BusinessValidator):
             self.transition_name
         )
         if last_version_identity and last_version_identity.year < self.working_year:
-            raise VersionNameExistedException(last_version_identity.version_name)
+            raise VersionNameExistsInPast(last_version_identity.version_name)

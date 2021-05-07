@@ -56,23 +56,25 @@ class TransitionVersionForm(forms.Form):
         max_length=28,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     transition_name = forms.CharField(
         max_length=14,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     end_year = forms.ChoiceField(
         required=False,
@@ -83,7 +85,7 @@ class TransitionVersionForm(forms.Form):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
         self._init_academic_year_choices()
-        self._set_remote_validation_on_version_name()
+        self._set_remote_validation_on_transition_name()
 
     def _init_academic_year_choices(self):
         max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
@@ -102,13 +104,28 @@ class TransitionVersionForm(forms.Form):
         if not self.fields["end_year"].initial:
             self.fields["end_year"].initial = choices_years[0]
 
-    def _set_remote_validation_on_version_name(self):
-        set_remote_validation(
-            self.fields["transition_name"],
-            reverse(
+    def _set_remote_validation_on_transition_name(self):
+        if self.tree_version_identity.version_name:
+            check_url = reverse(
+                "check_transition_name",
+                args=[
+                    self.tree_version_identity.year,
+                    self.tree_version_identity.offer_acronym,
+                    self.tree_version_identity.version_name
+                ]
+            )
+
+        else:
+            check_url = reverse(
                 "check_transition_name",
                 args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
+
+        set_remote_validation(
+            self.fields["transition_name"],
+            check_url,
+            validate_if_empty=True,
+            validate_on_load=True
         )
 
     def clean_end_year(self):

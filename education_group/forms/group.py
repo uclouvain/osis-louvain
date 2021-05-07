@@ -27,7 +27,6 @@ from typing import Dict
 
 from django import forms
 from django.contrib.auth.models import User
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
@@ -156,7 +155,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         academic_year = self.initial.get('academic_year', None)
         if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
-        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),

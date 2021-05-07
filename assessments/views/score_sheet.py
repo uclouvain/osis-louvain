@@ -36,7 +36,7 @@ from assessments.forms import score_sheet_address_entity
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.models import score_sheet_address as score_sheet_address_model
 from base.auth.roles import program_manager
-from base.models import session_exam_calendar
+from base.models import academic_year
 from base.models.education_group_year import EducationGroupYear
 from reference.models.country import Country
 
@@ -60,7 +60,7 @@ def offer_score_encoding_tab(request, education_group_id):
 def _get_common_context(request, education_group_id):
     education_group_year = EducationGroupYear.objects.select_related('education_group').get(
         education_group_id=education_group_id,
-        academic_year__year=session_exam_calendar.current_session_exam().authorized_target_year
+        academic_year=academic_year.current_academic_year()
     )
     is_program_manager = program_manager.is_program_manager(
         request.user,

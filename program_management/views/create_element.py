@@ -56,8 +56,9 @@ class SelectTypeCreateElementView(LoginRequiredMixin, AjaxTemplateMixin, FormVie
     def get_form_kwargs(self):
         return {
             **super().get_form_kwargs(),
+            'person': self.request.user.person,
             'category': self.kwargs["category"],
-            'path_to': self.request.GET.get('path_to')
+            'path_to': self.request.GET.get('path_to'),
         }
 
     def get_context_data(self, **kwargs):

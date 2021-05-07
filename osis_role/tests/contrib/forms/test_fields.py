@@ -66,8 +66,3 @@ class TestEntityRoleChoiceField(TestCase):
     def test_case_user_has_scope_all_on_entity(self):
         FacultyManagerFactory(person=self.person, entity=self.entity_version_level_2.entity, with_child=True)
         self.assertEqual(self.field_instance.get_queryset().count(), 1)
-
-    def test_case_user_has_other_scope_on_entity(self):
-        entity = self.entity_version_level_2.entity
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.value], entity=entity, with_child=True)
-        self.assertEqual(self.field_instance.get_queryset().count(), 0)

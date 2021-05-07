@@ -31,7 +31,7 @@ from django.views.decorators.http import require_http_methods
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd import command
-from program_management.ddd.domain.exception import VersionNameExistedException
+from program_management.ddd.domain.exception import VersionNameExistsInPast
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.read import check_version_name_service
 from django.utils.translation import gettext_lazy as _
@@ -53,7 +53,7 @@ def check_version_name(request, year, acronym):
         check_version_name_service.check_version_name(cmd)
     except MultipleBusinessExceptions as multiple_exceptions:
         first_exception = next(e for e in multiple_exceptions.exceptions)
-        if isinstance(first_exception, VersionNameExistedException):
+        if isinstance(first_exception, VersionNameExistsInPast):
             msg = ". ".join([first_exception.message, str(_("Save will prolong the past version"))])
             return JsonResponse({
                 "valid": True,

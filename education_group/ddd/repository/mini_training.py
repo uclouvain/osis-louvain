@@ -60,9 +60,13 @@ class MiniTrainingRepository(interface.AbstractRepository):
             end_year = AcademicYearModelDb.objects.get(year=mini_training_obj.end_year) \
                 if mini_training_obj.end_year else None
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=mini_training_obj.type.name)
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=mini_training_obj.management_entity.acronym,
-            )
+            ).order_by(
+                '-start_date'
+            ).first()
         except AcademicYearModelDb.DoesNotExist:
             raise exception.AcademicYearNotFound
         except EducationGroupTypeModelDb.DoesNotExist:
@@ -197,9 +201,13 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
 
 
 def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'):
-    management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+    management_entity = EntityVersionModelDb.objects.only(
+        'entity_id'
+    ).filter(
         acronym=mini_training_obj.management_entity.acronym,
-    )
+    ).order_by(
+        '-start_date'
+    ).first()
     education_group_year_db_obj = EducationGroupYearModelDb.objects.get(
         acronym=mini_training_obj.acronym,
         academic_year__year=mini_training_obj.year

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import functools
-from typing import List
+from typing import List, Union
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -33,7 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-import program_management.ddd.domain.exception
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import education_group_categories
 from base.models.utils.utils import ChoiceEnum
 from base.views.common import display_success_messages
@@ -48,6 +48,7 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
     ProlongExistingProgramTreeVersionCommand, \
     GetLastExistingVersionCommand, CreateProgramTreeTransitionVersionCommand, \
     GetLastExistingTransitionVersionNameCommand
+from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
@@ -117,7 +118,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
                 try:
                     identities = create_and_postpone_tree_specific_version_service. \
                         create_and_postpone_program_tree_specific_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                except (program_exception.VersionNameExistsCurrentYearAndInFuture,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
@@ -234,18 +235,22 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             )
 
             identities = []
-            if not last_existing_version:
-                command = _convert_form_to_create_transition_version_command(form)
-                try:
+            try:
+                if not last_existing_version:
+                    command = _convert_form_to_create_transition_version_command(form)
                     identities = create_and_postpone_tree_transition_version_service. \
                         create_and_postpone_program_tree_transition_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
-                        exception.MultipleEntitiesFoundException) as e:
-                    form.add_error('version_name', e.message)
-            else:
-                identities = prolong_existing_tree_version_service.prolong_existing_tree_version(
-                    _convert_form_to_prolong_command(form, last_existing_version)
-                )
+                else:
+                    identities = prolong_existing_tree_version_service.prolong_existing_tree_version(
+                        _convert_form_to_prolong_command(form, last_existing_version)
+                    )
+            except (program_exception.TransitionNameExistsCurrentYearAndInFuture,
+                    exception.MultipleEntitiesFoundException,
+                    program_exception.TransitionNameExistsInPastButExistenceOfOtherTransitionException,
+                    MultipleBusinessExceptions) as err:
+                if isinstance(err, MultipleBusinessExceptions):
+                    err = next(e for e in err.exceptions)
+                form.add_error('transition_name', err.message)
 
             if not form.errors:
                 self._display_success_messages(identities)
@@ -328,7 +333,7 @@ def _convert_form_to_create_transition_version_command(
 
 
 def _convert_form_to_prolong_command(
-        form: SpecificVersionForm,
+        form: Union[TransitionVersionForm, SpecificVersionForm],
         last_existing_version_identity: 'ProgramTreeVersionIdentity'
 ) -> ProlongExistingProgramTreeVersionCommand:
     last_program_tree_version = ProgramTreeVersionRepository.get(
@@ -339,7 +344,7 @@ def _convert_form_to_prolong_command(
         updated_year=form.tree_version_identity.year,
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data['version_name'],
-        transition_name=NOT_A_TRANSITION,
+        transition_name=last_program_tree_version.transition_name,
         title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
         title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
     )

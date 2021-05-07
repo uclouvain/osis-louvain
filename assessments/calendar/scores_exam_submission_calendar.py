@@ -24,16 +24,29 @@
 #
 ##############################################################################
 import datetime
+from typing import Optional
 
-from base.business.academic_calendar import AcademicEventSessionCalendarHelper
+from base.business.academic_calendar import AcademicEventSessionCalendarHelper, AcademicSessionEvent
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 
+FIRST_SESSION = 1
+
 
 class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
     event_reference = AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+
+    def get_closest_academic_event(self, date=None) -> Optional[AcademicSessionEvent]:
+        opened_academic_events = self.get_opened_academic_events(date)
+        if opened_academic_events:
+            return opened_academic_events[0]
+
+        next_academic_event = self.get_next_academic_event(date)
+        if next_academic_event and next_academic_event.session != FIRST_SESSION:
+            return next_academic_event
+        return None
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):

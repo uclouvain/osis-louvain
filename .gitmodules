@@ -20,3 +20,9 @@
 [submodule "admission"]
 	path = admission
 	url = https://github.com/uclouvain/osis-admission.git
+[submodule "osis_history"]
+	path = osis_history
+	url = https://github.com/uclouvain/osis-history.git
+[submodule "osis_mail_template"]
+	path = osis_mail_template
+	url = https://github.com/uclouvain/osis-mail-template.git

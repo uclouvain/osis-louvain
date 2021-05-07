@@ -74,6 +74,35 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
         return bool(self.transition_name)
 
 
+class ProgramTreeVersionIdentityBuilder:
+    def build(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+            transition_name: str
+    ) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentity(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=transition_name
+        )
+
+    def build_specific_version(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+    ) -> 'ProgramTreeVersionIdentity':
+        return self.build(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=NOT_A_TRANSITION
+        )
+
+
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
@@ -171,6 +200,7 @@ class ProgramTreeVersionBuilder:
     ) -> 'ProgramTreeVersion':
         if command.transition_name:
             validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.end_year,
                 command.start_year,
                 command.offer_acronym,
                 command.version_name,

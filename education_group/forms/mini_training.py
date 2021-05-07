@@ -26,7 +26,6 @@ from typing import Dict, Optional
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
@@ -215,7 +214,7 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
     def __init_management_entity_field(self):
         academic_year = AcademicYear.objects.get(year=self.year)
         old_entity = self.initial.get('management_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),

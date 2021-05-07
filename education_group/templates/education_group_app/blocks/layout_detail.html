@@ -15,6 +15,28 @@
     </li>
 {% endblock %}
 
+{% block messages %}
+    {{ block.super }}
+    {% if fields_warnings %}
+    <div class="alert alert-warning" style="margin-bottom: 10px">
+        <i class="fa fa-exclamation-triangle"aria-hidden="true"></i> {% trans 'There are warnings in the form.' %}
+        <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse"
+                data-target="#CollapseFields"
+                style="background-color: transparent;">
+                        <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
+                              style="color:#8a6d3b"></span>
+        </button>
+        <div class="collapse in" id="CollapseFields">
+            <ul>
+                {% for field in fields_warnings %}
+                <li>{{ field }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+{% endblock messages %}
+
 {% block header_content %}
     <div class="page-header">
     {% with disabled_nav=False %}

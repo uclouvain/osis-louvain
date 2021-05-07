@@ -13,9 +13,8 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import check_formations_impacted_by_update
-from base.views.common import display_error_messages, display_warning_messages
-from base.views.common import display_success_messages
+from base.views.common import check_formations_impacted_by_update, display_error_messages, display_warning_messages, \
+    display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group

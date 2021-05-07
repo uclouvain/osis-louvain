@@ -157,5 +157,10 @@ urlpatterns = [
             program_management.views.tree_version.check_transition_name.check_transition_name,
             name="check_transition_name"
         ),
+        path(
+            '<str:version_name>/check_transition_name/',
+            program_management.views.tree_version.check_transition_name.check_transition_name,
+            name="check_transition_name"
+        ),
     ])),
 ]

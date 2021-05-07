@@ -31,7 +31,6 @@ from django.db.models import Subquery, OuterRef, Value, CharField
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.person import Person
-from education_group.auth.scope import Scope
 from osis_role import role
 from osis_role.contrib.models import EntityRoleModel
 
@@ -51,8 +50,6 @@ class EntityRoleHelper:
 
         for role_mdl in role_mdls:
             subqs = role_mdl.objects.filter(person=person)
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
             subqs = subqs.values('entity_id', 'with_child')
             if qs is None:
                 qs = subqs
@@ -79,8 +76,6 @@ class EntityRoleHelper:
                     ).order_by('-start_date').values('acronym')[:1]
                 )
             )
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
             subqs = subqs.values_list(*Row._fields)
             qs = subqs if qs is None else qs.union(subqs)
 

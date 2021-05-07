@@ -29,6 +29,7 @@ from django.utils.functional import cached_property
 from base.business.education_groups.publication_contact import can_postpone_publication_contact
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.publication_contact import EducationGroupPublicationContactForm
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -58,7 +59,7 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
     @cached_property
     def education_group_year(self):
         return get_object_or_404(
-            EducationGroupYear,
+            EducationGroupYear.objects.all().select_related('education_group_type'),
             partial_acronym=self.kwargs['code'],
             academic_year__year=self.kwargs['year']
         )
@@ -70,6 +71,12 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
         return self.education_group_year
 
     def get_permission_required(self):
-        perm_name = 'base.change_commonpedagogyinformation' if self.education_group_year.is_common else \
-            'base.change_pedagogyinformation'
-        return (perm_name, )
+        if self.education_group_year.is_common:
+            return ('base.change_commonpedagogyinformation',)
+        elif self.education_group_year.education_group_type.category == Categories.TRAINING.name:
+            return ('base.change_training_pedagogyinformation',)
+        elif self.education_group_year.education_group_type.category == Categories.MINI_TRAINING.name:
+            return ('base.change_minitraining_pedagogyinformation',)
+        elif self.education_group_year.education_group_type.category == Categories.GROUP.name:
+            return ('base.change_group_pedagogyinformation',)
+        raise Exception("Unknown education group type")

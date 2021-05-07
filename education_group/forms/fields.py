@@ -1,12 +1,11 @@
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
 from base.models.academic_year import AcademicYear
-from base.models.entity_version import EntityVersion, find_pedagogical_entities_version, \
+from base.models.entity_version import find_pedagogical_entities_version, \
     find_pedagogical_entities_version_for_specific_academic_year
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
@@ -34,16 +33,11 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
         )
 
     def get_queryset(self):
-        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
-        if self.initial:
-            if self.academic_year:
-                qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).filter(acronym=self.initial)
-            else:
-                date = timezone.now()
-                qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
-        elif self.academic_year:
-            qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).pedagogical_entities()
-        return qs
+        if self.get_person().user.has_perm('education_group.change_management_entity'):
+            return super().get_queryset().pedagogical_entities_with_academic_year(
+                self.academic_year
+            ).order_by('acronym')
+        return super().get_queryset().pedagogical_entities().order_by('acronym')
 
     def clean(self, value):
         value = super(forms.ModelChoiceField, self).clean(value)

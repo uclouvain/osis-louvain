@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import VersionNameAlreadyExist
+from program_management.ddd.domain.exception import VersionNameExistsCurrentYearAndInFuture
 
 
 class VersionNameExistsValidator(BusinessValidator):
@@ -44,4 +44,4 @@ class VersionNameExistsValidator(BusinessValidator):
             self.transition_name
         )
         if last_version_identity and last_version_identity.year >= self.working_year:
-            raise VersionNameAlreadyExist(last_version_identity.version_name)
+            raise VersionNameExistsCurrentYearAndInFuture(last_version_identity.version_name)

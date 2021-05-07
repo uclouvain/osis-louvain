@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
 from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
@@ -52,22 +53,25 @@ class OfferViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'offers.html')
         self.assertEqual(len(response.context['offers']), 0)
-        self.assertEqual(response.context['academic_year'], academic_year.id)
 
     def test_offers_search(self):
-        today = datetime.date.today()
-        academic_year = AcademicYearFactory(start_date=today,
-                                            end_date=today.replace(year=today.year + 1),
-                                            year=today.year)
-
         response = self.client.get(reverse('offers_search'), data={
             'entity_acronym': 'entity',
             'code': 'code',
-            'academic_year': academic_year.id,
         })
 
         self.assertTemplateUsed(response, 'offers.html')
         self.assertEqual(response.context['educ_group_years'].count(), 0)
+
+    def test_offers_search_education_group_on_several_year(self):
+        _build_2_education_group_year_for_one_education_group()
+        response = self.client.get(reverse('offers_search'), data={
+            'entity_acronym': '',
+            'code': 'code',
+        })
+
+        self.assertTemplateUsed(response, 'offers.html')
+        self.assertEqual(response.context['educ_group_years'].count(), 1)
 
     def test_cannot_access_any_offer_pages_if_not_program_manager(self):
         offer_year = OfferYearCalendarFactory()
@@ -83,3 +87,22 @@ class OfferViewTestCase(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
             self.assertTemplateUsed(response, 'access_denied.html')
+
+
+def _build_2_education_group_year_for_one_education_group():
+    academic_year = AcademicYearFactory(current=True)
+    academic_year_next = AcademicYearFactory(year=academic_year.year + 1)
+    entity_version = EntityVersionFactory()
+    education_group = EducationGroupFactory()
+    TrainingFactory(
+        education_group=education_group,
+        academic_year=academic_year,
+        acronym="code",
+        management_entity=entity_version.entity
+    )
+    TrainingFactory(
+        education_group=education_group,
+        academic_year=academic_year_next,
+        acronym="code",
+        management_entity=entity_version.entity
+    )

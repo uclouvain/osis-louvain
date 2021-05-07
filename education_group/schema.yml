@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/education_group/
    description: 'Production server'
 info:
-  version: '1.06'
+  version: '1.07'
   title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
@@ -108,6 +108,36 @@ paths:
           name: study_domain
           schema:
             description: UUID of main study domain
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/offer_roots:
+    get:
+      description: Return the list of offer roots for a training.
+      operationId: trainings_offer_roots
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
             type: string
       responses:
         '200':

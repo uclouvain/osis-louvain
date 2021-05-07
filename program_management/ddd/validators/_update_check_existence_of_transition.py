@@ -22,27 +22,42 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from base.ddd.utils import business_validator
-from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.service.get_next_version_if_exists import GetNextVersionIfExists
 
 
 class CheckExistenceOfTransition(business_validator.BusinessValidator):
-    def __init__(self, tree_version: 'ProgramTreeVersion', initial_end_year: int):
-        self.tree_version = tree_version
+    def __init__(
+            self,
+            end_year: int,
+            initial_end_year: int,
+            offer_acronym: str,
+            version_name: str,
+            transition_name: str
+    ):
+        self.end_year = end_year
         self.initial_end_year = initial_end_year
+        self.offer_acronym = offer_acronym
+        self.version_name = version_name
+        self.transition_name = transition_name
+
         super().__init__()
 
     def validate(self, *args, **kwargs):
-        if not self.tree_version.is_transition:
+        if not self.transition_name:
             return
 
         other_transition_year = GetNextVersionIfExists.get_next_transition_version_year(
-            self.tree_version,
-            self.initial_end_year
+            self.initial_end_year,
+            self.end_year,
+            self.offer_acronym,
+            self.version_name,
         )
         if other_transition_year:
-            raise exception.CannotExtendTransitionDueToExistenceOfOtherTransitionException(
-                self.tree_version,
-                other_transition_year
+            raise exception.TransitionNameExistsInPastButExistenceOfOtherTransitionException(
+                self.offer_acronym,
+                self.end_year,
+                other_transition_year,
+                self.transition_name,
+                self.version_name,
             )
