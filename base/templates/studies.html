@@ -71,6 +71,18 @@
                 </div>
             {% endif %}
         </div>
+        <br>
+        <div class="row">
+            {% if show_dissertation_link %}
+                <div class="col-md-1"><i class="far fa-edit" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading">
+                        <a href="{% url 'dissertations' %}" id="lnk_dissertations">{% trans 'Dissertations' %}</a>
+                    </h4>
+                    <p>{% trans "Student's dissertations management" %}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

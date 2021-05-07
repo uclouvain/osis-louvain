@@ -163,7 +163,20 @@ def logged_out(request):
 @login_required
 @permission_required('base.can_access_student_path', raise_exception=True)
 def studies(request):
-    return render(request, "studies.html", {'section': 'studies'})
+    if 'dissertation' in settings.INSTALLED_APPS:
+        from dissertation.models.adviser import Adviser
+        show_dissertation_link = Adviser.objects.filter(person__user=request.user).exists()
+    else:
+        show_dissertation_link = False
+
+    return render(
+        request,
+        "studies.html",
+        {
+            'section': 'studies',
+            'show_dissertation_link': show_dissertation_link,
+        }
+    )
 
 
 @login_required
