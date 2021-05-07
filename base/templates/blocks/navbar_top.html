@@ -104,6 +104,14 @@
                                         </a>
                                     </li>
                                 {% endif %}
+                                {% if 'dissertation' in installed_apps and request.user.person.adviser %}
+                                    <li>
+                                        <a href="{% url 'dissertations' %}" id="lnk_dropdown_dissertations">
+                                            <span class="far fa-edit"></span>
+                                            {% trans 'Dissertations' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}
