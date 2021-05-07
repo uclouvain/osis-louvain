@@ -73,9 +73,18 @@ class LearningUnitModelForm(forms.ModelForm):
 
     def save(self, **kwargs):
         self.instance.learning_container = kwargs.pop('learning_container')
-        self.instance.start_year = kwargs.pop('start_year')
-        self.instance.end_year = kwargs.pop('end_year', None)
+        start_year = kwargs.pop('start_year')
+        self.instance.start_year = start_year
+        end_year = kwargs.pop('end_year', None)
+        self.instance.end_year = self._compute_end_year(start_year, end_year)
         return super().save(**kwargs)
+
+    def _compute_end_year(self, start_year, end_year):
+        is_creation = bool(self.instance)
+        is_partim_created_in_past = is_creation and start_year.is_past
+        if is_partim_created_in_past:
+            end_year = start_year
+        return end_year
 
     class Meta:
         model = LearningUnit
