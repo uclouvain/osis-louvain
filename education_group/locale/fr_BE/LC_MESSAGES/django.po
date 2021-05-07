@@ -79,6 +79,9 @@ msgstr "Code étude ARES"
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
 
+msgid "Abbreviated title"
+msgstr "Intitulé abrégé"
+
 msgid "Ac yr."
 msgstr "Anac."
 

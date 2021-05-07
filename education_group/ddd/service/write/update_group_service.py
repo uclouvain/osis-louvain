@@ -21,46 +21,42 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List
 
-from django.db import transaction
-
-from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.ddd import command
-from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
-from education_group.ddd.domain._entity import Entity
-from education_group.ddd.domain._remark import Remark
-from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain.group import GroupIdentity, Group
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
+from education_group.ddd.domain.service.postpone_group import PostponeOrphanGroup
 from education_group.ddd.repository import group as group_repository
+from education_group.ddd.service.write import copy_group_service
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.repositories import load_authorized_relationship
 
 
-@transaction.atomic()
-def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
+# DO NOT SET @transaction.atomic() because it breaks the update in case of GroupCopyConsistencyException
+def update_group(cmd: command.UpdateGroupCommand) -> List['GroupIdentity']:
+
+    # GIVEN
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
     grp = group_repository.GroupRepository.get(group_identity)
+    authorized_relationships = load_authorized_relationship.load()
+    conflicted_fields = ConflictedFields.get_group_conflicted_fields(grp.entity_id)
 
-    _update_group(grp, cmd)
+    # WHEN
+    grp.update(cmd)
+
+    # THEN
     group_repository.GroupRepository.update(grp)
-    return group_identity
+    updated_identities = [grp.entity_id]
 
-
-def _update_group(group_obj: 'Group', cmd: command.UpdateGroupCommand) -> 'Group':
-    group_obj.update(
-        abbreviated_title=cmd.abbreviated_title,
-        titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
-        credits=cmd.credits,
-        content_constraint=ContentConstraint(
-            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
-            minimum=cmd.min_constraint,
-            maximum=cmd.max_constraint
-        ),
-        management_entity=Entity(acronym=cmd.management_entity_acronym),
-        teaching_campus=Campus(
-            name=cmd.teaching_campus_name,
-            university_name=cmd.organization_name
-        ),
-        remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en),
-        end_year=cmd.end_year
+    updated_identities += PostponeOrphanGroup.postpone(
+        updated_group=grp,
+        conflicted_fields=conflicted_fields,
+        end_postponement_calculator=CalculateEndPostponement(),
+        copy_group_service=copy_group_service.copy_group,
+        authorized_relationships=authorized_relationships,
+        calendar=EducationGroupSwitchCalendar(),
     )
-    return group_obj
+
+    return updated_identities

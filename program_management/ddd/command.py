@@ -33,6 +33,7 @@ from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
 from education_group.ddd.command import DecreeName, DomainCode
 from osis_common.ddd import interface
+from program_management.ddd.domain.link import LinkIdentity
 
 
 @attr.s(frozen=True, slots=True)
@@ -304,13 +305,22 @@ class UpdateLinkCommand(interface.CommandRequest):
     comment_english = attr.ib(type=str)
     relative_credits = attr.ib(type=int)
 
+    @property
+    def link_identity(self) -> 'LinkIdentity':
+        return LinkIdentity(
+            parent_code=self.parent_node_code,
+            parent_year=self.parent_node_year,
+            child_code=self.child_node_code,
+            child_year=self.child_node_year,
+        )
+
 
 @attr.s(frozen=True, slots=True)
 class BulkUpdateLinkCommand(interface.CommandRequest):
-    parent_node_code = attr.ib(type=str)
-    parent_node_year = attr.ib(type=int)
+    working_tree_code = attr.ib(type=str)
+    working_tree_year = attr.ib(type=int)
 
-    update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)
+    update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)  # type: List['UpdateLinkCommand']
 
 
 @attr.s(frozen=True, slots=True)

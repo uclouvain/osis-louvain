@@ -22,10 +22,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 import attr
 from django.utils.translation import gettext_lazy as _
 
+from education_group.ddd.domain.exception import common_postponement_consistency_message
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.report import ReportEvent
 from program_management.ddd.business_types import *
@@ -144,3 +146,12 @@ class CannotCopyPrerequisiteAsLearningUnitNotPresent(ReportEvent):
             "copy_year": self.copy_year,
             "training_title": self.training_root_node.full_code_acronym_representation()
         }
+
+
+@attr.s(frozen=True, slots=True)
+class CannotPostponeLinkToNextYearAsConsistencyError(ReportEvent):
+    year = attr.ib(type=int)
+    fields = attr.ib(type=List[str])
+
+    def __str__(self):
+        return common_postponement_consistency_message(self.year, self.fields)

@@ -162,7 +162,7 @@ class TestUpdateGroupPostMethod(TestCase):
 
         self.update_group_patcher = mock.patch(
             "education_group.views.group.update.update_group_service.update_group",
-            return_value=self.group
+            return_value=[self.group]
         )
         self.mocked_update_group = self.update_group_patcher.start()
         self.addCleanup(self.update_group_patcher.stop)

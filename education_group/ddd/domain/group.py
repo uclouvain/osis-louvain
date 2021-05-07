@@ -33,6 +33,7 @@ from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
+from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
@@ -149,25 +150,22 @@ class Group(interface.RootEntity):
     def is_mini_training(self):
         return self.type in MiniTrainingType
 
-    def update(
-            self,
-            abbreviated_title: str,
-            titles: Titles,
-            credits: int,
-            content_constraint: ContentConstraint,
-            management_entity: Entity,
-            teaching_campus: Campus,
-            remark: Remark,
-            end_year: int
-    ):
-        self.abbreviated_title = abbreviated_title.upper()
-        self.titles = titles
-        self.credits = credits
-        self.content_constraint = content_constraint
-        self.management_entity = management_entity
-        self.teaching_campus = teaching_campus
-        self.remark = remark
-        self.end_year = end_year
+    def update(self, cmd: 'UpdateGroupCommand'):
+        self.abbreviated_title = cmd.abbreviated_title.upper()
+        self.titles = Titles(title_fr=cmd.title_fr, title_en=cmd.title_en)
+        self.credits = cmd.credits
+        self.content_constraint = ContentConstraint(
+            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
+            minimum=cmd.min_constraint,
+            maximum=cmd.max_constraint
+        )
+        self.management_entity = Entity(acronym=cmd.management_entity_acronym)
+        self.teaching_campus = Campus(
+            name=cmd.teaching_campus_name,
+            university_name=cmd.organization_name
+        )
+        self.remark = Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en)
+        self.end_year = cmd.end_year
         UpdateGroupValidatorList(self).validate()
         return self
 

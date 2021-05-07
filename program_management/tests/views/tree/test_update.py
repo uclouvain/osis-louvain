@@ -30,6 +30,7 @@ from django.urls import reverse
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.forms.content import LinkForm, ContentFormSet
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -43,7 +44,8 @@ def form_valid_effect(form: LinkForm):
 
 
 def form_save_effect():
-    return [LinkFactory()]
+    cmd = BulkUpdateLinkCommand(working_tree_code='LOSIS1111', working_tree_year=2021, update_link_cmds=[])
+    return cmd, [LinkFactory()]
 
 
 class TestUpdateLinkView(TestCase):

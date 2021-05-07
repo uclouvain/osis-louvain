@@ -65,6 +65,16 @@ class CalculateEndPostponement(interface.DomainService):
         return _calculate_end_postponement(tree_identity, repository)
 
     @classmethod
+    def calculate_end_postponement_year_for_orphan_group(
+            cls,
+            group: 'Group',
+    ):
+        limit = cls.calculate_end_postponement_limit()
+        if group.end_year is None:
+            return limit
+        return min(limit, group.end_year)
+
+    @classmethod
     def calculate_end_postponement_year_program_tree(
             cls,
             identity: 'ProgramTreeIdentity',

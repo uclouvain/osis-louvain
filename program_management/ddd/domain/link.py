@@ -24,12 +24,13 @@
 #
 ##############################################################################
 import copy
-from typing import Dict
+from typing import Dict, List
 
 import attr
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
@@ -42,12 +43,23 @@ class LinkIdentity(interface.EntityIdentity):
     parent_year = attr.ib(type=int)
     child_year = attr.ib(type=int)
 
+    def __str__(self):
+        return "{parent_code} ({verbose_parent_year}) - {child_code} ({verbose_child_year})".format(
+            parent_code=self.parent_code,
+            verbose_parent_year=AcademicYearIdentity.get_verbose_year(self.parent_year),
+            child_code=self.child_code,
+            verbose_child_year=AcademicYearIdentity.get_verbose_year(self.child_year),
+        )
+
+    def get_next_year_link_identity(self) -> 'LinkIdentity':
+        return attr.evolve(self, parent_year=self.parent_year + 1, child_year=self.child_year + 1)
+
 
 @attr.s(slots=True, str=False, hash=False, eq=False)
 class Link(interface.Entity):
 
-    parent = attr.ib(type='Node')
-    child = attr.ib(type='Node')
+    parent = attr.ib(type='Node')  # type: Node
+    child = attr.ib(type='Node')  # type: Node
     pk = attr.ib(type=int, default=None)
     relative_credits = attr.ib(type=int, default=None)
     min_credits = attr.ib(type=int, default=None)
@@ -137,6 +149,19 @@ class Link(interface.Entity):
     def order_down(self):
         self.order += 1
         self._has_changed = True
+
+    def has_same_values_as(self, other_link: 'Link') -> bool:
+        return not bool(self.get_conflicted_fields(other_link))
+
+    def get_conflicted_fields(self, other_link: 'Link') -> List[str]:
+        fields_not_to_compare = ("year", "entity_id", "child", "parent", "pk", "order")
+        conflicted_fields = []
+        for field_name in other_link.__slots__:
+            if field_name in fields_not_to_compare:
+                continue
+            if getattr(self, field_name) != getattr(other_link, field_name):
+                conflicted_fields.append(field_name)
+        return conflicted_fields
 
 
 @attr.s(slots=True, str=False, hash=False, eq=False)

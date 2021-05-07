@@ -35,6 +35,7 @@ from education_group.ddd.service.write import copy_training_service, update_trai
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
+# DO NOT SET @transaction.atomic() because it breaks the update in case of TrainingCopyConsistencyException
 def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrainingAndGroupModificationCommand) \
         -> List['TrainingIdentity']:
     # GIVEN

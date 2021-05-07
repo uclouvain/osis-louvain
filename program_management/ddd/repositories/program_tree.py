@@ -50,10 +50,13 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeIdentity']] = None,
-            root_ids: List[int] = None
+            root_ids: List[int] = None,
+            code: str = None
     ) -> List['ProgramTree']:
         if entity_ids:
             root_ids = _search_root_ids(entity_ids)
+        if code:
+            root_ids = Element.objects.filter(group_year__partial_acronym=code).values_list('pk', flat=True)
         if root_ids:
             return load_tree.load_trees(root_ids)
         return []

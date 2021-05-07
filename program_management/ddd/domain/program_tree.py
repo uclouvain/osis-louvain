@@ -41,7 +41,7 @@ from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.command import DO_NOT_OVERRIDE
+from program_management.ddd.command import DO_NOT_OVERRIDE, UpdateLinkCommand
 from program_management.ddd.domain import exception, report_events
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
@@ -459,7 +459,11 @@ class ProgramTree(interface.RootEntity):
     authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
     prerequisites = attr.ib(type='Prerequisites')
-    report = attr.ib(type=Optional[Report], default=None)
+    report = attr.ib(type=Optional[Report], default=None)  # type: Report
+
+    @property
+    def year(self) -> int:
+        return self.entity_id.year
 
     @prerequisites.default
     def _default_prerequisite(self) -> 'Prerequisites':
@@ -681,6 +685,12 @@ class ProgramTree(interface.RootEntity):
         my_map = self._links_mapped_by_child_and_parent()
         return my_map.get(str(child.entity_id) + str(parent.entity_id))
 
+    def get_link_from_identity(self, link_id: 'LinkIdentity') -> Optional['Link']:
+        return next(
+            filter(lambda link: link.entity_id == link_id, self.get_all_links()),
+            None
+        )
+
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = copy.deepcopy(self.root_node)
         if ignore_children_from:
@@ -830,43 +840,24 @@ class ProgramTree(interface.RootEntity):
                 return False
         return True
 
-    def update_link(
-            self,
-            parent_path: Path,
-            child_id: 'NodeIdentity',
-            relative_credits: int,
-            access_condition: bool,
-            is_mandatory: bool,
-            block: int,
-            link_type: str,
-            comment: str,
-            comment_english: str
-    ) -> 'Link':
+    def update_link(self, cmd: 'UpdateLinkCommand') -> 'Link':
         """
         Update link's attributes between parent_path and child_node
-        :param parent_path: The parent path node
-        :param child_id: The identity of child node
-        :param relative_credits: The link's relative credits
-        :param access_condition: The link's access_condition
-        :param is_mandatory: The link's is_mandatory
-        :param block: The block of link
-        :param link_type: The type of link
-        :param comment: The comment of link
-        :param comment_english: The comment english of link
         :return: Updated link
         """
-        parent_node = self.get_node(parent_path)
+        parent_node = self.get_node_by_code_and_year(cmd.parent_node_code, cmd.parent_node_year)
+        child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
         child_node = parent_node.get_direct_child_as_node(child_id)
 
         link_updated = parent_node.update_link_of_direct_child_node(
             child_id,
-            relative_credits=relative_credits,
-            access_condition=access_condition,
-            is_mandatory=is_mandatory,
-            block=block,
-            link_type=link_type,
-            comment=comment,
-            comment_english=comment_english
+            relative_credits=cmd.relative_credits,
+            access_condition=cmd.access_condition,
+            is_mandatory=cmd.is_mandatory,
+            block=cmd.block,
+            link_type=cmd.link_type,
+            comment=cmd.comment,
+            comment_english=cmd.comment_english
         )
 
         validators_by_business_action.UpdateLinkValidatorList(

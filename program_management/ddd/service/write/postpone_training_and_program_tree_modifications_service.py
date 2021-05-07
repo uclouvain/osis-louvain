@@ -37,6 +37,7 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
     postpone_program_tree_service, update_program_tree_version_end_date_service
 
 
+# DO NOT SET @transaction.atomic() because it breaks the update in case of TrainingCopyConsistencyException
 def postpone_training_and_program_tree_modifications(
         update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['TrainingIdentity']:

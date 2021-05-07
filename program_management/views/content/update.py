@@ -1,3 +1,28 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 import functools
 from typing import List, Dict, Optional
 
@@ -10,17 +35,21 @@ from django.views import View
 
 from base.forms.exceptions import InvalidFormException
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
+    display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.service.read import get_group_service, get_training_service
+from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
+from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.program_tree_version import version_label
+from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
@@ -72,7 +101,10 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if self.content_formset.is_valid():
             try:
-                self.content_formset.save()
+                cmd, updated_links = self.content_formset.save()
+                report = message_bus_instance.invoke(GetReportCommand(from_transaction_id=cmd.transaction_id))
+                if report:
+                    self.display_report_warning(report)
                 success_messages = self.get_success_msg_updated_links()
                 display_success_messages(request, success_messages, extra_tags='safe')
                 check_formations_impacted_by_update(self.get_group_obj().code,
@@ -84,6 +116,9 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
+
+    def display_report_warning(self, report: 'Report') -> None:
+        display_warning_messages(self.request, list({str(warning) for warning in report.get_warnings()}))
 
     def get_success_url(self) -> str:
         get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}

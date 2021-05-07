@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+from collections import Iterable
 
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
@@ -74,7 +75,7 @@ def validate_block_value(value: int):
 
 class GroupElementYearManager(models.Manager):
     def get_adjacency_list(self, root_elements_ids):
-        if not isinstance(root_elements_ids, list):
+        if not isinstance(root_elements_ids, Iterable):
             raise Exception('root_elements_ids must be an instance of list')
         if not root_elements_ids:
             return []

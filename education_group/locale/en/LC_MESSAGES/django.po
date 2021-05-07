@@ -70,6 +70,9 @@ msgstr ""
 msgid "ARES-GRACA"
 msgstr ""
 
+msgid "Abbreviated title"
+msgstr ""
+
 msgid "Ac yr."
 msgstr ""
 

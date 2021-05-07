@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.widgets import CKEditorWidget
-from typing import List
+from typing import List, Tuple
 
 from django import forms
 from django.forms import formset_factory, BaseFormSet
@@ -36,10 +35,10 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
+from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.service.write import bulk_update_link_service, update_link_service
 
 
 class LinkForm(forms.Form):
@@ -99,14 +98,6 @@ class LinkForm(forms.Form):
     def is_a_child_minor_major_option_list_choice(self):
         return self.child_obj.is_minor_major_option_list_choice()
 
-    def save(self):
-        if self.is_valid():
-            try:
-                return update_link_service.update_link(self.generate_update_link_command())
-            except MultipleBusinessExceptions as e:
-                self.handle_save_exception(e)
-        raise InvalidFormException()
-
     def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
         return command.UpdateLinkCommand(
             child_node_code=self.child_obj.code,
@@ -122,7 +113,10 @@ class LinkForm(forms.Form):
             parent_node_year=self.parent_obj.year
         )
 
-    def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
+    def handle_save_exception(
+            self,
+            business_exceptions: 'MultipleBusinessExceptions'
+    ):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
                     isinstance(e, exception.ChildTypeNotAuthorizedException) or\
@@ -137,16 +131,18 @@ class LinkForm(forms.Form):
 
 
 class BaseContentFormSet(BaseFormSet):
+
     def get_form_kwargs(self, index):
         if self.form_kwargs:
             return self.form_kwargs[index]
         return {}
 
-    def save(self) -> List['Link']:
+    def save(self) -> Tuple[command.BulkUpdateLinkCommand, List['Link']]:
         if self.is_valid():
             try:
                 cmd = self.generate_bulk_update_link_command()
-                return bulk_update_link_service.bulk_update_links(cmd)
+                updated_links = message_bus_instance.invoke(cmd)
+                return cmd, updated_links
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
                 for form in self.forms:
                     if e.exceptions.get(form.generate_update_link_command()):
@@ -159,8 +155,8 @@ class BaseContentFormSet(BaseFormSet):
         update_link_commands = [form.generate_update_link_command() for form in changed_forms]
 
         bulk_command = command.BulkUpdateLinkCommand(
-            parent_node_year=self.forms[0].parent_obj.year,
-            parent_node_code=self.forms[0].parent_obj.code,
+            working_tree_year=self.forms[0].parent_obj.year,
+            working_tree_code=self.forms[0].parent_obj.code,
             update_link_cmds=update_link_commands
         )
         return bulk_command

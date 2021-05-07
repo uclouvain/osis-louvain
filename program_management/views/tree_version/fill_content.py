@@ -36,8 +36,10 @@ from base.models.enums import education_group_categories
 from base.views.common import display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
+from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
+from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.report import Report
@@ -66,7 +68,7 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
     def form_valid(self, form: 'FillTransitionContentForm'):
         try:
             transaction_id = form.save()
-            report = get_report_service.get_report(command.GetReportCommand(from_transaction_id=transaction_id))
+            report = message_bus_instance.invoke(GetReportCommand(from_transaction_id=transaction_id))
             if report:
                 self.display_report_warning(report)
             return super().form_valid(form)

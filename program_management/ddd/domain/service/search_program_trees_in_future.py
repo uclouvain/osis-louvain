@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,34 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
-import attr
+from typing import List
 
 from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 
 
-@attr.s(frozen=True, slots=True)
-class AcademicYearIdentity(interface.EntityIdentity):
-    year = attr.ib(type=int)
+class SearchProgramTreesInFuture(interface.DomainService):
 
-    def __str__(self):
-        return self.get_verbose_year(self.year)
-
-    @staticmethod
-    def get_verbose_year(year: int) -> str:
-        return u"%s-%s" % (year, str(year + 1)[-2:])
-
-
-@attr.s(slots=True, hash=False, eq=False)
-class AcademicYear(interface.RootEntity):
-    entity_id = attr.ib(type=AcademicYearIdentity)
-    start_date = attr.ib(type=datetime.date)
-    end_date = attr.ib(type=datetime.date)
-
-    def __str__(self):
-        return str(self.entity_id)
-
-    @property
-    def year(self) -> int:
-        return self.entity_id.year
+    @classmethod
+    def search(
+            cls,
+            working_tree_identity: 'ProgramTreeIdentity',
+            trees_through_years: List['ProgramTree']
+    ) -> List['ProgramTree']:
+        working_year = working_tree_identity.year
+        ordered_trees_in_future = list(
+            sorted(
+                filter(
+                    lambda t: t.year > working_year and t.entity_id.code == working_tree_identity.code,
+                    trees_through_years
+                ),
+                key=lambda t: t.year
+            )
+        )  # type: List['ProgramTree']
+        return ordered_trees_in_future

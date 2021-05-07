@@ -183,6 +183,9 @@ class NodeIdentity(interface.EntityIdentity):
     code = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
 
+    def get_next_year_node_identity(self) -> 'NodeIdentity':
+        return attr.evolve(self, year=self.year + 1)
+
 
 @attr.s(slots=True, eq=False, hash=False)
 class Node(interface.Entity):

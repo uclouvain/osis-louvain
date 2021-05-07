@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -157,7 +158,9 @@ class TestCreateProgramTreeVersion(TestCase):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
             create_program_tree_specific_version_service.create_program_tree_specific_version(self.command)
 
-    def test_assert_tree_version_correctly_created(self):
+    @patch("base.business.academic_calendar.AcademicEventCalendarHelper.get_target_years_opened")
+    def test_assert_tree_version_correctly_created(self, mock_calendar):
+        mock_calendar.return_value = [self.current_year]
         self._create_standard_version()
 
         identity = create_program_tree_specific_version_service.create_program_tree_specific_version(self.command)

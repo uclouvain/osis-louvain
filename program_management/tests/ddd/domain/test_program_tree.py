@@ -36,6 +36,7 @@ from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.domain import node, exception
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree
@@ -795,22 +796,25 @@ class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
 
 class TestUpdateLink(SimpleTestCase):
     def setUp(self) -> None:
-        self.tree = ProgramTreeFactory()
+        self.tree = ProgramTreeFactory()  # type: ProgramTree
         self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
 
     @mock.patch('program_management.ddd.domain.program_tree.validators_by_business_action.UpdateLinkValidatorList')
     def test_assert_validator_called(self, mock_update_link_validator_list):
-        result = self.tree.update_link(
-            str(self.tree.root_node.pk),
-            child_id=self.link1.child.entity_id,
-            relative_credits=1,
+        cmd = UpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=self.link1.child.entity_id.code,
+            child_node_year=self.link1.child.entity_id.year,
             access_condition=False,
             is_mandatory=True,
             block=123,
             link_type=None,
             comment="Comment",
-            comment_english="Comment english"
+            comment_english="Comment english",
+            relative_credits=1,
         )
+        result = self.tree.update_link(cmd)
         self.assertTrue(mock_update_link_validator_list.called)
         self.assertIsInstance(result, Link)
 

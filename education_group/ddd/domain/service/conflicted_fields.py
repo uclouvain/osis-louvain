@@ -29,6 +29,7 @@ from typing import Dict, List
 
 import attr
 
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from education_group.ddd.domain.exception import GroupNotFoundException, TrainingNotFoundException, \
     MiniTrainingNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
@@ -36,6 +37,10 @@ from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from osis_common.ddd import interface
+from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
+from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 Year = int
 FieldLabel = str
@@ -119,3 +124,19 @@ class ConflictedFields(interface.DomainService):
                 break
             current_training = next_year_training
         return conflicted_aims
+
+    @classmethod
+    def get_conflicted_links(
+            cls,
+            updated_link: 'Link',
+            ordered_trees_in_future: List['ProgramTree']
+    ) -> Dict[Year, List[FieldLabel]]:
+        conflicted_fields = {}
+        current_link = updated_link
+        for next_year_tree in ordered_trees_in_future:
+            next_year_link_identity = current_link.entity_id.get_next_year_link_identity()
+            next_year_link = next_year_tree.get_link_from_identity(next_year_link_identity)
+            if not current_link.has_same_values_as(next_year_link):
+                conflicted_fields[next_year_tree.year] = current_link.get_conflicted_fields(next_year_link)
+            current_link = next_year_link
+        return conflicted_fields
