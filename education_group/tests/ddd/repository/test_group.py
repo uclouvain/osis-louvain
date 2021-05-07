@@ -40,7 +40,7 @@ from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFound, ManagementEntityNotFound, \
-    TeachingCampusNotFound, CodeAlreadyExistException, MultipleEntitiesFoundException
+    TeachingCampusNotFound, CodeAlreadyExistException
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.factories.group import GroupFactory
 from education_group.ddd.repository.group import GroupRepository

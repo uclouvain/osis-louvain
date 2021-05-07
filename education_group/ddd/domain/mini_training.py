@@ -38,7 +38,6 @@ from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.validators import validators_by_business_action
-from education_group.ddd.validators.validators_by_business_action import CopyMiniTrainingValidatorList
 from osis_common.ddd import interface
 from program_management.ddd.domain.academic_year import AcademicYear
 

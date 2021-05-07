@@ -176,8 +176,10 @@ def __instanciate_learning_unit_year(
             classes_count=learning_unit_data.pp_classes,
         ),
         achievements=achievements,
-        entities=Entities(requirement_entity_acronym=learning_unit_data.requirement_entity_acronym,
-                          allocation_entity_acronym=learning_unit_data.allocation_entity_acronym),
+        entities=Entities(
+            requirement_entity_acronym=learning_unit_data.requirement_entity.most_recent_acronym,
+            allocation_entity_acronym=learning_unit_data.allocation_entity.most_recent_acronym,
+        ),
         description_fiche=description_fiche,
         force_majeure=force_majeure,
         specifications=specifications,

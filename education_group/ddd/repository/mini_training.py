@@ -26,10 +26,8 @@ from typing import Optional, List
 
 from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, ProtectedError
-from django.utils import timezone
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
-from base.models.campus import Campus as CampusModelDb
 from base.models.education_group import EducationGroup as EducationGroupModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
@@ -39,7 +37,6 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
-from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
