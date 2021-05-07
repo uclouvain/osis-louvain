@@ -365,16 +365,5 @@
                 ]
             ]
         }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "partnership_viewers",
-            "permissions": [
-                ["can_access_partnerships","partnership","partnership"],
-                ["can_access_partners","partnership","partner"],
-                ["can_access_partnerships_agreements", "partnership", "partnershipagreement"]
-            ]
-        }
     }
 ]
