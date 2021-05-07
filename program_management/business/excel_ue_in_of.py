@@ -35,9 +35,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
-from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from attribution.ddd.domain.teacher import Teacher
-from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
@@ -49,7 +47,9 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.excel import get_html_to_text
+from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
+from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -149,7 +149,7 @@ SpecificationsCols = namedtuple(
         'achievements_fr', 'achievements_en'
     ]
 )
-FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Direct gathering'), _('Main gathering'),
+FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Gathering'), _('Training'),
               _('Block'), _('Mandatory')]
 
 FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title', 'type', 'subtype', 'gathering',

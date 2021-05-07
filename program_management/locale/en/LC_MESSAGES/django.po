@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-04 09:51+0200\n"
+"POT-Creation-Date: 2021-05-07 12:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,9 +255,6 @@ msgstr ""
 msgid "Diplomas /  Certificates"
 msgstr ""
 
-msgid "Direct gathering"
-msgstr ""
-
 msgid "Dissertation"
 msgstr ""
 
@@ -353,6 +350,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "General informations"
@@ -521,9 +521,6 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 msgid "Made in"
-msgstr ""
-
-msgid "Main gathering"
 msgstr ""
 
 msgid "Manag. ent."
