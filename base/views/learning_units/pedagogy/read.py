@@ -66,8 +66,8 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
 
     user_language = mdl.person.get_user_interface_language(request.user)
 
-    cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year_id, user_language)
-    cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year_id, user_language)
+    cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year.id, user_language)
+    cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year.id, user_language)
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
     attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
         "tutor__person"
