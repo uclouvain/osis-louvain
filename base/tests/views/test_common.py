@@ -28,11 +28,12 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase, SimpleTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from base.views.common import home, _build_attention_message
+from base.views.common import home, _build_attention_message, studies
+from dissertation.tests.factories.adviser import AdviserTeacherFactory
 from osis_common.tests.factories.application_notice import ApplicationNoticeFactory
 
 
@@ -90,3 +91,20 @@ class TestBuildAttentionMessage(SimpleTestCase):
             _build_attention_message(None),
             "Attention cette unité d'enseignement fait partie de plusieurs formations :"
         )
+
+
+class TestCommonStudiesViewDissertationLink(TestCase):
+    def setUp(self):
+        self.url = reverse(studies)
+        person = PersonWithPermissionsFactory("can_access_student_path")
+        self.user = person.user
+        self.client.force_login(self.user)
+
+    def test_user_cannot_see_dissertation_link(self):
+        response = self.client.get(self.url)
+        self.assertFalse(response.context['show_dissertation_link'])
+
+    def test_user_can_see_dissertation_link(self):
+        AdviserTeacherFactory(person__user=self.user)
+        response = self.client.get(self.url)
+        self.assertTrue(response.context['show_dissertation_link'])
